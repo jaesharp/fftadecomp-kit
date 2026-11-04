@@ -3771,6 +3771,38 @@
           "who": "sol-0802c5c8-471"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "060f4ee752d623a7cde290f04799e84a90d799c4939f211d8044ff8cd863f90d",
+        "acknowledged_cursor": 6627805530,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "060f4ee752d623a7cde290f04799e84a90d799c4939f211d8044ff8cd863f90d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802C5C8\",\"who\":\"sol-0802c5c8-474\",\"note\":\"Retry exact frozen 92 byte source after published literal verifier API fix; previous lease released, no new source steering\"}",
+          "created_at": "2026-11-04T09:51:00Z",
+          "id": 6627805530,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T09:51:00Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5a5028353e0172a58e24a38e72e37c023714afd3110eeca3d4da63b1264ec6c9",
+        "result": {
+          "address": "0x0802C5C8",
+          "claim_id": 6627805530,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6627805530,
+          "status": "accepted",
+          "who": "sol-0802c5c8-474"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
