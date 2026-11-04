@@ -3771,6 +3771,38 @@
           "who": "sol-C7E68"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "daa539444948cf58ca33096451da71932447cd2ad0a0f9d9ebeac14a64ade141",
+        "acknowledged_cursor": 6621521225,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "daa539444948cf58ca33096451da71932447cd2ad0a0f9d9ebeac14a64ade141",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7DEC\",\"who\":\"sol-C7DEC\",\"note\":\"Qualified exact76B count traversal from saved14B plus single62B reached continuation; paired owner repair14B7instr to76B37instr staged privately. Fresh Sol author in ISO2 only, excluded ongoing274.\"}",
+          "created_at": "2026-11-04T03:13:08Z",
+          "id": 6621521225,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T03:13:08Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a93e4c00ca13a37f09578fab3add7070438353effa593961c31be1034e45f10a",
+        "result": {
+          "address": "0x080C7DEC",
+          "claim_id": 6621521225,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6621521225,
+          "status": "accepted",
+          "who": "sol-C7DEC"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
