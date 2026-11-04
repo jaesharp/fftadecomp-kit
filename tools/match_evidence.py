@@ -153,6 +153,37 @@ def data_snapshot(root):
         return None
 
 
+COMPILER_MARKER = "* compiler: "
+
+
+def compiler_flags(report):
+    """The optimisation flags a saved report was produced with.
+
+    The report records the compiler and the flags it ran with.  A function
+    that only reproduces at another optimisation level has to be re-verified
+    with the level it was matched at, not with the default one, so the
+    flags travel with the report.
+
+    Returns the trailing run of option words, or None when the report names
+    no flags.
+    """
+    for line in report.splitlines():
+        if not line.startswith(COMPILER_MARKER):
+            continue
+        text = line[len(COMPILER_MARKER):].strip()
+        if text.startswith("`") and text.endswith("`"):
+            text = text[1:-1].strip()
+        tokens = text.split()
+        flags = []
+        for token in reversed(tokens):
+            if token.startswith("-"):
+                flags.insert(0, token)
+            else:
+                break
+        return " ".join(flags) if flags else None
+    return None
+
+
 def source_paths(root, address):
     root = Path(root)
     paths = {q for q in (root / "src").rglob(f"{address:08X}.c")}

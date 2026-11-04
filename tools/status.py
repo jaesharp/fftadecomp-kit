@@ -37,7 +37,7 @@ import re
 import subprocess
 import sys
 from threading import Lock
-from match_evidence import report_matches
+from match_evidence import report_matches, compiler_flags
 import inert_spin_profile as inert_spin
 import software_double_profile as software_double
 import function_thunk_profile as function_thunk
@@ -235,6 +235,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
         ok = False
         report = None
         rep = os.path.join(root, "docs", "match", f"{addr}.md")
+        saved_flags = None
         spin_profile = False
         double_profile = False
         target_remainder_profile = False
@@ -264,6 +265,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 thunk_profile = function_thunk.selected(saved_report)
                 spin_profile = inert_spin.selected(saved_report)
                 quotient_frame = f"* verification: `{divsi3.FRAMED_SCHEMA}`" in saved_report.splitlines()
+                saved_flags = compiler_flags(saved_report)
             except ValueError as error:
                 problems.append(f"{addr}: {error}")
                 return 0, 0, problems, []
@@ -310,6 +312,8 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command += ["--addressed-signed-runtime-profile", addressed_runtime_profile]
             if quotient_frame:
                 command += ["--signed-quotient-profile", divsi3.FRAMED_SELECTOR]
+            if saved_flags is not None:
+                command += ["--flags", saved_flags]
             if not write_reports:
                 command.append("--no-write")
             result = subprocess.run(command, capture_output=True, text=True)
