@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "60f2f82ea13d0a59883076d26fd036f47d13803ef873a316efcfad08874d538d",
-        "acknowledged_cursor": 6635043824,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "60f2f82ea13d0a59883076d26fd036f47d13803ef873a316efcfad08874d538d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808B58C\",\"who\":\"sol-0808B58C-704\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-04T15:44:35Z",
-          "id": 6635043721,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T15:44:35Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "206f686f3782b14020c7e1bc5e532cdb99d72bce8e398bec42795c166bdebcb7",
-        "result": {
-          "address": "0x0808B58C",
-          "claim_id": 6635043721,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6635043721,
-          "status": "accepted",
-          "who": "sol-0808B58C-704"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "80d3fd3a87b04d66bc0364a6b4e10cb43c32cb5cf8c3f3c91af07d9d5d207262",
-        "acknowledged_cursor": 6635251510,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "80d3fd3a87b04d66bc0364a6b4e10cb43c32cb5cf8c3f3c91af07d9d5d207262",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808B58C\",\"who\":\"sol-0808B58C-704\",\"claim_id\":6635043721,\"reason\":\"Eleven original natural C forms, including two complete224-byte bodies, retain distinct packed-dimension load/dataflow residual, no MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-04T15:53:18Z",
-          "id": 6635248289,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T15:53:18Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "18d70899383e768d67ad14134bc05f12a6bdd98b003e5705e0c77a2120a624ba",
-        "result": {
-          "address": "0x0808B58C",
-          "claim_id": 6635043721,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6635248289,
-          "status": "accepted",
-          "who": "sol-0808B58C-704"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "ca3fe76879facaf05c63cd63b316782653923aa5431747e42b4c9b136049f3a1",
         "acknowledged_cursor": 6635124374,
         "body_provenance": "acceptance-time",
@@ -3803,66 +3743,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "1058b25d212cb235e30f06a9c64bbd67413865ce0fce237969632fae9ac62c8e",
-        "acknowledged_cursor": 6635124374,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1058b25d212cb235e30f06a9c64bbd67413865ce0fce237969632fae9ac62c8e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080503E4\",\"who\":\"sol-080503E4-706\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-04T15:47:55Z",
-          "id": 6635124320,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T15:47:55Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "6cdc9f0de898bf538c67bbf97c438e38b5cf8d75b7a55f1ec688501a021e5368",
-        "result": {
-          "address": "0x080503E4",
-          "claim_id": 6635124320,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6635124320,
-          "status": "accepted",
-          "who": "sol-080503E4-706"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "c423ea614b8f44c47370decf50618ed453a5626edcb23f2ba5aa68e2b032e676",
-        "acknowledged_cursor": 6635251510,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c423ea614b8f44c47370decf50618ed453a5626edcb23f2ba5aa68e2b032e676",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080503E4\",\"who\":\"sol-080503E4-706\",\"claim_id\":6635124320,\"reason\":\"Complete natural C match,216 bytes; third original default native succeeds with genuine signed coordinate interface and reverse address cursor, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-04T15:53:18Z",
-          "id": 6635248360,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T15:53:18Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "18d70899383e768d67ad14134bc05f12a6bdd98b003e5705e0c77a2120a624ba",
-        "result": {
-          "address": "0x080503E4",
-          "claim_id": 6635124320,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6635248360,
-          "status": "accepted",
-          "who": "sol-080503E4-706"
-        }
-      }
     },
     {
       "claim": {
