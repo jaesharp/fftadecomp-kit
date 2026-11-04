@@ -3743,6 +3743,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "9f3cd83749478a2fc0def84219622c1a8d75735cae8bb9483b7711c4cfd9042e",
+        "acknowledged_cursor": 6620346123,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9f3cd83749478a2fc0def84219622c1a8d75735cae8bb9483b7711c4cfd9042e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805E798\",\"who\":\"sol-E798r2\",\"note\":\"Resume genuine source matching from saved original204B/15byte difference. Preserve unchanged first Parked attempt, new evidence-grounded C hypotheses only, stop first MATCH, ISO-only.\"}",
+          "created_at": "2026-11-04T01:49:57Z",
+          "id": 6620346123,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T01:49:57Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8809eb75e49a193e55aea5121676ca1f65a799b4a2b146bb1867facd562d472d",
+        "result": {
+          "address": "0x0805E798",
+          "claim_id": 6620346123,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6620346123,
+          "status": "accepted",
+          "who": "sol-E798r2"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
