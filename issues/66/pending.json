@@ -3802,7 +3802,35 @@
           "who": "sol-0802c5c8-474"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "06ad23cf9294cd78dae9a69439fd78599a85f5a6d437c9f0a39e63074b9446ba",
+        "acknowledged_cursor": 6627872774,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "06ad23cf9294cd78dae9a69439fd78599a85f5a6d437c9f0a39e63074b9446ba",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802C5C8\",\"who\":\"sol-0802c5c8-474\",\"claim_id\":6627805530,\"reason\":\"Native MATCH complete92B plausible source after published verifier fix; fully stopped, exact source and report frozen for parent publication\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T09:55:05Z",
+          "id": 6627872774,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T09:55:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a4eec392bb941762746731af31d16128ad1f51456c743aaaf8b6069606e8075c",
+        "result": {
+          "address": "0x0802C5C8",
+          "claim_id": 6627805530,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6627872774,
+          "status": "accepted",
+          "who": "sol-0802c5c8-474"
+        }
+      }
     }
   ],
   "issue": 66,
