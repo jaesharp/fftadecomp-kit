@@ -3774,7 +3774,35 @@
           "who": "sol-08063904-770"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7e874c97e2ab2e2bc206a040e93610faf4b7a3005d1960b43cc639e04e7745aa",
+        "acknowledged_cursor": 6636784117,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7e874c97e2ab2e2bc206a040e93610faf4b7a3005d1960b43cc639e04e7745aa",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08063904\",\"who\":\"sol-08063904-770\",\"claim_id\":6636511423,\"reason\":\"Complete440B plausible C native MATCH0 on ninth original form. Genuine history branch-sequence tail sharing; original proof and166 input readback frozen, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T17:01:29Z",
+          "id": 6636784117,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T17:01:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ba3acbcd9569428affe75c11a77e062387b967856a415be3a2a0c39651cef83a",
+        "result": {
+          "address": "0x08063904",
+          "claim_id": 6636511423,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6636784117,
+          "status": "accepted",
+          "who": "sol-08063904-770"
+        }
+      }
     },
     {
       "claim": {
