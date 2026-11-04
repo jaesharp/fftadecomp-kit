@@ -3743,6 +3743,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "f83649518cf2f76dc31449db48a1e24f7ec32a3313deef54c3128dc30642f1d6",
+        "acknowledged_cursor": 6622806492,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f83649518cf2f76dc31449db48a1e24f7ec32a3313deef54c3128dc30642f1d6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7DC8\",\"who\":\"sol-DC8\",\"note\":\"Actual34B/15decoded postorder free qualified294. Published306 entryrecursive owner route; Sol original typedELF/native inISO1, no maprepair required.\"}",
+          "created_at": "2026-11-04T04:46:21Z",
+          "id": 6622806492,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T04:46:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c5c3a1ff3ef20b96c6a58cc84f95331bb43da8ca3f8f7c72aae41ddac65112e2",
+        "result": {
+          "address": "0x080C7DC8",
+          "claim_id": 6622806492,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6622806492,
+          "status": "accepted",
+          "who": "sol-DC8"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
