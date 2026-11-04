@@ -3898,7 +3898,35 @@
           "who": "sol-0801439c-364"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8d362c2c303426fe2969f86df232a6499731bddea002a0ef5ef559952cd4515a",
+        "acknowledged_cursor": 6624587515,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8d362c2c303426fe2969f86df232a6499731bddea002a0ef5ef559952cd4515a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801439C\",\"who\":\"sol-0801439c-364\",\"claim_id\":6624507204,\"reason\":\"Original first natural C form matched full owner byte-for-byte with native plausible report; compiler stopped, exact source and original artifacts frozen for parent publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T06:49:58Z",
+          "id": 6624587515,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T06:49:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6fb9368529d2fc141fbe7091d4130a48d1f8b0d25fcba6ff50e323b95a751af5",
+        "result": {
+          "address": "0x0801439C",
+          "claim_id": 6624507204,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6624587515,
+          "status": "accepted",
+          "who": "sol-0801439c-364"
+        }
+      }
     }
   ],
   "issue": 66,
