@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "d74612a34baf4b8e87f86319a540d7b50563b736b8e106a637929e7e302fdede",
-        "acknowledged_cursor": 6620336683,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d74612a34baf4b8e87f86319a540d7b50563b736b8e106a637929e7e302fdede",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08066048\",\"who\":\"sol-6048r2\",\"note\":\"Resume genuine source matching from retained original204B/4byte difference. Prior attempt remains immutable Parked; new evidence-grounded C hypotheses only, stop at first MATCH; ISO-only.\"}",
-          "created_at": "2026-11-04T01:49:17Z",
-          "id": 6620336683,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T01:49:17Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c95d55781f2570eeed4573ba7841b8284af89a52f42d5c59c9e2a8974bd55466",
-        "result": {
-          "address": "0x08066048",
-          "claim_id": 6620336683,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6620336683,
-          "status": "accepted",
-          "who": "sol-6048r2"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "c674f12d160b489010a726f4081a09bcd076a243a04230b8c661503c7c060907",
-        "acknowledged_cursor": 6620467477,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c674f12d160b489010a726f4081a09bcd076a243a04230b8c661503c7c060907",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08066048\",\"who\":\"sol-6048r2\",\"claim_id\":6620336683,\"reason\":\"Natural revised source native MATCH complete204B frozen; all compiler/native work stopped, original failed Parked artifacts preserved unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-04T01:58:27Z",
-          "id": 6620467477,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T01:58:27Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "88024ef3abffb73a6125f6090f5d4b5d0e42e72cff966358b8bc15e3c7eb93a7",
-        "result": {
-          "address": "0x08066048",
-          "claim_id": 6620336683,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6620467477,
-          "status": "accepted",
-          "who": "sol-6048r2"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c880df7c37108b2aee0f7dbf06dc3dbae21c164361c775d56cb1e9b77d64b046",
         "acknowledged_cursor": 6620664350,
         "body_provenance": "acceptance-time",
