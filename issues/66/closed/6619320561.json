@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "c91980e49e2ab9e3d85f474460b5cea6cc751c1abed2ca7226a308d241417e10",
+    "acknowledged_cursor": 6619320600,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "c91980e49e2ab9e3d85f474460b5cea6cc751c1abed2ca7226a308d241417e10",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08013794\",\"who\":\"opencode-w5\",\"note\":\"hand-match batch1\"}",
+      "created_at": "2026-11-04T00:41:51Z",
+      "id": 6619320561,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T00:41:51Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "3f7fcb981bd66c1741c58bd40fa8984a37beba6339c13dc6ecc5b28cca17d877",
+    "result": {
+      "address": "0x08013794",
+      "claim_id": 6619320561,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6619320561,
+      "status": "accepted",
+      "who": "opencode-w5"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "67f0a3a784c1feaa69b6d11f1f6bef1e13cc37ad1799a95edd24eebbe5f5557c",
+    "acknowledged_cursor": 6620119567,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "67f0a3a784c1feaa69b6d11f1f6bef1e13cc37ad1799a95edd24eebbe5f5557c",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08013794\",\"who\":\"opencode-w5\",\"claim_id\":6619320561,\"reason\":\"Exact stopped OpenCode broker generation confirmed in session manifest; all original evidence preserved, author no longer working.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T01:34:30Z",
+      "id": 6620119567,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:34:30Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "46553b07c4622a2c52749c51ffde732f39c9806b5ad4b4cfaa08256f89afa64f",
+    "result": {
+      "address": "0x08013794",
+      "claim_id": 6619320561,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6620119567,
+      "status": "accepted",
+      "who": "opencode-w5"
+    }
+  }
+}
