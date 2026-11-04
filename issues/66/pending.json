@@ -3771,6 +3771,38 @@
           "who": "sol-C7BC8"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "70eab954bf0a5c11d775bd3c68e4fcd628f145adecc86c280dd7c1bb9d924c95",
+        "acknowledged_cursor": 6622799158,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "70eab954bf0a5c11d775bd3c68e4fcd628f145adecc86c280dd7c1bb9d924c95",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7E94\",\"who\":\"sol-E94\",\"note\":\"Actual14B/7instr leaf callback qualified309, new unique pairedowner addition excludes external2fill; Sol original DEFAULTnative inISO2 afteracceptedlease.\"}",
+          "created_at": "2026-11-04T04:45:49Z",
+          "id": 6622799158,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T04:45:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b24d9c09cdec3373736dd16e1f44b681d2c2f9cb06688adfa92a3d5ba8d0de3f",
+        "result": {
+          "address": "0x080C7E94",
+          "claim_id": 6622799158,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6622799158,
+          "status": "accepted",
+          "who": "sol-E94"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
