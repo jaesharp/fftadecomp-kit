@@ -3774,7 +3774,35 @@
           "who": "sol-08017380-541"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5dacdcf4951bfbefeb919a84a3aeb71895a5e8e1c990832be65eacebba68307c",
+        "acknowledged_cursor": 6629670070,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5dacdcf4951bfbefeb919a84a3aeb71895a5e8e1c990832be65eacebba68307c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08017380\",\"who\":\"sol-08017380-541\",\"claim_id\":6629537436,\"reason\":\"Six natural C forms stopped: complete164B forms retain rounding/register allocation gap; no grounded source correction remains.\",\"unmatchable\":true,\"tried\":\"Six distinct natural rounding/dataflow forms; native nonmatches preserved; old Parked unchanged.\"}",
+          "created_at": "2026-11-04T11:41:27Z",
+          "id": 6629670070,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:41:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1145ee53a95ba15d39e137c539ecdc2dd91a03d16fa0b3cfbd8ce02fd66aa6c3",
+        "result": {
+          "address": "0x08017380",
+          "claim_id": 6629537436,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6629670070,
+          "status": "accepted",
+          "who": "sol-08017380-541"
+        }
+      }
     },
     {
       "claim": {
