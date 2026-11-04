@@ -3834,7 +3834,35 @@
           "who": "sol-0804A4CC-772"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3cd119ead19df4c12fcca5e0bf8c4ea06a4bc60de8da387fc02afd969bf4cccb",
+        "acknowledged_cursor": 6636823914,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3cd119ead19df4c12fcca5e0bf8c4ea06a4bc60de8da387fc02afd969bf4cccb",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0804A4CC\",\"who\":\"sol-0804A4CC-772\",\"claim_id\":6636521865,\"reason\":\"Thirteen distinct original natural C/native attempts, all exit1. Best new full484B plausible form427 aligned bytes; historical441-byte comparison remains stronger and unchanged. Final166 pins unchanged, originals frozen.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T17:03:11Z",
+          "id": 6636823914,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T17:03:11Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a72862da39054957b5bbb307c41f0d005bd5b73e2dc519f08d2b4882eac02f70",
+        "result": {
+          "address": "0x0804A4CC",
+          "claim_id": 6636521865,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6636823914,
+          "status": "accepted",
+          "who": "sol-0804A4CC-772"
+        }
+      }
     },
     {
       "claim": {
