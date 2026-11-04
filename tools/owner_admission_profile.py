@@ -389,12 +389,15 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
         raise ValueError('owner requires original relocatable ELF')
     match.allocated_text_only(image)
     symbol,offset=match.function_record(image,f'func_{address:08X}',address,True)
-    if offset or symbol['size']!=len(image['text']) or any(
+    size=symbol['size']
+    external_alignment=(selector==named_buffer.SELECTOR and size%4==2 and
+                        len(image['text'])==size+2 and image['text'][size:]==b'\xc0\x46')
+    if offset or (size!=len(image['text']) and not external_alignment) or any(
             item['type']==2 and item is not symbol and item['section'] or
             item['type']==1 and item['section'] or re.fullmatch(r'\$a(?:\..*)?',item['name'])
             for item in image['symbols']):
         raise ValueError('owner requires sole complete Thumb ELF function')
-    size=symbol['size']; entries=json.loads(mapping); names=match.parse_data_symbols(objects)
+    entries=json.loads(mapping); names=match.parse_data_symbols(objects)
     result={'calls':[],'data':[],'functions':[],'switches':[]}; targets={}; occupied=set()
     decoder=match.Cs(match.CS_ARCH_ARM,match.CS_MODE_THUMB);decoder.detail=True
     for section_index in image['relocations']:
@@ -487,8 +490,9 @@ def object_bytes(runner,workspace,args,original,address,rom,mapping,objects, *, 
         return entry.linked_bytes(original,linked,address,rom,mapping,index,bindings,targets),bindings
     match.allocated_text_only(linked)
     record,offset=match.function_record(linked,f'func_{address:08X}',address,True)
+    original_record,_=match.function_record(original,f'func_{address:08X}',address,True)
     if linked['type']!=2 or offset or linked['relocations'] or \
-            record['size']!=len(original['text']) or len(linked['text'])!=len(original['text']):
+            record['size']!=original_record['size'] or len(linked['text'])!=len(original['text']):
         raise ValueError('linker altered complete owner extent or retained relocations')
     expected=bytearray(original['text']);decoder=match.Cs(match.CS_ARCH_ARM,match.CS_MODE_THUMB);decoder.detail=True
     for site,name in bindings['calls']:
@@ -502,7 +506,7 @@ def object_bytes(runner,workspace,args,original,address,rom,mapping,objects, *, 
     for site,name in bindings['functions']:struct.pack_into('<I',expected,site,targets[name][0]|1)
     if bytes(expected)!=linked['text']:
         raise ValueError('linker changed bytes outside exact original relocations')
-    return linked['text'],bindings
+    return linked['text'][:record['size']],bindings
 
 
 def fingerprint(address,data,manifest,source,mapping,index,objects,rom,original_elf=None):
