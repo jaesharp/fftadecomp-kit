@@ -3742,7 +3742,35 @@
           "who": "sol-0809C9E8-526"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "49da8d33bf59ee4fb44510b884f59e8b1fdc3682c5b5b7279f7136bc6066206c",
+        "acknowledged_cursor": 6629120203,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "49da8d33bf59ee4fb44510b884f59e8b1fdc3682c5b5b7279f7136bc6066206c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809C9E8\",\"who\":\"sol-0809C9E8-526\",\"claim_id\":6629051086,\"reason\":\"Fully stopped first natural source and first original restoring-owner-acyclic-v1 native: plausible MATCH, complete268B ELF, genuine report and original artifacts retained for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T11:09:57Z",
+          "id": 6629120203,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:09:57Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "05b42b4598f3e6d77f473c664a241f25e714b8d8658f2c78048c08b8b1719ae7",
+        "result": {
+          "address": "0x0809C9E8",
+          "claim_id": 6629051086,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6629120203,
+          "status": "accepted",
+          "who": "sol-0809C9E8-526"
+        }
+      }
     }
   ],
   "issue": 66,
