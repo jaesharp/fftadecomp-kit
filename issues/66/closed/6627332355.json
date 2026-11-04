@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "020d4d32837d6e906cbc9221d4437f3b38f6e219f8e2a85d48b48f2b6d933dad",
+    "acknowledged_cursor": 6627332355,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "020d4d32837d6e906cbc9221d4437f3b38f6e219f8e2a85d48b48f2b6d933dad",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802C5C8\",\"who\":\"sol-0802c5c8-465\",\"note\":\"Natural C matching from complete qualified owner with published current source verification\"}",
+      "created_at": "2026-11-04T09:23:59Z",
+      "id": 6627332355,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T09:23:59Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "25094f14046a9adb0176ec943e32b997b3702ef153b26481f19e9b53f58b0028",
+    "result": {
+      "address": "0x0802C5C8",
+      "claim_id": 6627332355,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6627332355,
+      "status": "accepted",
+      "who": "sol-0802c5c8-465"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "894c6cc0614879b5b667fb2e7e08fce6ea98b94df21c7586c5eeae66278cbed4",
+    "acknowledged_cursor": 6627436176,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "894c6cc0614879b5b667fb2e7e08fce6ea98b94df21c7586c5eeae66278cbed4",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802C5C8\",\"who\":\"sol-0802c5c8-465\",\"claim_id\":6627332355,\"reason\":\"Stopped one natural form after original native span refusal before report; all original compiler artifacts preserved privately\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
+      "created_at": "2026-11-04T09:29:19Z",
+      "id": 6627436176,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T09:29:19Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "cd680a599ff404c831308e13b863c39c7c0b23061a9f32635c325ab842de3130",
+    "result": {
+      "address": "0x0802C5C8",
+      "claim_id": 6627332355,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6627436176,
+      "status": "accepted",
+      "who": "sol-0802c5c8-465"
+    }
+  }
+}
