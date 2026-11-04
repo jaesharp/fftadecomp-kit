@@ -3806,7 +3806,35 @@
           "who": "sol-08057E98-768"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c72ec7ead4350ea05c3123a2f31f3e5b183ac0ab65190d116fd6e30a4d588619",
+        "acknowledged_cursor": 6636623485,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c72ec7ead4350ea05c3123a2f31f3e5b183ac0ab65190d116fd6e30a4d588619",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08057E98\",\"who\":\"sol-08057E98-768\",\"claim_id\":6636483978,\"reason\":\"Complete620B plausible C native MATCH0 on third original form, genuine header/unit-record view and actual helper widths. Original proof frozen,166 fixed inputs unchanged, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T16:54:35Z",
+          "id": 6636623485,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T16:54:35Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3785030eb0082a540a73067e0de511ea327652cb0745245049e97774f0045b55",
+        "result": {
+          "address": "0x08057E98",
+          "claim_id": 6636483978,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6636623485,
+          "status": "accepted",
+          "who": "sol-08057E98-768"
+        }
+      }
     },
     {
       "claim": {
