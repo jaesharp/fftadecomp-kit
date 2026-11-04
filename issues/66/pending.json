@@ -3771,6 +3771,38 @@
           "who": "sol-08017c68-464"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "5325f7ee395d04f47a35d1d7f2a97e84885dd40420c108845cd8c22afdd0d628",
+        "acknowledged_cursor": 6627534752,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5325f7ee395d04f47a35d1d7f2a97e84885dd40420c108845cd8c22afdd0d628",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802C5C8\",\"who\":\"sol-0802c5c8-471\",\"note\":\"Grounded corrected source operation width from retained first failure: initial u16 quotient conversion then full word addition before STRH; new accepted lease required\"}",
+          "created_at": "2026-11-04T09:34:19Z",
+          "id": 6627534752,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T09:34:19Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4caf677034802fdb861af7da85b0febb55c9d62cc9c3094ab008a69b01bf8406",
+        "result": {
+          "address": "0x0802C5C8",
+          "claim_id": 6627534752,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6627534752,
+          "status": "accepted",
+          "who": "sol-0802c5c8-471"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
