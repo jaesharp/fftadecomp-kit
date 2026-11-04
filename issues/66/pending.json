@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "009f780b9b532eaf124f5d482c87f407c79b2a245d85bcdaa758b947d5456f0f",
-        "acknowledged_cursor": 6618762174,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "009f780b9b532eaf124f5d482c87f407c79b2a245d85bcdaa758b947d5456f0f",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DBCD4\",\"who\":\"sol-BCD4\",\"note\":\"First natural source from frozen complete90byte two-object output-buffer qualification, isolated future225 batch.\"}",
-          "created_at": "2026-11-04T00:07:36Z",
-          "id": 6618762174,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T00:07:36Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "466aaac5a6b34521f79e5db6e1b0304784561cd1faf5450f2e1915bc68e79f7b",
-        "result": {
-          "address": "0x080DBCD4",
-          "claim_id": 6618762174,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6618762174,
-          "status": "accepted",
-          "who": "sol-BCD4"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "249fb256e4a9340578efcbba28e52f70772ed7843390a6181ad6e658d2b0154c",
-        "acknowledged_cursor": 6618898270,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "249fb256e4a9340578efcbba28e52f70772ed7843390a6181ad6e658d2b0154c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DBCD4\",\"who\":\"sol-BCD4\",\"claim_id\":6618762174,\"reason\":\"Single natural source original native refused DBD78 buffer pointer use or escape; complete emitted FUNC74bytes versus90target, section76includes trailingalignment. Same-invocation artifacts retained, all compiler work stopped, no retry.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
-          "created_at": "2026-11-04T00:14:43Z",
-          "id": 6618880283,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T00:14:43Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3e93ed2797c1b68180e1d7930d9c4eea4440661832865392b50f0929fb70d027",
-        "result": {
-          "address": "0x080DBCD4",
-          "claim_id": 6618762174,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6618880283,
-          "status": "accepted",
-          "who": "sol-BCD4"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "50da2f1b7e4e22db3a3cad640f9ed6200107bc4163688b663ac9939206d3d87d",
         "acknowledged_cursor": 6618814444,
         "body_provenance": "acceptance-time",
