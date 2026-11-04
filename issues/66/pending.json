@@ -3771,6 +3771,38 @@
           "who": "sol-6048r2"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "c880df7c37108b2aee0f7dbf06dc3dbae21c164361c775d56cb1e9b77d64b046",
+        "acknowledged_cursor": 6620664350,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c880df7c37108b2aee0f7dbf06dc3dbae21c164361c775d56cb1e9b77d64b046",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0809801C\",\"who\":\"sol-9801Cr2\",\"note\":\"Resume one explicit ordered-guard Boolean materialization hypothesis; field layout and all helpers unchanged; original Parked immutable.\"}",
+          "created_at": "2026-11-04T02:12:03Z",
+          "id": 6620664350,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T02:12:03Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3d10cc94c3954d8db491b65e49d17cc53f3746d98d494258e69a01d600250993",
+        "result": {
+          "address": "0x0809801C",
+          "claim_id": 6620664350,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6620664350,
+          "status": "accepted",
+          "who": "sol-9801Cr2"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
