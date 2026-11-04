@@ -3742,7 +3742,35 @@
           "who": "sol-080CBF34-543"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "80dbfa3727a0191e9f6d7ea25cc0a497801efdec32eb26030e8fd660688e506a",
+        "acknowledged_cursor": 6630202103,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "80dbfa3727a0191e9f6d7ea25cc0a497801efdec32eb26030e8fd660688e506a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CBF34\",\"who\":\"sol-080CBF34-543\",\"claim_id\":6629906538,\"reason\":\"Four natural C forms emit368,368,364,364B against424B target; complete linked bodies prove ordinary extent mismatch. Fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T12:08:42Z",
+          "id": 6630202103,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T12:08:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "0760e3c0e2965890c478fe6475bfe101aaa076ada73d5f15694e5ebcf17b81d5",
+        "result": {
+          "address": "0x080CBF34",
+          "claim_id": 6629906538,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6630202103,
+          "status": "accepted",
+          "who": "sol-080CBF34-543"
+        }
+      }
     },
     {
       "claim": {
