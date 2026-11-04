@@ -3774,7 +3774,35 @@
           "who": "sol-0803FB50-548"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "694279792b41c58cfa1e02630f64bd40fc6d4d0e09d48209de92aab05ff83dfe",
+        "acknowledged_cursor": 6630604128,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "694279792b41c58cfa1e02630f64bd40fc6d4d0e09d48209de92aab05ff83dfe",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0803FB50\",\"who\":\"sol-0803FB50-548\",\"claim_id\":6630518328,\"reason\":\"First natural C and first DEFAULT native MATCH:208/208B,88/88 instructions, plausible. Fully stopped; source/report/native ELF retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T12:28:31Z",
+          "id": 6630604128,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T12:28:31Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "07f4562bfb94113af5a4e967e668a0090f5878c03609455b22a470263c241e30",
+        "result": {
+          "address": "0x0803FB50",
+          "claim_id": 6630518328,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6630604128,
+          "status": "accepted",
+          "who": "sol-0803FB50-548"
+        }
+      }
     },
     {
       "claim": {
@@ -3870,7 +3898,35 @@
           "who": "sol-080406D4-548"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "78f0de14064731ff45a9469004a76fd5133488844d198df399b9d2557fa56713",
+        "acknowledged_cursor": 6630604128,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "78f0de14064731ff45a9469004a76fd5133488844d198df399b9d2557fa56713",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080406D4\",\"who\":\"sol-080406D4-548\",\"claim_id\":6630518568,\"reason\":\"First natural C and first DEFAULT native MATCH:208/208B,88/88 instructions, plausible. Fully stopped; source/report/native ELF retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T12:28:31Z",
+          "id": 6630604103,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T12:28:31Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "07f4562bfb94113af5a4e967e668a0090f5878c03609455b22a470263c241e30",
+        "result": {
+          "address": "0x080406D4",
+          "claim_id": 6630518568,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6630604103,
+          "status": "accepted",
+          "who": "sol-080406D4-548"
+        }
+      }
     },
     {
       "claim": {
