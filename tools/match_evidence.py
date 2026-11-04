@@ -13,6 +13,7 @@ import software_float_profile as software_float
 import function_thunk_profile as function_thunk
 import empty_body_profile as empty_body
 import switch_constants_profile as switch_constants
+import typed_switch_outgoing_frame as typed_switch_frame
 import subprocess
 from rompath import rom_path
 from pathlib import Path
@@ -507,18 +508,25 @@ def switch_report_matches(lines, root, address, *, data_profile=False):
     try:
         mapping = mapping_snapshot(root)
         objects = data_snapshot(root) if data_profile else None
+        outgoing_frame = data_profile and single("* verification: ") == f"`{typed_switch_frame.SCHEMA}`"
         scalar_data = data_profile and \
             single("* verification: ") == f"`{SWITCH_U16_SCALAR_SCHEMA}`"
-        multiple_data = scalar_data or data_profile and \
+        multiple_data = outgoing_frame or scalar_data or data_profile and \
             single("* verification: ") == f"`{SWITCH_MULTIPLE_DATA_SCHEMA}`"
-        summary = (SWITCH_U16_SCALAR_SUMMARY if scalar_data else
+        summary = (typed_switch_frame.SUMMARY if outgoing_frame else
+                   SWITCH_U16_SCALAR_SUMMARY if scalar_data else
                    SWITCH_MULTIPLE_DATA_SUMMARY if multiple_data else
                    SWITCH_DATA_SUMMARY if data_profile else SWITCH_SUMMARY)
         excluded = ("* stack frame:", "* buffer calls:", "* buffer proof SHA-256:",
                     "* function addresses:", "* function address manifest:",
                     "* function address proof SHA-256:")
+        if outgoing_frame:
+            if single("* stack frame: ") != STACK_SUMMARY:
+                return False
+            excluded = excluded[1:]
         if data_profile:
-            schema = (SWITCH_U16_SCALAR_SCHEMA if scalar_data else
+            schema = (typed_switch_frame.SCHEMA if outgoing_frame else
+                      SWITCH_U16_SCALAR_SCHEMA if scalar_data else
                       SWITCH_MULTIPLE_DATA_SCHEMA if multiple_data else SWITCH_DATA_SCHEMA)
             if single("* verification: ") != f"`{schema}`":
                 return False
@@ -550,13 +558,17 @@ def switch_report_matches(lines, root, address, *, data_profile=False):
                 isinstance(manifest, dict) and
                 manifest.get("data_policy") == SWITCH_MULTIPLE_DATA_POLICY):
             return False
+        if outgoing_frame != (isinstance(manifest, dict) and
+                              manifest.get("frame_policy") == typed_switch_frame.SELECTOR):
+            return False
         if scalar_data != (isinstance(manifest, dict) and
                            manifest.get("scalar_policy") == SWITCH_U16_SCALAR_POLICY):
             return False
         rom = Path(report_rom_path(root)).read_bytes()
         _, control_flow = verify_switches(data, address, rom, mapping, manifest,
                                          data_mapping=objects)
-        fingerprint = (switch_u16_scalar_fingerprint if scalar_data else
+        fingerprint = (typed_switch_frame.fingerprint if outgoing_frame else
+                       switch_u16_scalar_fingerprint if scalar_data else
                        switch_multiple_data_fingerprint if multiple_data else
                        switch_data_fingerprint if data_profile else switch_fingerprint)
         return (single("* control flow: ") == control_flow and
@@ -940,7 +952,8 @@ def report_matches(report, root, address):
         return False
     if profiles in ([f"* verification: `{SWITCH_DATA_SCHEMA}`"],
                     [f"* verification: `{SWITCH_MULTIPLE_DATA_SCHEMA}`"],
-                    [f"* verification: `{SWITCH_U16_SCALAR_SCHEMA}`"]):
+                    [f"* verification: `{SWITCH_U16_SCALAR_SCHEMA}`"],
+                    [f"* verification: `{typed_switch_frame.SCHEMA}`"]):
         return switch_report_matches(lines, root, address, data_profile=True)
     if profiles == [f"* verification: `{SWITCH_SCHEMA}`"]:
         return switch_report_matches(lines, root, address)

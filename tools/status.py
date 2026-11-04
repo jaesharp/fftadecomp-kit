@@ -42,6 +42,7 @@ import inert_spin_profile as inert_spin
 import software_double_profile as software_double
 import function_thunk_profile as function_thunk
 import switch_constants_profile as switch_constants
+import typed_switch_outgoing_frame as typed_switch_frame
 import divsi3_profile as divsi3
 from rompath import rom_path
 
@@ -242,6 +243,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
         thunk_profile = False
         owner_profile = False
         constants_profile = False
+        typed_outgoing_profile = False
         quotient_frame = False
         signed_runtime_profile = False
         unsigned_runtime_profile = False
@@ -262,6 +264,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 import owner_admission_profile
                 owner_profile = owner_admission_profile.selected(saved_report)
                 constants_profile = switch_constants.selected_policy(saved_report)
+                typed_outgoing_profile = typed_switch_frame.selector_for_report(saved_report)
                 double_profile = software_double.selected(saved_report)
                 if double_profile:
                     target_remainder_profile = software_double.target_remainder_selected(saved_report)
@@ -273,6 +276,9 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 problems.append(f"{addr}: {error}")
                 return 0, 0, problems, []
         if verify:
+            if typed_outgoing_profile and not report_matches(saved_report, root, int(addr, 16)):
+                problems.append(f"{addr}: invalid saved typed outgoing switch report")
+                return 0, 0, problems, []
             if unsigned_runtime_profile and not report_matches(saved_report, root, int(addr, 16)):
                 problems.append(f"{addr}: invalid saved unsigned divmod report")
                 return 0, 0, problems, []
@@ -312,6 +318,8 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command += ["--owner-runtime-profile", private_float_pack_admission_profile.SELECTOR]
             if constants_profile:
                 command += ["--switch-profile", constants_profile.selector]
+            if typed_outgoing_profile:
+                command += ["--switch-data-profile", typed_outgoing_profile]
             if unsigned_runtime_profile:
                 command += ["--unsigned-runtime-profile", unsigned_runtime_profile]
             if signed_runtime_profile:
@@ -326,7 +334,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command.append("--no-write")
             result = subprocess.run(command, capture_output=True, text=True)
             ok = result.returncode == 0 and "verdict MATCH - byte identical" in result.stdout.splitlines()
-        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or owner_profile or quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
+        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or typed_outgoing_profile or owner_profile or quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
             if os.path.exists(rep):
                 with open(rep, encoding="utf-8") as report_file:
                     report = report_file.read()

@@ -31,6 +31,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import typed_switch_outgoing_frame as typed_switch_frame
 import modsi3_profile as modsi3
 import divsi3_profile as divsi3
 import signed_divmod_profile as signed_divmod
@@ -1861,20 +1862,23 @@ def switch_layout(data, address, relocations, data_relocations=None, *, interpos
             relocations[literal] != table or \
             any(relocations[offset] < table_end for offset in range(table, table_end, 4)):
         raise ValueError("switch words must describe an adjacent table and forward local cases")
-    object_before_table = False
+    object_words_before_table = 0
     if data_relocations is not None:
         if not isinstance(data_relocations, dict) or not 1 <= len(data_relocations) <= len(data) // 4:
             raise ValueError("switch-data requires a finite nonempty object-word manifest")
         for offset, binding in data_relocations.items():
             if type(offset) is not int or offset < 0 or offset + 4 > len(data) or \
-                    (offset != literal - 4 and offset < table_end) or \
+                    (offset not in (literal - 8, literal - 4) and offset < table_end) or \
                     (address + offset) % 4 or not isinstance(binding, (tuple, list)) or \
                     len(binding) != 2 or not isinstance(binding[0], str) or \
                     type(binding[1]) is not int or not 0 <= binding[1] <= 0xFFFFFFFF or \
                     address <= binding[1] < address + len(data) or \
                     struct.unpack_from("<I", data, offset)[0] != binding[1]:
                 raise ValueError("invalid interposed switch-data object word")
-        object_before_table = literal - 4 in data_relocations
+        before = sorted(offset for offset in data_relocations if offset < literal)
+        if before != list(range(literal - 4 * len(before), literal, 4)):
+            raise ValueError("interposed switch-data object words must be adjacent to the table pointer")
+        object_words_before_table = len(before)
     decoder = Cs(CS_ARCH_ARM, CS_MODE_THUMB)
     decoder.detail = True
 
@@ -1891,16 +1895,12 @@ def switch_layout(data, address, relocations, data_relocations=None, *, interpos
         return decoded.operands[0].imm - address
 
     candidates = []
-    for dispatch in ((literal - 14, literal - 16) if object_before_table
-                     else (literal - 10 - interposed_words * 4,
-                           literal - 12 - interposed_words * 4)):
-        if not object_before_table:
-            pool_start = literal - interposed_words * 4
-            if dispatch < 0 or (address + dispatch + 13) & ~3 != address + pool_start or \
-                    any(data[dispatch + 10:pool_start]):
-                continue
-        elif (address + dispatch + 13) & ~3 != address + literal - 4 or \
-                any(data[dispatch + 10:literal - 4]):
+    pool_words = interposed_words + object_words_before_table
+    for dispatch in (literal - 10 - pool_words * 4,
+                     literal - 12 - pool_words * 4):
+        pool_start = literal - pool_words * 4
+        if dispatch < 0 or (address + dispatch + 13) & ~3 != address + pool_start or \
+                any(data[dispatch + 10:pool_start]):
             continue
         sequence = [instruction(dispatch + distance) for distance in range(0, 10, 2)]
         if any(item is None or item.cc not in (ARM_CC_AL, ARM_CC_INVALID) for item in sequence) or \
@@ -2003,11 +2003,17 @@ def verify_switches(data, address, rom, mapping, manifest, *, data_mapping=None)
     complete_data = data_profile and isinstance(manifest, dict) and \
         manifest.get("data_policy") == SWITCH_MULTIPLE_DATA_POLICY
     scalar_data = complete_data and manifest.get("scalar_policy") == SWITCH_U16_SCALAR_POLICY
+    outgoing_frame = isinstance(manifest, dict) and "frame_policy" in manifest
+    if outgoing_frame and (not complete_data or scalar_data or
+            manifest["frame_policy"] != typed_switch_frame.SELECTOR):
+        raise ValueError("typed outgoing switch requires its isolated canonical frame marker")
     fields = {"calls", "data", "switch"} if data_profile else {"calls", "switch"}
     if complete_data:
         fields.add("data_policy")
     if scalar_data:
         fields.update(("scalar_policy", "scalars"))
+    if outgoing_frame:
+        fields.add("frame_policy")
     if mapping is None or not isinstance(manifest, dict) or set(manifest) != fields or \
             not isinstance(manifest["calls"], list) or not isinstance(manifest["switch"], dict):
         raise ValueError("invalid switch manifest")
@@ -2098,7 +2104,9 @@ def verify_switches(data, address, rom, mapping, manifest, *, data_mapping=None)
         calls[address + offset] = function_address_target(name, entries, address, len(data), len(rom))
     instructions = verify_leaf_instructions(data, address, True, calls,
                                             switch_relocations=relocations,
-                                            switch_data_relocations=data_relocations)
+                                            switch_data_relocations=data_relocations,
+                                            typed_switch_outgoing_frame=typed_switch_frame.SELECTOR
+                                            if outgoing_frame else None)
     if complete_data:
         # The default policy still admits only the table pointer and typed
         # objects. The separate explicit policy binds every extra u16 word.
@@ -2844,10 +2852,25 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                              bounded_stack_output_zero_index_inventory_context=None,
                              zero_aware_mixed_inventory_context=None,
                              zero_aware_unsigned_quotient_inventory_context=None,
-                             addressed_signed_runtime_context=None, entry_recursive_calls=None):
+                             addressed_signed_runtime_context=None, entry_recursive_calls=None,
+                             typed_switch_outgoing_frame=None):
     """Verify a local CFG, optionally applying validated direct-call ABI summaries."""
     bounded_output_proof = None
     addressed_dependencies = None
+    if typed_switch_outgoing_frame is not None:
+        typed_switch_frame.check_context(typed_switch_outgoing_frame, thumb, validated_calls,
+            switch_relocations, switch_data_relocations, (buffer_proof, call_resolver,
+                udivsi3_context, preloaded_switch, modsi3_context, divsi3_context,
+                inert_spin_context, double_context, function_thunk_context, allow_switch_constants,
+                allow_switch_scalar_frame, umodsi3_context, ashldi3_context, float_context,
+                acyclic_state_budget, ignored_leaf_alias_proof, signed_quotient_profile,
+                stack_pointer_compare_profile, signed_runtime_context, remainder_inventory_context,
+                remainder_ordinary_inventory_context, remainder_shift_inventory_context,
+                remainder_framed_shift_inventory_context, remainder_byte_range_inventory_context,
+                bounded_stack_output_inventory_context, bounded_stack_output_zero_index_inventory_context,
+                zero_aware_mixed_inventory_context, zero_aware_unsigned_quotient_inventory_context,
+                addressed_signed_runtime_context, entry_recursive_calls))
+    scalar_switch_frame = allow_switch_scalar_frame or typed_switch_outgoing_frame is not None
     if entry_recursive_calls is not None:
         from entry_recursive_ordinary_call_profile import EntryCalls
         if type(entry_recursive_calls) is not EntryCalls or not thumb or \
@@ -3254,7 +3277,7 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             adjustment = thumb_literal_stack_adjustment(instruction, data, address)
             if adjustment is not None:
                 literal_adjustments.add(current)
-        if allow_switch_scalar_frame:
+        if scalar_switch_frame:
             if instruction.mnemonic.startswith(("ldm", "stm")):
                 raise ValueError("scalar switch frames exclude block transfers")
             if not stack_operation and adjustment is None and ARM_REG_SP in registers:
@@ -3759,12 +3782,12 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         raise ValueError("stack alias literal load is bypassed by a control-flow edge")
     if switch is not None:
         pool_switch = function_thunk_context is not None and 'pool_switch' in function_thunk_context
-        if (not allow_switch_scalar_frame and double_context is None and not pool_switch and
+        if (not scalar_switch_frame and double_context is None and not pool_switch and
                 uses_stack_frame(instructions.values())) or any(
                 target in RUNTIME_HELPERS.values() and not (pool_switch and target in function_thunk.ALIASES.values())
                 for target in calls.values()):
             raise ValueError("switch evidence excludes fixed frames and runtime call thunks")
-        if allow_switch_scalar_frame and not any(
+        if scalar_switch_frame and not any(
                 (thumb_stack_adjustment(instruction) or 0) < 0 for instruction in instructions.values()):
             raise ValueError("scalar switch frames require a reached nonzero fixed allocation")
         if preloaded_switch:
@@ -3782,6 +3805,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                     current == address or predecessors.get(current) != incoming
                     for current, incoming in expected.items()):
                 raise ValueError("switch selector bound is bypassed by an unverified predecessor edge")
+    if typed_switch_outgoing_frame is not None:
+        typed_switch_frame.verify_frame(instructions, edges, address, calls)
     reaching_return = set(returns)
     pending = list(returns)
     while pending:
@@ -3990,7 +4015,7 @@ def plausibility_result(result, address):
 def switch_u16_scalar_configuration(args):
     if args.switch_data_profile is None:
         return
-    if args.switch_data_profile != SWITCH_U16_SCALAR_SELECTOR or \
+    if args.switch_data_profile not in (SWITCH_U16_SCALAR_SELECTOR, typed_switch_frame.SELECTOR) or \
             args.mode != "thumb" or args.control_flow_profile != "ordinary" or \
             any((args.signed_quotient_profile, args.signed_runtime_profile,
                  args.addressed_signed_runtime_profile, args.unsigned_runtime_profile, args.software_double_profile,
@@ -4020,7 +4045,7 @@ def main():
     ap.add_argument("--software-double-remainder-profile", choices=(software_double.REMAINDER_TARGET_SELECTOR,))
     ap.add_argument("--function-address-profile", choices=function_thunk.SELECTORS)
     ap.add_argument("--switch-profile", choices=("two-constants-v2", "two-constants-frame-v1"))
-    ap.add_argument("--switch-data-profile", choices=(SWITCH_U16_SCALAR_SELECTOR,))
+    ap.add_argument("--switch-data-profile", choices=(SWITCH_U16_SCALAR_SELECTOR, typed_switch_frame.SELECTOR))
     ap.add_argument("--wsl", default="Ubuntu")
     ap.add_argument("--wsl-path", default=os.environ.get("FFTA_WSL_PATH",
                                                          DEFAULT_WSL_PATH))
@@ -4348,7 +4373,12 @@ def main():
                         for offset, (name, value) in sorted(data_relocations.items())]
                     if not preloaded_profile and len(data_relocations) > 1:
                         switch_evidence["data_policy"] = SWITCH_MULTIPLE_DATA_POLICY
-                if args.switch_data_profile:
+                if args.switch_data_profile == typed_switch_frame.SELECTOR:
+                    if preloaded_profile:
+                        raise ValueError("typed outgoing switch excludes preloaded switches")
+                    switch_evidence["data_policy"] = SWITCH_MULTIPLE_DATA_POLICY
+                    switch_evidence["frame_policy"] = typed_switch_frame.SELECTOR
+                elif args.switch_data_profile:
                     if preloaded_profile:
                         raise ValueError("u16 switch-data excludes preloaded switches")
                     scalar_instructions = verify_leaf_instructions(
@@ -4426,6 +4456,7 @@ def main():
                   FRAMED_FUNCTION_ADDRESS_SCHEMA if framed_profile else FUNCTION_ADDRESS_SCHEMA)
     if switch_relocations:
         schema = (PRELOADED_SWITCH_SCHEMA if preloaded_profile else
+                  typed_switch_frame.SCHEMA if "frame_policy" in switch_evidence else
                   SWITCH_U16_SCALAR_SCHEMA if "scalar_policy" in switch_evidence else
                   SWITCH_MULTIPLE_DATA_SCHEMA if "data_policy" in switch_evidence else
                   SWITCH_DATA_SCHEMA if data_profile else SWITCH_SCHEMA)
@@ -4658,12 +4689,14 @@ def main():
                     f.write(f"* function buffer proof SHA-256: `{proof_digest}`\n")
             if switch_relocations:
                 summary = (PRELOADED_SWITCH_SUMMARY if preloaded_profile else
+                           typed_switch_frame.SUMMARY if "frame_policy" in switch_evidence else
                            SWITCH_U16_SCALAR_SUMMARY if "scalar_policy" in switch_evidence else
                            SWITCH_MULTIPLE_DATA_SUMMARY if "data_policy" in switch_evidence else
                            SWITCH_DATA_SUMMARY if data_profile else SWITCH_SUMMARY)
                 f.write(f"* switches: {summary}\n")
                 f.write(f"* switch manifest: `{switch_manifest(switch_evidence)}`\n")
                 fingerprint_switch = (preloaded_switch_fingerprint if preloaded_profile else
+                                      typed_switch_frame.fingerprint if "frame_policy" in switch_evidence else
                                       switch_u16_scalar_fingerprint if "scalar_policy" in switch_evidence else
                                       switch_multiple_data_fingerprint if "data_policy" in switch_evidence else
                                       switch_data_fingerprint if data_profile else switch_fingerprint)
