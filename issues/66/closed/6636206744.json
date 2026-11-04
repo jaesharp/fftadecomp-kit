@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "3ca6144c95d6240908f158f8343411b2054a01d2532e56e6cb0c5c130bb75a47",
+    "acknowledged_cursor": 6636206744,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "3ca6144c95d6240908f158f8343411b2054a01d2532e56e6cb0c5c130bb75a47",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08124480\",\"who\":\"sol-08124480-756\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-04T16:36:52Z",
+      "id": 6636206744,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T16:36:52Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "50cafb11aec6da43f79bbc6ddf8bba1454e9f7cc10dc87b5ee0f9e05f4b890f6",
+    "result": {
+      "address": "0x08124480",
+      "claim_id": 6636206744,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6636206744,
+      "status": "accepted",
+      "who": "sol-08124480-756"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "e23d7b89001ab9fed301b14eaed3a829cb9ca057f912927debd2da368d7bb943",
+    "acknowledged_cursor": 6636292016,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "e23d7b89001ab9fed301b14eaed3a829cb9ca057f912927debd2da368d7bb943",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08124480\",\"who\":\"sol-08124480-756\",\"claim_id\":6636206744,\"reason\":\"Complete224B plausible C native MATCH0 on first new original form. Genuine matched sibling scan restored allocation; source/report and166 input end pins frozen, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T16:40:16Z",
+      "id": 6636288482,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T16:40:16Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "bd8395ecf2264cda464ceaa87596d4920efe2526c9f66f9c2fe131c53fba6280",
+    "result": {
+      "address": "0x08124480",
+      "claim_id": 6636206744,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6636288482,
+      "status": "accepted",
+      "who": "sol-08124480-756"
+    }
+  }
+}
