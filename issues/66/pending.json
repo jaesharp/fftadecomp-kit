@@ -3771,6 +3771,38 @@
           "who": "sol-123D50"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "b16999d3de1fc66b041748ae2f89d032476ce24bb796a983bca57542a8671b66",
+        "acknowledged_cursor": 6621180652,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b16999d3de1fc66b041748ae2f89d032476ce24bb796a983bca57542a8671b66",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7E68\",\"who\":\"sol-C7E68\",\"note\":\"Actual saved odd callback pointer grounds16B Thumb leaf in unowned gap ending at nextuniqueC7E78; full8instruction body qualified once. Private exactpairedindex insertion before genuine C authoring.\"}",
+          "created_at": "2026-11-04T02:48:35Z",
+          "id": 6621180652,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T02:48:35Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "796838c7e8efa6d8949a9bffda20b1ac469dccccc5a00b56ed67887ab67f46a3",
+        "result": {
+          "address": "0x080C7E68",
+          "claim_id": 6621180652,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6621180652,
+          "status": "accepted",
+          "who": "sol-C7E68"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
