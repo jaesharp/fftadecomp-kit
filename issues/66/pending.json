@@ -3774,7 +3774,35 @@
           "who": "sol-0802807C-610"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "03814c6159574c72ff928442f57cacf1861dd0df5390fab924f3c1247c667380",
+        "acknowledged_cursor": 6632514292,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "03814c6159574c72ff928442f57cacf1861dd0df5390fab924f3c1247c667380",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802807C\",\"who\":\"sol-0802807C-610\",\"claim_id\":6632308449,\"reason\":\"Complete120B/56instructions native MATCH under canonical-thunks-v1 in nine natural forms; original evidence retained, fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T13:57:07Z",
+          "id": 6632511558,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T13:57:07Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b22ceda9a38b9f109e2504d1e42a4395bc8d17dca7147f3d644d7907f92737e8",
+        "result": {
+          "address": "0x0802807C",
+          "claim_id": 6632308449,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6632511558,
+          "status": "accepted",
+          "who": "sol-0802807C-610"
+        }
+      }
     },
     {
       "claim": {
@@ -3838,7 +3866,35 @@
           "who": "sol-08020A68-614"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e3ef6e0f611fbb6705659d24bb8438555b15370e2e1669865d6b20ce0da4bfb6",
+        "acknowledged_cursor": 6632514292,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e3ef6e0f611fbb6705659d24bb8438555b15370e2e1669865d6b20ce0da4bfb6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08020A68\",\"who\":\"sol-08020A68-614\",\"claim_id\":6632369291,\"reason\":\"Three natural forms retained, best plausible310B differs at7 fixed-offset bytes in flags reload/copy and loop AND/comparison registers. Fully stopped; old Parked preserved, no MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T13:57:07Z",
+          "id": 6632511645,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T13:57:07Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b22ceda9a38b9f109e2504d1e42a4395bc8d17dca7147f3d644d7907f92737e8",
+        "result": {
+          "address": "0x08020A68",
+          "claim_id": 6632369291,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6632511645,
+          "status": "accepted",
+          "who": "sol-08020A68-614"
+        }
+      }
     },
     {
       "claim": {
@@ -3900,6 +3956,70 @@
           "request_id": 6632482553,
           "status": "accepted",
           "who": "sol-08026F9C-620"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "1a63727c60ebadc003c800e6b836f3a0d01d0f2c60f63c5b7f4c9f89d0157d03",
+        "acknowledged_cursor": 6632514292,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1a63727c60ebadc003c800e6b836f3a0d01d0f2c60f63c5b7f4c9f89d0157d03",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080270CC\",\"who\":\"sol-080270CC-622\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T13:57:15Z",
+          "id": 6632514269,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T13:57:15Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b22ceda9a38b9f109e2504d1e42a4395bc8d17dca7147f3d644d7907f92737e8",
+        "result": {
+          "address": "0x080270CC",
+          "claim_id": 6632514269,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6632514269,
+          "status": "accepted",
+          "who": "sol-080270CC-622"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "fdb7ebdf6b712da164dafbc9b67f252fb70d0d392e979057af7586f012d95438",
+        "acknowledged_cursor": 6632514292,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "fdb7ebdf6b712da164dafbc9b67f252fb70d0d392e979057af7586f012d95438",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08016344\",\"who\":\"sol-08016344-622\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T13:57:15Z",
+          "id": 6632514292,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T13:57:15Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b22ceda9a38b9f109e2504d1e42a4395bc8d17dca7147f3d644d7907f92737e8",
+        "result": {
+          "address": "0x08016344",
+          "claim_id": 6632514292,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6632514292,
+          "status": "accepted",
+          "who": "sol-08016344-622"
         }
       },
       "release": null
