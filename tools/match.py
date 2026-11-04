@@ -2653,6 +2653,7 @@ class BufferCallProof:
                 if current in finite_transfers:
                     successors = finite_transfers[current]
                 elif returning:
+                    aliases = self.normal_return_aliases(address, current, aliases)
                     if self.callee_frames:
                         for offset in aliases.values():
                             self.validate_pointer_value(offset, stack)
@@ -2738,6 +2739,9 @@ class BufferCallProof:
         finally:
             self.active.remove(address)
 
+    def normal_return_aliases(self, address, site, aliases):
+        return aliases
+
     def fingerprint(self):
         digest = hashlib.sha256()
         for address, data in sorted(self.dependencies.items()):
@@ -2771,10 +2775,26 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                              bounded_stack_output_zero_index_inventory_context=None,
                              zero_aware_mixed_inventory_context=None,
                              zero_aware_unsigned_quotient_inventory_context=None,
-                             addressed_signed_runtime_context=None):
+                             addressed_signed_runtime_context=None, entry_recursive_calls=None):
     """Verify a local CFG, optionally applying validated direct-call ABI summaries."""
     bounded_output_proof = None
     addressed_dependencies = None
+    if entry_recursive_calls is not None:
+        from entry_recursive_ordinary_call_profile import EntryCalls
+        if type(entry_recursive_calls) is not EntryCalls or not thumb or \
+                preloaded_switch or allow_switch_constants or allow_switch_scalar_frame or any(
+                    value is not None for value in (buffer_proof, call_resolver, switch_relocations,
+                        switch_data_relocations, udivsi3_context, modsi3_context, divsi3_context,
+                        inert_spin_context, double_context, function_thunk_context, umodsi3_context,
+                        ashldi3_context, float_context, acyclic_state_budget, ignored_leaf_alias_proof,
+                        signed_quotient_profile, stack_pointer_compare_profile, signed_runtime_context,
+                        remainder_inventory_context, remainder_ordinary_inventory_context,
+                        remainder_shift_inventory_context, remainder_framed_shift_inventory_context,
+                        remainder_byte_range_inventory_context, bounded_stack_output_inventory_context,
+                        bounded_stack_output_zero_index_inventory_context, zero_aware_mixed_inventory_context,
+                        zero_aware_unsigned_quotient_inventory_context, addressed_signed_runtime_context)):
+            raise ValueError('entry calls require their exclusive explicit Thumb ordinary context')
+        entry_recursive_calls.validate_bytes(data, address, validated_calls)
     if addressed_signed_runtime_context is not None:
         if not thumb or preloaded_switch or allow_switch_constants or allow_switch_scalar_frame or any(
                 value is not None for value in (buffer_proof, call_resolver, switch_relocations,
@@ -3177,7 +3197,9 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         if calling:
             if not thumb or not unconditional or instruction.id != ARM_INS_BL or \
                     instruction.size != 4 or len(operands) != 1 or operands[0].type != ARM_OP_IMM or \
-                    address <= operands[0].imm < end:
+                    address <= operands[0].imm < end and not (
+                        entry_recursive_calls is not None and operands[0].imm == address and
+                        dict(entry_recursive_calls.calls).get(current) == address):
                 raise ValueError("call is not a validated external direct Thumb BL")
             target = operands[0].imm
             if software_float.reserved(target) and not (
@@ -3936,6 +3958,8 @@ def main():
                                                       "named-data-buffer-v1",
                                                       "static-callback-buffer-v1",
                                                       "static-callback-unwritten-r7-v1",
+                                                      "static-callback-local-output-word-return-r7-v1",
+            "entry-recursive-ordinary-call-v1",
                                                       "protected-descriptor-word-v1",
                                                       "watched-switch-preservation-v1",
                                                       "descriptor-output-alias-v1",

@@ -81,7 +81,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 entry_stack_policy=None, local_alias_slot_policy=None, finite_stack_index_policy=None,
                 discarded_exit_scratch=None, formal_stack_callee_proof=None,
                 formal_stack_alias_constant_policy=None, formal_stack_entry_word_policy=None,
-                formal_stack_entry_words_policy=None):
+                formal_stack_entry_words_policy=None, entry_recursive_calls=None):
     """Prove saved registers, fixed SP, and entry-LR return on every CFG path.
 
     Caller-clobbered registers lose provenance only on actual external calls.
@@ -217,11 +217,23 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         return next(iter(values))[0]
     if address not in instructions or set(edges) != set(instructions):
         raise ValueError("local long branch requires its complete enclosing CFG")
+    entry_sites = set()
+    if entry_recursive_calls is not None:
+        from entry_recursive_ordinary_call_profile import EntryCalls
+        if type(entry_recursive_calls) is not EntryCalls or stack_aliases or any(
+                value is not None for value in (buffer_proof, runtime_calls,
+                    call_preservation, bounded_output_proof, zero_index_profile,
+                    entry_stack_policy, local_alias_slot_policy, finite_stack_index_policy,
+                    discarded_exit_scratch, formal_stack_callee_proof,
+                    formal_stack_alias_constant_policy, formal_stack_entry_word_policy,
+                    formal_stack_entry_words_policy)):
+            raise ValueError("entry calls require their exclusive ordinary saved-frame contract")
+        entry_sites = entry_recursive_calls.validate_cfg(instructions, edges, address, calls)
     end = max(item.address + item.size for item in instructions.values())
     reached = {site: target(item, address, end) for site, item in instructions.items()
                if item.mnemonic == "bl" and len(item.operands) == 1 and
                item.operands[0].type == ARM_OP_IMM and
-               address <= item.operands[0].imm < end}
+               address <= item.operands[0].imm < end and site not in entry_sites}
     if branches != reached or set(branches) & set(calls) or \
             any(destination not in instructions or edges[site] != (destination,)
                 for site, destination in branches.items()):
@@ -252,6 +264,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         regs = tuple(operand.reg for operand in operands if operand.type == ARM_OP_REG)
         adjustment = thumb_stack_adjustment(instruction)
         name = instruction.mnemonic
+        if entry_recursive_calls is not None:
+            entry_recursive_calls.check_instruction(instruction, registers)
+            if site in calls:
+                entry_recursive_calls.check_call(registers, stack)
         if name == "push":
             if ARM_REG_PC in regs or ARM_REG_SP in regs:
                 raise ValueError("local branch frame cannot save PC or SP")
@@ -536,6 +552,8 @@ def prove_frame(instructions, edges, address, branches, calls, *,
     proof = {"schema": SCHEMA, "instructions": len(instructions), "maximum_frame_bytes": maximum,
             "returns": sorted(returns), "preserved": "r4-r11,sp,entry-lr",
             "external_calls": "existing-direct-call-ABI-summary"}
+    if entry_recursive_calls is not None:
+        proof["entry_calls"] = entry_recursive_calls.record()
     if call_preservation is not None:
         proof["external_calls"] = "complete-native-callee-preservation-v1"
         proof["call_preservation"] = [[site, sorted(registers)]
