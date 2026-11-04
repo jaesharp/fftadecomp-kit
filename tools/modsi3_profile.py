@@ -100,7 +100,7 @@ def verify_context(data, address, calls, context):
 def prove_operands(instructions, edges, address, sites, *, logical_shift_signed16=False):
     from capstone import CS_GRP_CALL
     from capstone.arm_const import (ARM_CC_AL, ARM_CC_INVALID, ARM_CC_EQ, ARM_CC_NE,
-                                   ARM_INS_ASR, ARM_INS_LSR, ARM_INS_B, ARM_INS_CMP,
+                                   ARM_INS_ASR, ARM_INS_LSR, ARM_INS_LSL, ARM_INS_B, ARM_INS_CMP,
                                    ARM_OP_IMM, ARM_OP_REG, ARM_REG_R0, ARM_REG_R1,
                                    ARM_REG_R2, ARM_REG_R3, ARM_REG_R12, ARM_REG_LR)
 
@@ -133,6 +133,7 @@ def prove_operands(instructions, edges, address, sites, *, logical_shift_signed1
                         source = operands[1].reg
                     elif operands[1].type == ARM_OP_IMM:
                         value = operands[1].imm & 0xFFFFFFFF
+                        outgoing.add((destination, ("const", value)))
                         signed = value if value < 0x80000000 else value - 0x100000000
                         if -32768 <= signed <= 32767:
                             outgoing.add((destination, "s16"))
@@ -146,6 +147,17 @@ def prove_operands(instructions, edges, address, sites, *, logical_shift_signed1
                         operands[1].type == ARM_OP_REG and operands[2].type == ARM_OP_IMM and \
                         operands[2].imm == 16:
                     outgoing.add((destination, "s16"))
+                elif instruction.id == ARM_INS_LSL and len(operands) == 3 and \
+                        operands[1].type == ARM_OP_REG and operands[2].type == ARM_OP_IMM and \
+                        0 <= operands[2].imm <= 31:
+                    # Nonzero alone is insufficient: a left shift can wrap to
+                    # zero. Exact constants survive only identical CFG joins.
+                    for register, kind in incoming:
+                        if register == operands[1].reg and isinstance(kind, tuple) and kind[0] == "const":
+                            value = (kind[1] << operands[2].imm) & 0xFFFFFFFF
+                            outgoing.add((destination, ("const", value)))
+                            if value:
+                                outgoing.add((destination, "nz"))
                 elif logical_shift_signed16 and instruction.id == ARM_INS_LSR and \
                         int.from_bytes(instruction.bytes, 'little') & 0xF800 == 0x0800 and \
                         len(operands) == 3 and operands[1].type == ARM_OP_REG and \
