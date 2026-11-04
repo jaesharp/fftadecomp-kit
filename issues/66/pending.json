@@ -3931,6 +3931,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "79c7134cea155decbecdf673368c724dff3da8729adad63575eca272a280752b",
+        "acknowledged_cursor": 6629687456,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "79c7134cea155decbecdf673368c724dff3da8729adad63575eca272a280752b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0809D79C\",\"who\":\"sol-0809D79C-542\",\"note\":\"Continue natural C matching of preserved72B near-match; recover actual signed coordinate normalization.\"}",
+          "created_at": "2026-11-04T11:42:22Z",
+          "id": 6629687456,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:42:22Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cffb8b7b4e5d9db008113099f13e12dd7b976e47a0a1c4b3571118580de7eb86",
+        "result": {
+          "address": "0x0809D79C",
+          "claim_id": 6629687456,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6629687456,
+          "status": "accepted",
+          "who": "sol-0809D79C-542"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
