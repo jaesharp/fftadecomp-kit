@@ -3774,7 +3774,35 @@
           "who": "sol-0803172C-929"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "9a73bb6fa442dce9db0e9b612bdd7e3b58011e88cece81efd89fe0e965ed2e48",
+        "acknowledged_cursor": 6643728373,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9a73bb6fa442dce9db0e9b612bdd7e3b58011e88cece81efd89fe0e965ed2e48",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0803172C\",\"who\":\"sol-0803172C-929\",\"claim_id\":6643299198,\"reason\":\"Original corrected420B natural C MATCH frozen; old432B blocked context retained, true independent12B owner separated.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T22:26:53Z",
+          "id": 6643727960,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T22:26:53Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f2d211e17cc60cc62f446eee78ce444b60034de65576421f496d20f203db00a9",
+        "result": {
+          "address": "0x0803172C",
+          "claim_id": 6643299198,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6643727960,
+          "status": "accepted",
+          "who": "sol-0803172C-929"
+        }
+      }
     },
     {
       "claim": {
@@ -3866,7 +3894,35 @@
           "who": "sol-080318D0-934"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2b3727c52fdd2833640c8e2d282a1bac057b034e99b5ca404d5654b1023e6983",
+        "acknowledged_cursor": 6643728373,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2b3727c52fdd2833640c8e2d282a1bac057b034e99b5ca404d5654b1023e6983",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080318D0\",\"who\":\"sol-080318D0-934\",\"claim_id\":6643496578,\"reason\":\"Original first-form12B new complete physical leaf MATCH frozen, parent preserved old composite owner proof.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T22:26:55Z",
+          "id": 6643728373,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T22:26:55Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f2d211e17cc60cc62f446eee78ce444b60034de65576421f496d20f203db00a9",
+        "result": {
+          "address": "0x080318D0",
+          "claim_id": 6643496578,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6643728373,
+          "status": "accepted",
+          "who": "sol-080318D0-934"
+        }
+      }
     },
     {
       "claim": {
