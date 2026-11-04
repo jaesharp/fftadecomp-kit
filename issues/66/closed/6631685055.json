@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "08b87b413355940cbcf15538547a3141bbbf891a29ba5848000cac4dc9310b09",
+    "acknowledged_cursor": 6631685055,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "08b87b413355940cbcf15538547a3141bbbf891a29ba5848000cac4dc9310b09",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800C2FC\",\"who\":\"sol-0800C2FC-584\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-04T13:19:11Z",
+      "id": 6631685055,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T13:19:11Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "da02eea099c0ecc8c1201ba9e2489ef9443075eebd592c140707b2e4388a46fd",
+    "result": {
+      "address": "0x0800C2FC",
+      "claim_id": 6631685055,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6631685055,
+      "status": "accepted",
+      "who": "sol-0800C2FC-584"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "a0c7c621fa28505197bedbcc9943713372788f4e0be8a19283b29a6a2fd5ad5b",
+    "acknowledged_cursor": 6631799968,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "a0c7c621fa28505197bedbcc9943713372788f4e0be8a19283b29a6a2fd5ad5b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800C2FC\",\"who\":\"sol-0800C2FC-584\",\"claim_id\":6631685055,\"reason\":\"Native plausible complete72B MATCH. Fully stopped; exact source/report/original ELF artifacts retained, old Parked unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T13:24:29Z",
+      "id": 6631797194,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T13:24:29Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "b9376e0f41e4bd58b6b66ec64daaca7a4e490a215b6d32a1af1bbc2d1973d4fe",
+    "result": {
+      "address": "0x0800C2FC",
+      "claim_id": 6631685055,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6631797194,
+      "status": "accepted",
+      "who": "sol-0800C2FC-584"
+    }
+  }
+}
