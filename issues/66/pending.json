@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "0a68ec4c95b1819c96f464a8ef86f741867f2a21c2dfe4eae588c377912c0e8b",
-        "acknowledged_cursor": 6623709551,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0a68ec4c95b1819c96f464a8ef86f741867f2a21c2dfe4eae588c377912c0e8b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7C48\",\"who\":\"sol-c48-337\",\"note\":\"Natural C matching from qualified complete owner with fixed agbcc toolchain\"}",
-          "created_at": "2026-11-04T05:51:51Z",
-          "id": 6623709551,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T05:51:51Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ae8795ae924c1c65757c3bd83db4200533828fd205cc2fd19bf6b2b738cb9bc4",
-        "result": {
-          "address": "0x080C7C48",
-          "claim_id": 6623709551,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6623709551,
-          "status": "accepted",
-          "who": "sol-c48-337"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5e46a8edb27671be46c9ef19797794ce0e839bbdd6f30d48fbd204de0630d180",
-        "acknowledged_cursor": 6623834361,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5e46a8edb27671be46c9ef19797794ce0e839bbdd6f30d48fbd204de0630d180",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C7C48\",\"who\":\"sol-c48-337\",\"claim_id\":6623709551,\"reason\":\"Bounded3 natural forms remain full120B byte mismatches; original failures preserved in author337; no new MATCH\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; baseline, by-value node insertion, signed-key capture; observer repair retained\"}",
-          "created_at": "2026-11-04T06:00:51Z",
-          "id": 6623834361,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T06:00:51Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f6c48b5167a1b278b98fb8a0063ee01b85480ea050dc9402bd490cd36d1e677f",
-        "result": {
-          "address": "0x080C7C48",
-          "claim_id": 6623709551,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6623834361,
-          "status": "accepted",
-          "who": "sol-c48-337"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "39256de7a96fbc226012bfe15dcb7268249feb7e1a6a130f3a9a69f89696d1c7",
         "acknowledged_cursor": 6623723655,
         "body_provenance": "acceptance-time",
