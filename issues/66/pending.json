@@ -90,7 +90,35 @@
           "who": "opencode-w11"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "47636b9551b2fd8ec54488884f71eecc6158dd4bb42ace1f9b280ff8939ec503",
+        "acknowledged_cursor": 6620160131,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "47636b9551b2fd8ec54488884f71eecc6158dd4bb42ace1f9b280ff8939ec503",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DADFC\",\"who\":\"opencode-w11\",\"claim_id\":6619320600,\"reason\":\"Exact stopped OpenCode broker generation confirmed in session manifest; all original evidence preserved, author no longer working.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T01:37:05Z",
+          "id": 6620160131,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T01:37:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7522f189d9802124b7db5ce67dee35450b2d4d847337eb788880984855589fa8",
+        "result": {
+          "address": "0x080DADFC",
+          "claim_id": 6619320600,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6620160131,
+          "status": "accepted",
+          "who": "opencode-w11"
+        }
+      }
     },
     {
       "claim": {
