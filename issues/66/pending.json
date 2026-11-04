@@ -3774,7 +3774,35 @@
           "who": "sol-0814513C-883"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ea2b39e325463ee65c94c139d19f8365214d4d6e4312d2b0cb0304656e9c290b",
+        "acknowledged_cursor": 6641629093,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ea2b39e325463ee65c94c139d19f8365214d4d6e4312d2b0cb0304656e9c290b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814513C\",\"who\":\"sol-0814513C-883\",\"claim_id\":6641541318,\"reason\":\"No C attempted: actual function literal08144595 lacks indexed entry; exact frozen qualification preserved; no fabricated data identity.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T20:42:56Z",
+          "id": 6641626092,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T20:42:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "948f5bbb9608f36443b190df2e2f1865ba2a85d5ec0adab97f2451b41ac32c52",
+        "result": {
+          "address": "0x0814513C",
+          "claim_id": 6641541318,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6641626092,
+          "status": "accepted",
+          "who": "sol-0814513C-883"
+        }
+      }
     },
     {
       "claim": {
@@ -3806,7 +3834,35 @@
           "who": "sol-08145834-883"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "70c7f72c1a5282f67a354304ff1574e61a501d5511aaff6290e4e4d8414853da",
+        "acknowledged_cursor": 6641629093,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "70c7f72c1a5282f67a354304ff1574e61a501d5511aaff6290e4e4d8414853da",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08145834\",\"who\":\"sol-08145834-883\",\"claim_id\":6641541336,\"reason\":\"No C attempted: actual function literal08144B2D lacks indexed entry; private maps unchanged for this owner; replacement independent target selected.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T20:42:56Z",
+          "id": 6641626039,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T20:42:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "948f5bbb9608f36443b190df2e2f1865ba2a85d5ec0adab97f2451b41ac32c52",
+        "result": {
+          "address": "0x08145834",
+          "claim_id": 6641541336,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6641626039,
+          "status": "accepted",
+          "who": "sol-08145834-883"
+        }
+      }
     },
     {
       "claim": {
@@ -3900,6 +3956,70 @@
           "request_id": 6641541920,
           "status": "accepted",
           "who": "sol-0813FC24-883"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "953d86985be942449d487a7ca212a62555b753a0345e8d68af8a434778d98de0",
+        "acknowledged_cursor": 6641629093,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "953d86985be942449d487a7ca212a62555b753a0345e8d68af8a434778d98de0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08022BA4\",\"who\":\"sol-08022BA4-884\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T20:43:05Z",
+          "id": 6641629055,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T20:43:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "948f5bbb9608f36443b190df2e2f1865ba2a85d5ec0adab97f2451b41ac32c52",
+        "result": {
+          "address": "0x08022BA4",
+          "claim_id": 6641629055,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6641629055,
+          "status": "accepted",
+          "who": "sol-08022BA4-884"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "38c5b1af70e681511959ec2763dd8b37ed5a49b63c53ace0af7e03f7042ceb11",
+        "acknowledged_cursor": 6641629093,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "38c5b1af70e681511959ec2763dd8b37ed5a49b63c53ace0af7e03f7042ceb11",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08022A04\",\"who\":\"sol-08022A04-884\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T20:43:05Z",
+          "id": 6641629093,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T20:43:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "948f5bbb9608f36443b190df2e2f1865ba2a85d5ec0adab97f2451b41ac32c52",
+        "result": {
+          "address": "0x08022A04",
+          "claim_id": 6641629093,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6641629093,
+          "status": "accepted",
+          "who": "sol-08022A04-884"
         }
       },
       "release": null
