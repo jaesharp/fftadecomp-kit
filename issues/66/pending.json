@@ -3742,7 +3742,35 @@
           "who": "sol-08022298-676"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "6387dba0931389e27e6a7b6b7e1f3535a1e0fb36487c6653fd229622e4c14b7c",
+        "acknowledged_cursor": 6635043824,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6387dba0931389e27e6a7b6b7e1f3535a1e0fb36487c6653fd229622e4c14b7c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08022298\",\"who\":\"sol-08022298-676\",\"claim_id\":6634536726,\"reason\":\"Sixteen distinct original natural forms, one full282-byte symbol still differs; compact-distance normalization and cursor placement remain unresolved, no MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T15:44:27Z",
+          "id": 6635040658,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T15:44:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "206f686f3782b14020c7e1bc5e532cdb99d72bce8e398bec42795c166bdebcb7",
+        "result": {
+          "address": "0x08022298",
+          "claim_id": 6634536726,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6635040658,
+          "status": "accepted",
+          "who": "sol-08022298-676"
+        }
+      }
     },
     {
       "claim": {
@@ -3806,7 +3834,35 @@
           "who": "sol-0809915C-692"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "49f38c04ab1c7ec6aded15826810a1bb4f9266863a9de6ce3ea39a26916a89ed",
+        "acknowledged_cursor": 6635043824,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "49f38c04ab1c7ec6aded15826810a1bb4f9266863a9de6ce3ea39a26916a89ed",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809915C\",\"who\":\"sol-0809915C-692\",\"claim_id\":6634782915,\"reason\":\"Eight original natural C forms, no MATCH; saved-pointer increment and required unit-pointer reload allocation remain unresolved.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T15:44:27Z",
+          "id": 6635040695,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T15:44:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "206f686f3782b14020c7e1bc5e532cdb99d72bce8e398bec42795c166bdebcb7",
+        "result": {
+          "address": "0x0809915C",
+          "claim_id": 6634782915,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6635040695,
+          "status": "accepted",
+          "who": "sol-0809915C-692"
+        }
+      }
     },
     {
       "claim": {
@@ -3900,6 +3956,70 @@
           "request_id": 6634953969,
           "status": "accepted",
           "who": "sol-080894AC-702"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "60f2f82ea13d0a59883076d26fd036f47d13803ef873a316efcfad08874d538d",
+        "acknowledged_cursor": 6635043824,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "60f2f82ea13d0a59883076d26fd036f47d13803ef873a316efcfad08874d538d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808B58C\",\"who\":\"sol-0808B58C-704\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T15:44:35Z",
+          "id": 6635043721,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T15:44:35Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "206f686f3782b14020c7e1bc5e532cdb99d72bce8e398bec42795c166bdebcb7",
+        "result": {
+          "address": "0x0808B58C",
+          "claim_id": 6635043721,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6635043721,
+          "status": "accepted",
+          "who": "sol-0808B58C-704"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "8502943617aab6e5d17d434fdea9a9101ae31e97a5ee91632bea0d78c7d5bd51",
+        "acknowledged_cursor": 6635043824,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8502943617aab6e5d17d434fdea9a9101ae31e97a5ee91632bea0d78c7d5bd51",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08064CCC\",\"who\":\"sol-08064CCC-704\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T15:44:35Z",
+          "id": 6635043824,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T15:44:35Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "206f686f3782b14020c7e1bc5e532cdb99d72bce8e398bec42795c166bdebcb7",
+        "result": {
+          "address": "0x08064CCC",
+          "claim_id": 6635043824,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6635043824,
+          "status": "accepted",
+          "who": "sol-08064CCC-704"
         }
       },
       "release": null
