@@ -404,8 +404,9 @@ def call_bindings(image, name, address, mapping, rom_size,
                    double_bindings=None, double_index=None, function_thunks=False, *,
                    allow_switch_constants=False, umodsi3_bindings=None,
                    ashldi3_bindings=None, ashldi3_index=None, float_bindings=None, float_index=None,
-                   allow_double_data=False, signed_runtime_profile=None):
+                   allow_double_data=False, signed_runtime_profile=None, thunk_pool_words=5):
     """Bind external Thumb calls and explicitly mapped absolute data words."""
+    function_thunk.check_pool_opt_in(thunk_pool_words, function_thunks)
     from switch_constants_profile import check_opt_in
     check_opt_in(allow_switch_constants, switch_relocations, data_mapping,
                  function_relocations, allow_switch_data, udivsi3_bindings,
@@ -804,7 +805,7 @@ def call_bindings(image, name, address, mapping, rom_size,
             from thunk_pool_switch import layout as pool_layout
             for position, (_, value) in function_relocations.items():
                 struct.pack_into("<I", relocated, position, value)
-            layout = pool_layout(bytes(relocated), address, switch_relocations)
+            layout = pool_layout(bytes(relocated), address, switch_relocations, interposed_words=thunk_pool_words)
         else:
             layout = (switch_layout(bytes(relocated), address, switch_relocations)
                       if double_bindings is not None else selected_switch_layout(
@@ -817,6 +818,10 @@ def call_bindings(image, name, address, mapping, rom_size,
             any(item["name"] and not item["section"] and item["name"] not in targets
                 for item in image["symbols"]):
         raise ValueError("unresolved symbols outside the permitted bindings")
+    if thunk_pool_words == 0:
+        function_thunk.verify_pool_calls(calls, thunk_pool_words)
+        if not switch_relocations:
+            raise ValueError("zero-pool linking requires its complete local switch")
     function_thunk.verify_data_bindings(calls, data_relocations, data_symbols, entries)
     return calls, targets, data_relocations
 
@@ -827,8 +832,9 @@ def linked_function_bytes(original, linked, name, address, calls, targets, data_
                           allow_preloaded_switch=False, modsi3_bindings=None, divsi3_bindings=None,
                           double_bindings=None, function_thunks=False, *,
                           allow_switch_constants=False, umodsi3_bindings=None, ashldi3_bindings=None, float_bindings=None,
-                          allow_double_data=False, signed_runtime_profile=None):
+                          allow_double_data=False, signed_runtime_profile=None, thunk_pool_words=5):
     """Validate exact placement and the linker's complete modification surface."""
+    function_thunk.check_pool_opt_in(thunk_pool_words, function_thunks)
     if signed_runtime_profile is not None and (
             signed_runtime_profile not in signed_divmod.SCHEMAS or
             not divsi3_bindings or not modsi3_bindings or
@@ -869,6 +875,10 @@ def linked_function_bytes(original, linked, name, address, calls, targets, data_
     elif function_relocations and any(name in RUNTIME_HELPERS for name in targets):
         raise ValueError("linked function literals exclude call thunks without their profile")
     switch_relocations = switch_relocations or {}
+    if thunk_pool_words == 0:
+        function_thunk.verify_pool_calls(calls, thunk_pool_words)
+        if not switch_relocations:
+            raise ValueError("zero-pool linking requires its complete local switch")
     float_targets = {name: target for name, target in targets.items()
                      if software_float.reserved(target) and not (
                          double_bindings is not None and software_double.shared_float_call(name, target) or
@@ -1033,12 +1043,14 @@ def linked_function_bytes(original, linked, name, address, calls, targets, data_
     if switch_relocations:
         if function_thunks:
             from thunk_pool_switch import layout as pool_layout
-            layout = pool_layout(linked["text"][:after["size"]], address, switch_relocations)
+            layout = pool_layout(linked["text"][:after["size"]], address, switch_relocations,
+                                 interposed_words=thunk_pool_words)
             # The original local section words grant only this finite table.
             # Prove all case/guard edges, literal roles and frame/return joins
             # against the fully linked complete symbol, not linear decoding.
             verify_leaf_instructions(linked["text"][:after["size"]], address, True, calls,
-                                     function_thunk_context={"pool_switch": switch_relocations})
+                                     function_thunk_context={"pool_switch": switch_relocations,
+                                         **({"interposed_words": 0} if thunk_pool_words == 0 else {})})
         else:
             layout = (switch_layout(linked["text"][:after["size"]], address, switch_relocations)
                       if double_bindings is not None else selected_switch_layout(
@@ -1060,7 +1072,8 @@ def link_calls(runner, workspace, args, original, address, mapping, rom_size,
                modsi3_bindings=None, divsi3_bindings=None, double_bindings=None, double_index=None,
                function_thunks=False, *, allow_switch_constants=False, umodsi3_bindings=None,
                ashldi3_bindings=None, ashldi3_index=None, float_bindings=None, float_index=None,
-               allow_double_data=False, signed_runtime_profile=None):
+               allow_double_data=False, signed_runtime_profile=None, thunk_pool_words=5):
+    function_thunk.check_pool_opt_in(thunk_pool_words, function_thunks)
     name = f"func_{address:08X}"
     calls, targets, data_relocations = call_bindings(original, name, address, mapping,
                                                     rom_size, rom_image, data_mapping,
@@ -1073,7 +1086,8 @@ def link_calls(runner, workspace, args, original, address, mapping, rom_size,
                                                     ashldi3_bindings=ashldi3_bindings, ashldi3_index=ashldi3_index,
                                                     float_bindings=float_bindings, float_index=float_index,
                                                     allow_double_data=allow_double_data,
-                                                    signed_runtime_profile=signed_runtime_profile)
+                                                    signed_runtime_profile=signed_runtime_profile,
+                                                    thunk_pool_words=thunk_pool_words)
     data_names = {binding[0] for binding in data_relocations.values()}
     definitions = [".syntax unified", ".thumb"]
     for target_name, target in sorted(targets.items()):
@@ -1111,7 +1125,8 @@ def link_calls(runner, workspace, args, original, address, mapping, rom_size,
                                   umodsi3_bindings=umodsi3_bindings,
                                   ashldi3_bindings=ashldi3_bindings, float_bindings=float_bindings,
                                   allow_double_data=allow_double_data,
-                                  signed_runtime_profile=signed_runtime_profile),
+                                  signed_runtime_profile=signed_runtime_profile,
+                                  thunk_pool_words=thunk_pool_words),
             calls, data_relocations)
 
 
@@ -3022,11 +3037,13 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                for target in (validated_calls or {}).values()):
             raise ValueError("unsigned remainder excludes other runtimes and thunks")
     if function_thunk_context is not None:
-        if type(function_thunk_context) is not dict or set(function_thunk_context) not in (set(), {'pool_switch'}) or not thumb or \
+        if type(function_thunk_context) is not dict or set(function_thunk_context) not in (set(), {'pool_switch'},
+                {'interposed_words'}, {'pool_switch', 'interposed_words'}) or not thumb or \
                 buffer_proof is not None or call_resolver is not None or switch_relocations is not None or \
                 switch_data_relocations is not None or udivsi3_context is not None or modsi3_context is not None or \
                 divsi3_context is not None or inert_spin_context is not None or double_context is not None or preloaded_switch:
             raise ValueError("function thunks require an isolated ordinary caller context")
+        function_thunk.verify_pool_calls(validated_calls or {}, function_thunk.context_words(function_thunk_context))
         if not any(target in function_thunk.ALIASES.values() for target in (validated_calls or {}).values()) or \
                 any(is_udivsi3_address(target) or modsi3.reserved(target) or divsi3.reserved(target) or
                     ashldi3.reserved(target) or software_double.reserved(target) or software_float.reserved(target) or function_thunk.reserved(target) and
@@ -3111,20 +3128,24 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         reserved.update({address + position
                     for offset in (*switch_relocations, *(switch_data_relocations or {}))
                     for position in range(offset, offset + 4)})
-    if function_thunk_context == {}:
+    if function_thunk_context == {} or function_thunk_context == {'interposed_words': 0}:
         # This is already an explicit canonical-thunk profile. Discover only the
         # exact finite five-word shape; failure grants no indirect-jump edge.
         from thunk_pool_switch import discover as pool_discover
         try:
-            pool_relocations = pool_discover(data, address, list(decoder.disasm(data, address)))
+            pool_relocations = pool_discover(data, address, list(decoder.disasm(data, address)),
+                interposed_words=function_thunk.context_words(function_thunk_context))
         except ValueError:
-            pass
+            if function_thunk.context_words(function_thunk_context) == 0:
+                raise
         else:
-            function_thunk_context = {'pool_switch': pool_relocations}
+            function_thunk_context = {'pool_switch': pool_relocations,
+                **({'interposed_words': 0} if function_thunk.context_words(function_thunk_context) == 0 else {})}
     if function_thunk_context is not None and 'pool_switch' in function_thunk_context:
         from thunk_pool_switch import layout as pool_layout
         switch_relocations = function_thunk_context['pool_switch']
-        switch = pool_layout(data, address, switch_relocations)
+        switch = pool_layout(data, address, switch_relocations,
+            interposed_words=function_thunk.context_words(function_thunk_context))
         reserved.update(range(address + switch['dispatch'] + 10,
                               address + switch['literal']))
         reserved.update(address + offset + byte for offset in switch_relocations for byte in range(4))
@@ -3817,7 +3838,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         prove_frame(instructions, edges, address, local_branches, calls)
     if function_thunk_context is not None and 'pool_switch' in function_thunk_context:
         from thunk_pool_switch import record as pool_record
-        pool_record(data, address, switch_relocations, instructions.values())
+        pool_record(data, address, switch_relocations, instructions.values(),
+            interposed_words=function_thunk.context_words(function_thunk_context))
     if signed_runtime_context is not None:
         signed_divmod.finish(data, address, calls, signed_runtime_context,
                              instructions.values(), divsi3_context[3], transfers)
@@ -3951,7 +3973,7 @@ def main():
     ap.add_argument("--addressed-signed-runtime-profile", choices=tuple(addressed_signed_runtime.SCHEMAS))
     ap.add_argument("--software-double-profile", choices=(software_double.SELECTOR,))
     ap.add_argument("--software-double-remainder-profile", choices=(software_double.REMAINDER_TARGET_SELECTOR,))
-    ap.add_argument("--function-address-profile", choices=(function_thunk.SELECTOR,))
+    ap.add_argument("--function-address-profile", choices=function_thunk.SELECTORS)
     ap.add_argument("--switch-profile", choices=("two-constants-v2", "two-constants-frame-v1"))
     ap.add_argument("--switch-data-profile", choices=(SWITCH_U16_SCALAR_SELECTOR,))
     ap.add_argument("--wsl", default="Ubuntu")
@@ -4048,7 +4070,7 @@ def main():
     remainder_target_profile = args.software_double_remainder_profile == software_double.REMAINDER_TARGET_SELECTOR
     if remainder_target_profile and not double_profile:
         sys.exit("target-state remainder requires its explicit software-double profile")
-    thunk_profile = args.function_address_profile == function_thunk.SELECTOR
+    thunk_profile = args.function_address_profile in function_thunk.SELECTORS
     function_index = inert_spin.index_snapshot(ROOT) if spin_profile or double_profile or thunk_profile else None
     if thunk_profile:
         try:
@@ -4109,7 +4131,8 @@ def main():
             thunk_evidence = None
             if thunk_profile:
                 got, calls, function_relocations, data_relocations = function_thunk.object_bytes(
-                    runner, workspace, args, original, addr, mapping, rom, data_mapping)
+                    runner, workspace, args, original, addr, mapping, rom, data_mapping,
+                    selector=args.function_address_profile)
                 linked_profile = True
             elif double_profile:
                 got, calls, double_bindings = software_double.object_bytes(
@@ -4147,9 +4170,11 @@ def main():
                 raise ValueError("u16 switch-data requires a mapped local switch without other runtimes or function literals")
             buffer_proof = BufferCallProof(rom, mapping if calls else None)
             if thunk_profile:
-                verified_instructions = verify_leaf_instructions(got, addr, True, calls, function_thunk_context={})
+                verified_instructions = verify_leaf_instructions(got, addr, True, calls,
+                    function_thunk_context={"interposed_words": 0} if args.function_address_profile == function_thunk.ZERO_SELECTOR else {})
                 thunk_evidence = function_thunk.make_manifest(calls, function_relocations, data_relocations,
-                                                             addr, rom, data_mapping, verified_instructions)
+                                                             addr, rom, data_mapping, verified_instructions,
+                                                             selector=args.function_address_profile)
                 verified_instructions = function_thunk.verify(got, addr, rom, mapping, function_index,
                                                                data_mapping, thunk_evidence)
             elif double_profile:
@@ -4370,7 +4395,7 @@ def main():
     if double_profile:
         schema = software_double.SCHEMA
     if thunk_profile:
-        schema = function_thunk.SCHEMA
+        schema = function_thunk.schema_for(args.function_address_profile)
     control_flow = CALL_SUMMARY if linked_profile else "closed leaf CFG"
     if preloaded_profile:
         control_flow = PRELOADED_SWITCH_CONTROL_FLOW
@@ -4652,7 +4677,7 @@ def main():
             if thunk_profile:
                 f.write(f"* function index SHA-256: `{mapping_fingerprint(function_index)}`\n")
                 f.write(f"* ROM SHA-256: `{hashlib.sha256(rom).hexdigest()}`\n")
-                f.write(f"* function-address thunks: {function_thunk.SELECTOR}\n")
+                f.write(f"* function-address thunks: {args.function_address_profile}\n")
                 f.write(f"* function-address-thunk manifest: `{function_thunk.manifest_text(thunk_evidence)}`\n")
                 proof_digest = function_thunk.fingerprint(addr, got_body, thunk_evidence, fingerprint,
                                                           mapping, function_index, data_mapping, rom)

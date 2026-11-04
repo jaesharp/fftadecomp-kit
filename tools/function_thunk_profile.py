@@ -16,6 +16,54 @@ from inert_spin_profile import fixed_configuration, index_snapshot, marker_text,
 
 SCHEMA = "elf-symbol-thumb-function-address-thunks-v1"
 SELECTOR = "canonical-thunks-v1"
+ZERO_SELECTOR = "canonical-thunks-zero-word-pool-v1"
+ZERO_SCHEMA = "elf-symbol-thumb-function-address-thunks-zero-pool-v1"
+SELECTORS = (SELECTOR, ZERO_SELECTOR)
+
+
+def pool_words(selector):
+    if selector not in SELECTORS:
+        raise ValueError("unsupported canonical-thunk selector")
+    return 0 if selector == ZERO_SELECTOR else 5
+
+
+def schema_for(selector):
+    pool_words(selector)
+    return ZERO_SCHEMA if selector == ZERO_SELECTOR else SCHEMA
+
+
+def selector_from_manifest(manifest):
+    selector = manifest.get("selector", SELECTOR)
+    pool_words(selector)
+    if "selector" in manifest and selector != ZERO_SELECTOR:
+        raise ValueError("legacy thunk evidence cannot carry an alternate pool policy")
+    return selector
+
+
+def producer_sources():
+    return {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+            for name in ("match.py", "function_thunk_profile.py", "thunk_pool_switch.py")}
+
+
+def context_words(context):
+    if context is not None and "interposed_words" in context:
+        if type(context["interposed_words"]) is not int or context["interposed_words"] != 0:
+            raise ValueError("explicit zero-pool context requires the exact integer zero")
+        return 0
+    return 5
+
+
+def check_pool_opt_in(words, function_thunks):
+    if type(words) is not int or words not in (0, 5) or words == 0 and function_thunks is not True:
+        raise ValueError("zero-pool linking requires its explicit canonical-thunk context")
+
+
+def verify_pool_calls(calls, words):
+    if type(words) is not int or words not in (0, 5):
+        raise ValueError("unsupported canonical-thunk pool policy")
+    if words == 0 and {target for target in calls.values() if reserved(target)} != {ALIASES["_call_via_r3"]}:
+        raise ValueError("zero-pool selector requires only canonical R3 thunks and ordinary calls")
+
 RUNTIME = "agbcc-call-via-r0-r12-v1"
 ABI = "conditional-indirect-caller-abi-v1"
 CONTROL_FLOW = "typed function literals and canonical thunks; conditional returning indirect ARM ABI"
@@ -59,15 +107,23 @@ def verify_literal_bindings(data, address, instructions, calls, mapping, functio
             raise ValueError("code-entry thunk literals require canonical function provenance")
 
 
-def selected(report):
+def selector_for_report(report):
     lines = report.splitlines()
     if not any("elf-symbol-thumb-function-address-thunks-" in line or
                marker_text(line).startswith("* function-address") for line in lines):
-        return False
+        return None
+    fields = [line for line in lines if marker_text(line).split(":", 1)[0].rstrip() == "* function-address thunks"]
+    if len(fields) != 1 or not fields[0].startswith("* function-address thunks: "):
+        raise ValueError("missing or duplicate canonical-thunk selector")
+    selector = fields[0][len("* function-address thunks: "):]
     if [line for line in lines if marker_text(line).startswith("* verification")] != \
-            [f"* verification: `{SCHEMA}`"] or any(marker_text(line).startswith(FORBIDDEN) for line in lines):
+            [f"* verification: `{schema_for(selector)}`"] or any(marker_text(line).startswith(FORBIDDEN) for line in lines):
         raise ValueError("mixed or malformed function-thunk selection")
-    return True
+    return selector
+
+
+def selected(report):
+    return selector_for_report(report) is not None
 
 
 def manifest_text(manifest):
@@ -77,7 +133,7 @@ def manifest_text(manifest):
 def fingerprint(address, data, manifest, source_digest, mapping, index, objects, rom):
     from match import DEFAULT_CC, DEFAULT_CPP, DEFAULT_AS, DEFAULT_OBJCOPY, DEFAULT_LD, DEFAULT_FLAGS
     digest = hashlib.sha256()
-    for payload in (SCHEMA.encode(), address.to_bytes(4, "little"), data,
+    for payload in (schema_for(selector_from_manifest(manifest)).encode(), address.to_bytes(4, "little"), data,
                     manifest_text(manifest).encode(), source_digest.encode(), mapping, index,
                     b"absent" if objects is None else b"present:" + objects,
                     hashlib.sha256(rom).digest(),
@@ -108,9 +164,10 @@ def namespace(preprocessed):
         raise ValueError("call-via identifiers are reserved for compiler emission")
 
 
-def original_bindings(image, address, mapping, rom, objects, *, switch_relocations=None):
+def original_bindings(image, address, mapping, rom, objects, *, switch_relocations=None, selector=SELECTOR):
     from match import (allocated_text_only, function_record, call_bindings, ARM_INS_BL,
                        ARM_OP_IMM, Cs, CS_ARCH_ARM, CS_MODE_THUMB)
+    words = pool_words(selector)
     if image["type"] != 1:
         raise ValueError("function thunks require original relocatable ELF")
     allocated_text_only(image)
@@ -149,7 +206,10 @@ def original_bindings(image, address, mapping, rom, objects, *, switch_relocatio
     switch_relocations = {} if switch_relocations is None else switch_relocations
     calls, targets, literals = call_bindings(image, f"func_{address:08X}", address, mapping,
                                             len(rom), rom, objects, functions, switch_relocations,
-                                            function_thunks=True)
+                                            function_thunks=True, thunk_pool_words=words)
+    verify_pool_calls(calls, words)
+    if words == 0 and not switch_relocations:
+        raise ValueError("zero-pool selector requires a complete local switch")
     if not any(name in ALIASES for name in targets):
         raise ValueError("function thunks require canonical calls")
     for name, value in targets.items():
@@ -161,24 +221,27 @@ def original_bindings(image, address, mapping, rom, objects, *, switch_relocatio
     return calls, functions, literals
 
 
-def object_bytes(runner, workspace, args, original, address, mapping, rom, objects):
+def object_bytes(runner, workspace, args, original, address, mapping, rom, objects, *, selector=SELECTOR):
     from match import link_calls
     fixed_configuration(args)
     namespace(runner.read_binary(f"{workspace}/f.i").decode("utf-8"))
     expected_switch = {}
     expected_calls, expected_functions, expected_literals = original_bindings(
-        original, address, mapping, rom, objects, switch_relocations=expected_switch)
+        original, address, mapping, rom, objects, switch_relocations=expected_switch, selector=selector)
     functions, switches = {}, {}
     data, calls, literals = link_calls(runner, workspace, args, original, address, mapping,
-                                       len(rom), rom, objects, functions, switches, function_thunks=True)
+                                       len(rom), rom, objects, functions, switches, function_thunks=True,
+                                       thunk_pool_words=pool_words(selector))
     if (calls, functions, literals, switches) != \
             (expected_calls, expected_functions, expected_literals, expected_switch):
         raise ValueError("function-thunk original bindings changed during linking")
     return data, calls, functions, literals
 
 
-def make_manifest(calls, functions, literals, address, rom, objects, instructions, *, pool_switch=None):
+def make_manifest(calls, functions, literals, address, rom, objects, instructions, *, pool_switch=None, selector=SELECTOR):
     from match import parse_data_symbols, uses_stack_frame, ARM_OP_REG, ARM_REG_PC
+    words = pool_words(selector)
+    verify_pool_calls(calls, words)
     reverse = {target: name for name, target in ALIASES.items()}
     names = parse_data_symbols(objects)
     thunks = [[site - address, reverse[target]] for site, target in sorted(calls.items()) if target in reverse]
@@ -200,8 +263,13 @@ def make_manifest(calls, functions, literals, address, rom, objects, instruction
                     end = max(end, ((item.address + 4) & ~3) + operand.mem.disp + 4)
         body = rom[address - 0x08000000:end - 0x08000000]
         if pool_switch is None:
-            pool_switch = discover(body, address, instructions)
-        manifest['pool_switch'] = record(body, address, pool_switch, instructions)
+            pool_switch = discover(body, address, instructions, interposed_words=words)
+        manifest['pool_switch'] = record(body, address, pool_switch, instructions, interposed_words=words)
+    if words == 0:
+        if 'pool_switch' not in manifest:
+            raise ValueError("zero-pool selector requires a complete local switch")
+        manifest["selector"] = selector
+        manifest["producer_source_sha256"] = producer_sources()
     return manifest
 
 
@@ -209,11 +277,18 @@ def verify(data, address, rom, mapping, index, objects, manifest):
     from match import function_address_bindings, verify_leaf_instructions, verify_data_literals, uses_stack_frame
     validate_span(data, address, rom, mapping, index)
     keys = {"runtime", "abi", "frame", "calls", "thunks", "functions", "data", "dependencies"}
-    if type(manifest) is not dict or set(manifest) not in (keys, keys | {'pool_switch'}) or manifest["runtime"] != RUNTIME or \
+    if type(manifest) is not dict:
+        raise ValueError("invalid function-thunk manifest")
+    selector = selector_from_manifest(manifest)
+    words = pool_words(selector)
+    allowed = (keys | {"pool_switch", "selector", "producer_source_sha256"},) if words == 0 else (keys, keys | {'pool_switch'})
+    if set(manifest) not in allowed or manifest["runtime"] != RUNTIME or \
             manifest["abi"] != ABI or type(manifest["frame"]) is not bool or \
             any(type(manifest[name]) is not list for name in keys - {"runtime", "abi", "frame"}) or \
             not manifest["thunks"]:
         raise ValueError("invalid function-thunk manifest")
+    if words == 0 and manifest["producer_source_sha256"] != producer_sources():
+        raise ValueError("zero-pool producer source bytes differ")
     ordinary = {name: manifest[name] for name in ("calls", "functions", "data")}
     calls, literals = function_address_bindings(
         data, address, rom, mapping, objects, ordinary, allow_empty_functions=True)
@@ -233,6 +308,7 @@ def verify(data, address, rom, mapping, index, objects, manifest):
         occupied.update(range(offset, offset + 4))
         calls[address + offset] = ALIASES[name]
         previous = offset
+    verify_pool_calls(calls, words)
     for record in manifest["dependencies"]:
         if type(record) is not list or len(record) != 4 or type(record[0]) is not str or \
                 type(record[1]) is not int or type(record[2]) is not int or type(record[3]) is not str:
@@ -248,8 +324,10 @@ def verify(data, address, rom, mapping, index, objects, manifest):
         from match import Cs, CS_ARCH_ARM, CS_MODE_THUMB
         decoder = Cs(CS_ARCH_ARM, CS_MODE_THUMB)
         decoder.detail = True
-        relocations = discover(data, address, list(decoder.disasm(data, address)))
+        relocations = discover(data, address, list(decoder.disasm(data, address)), interposed_words=words)
         context['pool_switch'] = relocations
+        if words == 0:
+            context['interposed_words'] = 0
     instructions = verify_leaf_instructions(data, address, True, calls, function_thunk_context=context)
     if not context:
         from match import ARM_OP_REG, ARM_REG_PC
@@ -260,7 +338,7 @@ def verify(data, address, rom, mapping, index, objects, manifest):
     if context:
         if type(manifest['pool_switch']) is not dict or \
                 manifest_text(manifest['pool_switch']) != manifest_text(
-                    record(data, address, context['pool_switch'], instructions)):
+                    record(data, address, context['pool_switch'], instructions, interposed_words=words)):
             raise ValueError('canonical pool-switch manifest differs')
     functions = {offset: (name, struct.unpack_from("<I", data, offset)[0])
                  for offset, name in manifest["functions"]}
@@ -279,6 +357,7 @@ def verify_source(root, address, data, rom, mapping, index, objects, source_dige
     from match_evidence import source_paths, source_fingerprint, mapping_snapshot, data_snapshot, report_rom_path
     if _replay_active.get():
         raise ValueError("recursive function-thunk replay is unsupported")
+    selector = SELECTOR if manifest is None else selector_from_manifest(manifest)
     token = _replay_active.set(True)
     try:
         root = Path(root)
@@ -320,16 +399,16 @@ def verify_source(root, address, data, rom, mapping, index, objects, source_dige
                         verify_literal_bindings(got, address, instructions, calls, mapping, functions)
                 else:
                     got, calls, functions, literals = object_bytes(runner, workspace, args, original,
-                                                                  address, mapping, rom, objects)
+                                                                  address, mapping, rom, objects, selector=selector)
                     if "pool_switch" in manifest:
                         switches = {}
                         original_bindings(original, address, mapping, rom, objects,
-                                          switch_relocations=switches)
+                                          switch_relocations=switches, selector=selector)
                         if [[offset, addend] for offset, addend in sorted(switches.items())] != \
                                 manifest["pool_switch"]["layout"]["relocations"]:
                             raise ValueError("pool switch lacks exact original local relocations")
                     instructions = verify(got, address, rom, mapping, index, objects, manifest)
-                    if make_manifest(calls, functions, literals, address, rom, objects, instructions) != manifest:
+                    if make_manifest(calls, functions, literals, address, rom, objects, instructions, selector=selector) != manifest:
                         raise ValueError("function-thunk manifest lacks original-ELF provenance")
                 if got != data:
                     raise ValueError("function-thunk fresh complete bytes differ")
@@ -377,7 +456,8 @@ def report_matches(report, root, address):
             result[name] = value
         return result
     try:
-        if not selected(report):
+        selector = selector_for_report(report)
+        if selector is None:
             return False
         markers = {"* function-address thunks", "* function-address-thunk manifest", "* function-address-thunk sha256"}
         if any(marker_text(line).startswith("* function-address") and line.split(":", 1)[0] not in markers for line in lines):
@@ -386,7 +466,7 @@ def report_matches(report, root, address):
         source_digest = source_fingerprint(root, address)
         rom_path = report_rom_path(root)
         rom = Path(rom_path).read_bytes()
-        if single("* function-address thunks: ") != SELECTOR or single("* control flow: ") != CONTROL_FLOW or \
+        if single("* function-address thunks: ") != selector or single("* control flow: ") != CONTROL_FLOW or \
                 quoted("* compiler: ") != f"{DEFAULT_CC} {DEFAULT_FLAGS}" or \
                 quoted("* source SHA-256: ") != source_digest or \
                 quoted("* mapping SHA-256: ") != hashlib.sha256(mapping).hexdigest() or \
@@ -406,6 +486,8 @@ def report_matches(report, root, address):
         encoded_manifest = quoted("* function-address-thunk manifest: ")
         manifest = json.loads(encoded_manifest, object_pairs_hook=unique)
         if manifest_text(manifest) != encoded_manifest:
+            return False
+        if selector_from_manifest(manifest) != selector:
             return False
         verify(data, address, rom, mapping, index, objects, manifest)
         expected_objects = [f"* data symbols SHA-256: `{hashlib.sha256(objects).hexdigest()}`"] if manifest["data"] else []

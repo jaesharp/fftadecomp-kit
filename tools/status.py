@@ -262,7 +262,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 double_profile = software_double.selected(saved_report)
                 if double_profile:
                     target_remainder_profile = software_double.target_remainder_selected(saved_report)
-                thunk_profile = function_thunk.selected(saved_report)
+                thunk_profile = function_thunk.selector_for_report(saved_report)
                 spin_profile = inert_spin.selected(saved_report)
                 quotient_frame = f"* verification: `{divsi3.FRAMED_SCHEMA}`" in saved_report.splitlines()
                 saved_flags = compiler_flags(saved_report)
@@ -299,7 +299,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 if target_remainder_profile:
                     command += ["--software-double-remainder-profile", software_double.REMAINDER_TARGET_SELECTOR]
             if thunk_profile:
-                command += ["--function-address-profile", function_thunk.SELECTOR]
+                command += ["--function-address-profile", thunk_profile]
             if owner_profile:
                 command += ["--owner-runtime-profile", owner_admission_profile.selector_for_report(saved_report)]
             if private_float_profile:

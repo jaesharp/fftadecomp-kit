@@ -7,11 +7,19 @@ import hashlib
 import struct
 
 SCHEMA = 'canonical-thunk-five-word-pool-switch-v1'
+ZERO_SCHEMA = 'canonical-thunk-zero-word-pool-switch-v1'
 
 
-def discover(data, address, instructions):
+def pool_words(value):
+    if type(value) is not int or value not in (0, 5):
+        raise ValueError('canonical pool policy requires exactly zero or five interposed words')
+    return value
+
+
+def discover(data, address, instructions, *, interposed_words=5):
     """Return one exact candidate, never infer an arbitrary indirect successor."""
-    from match import ARM_OP_MEM, ARM_OP_REG, ARM_REG_PC, switch_layout
+    interposed_words = pool_words(interposed_words)
+    from match import ARM_OP_MEM, ARM_OP_REG, ARM_REG_PC
     result = []
     by_address = {item.address: item for item in instructions}
     for item in instructions:
@@ -30,34 +38,34 @@ def discover(data, address, instructions):
             continue
         literal = (((load.address + 4) & ~3) + load.operands[1].mem.disp) - address
         end = literal + 4 + 4 * (compare.operands[1].imm + 1)
-        if literal < 20 or (address + literal) % 4 or end > len(data):
+        if literal < 4 * interposed_words or (address + literal) % 4 or end > len(data):
             continue
         relocations = {offset: struct.unpack_from('<I', data, offset)[0] - address
                        for offset in range(literal, end, 4)}
         try:
-            descriptor = layout(data, address, relocations)
+            descriptor = layout(data, address, relocations, interposed_words=interposed_words)
         except ValueError:
             continue
         if descriptor['dispatch'] + 8 == item.address - address:
             result.append(relocations)
     if len(result) != 1:
-        raise ValueError('five-word pool requires one exact guarded switch')
+        raise ValueError('canonical pool requires one exact guarded switch')
     return result[0]
 
 
-def layout(data, address, relocations):
+def layout(data, address, relocations, *, interposed_words=5):
     from match import switch_layout
     # The real encoding uses CMP; BLS dispatch; B default. Other guard
     # encodings remain outside this optional composition.
-    descriptor = switch_layout(data, address, relocations, interposed_words=5)
+    descriptor = switch_layout(data, address, relocations, interposed_words=pool_words(interposed_words))
     if descriptor['dispatch'] - descriptor['comparison'] != 6:
-        raise ValueError('five-word pool requires adjacent unsigned low guard and default branch')
+        raise ValueError('canonical pool requires adjacent unsigned low guard and default branch')
     return descriptor
 
 
-def record(data, address, relocations, instructions):
+def record(data, address, relocations, instructions, *, interposed_words=5):
     from match import ARM_OP_MEM, ARM_REG_PC
-    descriptor = layout(data, address, relocations)
+    descriptor = layout(data, address, relocations, interposed_words=interposed_words)
     starts = {item.address - address for item in instructions}
     code = set()
     loads = {}
@@ -70,7 +78,7 @@ def record(data, address, relocations, instructions):
                 if offset < 0 or (address + offset) % 4 or offset + 4 > len(data):
                     raise ValueError('five-word pool requires complete local literal words')
                 loads.setdefault(offset, []).append(item.address - address)
-    pool = range(descriptor['literal'] - 20, descriptor['literal'], 4)
+    pool = range(descriptor['literal'] - 4 * interposed_words, descriptor['literal'], 4)
     if any(offset not in loads for offset in pool):
         raise ValueError('every interposed pool word requires a reached PC-relative load')
     if any(addend not in starts for offset, addend in relocations.items()
@@ -91,7 +99,7 @@ def record(data, address, relocations, instructions):
             raise ValueError('pool switch has unclassified complete-body bytes')
     if any(offset & 1 and offset - 1 not in missing for offset in missing):
         raise ValueError('pool switch has unclassified odd byte')
-    return {'schema': SCHEMA, 'layout': descriptor,
+    return {'schema': ZERO_SCHEMA if interposed_words == 0 else SCHEMA, 'layout': descriptor,
             'body_sha256': hashlib.sha256(data).hexdigest(),
             'table_sha256': hashlib.sha256(data[descriptor['literal']:
                                descriptor['table'] + 4 * (descriptor['bound'] + 1)]).hexdigest(),
