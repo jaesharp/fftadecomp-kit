@@ -3774,7 +3774,35 @@
           "who": "sol-E798r2"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "adfaba31105a53f6a105184ba19182e8e743e8e8565d3c61a815da4dbac20579",
+        "acknowledged_cursor": 6620463073,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "adfaba31105a53f6a105184ba19182e8e743e8e8565d3c61a815da4dbac20579",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805E798\",\"who\":\"sol-E798r2\",\"claim_id\":6620346123,\"reason\":\"Natural revised source native MATCH complete204B frozen; all compiler/native work stopped, original failed Parked artifacts preserved unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T01:58:09Z",
+          "id": 6620463073,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T01:58:09Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f1124847f3046c554a44cb2634e99843cdbc00d172013c1a390e85405021d74f",
+        "result": {
+          "address": "0x0805E798",
+          "claim_id": 6620346123,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6620463073,
+          "status": "accepted",
+          "who": "sol-E798r2"
+        }
+      }
     }
   ],
   "issue": 66,
