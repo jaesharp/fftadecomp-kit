@@ -3743,6 +3743,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "c97bc6ae3022f5abdb84a7173d3b6f17acd48346821a584f7192dfc11d2a00ce",
+        "acknowledged_cursor": 6620995075,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c97bc6ae3022f5abdb84a7173d3b6f17acd48346821a584f7192dfc11d2a00ce",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08123D50\",\"who\":\"sol-123D50\",\"note\":\"Saved complete176B natural callback-configuration source; missing24758 complete164B helper ABI now qualified. Isolated genuine C after accepted lease, preserve all prior original artifacts.\"}",
+          "created_at": "2026-11-04T02:35:17Z",
+          "id": 6620995075,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T02:35:17Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e78bb5ed2e37ab2ff2d102ee803b56a2f49f1b22356eaab2ec641703f33270f0",
+        "result": {
+          "address": "0x08123D50",
+          "claim_id": 6620995075,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6620995075,
+          "status": "accepted",
+          "who": "sol-123D50"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
