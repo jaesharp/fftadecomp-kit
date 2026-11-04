@@ -12,6 +12,7 @@ import tempfile
 
 import unsigned_divmod_ordinary_inventory as inventory
 import umodsi3_profile as remainder
+from modsi3_profile import address_literal
 from addressed_signed_runtime_profile import runtime_fingerprint, toolchain_fingerprint
 
 SELECTOR = 'unsigned-divmod-ten-v1'
@@ -34,7 +35,7 @@ def producers():
              'umod_only_ordinary_inventory', 'unsigned_remainder_closure_inventory',
              'owner_admission_profile', 'owner_graph_profile', 'owner_runtime_profile',
              'local_long_branch_profile', 'umodsi3_profile', 'function_thunk_profile',
-             'addressed_signed_runtime_profile')
+             'addressed_signed_runtime_profile', 'modsi3_profile')
     paths = {Path(importlib.import_module(name).__file__) for name in names} | {Path(__file__)}
     return {path.name: sha(path.read_bytes()) for path in sorted(paths)}
 
@@ -72,7 +73,7 @@ def verify(data, address, rom, mapping, index, calls, bindings, manifest=None):
     if set(divisors) != set(calls) or any(value != 10 for value in divisors.values()):
         raise ValueError('unsigned divmod requires CFG-proven r1=10 at both runtime calls')
     # Numeric literals are not authority to introduce an unbound address.
-    if any(remainder.address_literal(row['value']) for row in structural['partition']['words']):
+    if any(address_literal(row['value']) for row in structural['partition']['words']):
         raise ValueError('unsigned divmod excludes unbound address literals')
     observed = {'schema': SCHEMA, 'selector': SELECTOR,
         'unsigned_runtime_inventory': structural,
