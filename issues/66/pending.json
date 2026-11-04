@@ -3771,66 +3771,6 @@
           "who": "sol-08003d9c-441"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "e01188fd8c75c1464008f8b3704d826e6d75e4a2736d75ab8a5715bf98481c4f",
-        "acknowledged_cursor": 6626233446,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e01188fd8c75c1464008f8b3704d826e6d75e4a2736d75ab8a5715bf98481c4f",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800C4B4\",\"who\":\"sol-0800c4b4-442\",\"note\":\"Natural C matching from complete qualified owner using explicit published profile\"}",
-          "created_at": "2026-11-04T08:26:01Z",
-          "id": 6626233446,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T08:26:01Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "bbfb87ce997186188d202c8c33ed9da9549304ba0c194369e0822d8949f3e343",
-        "result": {
-          "address": "0x0800C4B4",
-          "claim_id": 6626233446,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6626233446,
-          "status": "accepted",
-          "who": "sol-0800c4b4-442"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "1fcf213b660e131e806475a8950b7fb556860ae6810124f8ecde0856f0883dd8",
-        "acknowledged_cursor": 6626353873,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1fcf213b660e131e806475a8950b7fb556860ae6810124f8ecde0856f0883dd8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800C4B4\",\"who\":\"sol-0800c4b4-442\",\"claim_id\":6626233446,\"reason\":\"Stopped one natural source after typed ABS32 addend guard refusal; original316B versus320B target, artifacts retained and no further grounded correction\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
-          "created_at": "2026-11-04T08:32:33Z",
-          "id": 6626353873,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T08:32:33Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "778cf5cfd2ffb05df7e9847d9630c607be9b9747a7ee7dcd1f31a2102e242092",
-        "result": {
-          "address": "0x0800C4B4",
-          "claim_id": 6626233446,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6626353873,
-          "status": "accepted",
-          "who": "sol-0800c4b4-442"
-        }
-      }
     }
   ],
   "issue": 66,
