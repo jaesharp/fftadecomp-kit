@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "37f8a7ea2123fa0b3dacccaf83843c220ab7eb73fcf6565ae6829c7ce7f1d7f2",
+    "acknowledged_cursor": 6619320600,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "37f8a7ea2123fa0b3dacccaf83843c220ab7eb73fcf6565ae6829c7ce7f1d7f2",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805F6EC\",\"who\":\"opencode-w1\",\"note\":\"hand-match batch1\"}",
+      "created_at": "2026-11-04T00:41:51Z",
+      "id": 6619320599,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T00:41:51Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "3f7fcb981bd66c1741c58bd40fa8984a37beba6339c13dc6ecc5b28cca17d877",
+    "result": {
+      "address": "0x0805F6EC",
+      "claim_id": 6619320599,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6619320599,
+      "status": "accepted",
+      "who": "opencode-w1"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "UNPROVEN",
+    "acknowledged_cursor": 6619688978,
+    "body_provenance": "snapshot-at-archive",
+    "body_sha256": "9caaa8f9a02ea9267640ab01b67d26ff57a42a5acb5dfd26611ad809ed136bee",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805F6EC\",\"who\":\"opencode-w1\",\"claim_id\":6619320599,\"reason\":\"buffer callee 0x08005C04 performs an indirect call via canonical thunk 0x08142250; buffer/indirect-call dependency is excluded by every available profile\",\"unmatchable\":true,\"tried\":\"default profiles; --function-address-profile canonical-thunks-v1; all --owner-runtime-profile selectors\"}",
+      "created_at": "2026-11-04T01:00:39Z",
+      "id": 6619602287,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:00:39Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "2f434c399163ff38dd029336c24c53f0202ad5b0ed5b38c1569547d0b38f7336",
+    "result": {
+      "address": "0x0805F6EC",
+      "claim_id": 6619320599,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6619602287,
+      "status": "accepted",
+      "who": "opencode-w1"
+    }
+  }
+}
