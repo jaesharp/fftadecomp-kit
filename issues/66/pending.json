@@ -3742,7 +3742,35 @@
           "who": "sol-080028e4-359"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d546db01a910da0d67bca94276331e153f153c7b8981be80f707ff1fa8574a46",
+        "acknowledged_cursor": 6624541741,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d546db01a910da0d67bca94276331e153f153c7b8981be80f707ff1fa8574a46",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080028E4\",\"who\":\"sol-080028e4-359\",\"claim_id\":6624465479,\"reason\":\"Stopped bounded natural parser attempt; original compiled FUNC106 versus complete target108 bytes, terminal sign-selection layout differs; no grounded source correction. Original failure retained privately, no C installed.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
+          "created_at": "2026-11-04T06:46:55Z",
+          "id": 6624541741,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T06:46:55Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "de7b8f3d17b73cf6fd09bb1e3f09d8b564b4b894e17f25247e2d846faa34f808",
+        "result": {
+          "address": "0x080028E4",
+          "claim_id": 6624465479,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6624541741,
+          "status": "accepted",
+          "who": "sol-080028e4-359"
+        }
+      }
     },
     {
       "claim": {
