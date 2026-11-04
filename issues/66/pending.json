@@ -3771,6 +3771,38 @@
           "who": "sol-C7B9C"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "51ce8cca3b642488ce459f40e896b6756d6385be655bf2a0268258da65fa5114",
+        "acknowledged_cursor": 6622427203,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "51ce8cca3b642488ce459f40e896b6756d6385be655bf2a0268258da65fa5114",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7BC8\",\"who\":\"sol-C7BC8\",\"note\":\"Adjacent44B tree cursor/count wrapper, exact paired owner and saved D70/E68 contracts qualified295. One Sol author inISO2 using publishedR7 policy631c; no source/map/tool changes outside ownC/report, no diagnostics/success replay.\"}",
+          "created_at": "2026-11-04T04:18:54Z",
+          "id": 6622427203,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T04:18:54Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "fc8716f09ef84a0f894133393d1d6275f84633c07a70f6d9d6e724370aababcc",
+        "result": {
+          "address": "0x080C7BC8",
+          "claim_id": 6622427203,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6622427203,
+          "status": "accepted",
+          "who": "sol-C7BC8"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
