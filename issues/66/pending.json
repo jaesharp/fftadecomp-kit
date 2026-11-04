@@ -3742,7 +3742,35 @@
           "who": "sol-08140BAC-974"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2804e9de08513a60b4e64a236a567458d59e76a498e1744525e5a25e82186da6",
+        "acknowledged_cursor": 6645022040,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2804e9de08513a60b4e64a236a567458d59e76a498e1744525e5a25e82186da6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08140BAC\",\"who\":\"sol-08140BAC-974\",\"claim_id\":6644657244,\"reason\":\"Four distinct natural forms stopped; best exact780-byte body has9 scheduling/control bytes different, original full artifacts retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-04T23:27:18Z",
+          "id": 6645022040,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T23:27:18Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "75c7d454174cd64263fd30c95e2596a548d2eaba3d2bc2fd196a12c12b5fdda9",
+        "result": {
+          "address": "0x08140BAC",
+          "claim_id": 6644657244,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6645022040,
+          "status": "accepted",
+          "who": "sol-08140BAC-974"
+        }
+      }
     },
     {
       "claim": {
