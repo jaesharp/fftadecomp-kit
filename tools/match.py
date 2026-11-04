@@ -3935,6 +3935,7 @@ def main():
                                                       "restoring-owner-ignored-leaf-alias-v1",
                                                       "named-data-buffer-v1",
                                                       "static-callback-buffer-v1",
+                                                      "static-callback-unwritten-r7-v1",
                                                       "protected-descriptor-word-v1",
                                                       "watched-switch-preservation-v1",
                                                       "descriptor-output-alias-v1",
