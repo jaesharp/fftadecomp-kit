@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "36332c10f1e58dc2c6560898ff6d6c1f39e021ee260ede1e76376a3b1ae3e95b",
+    "acknowledged_cursor": 6636123073,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "36332c10f1e58dc2c6560898ff6d6c1f39e021ee260ede1e76376a3b1ae3e95b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0811CC9C\",\"who\":\"sol-0811CC9C-754\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-04T16:33:22Z",
+      "id": 6636123073,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T16:33:22Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "7da9cc64f7aff67185d107cd43e90e9401973fe477f13d6b85f120b5ab67341c",
+    "result": {
+      "address": "0x0811CC9C",
+      "claim_id": 6636123073,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6636123073,
+      "status": "accepted",
+      "who": "sol-0811CC9C-754"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "1ef149a3dd35cf0c0e19570763e65494273ea1c2e41897bca1eaafd0d280b52a",
+    "acknowledged_cursor": 6636424130,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "1ef149a3dd35cf0c0e19570763e65494273ea1c2e41897bca1eaafd0d280b52a",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811CC9C\",\"who\":\"sol-0811CC9C-754\",\"claim_id\":6636123073,\"reason\":\"Ten distinct original natural source/native forms, all exit1. Best complete176B recovers opening object loop but palette row/column allocation and hoisting differ. All166 inputs unchanged; originals frozen.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+      "created_at": "2026-11-04T16:45:46Z",
+      "id": 6636417671,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T16:45:46Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d537b19373749049f084f06151f4403469bc2ceb651d359d1558989999f68b77",
+    "result": {
+      "address": "0x0811CC9C",
+      "claim_id": 6636123073,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6636417671,
+      "status": "accepted",
+      "who": "sol-0811CC9C-754"
+    }
+  }
+}
