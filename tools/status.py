@@ -244,12 +244,15 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
         constants_profile = False
         quotient_frame = False
         signed_runtime_profile = False
+        unsigned_runtime_profile = False
         addressed_runtime_profile = False
         private_float_profile = False
         if os.path.exists(rep):
             with open(rep, encoding="utf-8") as report_file:
                 saved_report = report_file.read()
             try:
+                import unsigned_divmod_profile
+                unsigned_runtime_profile = unsigned_divmod_profile.selector_for_report(saved_report)
                 import private_float_pack_admission_profile
                 private_float_profile = private_float_pack_admission_profile.selected(saved_report)
                 import addressed_signed_runtime_profile
@@ -270,6 +273,9 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 problems.append(f"{addr}: {error}")
                 return 0, 0, problems, []
         if verify:
+            if unsigned_runtime_profile and not report_matches(saved_report, root, int(addr, 16)):
+                problems.append(f"{addr}: invalid saved unsigned divmod report")
+                return 0, 0, problems, []
             if addressed_runtime_profile and not report_matches(saved_report, root, int(addr, 16)):
                 problems.append(f"{addr}: invalid saved addressed signed runtime report")
                 return 0, 0, problems, []
@@ -306,6 +312,8 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command += ["--owner-runtime-profile", private_float_pack_admission_profile.SELECTOR]
             if constants_profile:
                 command += ["--switch-profile", constants_profile.selector]
+            if unsigned_runtime_profile:
+                command += ["--unsigned-runtime-profile", unsigned_runtime_profile]
             if signed_runtime_profile:
                 command += ["--signed-runtime-profile", signed_runtime_profile]
             if addressed_runtime_profile:
@@ -318,7 +326,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command.append("--no-write")
             result = subprocess.run(command, capture_output=True, text=True)
             ok = result.returncode == 0 and "verdict MATCH - byte identical" in result.stdout.splitlines()
-        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or owner_profile or quotient_frame or signed_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
+        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or owner_profile or quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
             if os.path.exists(rep):
                 with open(rep, encoding="utf-8") as report_file:
                     report = report_file.read()

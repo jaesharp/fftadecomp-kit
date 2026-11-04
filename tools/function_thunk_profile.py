@@ -18,7 +18,9 @@ SCHEMA = "elf-symbol-thumb-function-address-thunks-v1"
 SELECTOR = "canonical-thunks-v1"
 ZERO_SELECTOR = "canonical-thunks-zero-word-pool-v1"
 ZERO_SCHEMA = "elf-symbol-thumb-function-address-thunks-zero-pool-v1"
-SELECTORS = (SELECTOR, ZERO_SELECTOR)
+from umod_r1_thunk_profile import SELECTOR as UMOD_R1_SELECTOR, SCHEMA as UMOD_R1_SCHEMA
+
+SELECTORS = (SELECTOR, ZERO_SELECTOR, UMOD_R1_SELECTOR)
 
 
 def pool_words(selector):
@@ -29,13 +31,13 @@ def pool_words(selector):
 
 def schema_for(selector):
     pool_words(selector)
-    return ZERO_SCHEMA if selector == ZERO_SELECTOR else SCHEMA
+    return UMOD_R1_SCHEMA if selector == UMOD_R1_SELECTOR else ZERO_SCHEMA if selector == ZERO_SELECTOR else SCHEMA
 
 
 def selector_from_manifest(manifest):
     selector = manifest.get("selector", SELECTOR)
     pool_words(selector)
-    if "selector" in manifest and selector != ZERO_SELECTOR:
+    if "selector" in manifest and selector not in (ZERO_SELECTOR, UMOD_R1_SELECTOR):
         raise ValueError("legacy thunk evidence cannot carry an alternate pool policy")
     return selector
 
@@ -203,10 +205,12 @@ def original_bindings(image, address, mapping, rom, objects, *, switch_relocatio
                         instruction.operands[0].imm != address + site:
                     raise ValueError("function-thunk BL requires a canonical zero addend")
     functions = {}
+    unsigned = {} if selector == UMOD_R1_SELECTOR else None
     switch_relocations = {} if switch_relocations is None else switch_relocations
     calls, targets, literals = call_bindings(image, f"func_{address:08X}", address, mapping,
                                             len(rom), rom, objects, functions, switch_relocations,
-                                            function_thunks=True, thunk_pool_words=words)
+                                            function_thunks=True, thunk_pool_words=words, umodsi3_bindings=unsigned,
+                                            umod_r1_profile=selector if unsigned is not None else None)
     verify_pool_calls(calls, words)
     if words == 0 and not switch_relocations:
         raise ValueError("zero-pool selector requires a complete local switch")
@@ -229,9 +233,11 @@ def object_bytes(runner, workspace, args, original, address, mapping, rom, objec
     expected_calls, expected_functions, expected_literals = original_bindings(
         original, address, mapping, rom, objects, switch_relocations=expected_switch, selector=selector)
     functions, switches = {}, {}
+    unsigned = {} if selector == UMOD_R1_SELECTOR else None
     data, calls, literals = link_calls(runner, workspace, args, original, address, mapping,
                                        len(rom), rom, objects, functions, switches, function_thunks=True,
-                                       thunk_pool_words=pool_words(selector))
+                                       thunk_pool_words=pool_words(selector), umodsi3_bindings=unsigned,
+                                       umod_r1_profile=selector if unsigned is not None else None)
     if (calls, functions, literals, switches) != \
             (expected_calls, expected_functions, expected_literals, expected_switch):
         raise ValueError("function-thunk original bindings changed during linking")
@@ -240,6 +246,11 @@ def object_bytes(runner, workspace, args, original, address, mapping, rom, objec
 
 def make_manifest(calls, functions, literals, address, rom, objects, instructions, *, pool_switch=None, selector=SELECTOR):
     from match import parse_data_symbols, uses_stack_frame, ARM_OP_REG, ARM_REG_PC
+    if selector == UMOD_R1_SELECTOR:
+        from umod_r1_thunk_profile import make_manifest as composed_manifest
+        if pool_switch is not None:
+            raise ValueError("UMOD/r1 source admission excludes switches")
+        return composed_manifest(calls, functions, literals, address, rom, objects, instructions)
     words = pool_words(selector)
     verify_pool_calls(calls, words)
     reverse = {target: name for name, target in ALIASES.items()}
@@ -280,6 +291,9 @@ def verify(data, address, rom, mapping, index, objects, manifest):
     if type(manifest) is not dict:
         raise ValueError("invalid function-thunk manifest")
     selector = selector_from_manifest(manifest)
+    if selector == UMOD_R1_SELECTOR:
+        from umod_r1_thunk_profile import verify as composed_verify
+        return composed_verify(data, address, rom, mapping, index, objects, manifest)
     words = pool_words(selector)
     allowed = (keys | {"pool_switch", "selector", "producer_source_sha256"},) if words == 0 else (keys, keys | {'pool_switch'})
     if set(manifest) not in allowed or manifest["runtime"] != RUNTIME or \
