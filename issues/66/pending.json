@@ -3934,7 +3934,35 @@
           "who": "sol-08070414-929"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5359db66d412bf619516bac23c5d58768640ebca4b5eb7e220928d1b5bcd6b9e",
+        "acknowledged_cursor": 6643496878,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5359db66d412bf619516bac23c5d58768640ebca4b5eb7e220928d1b5bcd6b9e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08070414\",\"who\":\"sol-08070414-929\",\"claim_id\":6643314386,\"reason\":\"No C authored: actual odd function literal08071375 has no accepted true function identity; exact point is not invented as data alias. Held packet retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-04T22:14:45Z",
+          "id": 6643494812,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T22:14:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5def07490d10a82803eb6e87ffe59794159a671269dad6d9dc6718762531179b",
+        "result": {
+          "address": "0x08070414",
+          "claim_id": 6643314386,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6643494812,
+          "status": "accepted",
+          "who": "sol-08070414-929"
+        }
+      }
     },
     {
       "claim": {
@@ -4092,6 +4120,70 @@
           "request_id": 6643319764,
           "status": "accepted",
           "who": "sol-0801E710-929"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "96e2704501ec897bad701fff48e665f28cd29638668eda2858d32a24d19a118a",
+        "acknowledged_cursor": 6643496878,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "96e2704501ec897bad701fff48e665f28cd29638668eda2858d32a24d19a118a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080318D0\",\"who\":\"sol-080318D0-934\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T22:14:50Z",
+          "id": 6643496578,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T22:14:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5def07490d10a82803eb6e87ffe59794159a671269dad6d9dc6718762531179b",
+        "result": {
+          "address": "0x080318D0",
+          "claim_id": 6643496578,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6643496578,
+          "status": "accepted",
+          "who": "sol-080318D0-934"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "69bdc6ecc1800fc6e3fc3118d53e265e9e9c5eee18817ce0b50ab14504f68ce9",
+        "acknowledged_cursor": 6643496878,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "69bdc6ecc1800fc6e3fc3118d53e265e9e9c5eee18817ce0b50ab14504f68ce9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805AD30\",\"who\":\"sol-0805AD30-934\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-04T22:14:51Z",
+          "id": 6643496878,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T22:14:51Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5def07490d10a82803eb6e87ffe59794159a671269dad6d9dc6718762531179b",
+        "result": {
+          "address": "0x0805AD30",
+          "claim_id": 6643496878,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6643496878,
+          "status": "accepted",
+          "who": "sol-0805AD30-934"
         }
       },
       "release": null
