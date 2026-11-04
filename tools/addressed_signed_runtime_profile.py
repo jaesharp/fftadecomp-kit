@@ -30,12 +30,14 @@ READONLY_TWO_SELECTOR = 'addressed-signed-runtime-readonly-two-words-v1'
 READONLY_TWO_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-readonly-two-words-v1'
 DATA_SELECTOR = 'addressed-signed-runtime-data-v1'
 DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-data-v1'
+READONLY_TWO_DATA_SELECTOR = 'addressed-signed-runtime-readonly-two-words-data-v1'
+READONLY_TWO_DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-readonly-two-words-data-v1'
 CALLBACK_SELECTOR = 'addressed-signed-runtime-r2-callback-data-v1'
 CALLBACK_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-r2-callback-data-v1'
 R3_CALLBACK_SELECTOR = 'addressed-signed-runtime-r3-callback-data-v1'
 R3_CALLBACK_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-r3-callback-data-v1'
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR)
-DATA_SELECTORS = (DATA_SELECTOR, *CALLBACK_SELECTORS)
+DATA_SELECTORS = (DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -47,6 +49,7 @@ DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readabilit
                  'allocation, pointee type, memory safety or C semantic facts')
 SCHEMAS = {SELECTOR: SCHEMA, READONLY_SELECTOR: READONLY_SCHEMA,
             READONLY_TWO_SELECTOR: READONLY_TWO_SCHEMA, DATA_SELECTOR: DATA_SCHEMA,
+            READONLY_TWO_DATA_SELECTOR: READONLY_TWO_DATA_SCHEMA,
             CALLBACK_SELECTOR: CALLBACK_SCHEMA, R3_CALLBACK_SELECTOR: R3_CALLBACK_SCHEMA}
 OPERATIONS = {'func_081426B8': quotient.ADDRESS, remainder.ADDRESSED_NAME: remainder.ADDRESS}
 ABI = 'conditional returning ARM ABI; arbitrary incoming word patterns; no numeric return facts'
@@ -107,7 +110,7 @@ def data_literals(data, address, rom, mapping, objects, records):
     return literals
 
 
-def data_producer_fingerprint():
+def data_producer_fingerprint(selector=DATA_SELECTOR):
     """Pin the actual data admission, linker, CFG and source-replay producers."""
     import match
     import owner_admission_profile as owner
@@ -118,6 +121,8 @@ def data_producer_fingerprint():
     paths = {Path(module.__file__) for module in modules} | {Path(__file__)}
     paths.update(Path(importlib.import_module(name).__file__) for name in
                  ('match_evidence', 'inert_spin_profile', 'analyze', 'plausible'))
+    if selector == READONLY_TWO_DATA_SELECTOR:
+        paths.add(Path(importlib.import_module('readonly_entry_stack_words_profile').__file__))
     return {path.name: sha(path.read_bytes()) for path in sorted(paths)}
 
 
@@ -393,8 +398,8 @@ def finish(data, address, calls, context, verified, dependencies):
             raise ValueError('addressed data requires exact typed coverage of reached address words')
     elif any(remainder.address_literal(row['value']) for row in partition['words']):
         raise ValueError('addressed signed runtimes exclude address literals and data bindings')
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR):
-        if selector == READONLY_TWO_SELECTOR:
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR):
+        if selector in (READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR):
             import readonly_entry_stack_words_profile as incoming
             policy = {'schema': incoming.SCHEMA, 'words': [0, 1]}
         else:
@@ -412,7 +417,7 @@ def finish(data, address, calls, context, verified, dependencies):
     pins = {Path(module.__file__).name: sha(Path(module.__file__).read_bytes()) for module in modules}
     pins[Path(__file__).name] = sha(Path(__file__).read_bytes())
     if selector in DATA_SELECTORS:
-        pins = data_producer_fingerprint()
+        pins = data_producer_fingerprint(selector)
     context[4].update(schema=SCHEMAS[selector], calls=[
         [site-address, callback_alias(selector) if selector in CALLBACK_SELECTORS and
          target == match.function_thunk.ALIASES[callback_alias(selector)] else
@@ -500,6 +505,8 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
     objects = match.parse_data_symbols(data_mapping) if with_data else {}
     if selector not in SCHEMAS or selector in CALLBACK_SELECTORS and not with_data:
         raise ValueError('callback linking requires its exact selector and typed data')
+    if selector == READONLY_TWO_DATA_SELECTOR and not with_data:
+        raise ValueError('addressed readonly data requires actual typed bindings')
     symbol = original_function(image, address)
     entries = json.loads(mapping)
     calls, bindings, targets, occupied = {}, {}, {}, set()
@@ -684,7 +691,7 @@ def build(root, address, args=None, expected=None, *, selector=SELECTOR):
     if selector not in SCHEMAS:
         raise ValueError('unknown addressed signed runtime selector')
     runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, *DATA_SELECTORS) else None
-    producers = data_producer_fingerprint() if selector in DATA_SELECTORS else None
+    producers = data_producer_fingerprint(selector) if selector in DATA_SELECTORS else None
     source,mapping,index = source_fingerprint(root,address),mapping_snapshot(root),index_snapshot(root)
     objects,selected_rom = data_snapshot(root),report_rom_path(root)
     rom = Path(selected_rom).read_bytes(); tools = toolchain_fingerprint()
@@ -722,7 +729,7 @@ def build(root, address, args=None, expected=None, *, selector=SELECTOR):
             index_snapshot(root) != index or data_snapshot(root) != objects or \
             report_rom_path(root) != selected_rom or Path(selected_rom).read_bytes() != rom or \
             toolchain_fingerprint() != tools or runtime is not None and runtime_fingerprint() != runtime or \
-            producers is not None and (data_producer_fingerprint() != producers or
+            producers is not None and (data_producer_fingerprint(selector) != producers or
                 manifest['producer_source_sha256'] != producers):
         raise ValueError('addressed signed runtime source, inputs or tools changed during verification')
     result = dict(address=address,body=body,manifest=manifest,source_sha256=source,
@@ -738,10 +745,10 @@ def render(result):
     selector = next((key for key,value in SCHEMAS.items() if value == result['manifest']['schema']),None)
     if selector is None:
         raise ValueError('unknown addressed signed runtime manifest schema')
-    premise = [] if selector not in (READONLY_SELECTOR, READONLY_TWO_SELECTOR) else [
+    premise = [] if selector not in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR) else [
         '* incoming stack ABI: ' + result['manifest']['frame']['entry_stack']['contract']]
     if selector in DATA_SELECTORS:
-        premise = ['* named data binding: ' + result['manifest']['data_contract']]
+        premise.append('* named data binding: ' + result['manifest']['data_contract'])
     if selector in CALLBACK_SELECTORS:
         register = 'r3' if selector == R3_CALLBACK_SELECTOR else 'r2'
         premise.append(f'* mapped {register} callback ABI: ' + result['manifest']['callback']['contract'])
