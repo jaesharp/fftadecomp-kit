@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "daa539444948cf58ca33096451da71932447cd2ad0a0f9d9ebeac14a64ade141",
-        "acknowledged_cursor": 6621521225,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "daa539444948cf58ca33096451da71932447cd2ad0a0f9d9ebeac14a64ade141",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C7DEC\",\"who\":\"sol-C7DEC\",\"note\":\"Qualified exact76B count traversal from saved14B plus single62B reached continuation; paired owner repair14B7instr to76B37instr staged privately. Fresh Sol author in ISO2 only, excluded ongoing274.\"}",
-          "created_at": "2026-11-04T03:13:08Z",
-          "id": 6621521225,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T03:13:08Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a93e4c00ca13a37f09578fab3add7070438353effa593961c31be1034e45f10a",
-        "result": {
-          "address": "0x080C7DEC",
-          "claim_id": 6621521225,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6621521225,
-          "status": "accepted",
-          "who": "sol-C7DEC"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a0c3e1e0524388c7e310044ee0bf4407d969467380d049c470e9107af18cb5cf",
-        "acknowledged_cursor": 6622044517,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a0c3e1e0524388c7e310044ee0bf4407d969467380d049c470e9107af18cb5cf",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C7DEC\",\"who\":\"sol-C7DEC\",\"claim_id\":6621521225,\"reason\":\"Actual corrected74B FUNC/37instructions now DEFAULTMATCH once on new map; original76B extent failure and ELF retained. Two external alignmentbytes excluded by qualifiedmetadatarepair; no C padding, only accurate targetcomment. Authorstopped, excluded274, parentfutureintegration only.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-04T03:50:41Z",
-          "id": 6622044517,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T03:50:41Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "583ec866041d77c8c5ea34a932fa43f498376cade3361f140c79e1871c801b8d",
-        "result": {
-          "address": "0x080C7DEC",
-          "claim_id": 6621521225,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6622044517,
-          "status": "accepted",
-          "who": "sol-C7DEC"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "a8594db3f619d6b684511d7e3511197448baf556594bd8b5a5e5fe0e64bf5a95",
         "acknowledged_cursor": 6622099389,
         "body_provenance": "acceptance-time",
