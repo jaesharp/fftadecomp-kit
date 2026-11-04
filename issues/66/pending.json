@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "93cf015ab9b60f4d2c1b5b834ded50393d8aa0259b6e57188cc3baa55cedb143",
-        "acknowledged_cursor": 6619320600,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "93cf015ab9b60f4d2c1b5b834ded50393d8aa0259b6e57188cc3baa55cedb143",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0814496C\",\"who\":\"opencode-w8\",\"note\":\"hand-match batch1\"}",
-          "created_at": "2026-11-04T00:41:51Z",
-          "id": 6619320520,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T00:41:51Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3f7fcb981bd66c1741c58bd40fa8984a37beba6339c13dc6ecc5b28cca17d877",
-        "result": {
-          "address": "0x0814496C",
-          "claim_id": 6619320520,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6619320520,
-          "status": "accepted",
-          "who": "opencode-w8"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d445d2067c01301b3d155dae59ce5ad5562d0e0987c13a859f419062d52640df",
-        "acknowledged_cursor": 6620102837,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d445d2067c01301b3d155dae59ce5ad5562d0e0987c13a859f419062d52640df",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814496C\",\"who\":\"opencode-w8\",\"claim_id\":6619320520,\"reason\":\"Exact stopped OpenCode broker generation confirmed in session manifest; all original evidence preserved, author no longer working.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-04T01:33:27Z",
-          "id": 6620102837,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-04T01:33:27Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "54b53154ecff2dd270d7bd811340b49a94935b43bc2ee4a538b5f2271693e94f",
-        "result": {
-          "address": "0x0814496C",
-          "claim_id": 6619320520,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6620102837,
-          "status": "accepted",
-          "who": "opencode-w8"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "831c5d82015241a108448100e5a6180117b2f49d390ffee7c2b89d2a7e9b2cda",
         "acknowledged_cursor": 6619320600,
         "body_provenance": "acceptance-time",
