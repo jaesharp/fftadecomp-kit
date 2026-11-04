@@ -2270,6 +2270,33 @@ def thumb_stack_alias_ldm(instruction, aliases, depth):
     return base, offset, registers[0]
 
 
+def thumb_buffer_alias_ldm(instruction, aliases):
+    """Recognize exact multi-word Thumb-1 reads through a known buffer alias.
+
+    The buffer replay checks every source word before applying writeback.
+    This does not change the separate single-word stack/return transfer rule.
+    """
+    operands = instruction.operands
+    if not instruction.mnemonic.startswith("ldm") or not operands or \
+            operands[0].type != ARM_OP_REG or operands[0].reg not in aliases:
+        return None
+    encoded = int.from_bytes(instruction.bytes, "little")
+    base = ARM_REG_R0 + ((encoded >> 8) & 7)
+    registers = tuple(ARM_REG_R0 + bit for bit in range(8) if encoded & (1 << bit))
+    read, written = instruction.regs_access()
+    if instruction.size != 2 or len(instruction.bytes) != 2 or \
+            encoded & 0xF800 != 0xC800 or \
+            instruction.mnemonic != "ldm" or not instruction.writeback or \
+            instruction.cc not in (ARM_CC_AL, ARM_CC_INVALID) or \
+            len(registers) < 2 or base in registers or \
+            tuple(operand.reg for operand in operands) != (base, *registers) or \
+            any(operand.type != ARM_OP_REG or operand.shift.type or
+                operand.shift.value or operand.subtracted for operand in operands) or \
+            set(read) != {base} or set(written) != {base, *registers}:
+        raise ValueError("unsupported buffer-alias LDM encoding or register list")
+    return base, aliases[base], registers
+
+
 CALLER_CLOBBERED = (ARM_REG_R0, ARM_REG_R1, ARM_REG_R2,
                     ARM_REG_R3, ARM_REG_R12, ARM_REG_LR)
 
@@ -2532,6 +2559,19 @@ class BufferCallProof:
                             self.access(assignment[1], 1, stack)
                             self.observe_frame_alias(address, instruction.address, assignment, stack, words,
                                 frame_base, root_frame, watched, arguments, incoming, protected, constants)
+                    ldm = thumb_buffer_alias_ldm(instruction, aliases)
+                    if ldm is not None:
+                        # Exact-word policies must not silently turn pointer or
+                        # uninitialized/protected words into unknown scalars.
+                        if self.word_provenance:
+                            raise ValueError("multi-register buffer LDM excludes word-provenance contexts")
+                        base, offset, destinations = ldm
+                        for index in range(len(destinations)):
+                            source = offset + 4 * index
+                            self.access(source, 4, stack)
+                            if any(source < slot + 4 and source + 4 > slot for slot in protected):
+                                raise ValueError("buffer access overlaps a pointer-bearing argument slot")
+                        assignment = (base, offset + 4 * len(destinations), base)
                     allowed = {assignment[2]} if assignment is not None else set()
                     loaded = None
                     word_constant = None
@@ -3898,6 +3938,7 @@ def main():
                                                       "protected-descriptor-word-v1",
                                                       "watched-switch-preservation-v1",
                                                       "descriptor-output-alias-v1",
+                                                      "ordinary-formal-output-spill-v1",
                                                       "descriptor-single-store-v1",
                                                       "descriptor-disjunctive-alias-v1",
                                                       "descriptor-callee-constant-v1",
