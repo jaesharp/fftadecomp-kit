@@ -3835,6 +3835,102 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "743fbce507a93f762653e5bc61534dfae53be0735810d1ce267827695a4aba2f",
+        "acknowledged_cursor": 6629848998,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "743fbce507a93f762653e5bc61534dfae53be0735810d1ce267827695a4aba2f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08028C34\",\"who\":\"sol-08028C34-543\",\"note\":\"Actual C matching of complete indexed Thumb owner; unchanged tools/maps, parent owns GH.\"}",
+          "created_at": "2026-11-04T11:50:48Z",
+          "id": 6629848730,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:50:48Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "11486feb2918b55607d1c42d7788333a947c7cd149c72f13f356b0e1ad70aa51",
+        "result": {
+          "address": "0x08028C34",
+          "claim_id": 6629848730,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6629848730,
+          "status": "accepted",
+          "who": "sol-08028C34-543"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "0dca32f7b05185b9277e84d47869849615f8a0bc883484992b4e0b6c37775d18",
+        "acknowledged_cursor": 6629848998,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "0dca32f7b05185b9277e84d47869849615f8a0bc883484992b4e0b6c37775d18",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08028BDC\",\"who\":\"sol-08028BDC-543\",\"note\":\"Actual C matching of complete indexed Thumb owner; unchanged tools/maps, parent owns GH.\"}",
+          "created_at": "2026-11-04T11:50:48Z",
+          "id": 6629848797,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:50:48Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "11486feb2918b55607d1c42d7788333a947c7cd149c72f13f356b0e1ad70aa51",
+        "result": {
+          "address": "0x08028BDC",
+          "claim_id": 6629848797,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6629848797,
+          "status": "accepted",
+          "who": "sol-08028BDC-543"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "439e0131ca5786eca4d3ff6c613becd28a3ca5abfec38899186cbfb0a022f6d9",
+        "acknowledged_cursor": 6629848998,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "439e0131ca5786eca4d3ff6c613becd28a3ca5abfec38899186cbfb0a022f6d9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08000670\",\"who\":\"sol-08000670-543\",\"note\":\"Actual C matching of complete indexed Thumb owner; unchanged tools/maps, parent owns GH.\"}",
+          "created_at": "2026-11-04T11:50:48Z",
+          "id": 6629848998,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:50:48Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "11486feb2918b55607d1c42d7788333a947c7cd149c72f13f356b0e1ad70aa51",
+        "result": {
+          "address": "0x08000670",
+          "claim_id": 6629848998,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6629848998,
+          "status": "accepted",
+          "who": "sol-08000670-543"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
