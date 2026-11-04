@@ -18,6 +18,7 @@ import tempfile
 
 import analyze
 import entry_recursive_ordinary_call_profile as entry
+import mutable_three_call_native_profile as mutable_native
 import owner_graph_profile as graph
 import owner_runtime_profile as runtime
 import function_thunk_profile as thunk
@@ -25,7 +26,9 @@ import ignored_leaf_alias_profile as ignored_leaf
 import named_data_buffer_profile as named_buffer
 import static_callback_buffer_profile as static_buffer
 import static_callback_target_preservation_profile as r7_buffer
+import static_callback_r6_frame_profile as r6_buffer
 import word_result_callback_profile as word_buffer
+import standalone_local_output_word_profile as resident_word
 import protected_descriptor_word_profile as descriptor
 import watched_switch_preservation_profile as watched_switch
 import descriptor_output_alias_profile as output_alias
@@ -55,7 +58,7 @@ def sha(raw):
 
 
 def selected(report):
-    relevant = entry.NATIVE_SCHEMA in report or SCHEMA in report or ACYCLIC_SCHEMA in report or ignored_leaf.SCHEMA in report or named_buffer.SCHEMA in report or static_buffer.SCHEMA in report or word_buffer.SCHEMA in report or r7_buffer.SCHEMA in report or descriptor.SCHEMA in report or watched_switch.SCHEMA in report or output_alias.SCHEMA in report or single_store.SCHEMA in report or disjunctive.SCHEMA in report or callee_constant.SCHEMA in report or cursor.SCHEMA in report or formal_spill.SCHEMA in report or any(marker_text(line).startswith('* owner runtime')
+    relevant = mutable_native.SCHEMA in report or resident_word.SCHEMA in report or r6_buffer.SCHEMA in report or entry.NATIVE_SCHEMA in report or SCHEMA in report or ACYCLIC_SCHEMA in report or ignored_leaf.SCHEMA in report or named_buffer.SCHEMA in report or static_buffer.SCHEMA in report or word_buffer.SCHEMA in report or r7_buffer.SCHEMA in report or descriptor.SCHEMA in report or watched_switch.SCHEMA in report or output_alias.SCHEMA in report or single_store.SCHEMA in report or disjunctive.SCHEMA in report or callee_constant.SCHEMA in report or cursor.SCHEMA in report or formal_spill.SCHEMA in report or any(marker_text(line).startswith('* owner runtime')
                                       for line in report.splitlines())
     if not relevant:
         return False
@@ -65,7 +68,9 @@ def selected(report):
                       [f'* verification: `{named_buffer.SCHEMA}`'],
                       [f'* verification: `{static_buffer.SCHEMA}`'],
                       [f'* verification: `{r7_buffer.SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.SCHEMA}`'],
                       [f'* verification: `{word_buffer.SCHEMA}`'],
+                      [f'* verification: `{resident_word.SCHEMA}`'],
                       [f'* verification: `{descriptor.SCHEMA}`'],
                       [f'* verification: `{watched_switch.SCHEMA}`'],
                       [f'* verification: `{output_alias.SCHEMA}`'],
@@ -74,7 +79,8 @@ def selected(report):
                       [f'* verification: `{callee_constant.SCHEMA}`'],
                       [f'* verification: `{cursor.SCHEMA}`'],
                       [f'* verification: `{formal_spill.SCHEMA}`'],
-                      [f'* verification: `{entry.NATIVE_SCHEMA}`']) or any(marker_text(line).startswith((
+                      [f'* verification: `{entry.NATIVE_SCHEMA}`'],
+                      [f'* verification: `{mutable_native.SCHEMA}`']) or any(marker_text(line).startswith((
             '* function-address', '* unsigned division', '* software double', '* software float',
             '* inert spin', '* switches', '* buffer calls', '* signed quotient', '* signed remainder'))
             for line in report.splitlines()):
@@ -85,6 +91,10 @@ def selected(report):
 def selector_for_report(report):
     if not selected(report):
         raise ValueError('not a complete-owner report')
+    if f'* verification: `{mutable_native.SCHEMA}`' in report.splitlines():
+        return mutable_native.SELECTOR
+    if f'* verification: `{resident_word.SCHEMA}`' in report.splitlines():
+        return resident_word.SELECTOR
     if f'* verification: `{entry.NATIVE_SCHEMA}`' in report.splitlines():
         return entry.SELECTOR
     if f'* verification: `{formal_spill.SCHEMA}`' in report.splitlines():
@@ -107,6 +117,8 @@ def selector_for_report(report):
         return descriptor.SELECTOR
     if f'* verification: `{word_buffer.SCHEMA}`' in report.splitlines():
         return word_buffer.SELECTOR
+    if f'* verification: `{r6_buffer.SCHEMA}`' in report.splitlines():
+        return r6_buffer.SELECTOR
     if f'* verification: `{r7_buffer.SCHEMA}`' in report.splitlines():
         return r7_buffer.SELECTOR
     if f'* verification: `{static_buffer.SCHEMA}`' in report.splitlines():
@@ -122,14 +134,16 @@ def refine(data, address, mapping):
 
 
 def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindings=None,
-           selector=SELECTOR):
+           selector=SELECTOR, source_fingerprint=None):
     """Replay complete structural/frame/runtime proof before typed provenance."""
     import match
+    if selector == mutable_native.SELECTOR:
+        return mutable_native.verify_owner(data,address,rom,mapping,index,objects,manifest,bindings)
     if selector == entry.SELECTOR:
         return entry.verify_owner(data,address,rom,mapping,index,objects,manifest,bindings)
-    if selector not in (SELECTOR, ACYCLIC_SELECTOR, ignored_leaf.SELECTOR, named_buffer.SELECTOR, static_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR):
+    if selector not in (resident_word.SELECTOR, SELECTOR, ACYCLIC_SELECTOR, ignored_leaf.SELECTOR, named_buffer.SELECTOR, static_buffer.SELECTOR, r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR):
         raise ValueError('unknown complete-owner selector')
-    buffer_selector = selector in (named_buffer.SELECTOR, static_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR)
+    buffer_selector = selector in (resident_word.SELECTOR, named_buffer.SELECTOR, static_buffer.SELECTOR, r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR)
     if buffer_selector and len(data) > named_buffer.MAX_BYTES:
         raise ValueError('named-data buffer caller exceeds bounded owner size')
     validate_span(data,address,rom,mapping,index)
@@ -141,14 +155,18 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
     if not buffer_selector and (len(selected_rows)!=1 or len(selected_rows[0])<4 or int(selected_rows[0][3])!=refinement['instrs']):
         raise ValueError('complete-owner text reachable instruction count differs')
     ins, edges, branches, calls, words = graph.graph(data,address,refinement)
-    if buffer_selector:
-        module = word_buffer if selector == word_buffer.SELECTOR else r7_buffer if selector == r7_buffer.SELECTOR else formal_spill if selector == formal_spill.SELECTOR else cursor if selector == cursor.SELECTOR else callee_constant if selector == callee_constant.SELECTOR else disjunctive if selector == disjunctive.SELECTOR else single_store if selector == single_store.SELECTOR else output_alias if selector == output_alias.SELECTOR else watched_switch if selector == watched_switch.SELECTOR else descriptor if selector == descriptor.SELECTOR else static_buffer if selector == static_buffer.SELECTOR else named_buffer
+    if selector == resident_word.SELECTOR:
+        proof = resident_word.prove(data,address,rom,mapping,index,objects,
+            bindings=bindings,source_fingerprint=source_fingerprint)
+    elif buffer_selector:
+        module = r6_buffer if selector == r6_buffer.SELECTOR else word_buffer if selector == word_buffer.SELECTOR else r7_buffer if selector == r7_buffer.SELECTOR else formal_spill if selector == formal_spill.SELECTOR else cursor if selector == cursor.SELECTOR else callee_constant if selector == callee_constant.SELECTOR else disjunctive if selector == disjunctive.SELECTOR else single_store if selector == single_store.SELECTOR else output_alias if selector == output_alias.SELECTOR else watched_switch if selector == watched_switch.SELECTOR else descriptor if selector == descriptor.SELECTOR else static_buffer if selector == static_buffer.SELECTOR else named_buffer
         if branches or words:
             raise ValueError('named-data buffer caller excludes local BL and word switches')
         for destination in calls.values():
             match.function_address_target(f'func_{destination:08X}', json.loads(mapping),
                                           address, len(data), len(rom))
-        buffers = (word_buffer.WordResultCallbackProof if selector == word_buffer.SELECTOR else
+        buffers = (r6_buffer.R6FrameCallbackProof if selector == r6_buffer.SELECTOR else
+                   word_buffer.WordResultCallbackProof if selector == word_buffer.SELECTOR else
                    r7_buffer.StaticCallbackTargetPreservationProof if selector == r7_buffer.SELECTOR else
                    formal_spill.FormalOutputSpillProof if selector == formal_spill.SELECTOR else
                    cursor.DescriptorCursorValueProof if selector == cursor.SELECTOR else
@@ -161,7 +179,8 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
                    static_buffer.StaticCallbackBufferProof if selector == static_buffer.SELECTOR else
                    named_buffer.NamedDataBufferProof)(rom, mapping, index, objects,
                        **({"root": address, "bindings": bindings if bindings is not None else (manifest or {}).get("bindings")}
-                           if selector == word_buffer.SELECTOR else {"policy": r7_buffer.SELECTOR}
+                           if selector == word_buffer.SELECTOR else {"policy": r6_buffer.SELECTOR}
+                           if selector == r6_buffer.SELECTOR else {"policy": r7_buffer.SELECTOR}
                            if selector == r7_buffer.SELECTOR else {}))
         if selector in (descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR):
             buffers.check_lifetime(data, address, list(ins.values()))
@@ -171,7 +190,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
         if selector == formal_spill.SELECTOR:
             if bindings is None or any(bindings.get(key) for key in ('data','functions','switches')):
                 raise ValueError('formal output excludes data/callback/switch composition')
-        if selector in (static_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR) and not buffers.callbacks:
+        if selector in (static_buffer.SELECTOR, r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR) and not buffers.callbacks:
             raise ValueError('static callback profile requires an actual resolved buffer callback')
         proof = {'schema': module.SCHEMA, 'instructions': len(verified),
                  'calls': [[site-address, f'func_{target:08X}'] for site,target in sorted(calls.items())],
@@ -185,11 +204,18 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
                 raise ValueError('unwritten-R7 profile requires actual authenticated callback preservation')
             proof['buffers']['r7_preservation'] = dict(
                 policy=r7_buffer.policy_manifest(), observations=observations)
+        if selector == r6_buffer.SELECTOR:
+            restorations = buffers.restoration_observations()
+            callbacks = buffers.preservation_observations()
+            if not restorations or not callbacks or not any(row['value'] is not None for row in restorations):
+                raise ValueError('R6 selector requires actual frame restoration and callback effect replay')
+            proof['buffers']['r6_restoration'] = dict(policy=r6_buffer.policy_manifest(),
+                observations=restorations, r7_observations=callbacks)
         if selector == word_buffer.SELECTOR:
             proof['buffers']['word_result_callback'] = buffers.effect_manifest()
         if selector == formal_spill.SELECTOR:
             proof['buffers']['formal_output_spill'] = buffers.spill_manifest()
-        if selector in (static_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR):
+        if selector in (static_buffer.SELECTOR, r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR):
             proof['buffers'].update(context_budget=static_buffer.MAX_CONTEXTS,
                                     callbacks=buffers.observations())
         if selector in (output_alias.SELECTOR,single_store.SELECTOR,disjunctive.SELECTOR,callee_constant.SELECTOR, cursor.SELECTOR):
@@ -290,7 +316,9 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
          0x08000000 <= row['value'] < 0x09000000)}
     if address_words != set(literals):
         raise ValueError('owner address literals require exact typed object/function coverage')
-    schema = word_buffer.SCHEMA if selector == word_buffer.SELECTOR else \
+    schema = resident_word.SCHEMA if selector == resident_word.SELECTOR else \
+        r6_buffer.SCHEMA if selector == r6_buffer.SELECTOR else \
+        word_buffer.SCHEMA if selector == word_buffer.SELECTOR else \
         r7_buffer.SCHEMA if selector == r7_buffer.SELECTOR else \
         formal_spill.SCHEMA if selector == formal_spill.SELECTOR else \
         cursor.SCHEMA if selector == cursor.SELECTOR else \
@@ -319,8 +347,12 @@ def preflight(data,address,rom,mapping,index,objects, *, selector=SELECTOR):
     reconstruct the same calls, local tables and typed object/function words.
     """
     import match
+    if selector == mutable_native.SELECTOR:
+        raise ValueError('native admission requires original resident-owner ELF bindings')
     if selector == entry.SELECTOR:
         raise ValueError('entry native admission requires original resident-owner ELF bindings')
+    if selector == resident_word.SELECTOR:
+        raise ValueError('resident native admission requires original ELF and source bindings')
     refinement=refine(data,address,mapping)
     instructions,edges,branches,calls,words=graph.graph(data,address,refinement)
     partition=graph.partition(data,address,refinement,instructions,words)
@@ -413,7 +445,7 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
            for item in image['symbols']):
         raise ValueError('unresolved owner symbol outside exact binding roles')
     for records in result.values():records.sort()
-    if selector in (ACYCLIC_SELECTOR, ignored_leaf.SELECTOR, named_buffer.SELECTOR, static_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR):
+    if selector in (mutable_native.SELECTOR, resident_word.SELECTOR, ACYCLIC_SELECTOR, ignored_leaf.SELECTOR, named_buffer.SELECTOR, static_buffer.SELECTOR, r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, descriptor.SELECTOR, watched_switch.SELECTOR, output_alias.SELECTOR, single_store.SELECTOR, disjunctive.SELECTOR, callee_constant.SELECTOR, cursor.SELECTOR, formal_spill.SELECTOR):
         if any(destination in thunk.ALIASES.values() or match.is_udivsi3_address(destination)
                for destination,is_object in targets.values() if not is_object):
             raise ValueError('acyclic owner excludes arithmetic runtimes and indirect thunks')
@@ -479,7 +511,7 @@ def fingerprint(address,data,manifest,source,mapping,index,objects,rom,original_
            mapping,index,b'absent' if objects is None else objects,hashlib.sha256(rom).digest(),
            text([match.DEFAULT_CC,match.DEFAULT_CPP,match.DEFAULT_AS,match.DEFAULT_OBJCOPY,
                  match.DEFAULT_LD,match.DEFAULT_FLAGS]).encode()]
-    if manifest['profile'] in (entry.NATIVE_SCHEMA, named_buffer.SCHEMA, static_buffer.SCHEMA, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, disjunctive.SCHEMA, callee_constant.SCHEMA, cursor.SCHEMA, formal_spill.SCHEMA):
+    if manifest['profile'] in (mutable_native.SCHEMA, resident_word.SCHEMA, entry.NATIVE_SCHEMA, named_buffer.SCHEMA, static_buffer.SCHEMA, r6_buffer.SCHEMA, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, disjunctive.SCHEMA, callee_constant.SCHEMA, cursor.SCHEMA, formal_spill.SCHEMA):
         if not isinstance(original_elf, bytes):
             raise ValueError('named-data buffer evidence requires original ELF identity')
         parts.append(hashlib.sha256(original_elf).digest())
@@ -494,7 +526,9 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
     args=args or argparse.Namespace(cc=match.DEFAULT_CC,cpp=match.DEFAULT_CPP,assembler=match.DEFAULT_AS,
         objcopy=match.DEFAULT_OBJCOPY,linker=match.DEFAULT_LD,flags=match.DEFAULT_FLAGS)
     fixed_configuration(args)
-    environment=entry.environment_fingerprint() if selector == entry.SELECTOR else None
+    environment_reader = (mutable_native.environment_fingerprint if selector == mutable_native.SELECTOR
+        else entry.environment_fingerprint if selector == entry.SELECTOR else None)
+    environment=environment_reader() if environment_reader else None
     source=source_fingerprint(root,address);mapping=mapping_snapshot(root);index=index_snapshot(root)
     objects=data_snapshot(root);rom_path=report_rom_path(root);rom=Path(rom_path).read_bytes()
     candidates=list((root/'src').rglob(f'{address:08X}.c'))
@@ -512,7 +546,7 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
             data,bindings=object_bytes(runner,workspace,args,original,address,rom,mapping,objects,
                                       selector=selector,index=index)
             manifest,instructions=verify(data,address,rom,mapping,index,objects,expected,
-                                         bindings=bindings,selector=selector)
+                                         bindings=bindings,selector=selector,source_fingerprint=source)
         check=match._run_replay_process([sys.executable,str(Path(__file__).with_name('plausible.py')),
             '--quiet','--addr',f'0x{address:08X}','--json']+[str(p) for p in source_paths(capture,address)],capture,120)
         findings,allowed=match.plausibility_result(check,address)
@@ -522,7 +556,7 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
             index_snapshot(root)!=index or data_snapshot(root)!=objects or \
             report_rom_path(root)!=rom_path or Path(rom_path).read_bytes()!=rom:
         raise ValueError('owner source, maps, headers or ROM changed during native verification')
-    if environment is not None and environment != entry.environment_fingerprint():
+    if environment is not None and environment != environment_reader():
         raise ValueError('entry admission producers, selected binaries or runtime changed during compilation')
     return data,manifest,source,mapping,index,objects,rom,len(instructions),raw
 
@@ -530,8 +564,11 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
 def render(address,result):
     import match
     data,manifest,source,mapping,index,objects,rom,count,original_elf=result
+    mutable_selected = manifest['profile'] == mutable_native.SCHEMA
     recursive = manifest['profile'] == entry.NATIVE_SCHEMA
+    resident_selected = manifest['profile'] == resident_word.SCHEMA
     word_selected = manifest['profile'] == word_buffer.SCHEMA
+    r6_selected = manifest['profile'] == r6_buffer.SCHEMA
     r7_selected = manifest['profile'] == r7_buffer.SCHEMA
     spilled = manifest['profile'] == formal_spill.SCHEMA
     acyclic = manifest['profile'] == ACYCLIC_SCHEMA
@@ -544,17 +581,17 @@ def render(address,result):
     switch = manifest['profile'] == watched_switch.SCHEMA
     words = manifest['profile'] == descriptor.SCHEMA
     static = manifest['profile'] == static_buffer.SCHEMA
-    buffers = manifest['profile'] in (named_buffer.SCHEMA, static_buffer.SCHEMA, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, disjunctive.SCHEMA, callee_constant.SCHEMA, cursor.SCHEMA, formal_spill.SCHEMA)
+    buffers = manifest['profile'] in (resident_word.SCHEMA, named_buffer.SCHEMA, static_buffer.SCHEMA, r6_buffer.SCHEMA, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, disjunctive.SCHEMA, callee_constant.SCHEMA, cursor.SCHEMA, formal_spill.SCHEMA)
     evidence={'address':address,'bytes':len(data),'instructions':count,'source_sha256':source,
         'mapping_sha256':sha(mapping),'index_sha256':sha(index),'objects_sha256':None if objects is None else sha(objects),
         'rom_sha256':sha(rom),'compiler':[match.DEFAULT_CC,match.DEFAULT_FLAGS],
         'manifest':manifest,'fingerprint':fingerprint(address,data,manifest,source,mapping,index,objects,rom,
-                                                     original_elf if buffers or recursive else None)}
-    if buffers or recursive:
+                                                     original_elf if buffers or recursive or mutable_selected else None)}
+    if buffers or recursive or mutable_selected:
         evidence['original_elf_sha256'] = sha(original_elf)
     return '\n'.join([f'# 0x{address:08X}','',f'* verification: `{manifest["profile"]}`',
-        f'* owner runtime: {entry.SELECTOR if recursive else word_buffer.SELECTOR if word_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else callee_constant.SELECTOR if constant else disjunctive.SELECTOR if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
-        f'* control flow: {entry.CONTROL_FLOW if recursive else word_buffer.CONTROL_FLOW if word_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.CONTROL_FLOW if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
+        f'* owner runtime: {mutable_native.SELECTOR if mutable_selected else entry.SELECTOR if recursive else resident_word.SELECTOR if resident_selected else word_buffer.SELECTOR if word_selected else r6_buffer.SELECTOR if r6_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else callee_constant.SELECTOR if constant else disjunctive.SELECTOR if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
+        f'* control flow: {mutable_native.CONTROL_FLOW if mutable_selected else entry.CONTROL_FLOW if recursive else resident_word.CONTROL_FLOW if resident_selected else word_buffer.CONTROL_FLOW if word_selected else r6_buffer.CONTROL_FLOW if r6_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.CONTROL_FLOW if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
         '* verified extent: complete ELF function symbol, including literal pools',
         '* relocations: none','* source plausibility: plausible','* hand-asm allow list: not listed',
         f'* owner runtime evidence: `{text(evidence)}`',f'* compiled : `{data.hex()}`',
@@ -592,12 +629,12 @@ def issue(root,address,args):
             args.function_address_profile or args.switch_profile or args.label or \
             args.wsl!='Ubuntu' or args.wsl_path!=match.DEFAULT_WSL_PATH:
         raise ValueError('owner profile requires its isolated fixed Thumb selector')
-    if args.owner_runtime_profile in (r7_buffer.SELECTOR, word_buffer.SELECTOR) and any(
+    if args.owner_runtime_profile in (r6_buffer.SELECTOR, r7_buffer.SELECTOR, word_buffer.SELECTOR, resident_word.SELECTOR) and any(
             getattr(args, name, None) for name in ('signed_quotient_profile',
                 'signed_runtime_profile', 'addressed_signed_runtime_profile',
                 'switch_data_profile')):
         raise ValueError('unwritten-R7 selector excludes other profile policies')
-    if args.owner_runtime_profile == entry.SELECTOR and any(
+    if args.owner_runtime_profile in (entry.SELECTOR, mutable_native.SELECTOR) and any(
             getattr(args, name, None) for name in ('signed_quotient_profile',
                 'signed_runtime_profile', 'addressed_signed_runtime_profile',
                 'switch_data_profile')):
@@ -613,8 +650,11 @@ def issue(root,address,args):
     if not args.no_write:
         path=Path(root)/'docs/match'/f'{address:08X}.md';path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(report)
-    control_flow = entry.CONTROL_FLOW if args.owner_runtime_profile == entry.SELECTOR else \
+    control_flow = mutable_native.CONTROL_FLOW if args.owner_runtime_profile == mutable_native.SELECTOR else \
+        resident_word.CONTROL_FLOW if args.owner_runtime_profile == resident_word.SELECTOR else \
+        entry.CONTROL_FLOW if args.owner_runtime_profile == entry.SELECTOR else \
         word_buffer.CONTROL_FLOW if args.owner_runtime_profile == word_buffer.SELECTOR else \
+        r6_buffer.CONTROL_FLOW if args.owner_runtime_profile == r6_buffer.SELECTOR else \
         r7_buffer.CONTROL_FLOW if args.owner_runtime_profile == r7_buffer.SELECTOR else \
         cursor.CONTROL_FLOW if args.owner_runtime_profile == cursor.SELECTOR else \
         callee_constant.CONTROL_FLOW if args.owner_runtime_profile == callee_constant.SELECTOR else \

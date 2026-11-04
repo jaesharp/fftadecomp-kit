@@ -81,7 +81,8 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 entry_stack_policy=None, local_alias_slot_policy=None, finite_stack_index_policy=None,
                 discarded_exit_scratch=None, formal_stack_callee_proof=None,
                 formal_stack_alias_constant_policy=None, formal_stack_entry_word_policy=None,
-                formal_stack_entry_words_policy=None, entry_recursive_calls=None):
+                formal_stack_entry_words_policy=None, mutable_stack_index_policy=None,
+                consumer_scratch_proof=None, entry_recursive_calls=None, native_three_call_policy=None):
     """Prove saved registers, fixed SP, and entry-LR return on every CFG path.
 
     Caller-clobbered registers lose provenance only on actual external calls.
@@ -191,8 +192,59 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         slot_states = alias_slots.prove_constants(instructions, edges, address,
             constant_domain=None if formal_stack_alias_constant_policy is None else alias_slots.FORMAL_MOVS10_DOMAIN)
 
-    finite_states = None
-    finite_additions, finite_reads = set(), set()
+    mutable = mutable_stack_index_policy is not None
+    mutable_slots = False
+    mutable_halfword = False
+    mutable_halfword_array = False
+    mutable_scalar_slots = False
+    scalar_stores, scalar_loads = set(), set()
+    halfword_reads = set()
+    halfword_array_reads, halfword_array_writes = set(), set()
+    if mutable:
+        import mutable_stack_index_profile as finite
+        finite.validate(mutable_stack_index_policy)
+        mutable_three_call = mutable_stack_index_policy == finite.THREE_CALL_SELECTOR
+        mutable_overwrite = mutable_stack_index_policy == finite.LEAF_OVERWRITE_SELECTOR
+        mutable_consumer = mutable_stack_index_policy in (finite.CONSUMER_SCRATCH_SELECTOR, finite.LEAF_OVERWRITE_SELECTOR, finite.THREE_CALL_SELECTOR)
+        mutable_scalar_slots = mutable_stack_index_policy in (finite.SCALAR_SLOT_SELECTOR, finite.CONSUMER_SCRATCH_SELECTOR, finite.LEAF_OVERWRITE_SELECTOR, finite.THREE_CALL_SELECTOR)
+        mutable_halfword_array = mutable_stack_index_policy in (finite.HALFWORD_ACCESS_SELECTOR, finite.SCALAR_SLOT_SELECTOR, finite.CONSUMER_SCRATCH_SELECTOR, finite.LEAF_OVERWRITE_SELECTOR, finite.THREE_CALL_SELECTOR)
+        mutable_halfword = mutable_stack_index_policy in (finite.LOW_HALFWORD_SELECTOR, finite.HALFWORD_ACCESS_SELECTOR, finite.SCALAR_SLOT_SELECTOR, finite.CONSUMER_SCRATCH_SELECTOR, finite.LEAF_OVERWRITE_SELECTOR, finite.THREE_CALL_SELECTOR)
+        mutable_slots = mutable_stack_index_policy in (finite.ALIAS_SLOT_SELECTOR, finite.LOW_HALFWORD_SELECTOR, finite.HALFWORD_ACCESS_SELECTOR, finite.SCALAR_SLOT_SELECTOR, finite.CONSUMER_SCRATCH_SELECTOR, finite.LEAF_OVERWRITE_SELECTOR, finite.THREE_CALL_SELECTOR)
+        if mutable_slots:
+            import local_alias_slot_profile as alias_slots
+        if mutable_halfword:
+            import zero_index_stack_profile as zero_index
+        if not stack_aliases or any(value is not None for value in (buffer_proof,
+                bounded_output_proof, runtime_calls, call_preservation, zero_index_profile,
+                entry_stack_policy, local_alias_slot_policy, finite_stack_index_policy,
+                discarded_exit_scratch, formal_stack_callee_proof, formal_stack_alias_constant_policy,
+                formal_stack_entry_word_policy, formal_stack_entry_words_policy,
+                entry_recursive_calls)):
+            raise ValueError('mutable indices require exclusive local-only conditional ordinary ABI policy')
+
+    if native_three_call_policy is not None:
+        from mutable_three_call_native_profile import SELECTOR as NATIVE_THREE_CALL
+        if type(native_three_call_policy) is not str or native_three_call_policy != NATIVE_THREE_CALL or not mutable or not mutable_three_call:
+            raise ValueError('native three-call roles require their exclusive explicit frame selector')
+
+    if consumer_scratch_proof is not None or mutable and mutable_consumer:
+        from consumer_scratch_alias_profile import ConsumerScratchAliasProof
+        expected = ConsumerScratchAliasProof
+        if mutable and mutable_overwrite:
+            from readonly_leaf_overwrite_profile import ReadonlyLeafOverwriteProof
+            expected = ReadonlyLeafOverwriteProof
+        if mutable and mutable_three_call:
+            from three_call_composition_profile import ThreeCallCompositionProof
+            expected = ThreeCallCompositionProof
+            if native_three_call_policy is not None:
+                from mutable_three_call_native_profile import NativeRoleProof
+                expected = NativeRoleProof
+        if not mutable or not mutable_consumer or type(consumer_scratch_proof) is not expected:
+            raise ValueError('consumer scratch requires its exclusive explicit mutable inventory composition')
+        consumer_scratch_proof.bind_frame(instructions, edges, address, branches, calls)
+
+    finite_states = {} if mutable else None
+    finite_additions, finite_reads, mutable_writes = set(), set(), set()
     if finite_stack_index_policy is not None:
         import finite_stack_index_profile as finite
         finite.validate(finite_stack_index_policy)
@@ -210,6 +262,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             raise ValueError("local alias access leaves aligned allocated local words")
         return position // 4
 
+    def initialized_units(offset, width):
+        # One initialized state, with byte coverage only in the explicit halfword policy.
+        return range(offset, offset + width) if mutable_halfword_array else (offset,)
+
     def alias_offset(register, aliases):
         values = aliases[register]
         if len(values) != 1 or not next(iter(values))[1]:
@@ -226,7 +282,8 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     entry_stack_policy, local_alias_slot_policy, finite_stack_index_policy,
                     discarded_exit_scratch, formal_stack_callee_proof,
                     formal_stack_alias_constant_policy, formal_stack_entry_word_policy,
-                    formal_stack_entry_words_policy)):
+                    formal_stack_entry_words_policy, mutable_stack_index_policy,
+                    consumer_scratch_proof)):
             raise ValueError("entry calls require their exclusive ordinary saved-frame contract")
         entry_sites = entry_recursive_calls.validate_cfg(instructions, edges, address, calls)
     end = max(item.address + item.size for item in instructions.values())
@@ -249,17 +306,21 @@ def prove_frame(instructions, edges, address, branches, calls, *,
     states = {address: (tuple(sorted(initial.items())), (), (), ())}
     if finite_states is not None:
         states[address] += (frozenset(),)
-    pending, returns, maximum = [address], set(), 0
+    if mutable:
+        states = {(address, ((), None)): states[address]}
+    pending, returns, maximum = list(states), set(), 0
     finite_updates = 0
     alias_sites, alias_accesses, alias_calls = set(), set(), set()
     clobbered = (*range(ARM_REG_R0, ARM_REG_R0 + 4), ARM_REG_R12, ARM_REG_LR)
     while pending:
-        site = pending.pop()
+        key = pending.pop()
+        site, context = key if mutable else (key, None)
+        constants, comparison = (dict(context[0]), context[1]) if mutable else ({}, None)
         instruction = instructions[site]
-        registers, stack = dict(states[site][0]), list(states[site][1])
-        aliases = {register: frozenset(values) for register, values in states[site][2]}
-        pointer_slots = {word: frozenset(values) for word, values in states[site][3]}
-        initialized = set(states[site][4]) if finite_states is not None else set()
+        registers, stack = dict(states[key][0]), list(states[key][1])
+        aliases = {register: frozenset(values) for register, values in states[key][2]}
+        pointer_slots = {word: frozenset(values) for word, values in states[key][3]}
+        initialized = set(states[key][4]) if finite_states is not None else set()
         operands = instruction.operands
         regs = tuple(operand.reg for operand in operands if operand.type == ARM_OP_REG)
         adjustment = thumb_stack_adjustment(instruction)
@@ -268,6 +329,25 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             entry_recursive_calls.check_instruction(instruction, registers)
             if site in calls:
                 entry_recursive_calls.check_call(registers, stack)
+        loaded_scalar = None
+
+        def stored_word(register):
+            # Reuse the existing local-word token and all-path stack join. A
+            # scalar tag is distinct from entry-register/return provenance.
+            token = registers.get(register)
+            if mutable_scalar_slots and register in constants and register not in aliases:
+                return ("scalar-word", constants[register])
+            return token
+
+        def recover_word(register, token, offsets):
+            nonlocal loaded_scalar
+            if mutable_scalar_slots and token is not None and token[0] == "scalar-word":
+                alias_slots.word(instruction)
+                loaded_scalar = (register, token[1])
+                scalar_loads.add((site, bytes(instruction.bytes).hex(), register, offsets, token[1]))
+                return None
+            return token
+
         if name == "push":
             if ARM_REG_PC in regs or ARM_REG_SP in regs:
                 raise ValueError("local branch frame cannot save PC or SP")
@@ -290,7 +370,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 raise ValueError("local branch SP release leaves the allocated local frame")
             else:
                 del stack[:adjustment]
-                if slot_states is not None:
+                if slot_states is not None or mutable_slots:
                     pointer_slots = alias_slots.release(pointer_slots, len(stack))
                 # Keep dangling values tainted until overwritten. Reallocating
                 # the same offset must not revive a released pointer lifetime.
@@ -323,7 +403,21 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                         stack[slot] = ('local', None)
                     alias_slots.store(pointer_slots, offset, width)
                 alias_calls.add(site)
-            if set(clobbered) & aliases.keys() and not formal_call:
+            consumer_call = consumer_scratch_proof is not None and bool(set(clobbered) & aliases.keys())
+            if consumer_call:
+                # Validate actual live allocated aliases using the same frame machinery.
+                for register in set(clobbered) & aliases.keys():
+                    for offset in finite.offsets(aliases[register]):
+                        access(offset, 1, stack)
+                before_local = (list(stack), dict(pointer_slots), set(initialized))
+                if mutable_three_call:
+                    consumer_scratch_proof.check_call(site, calls[site], aliases, stack, pointer_slots, initialized)
+                else:
+                    consumer_scratch_proof.check_call(site, calls[site], aliases, pointer_slots)
+                if before_local != (stack, pointer_slots, initialized):
+                    raise ValueError('read-only consumer proof changed local memory provenance')
+                alias_calls.add(site)
+            if set(clobbered) & aliases.keys() and not formal_call and not consumer_call:
                 if buffer_proof is None and bounded_output_proof is None:
                     raise ValueError("local aliases crossing calls require native buffer proof")
                 offsets = {register: alias_offset(register, aliases)
@@ -349,7 +443,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             assignment = None
             loaded_alias = None
             if stack_aliases:
-                if finite_states is not None:
+                if mutable:
+                    assignment = finite.assignment(instruction, aliases, len(stack), constants,
+                        halfword_access=mutable_halfword_array)
+                elif finite_states is not None:
                     assignment = finite.assignment(instruction, aliases, len(stack), finite_states[site])
                 else:
                     exact = {register: alias_offset(register, aliases)
@@ -363,7 +460,9 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                         access(assignment[1], 1, stack)
                     else:
                         for offset in finite.offsets(assignment[1]): access(offset, 1, stack)
-                        if instruction.mnemonic == "add" and assignment[2] == ARM_REG_SP and assignment[0] in finite_states[site]:
+                        if mutable:
+                            finite_additions.add((site, assignment[0], tuple(finite.offsets(assignment[1]))))
+                        elif instruction.mnemonic == "add" and assignment[2] == ARM_REG_SP and assignment[0] in finite_states[site]:
                             finite_additions.add((site, assignment[0], tuple(sorted(
                                 (value, tuple(sorted(origins))) for value,origins in finite_states[site][assignment[0]].items()))))
                     alias_sites.add(site)
@@ -385,7 +484,14 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     width = {"ldr": 4, "str": 4, "ldrh": 2, "strh": 2,
                              "ldrb": 1, "strb": 1, "ldrsh": 2, "ldrsb": 1}.get(name)
                     certified_zero = False
+                    low_halfword = None
                     index_displacement = 0
+                    if mutable_halfword and operand.mem.index:
+                        decoded = zero_index.signed_load(instruction)
+                        if decoded is not None and decoded[2] == 2 and decoded[1] not in aliases and \
+                                constants.get(decoded[1]) == 0:
+                            certified_zero = True
+                            low_halfword = decoded
                     if slot_states is not None and operand.mem.index:
                         decoded = alias_slots.indexed_byte(instruction, slot_states[site], aliases)
                         if decoded is not None:
@@ -405,15 +511,106 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                             operand.subtracted or operand.mem.disp < 0:
                         raise ValueError("local alias requires an ordinary constant-offset memory access")
                     if finite_states is not None:
-                        if name != "ldr" or width != 4 or operand.mem.index:
-                            raise ValueError("finite local aliases permit only aligned read-only local words")
+                        if mutable_halfword_array and name in ('strh', 'ldrh', 'ldrsh'):
+                            writing, register, base, index = finite.halfword(instruction)
+                            if index and (index in aliases or constants.get(index) != 0):
+                                raise ValueError("halfword signed load requires an exact scalar zero index")
+                            offsets = finite.offsets(aliases[base])
+                            positions = [access(offset, 2, stack) for offset in offsets]
+                            event = (site, bytes(instruction.bytes).hex(), name, base, index, offsets)
+                            if writing:
+                                if register in aliases:
+                                    raise ValueError("halfword arrays cannot contain pointer aliases")
+                                alternatives = []
+                                for offset in offsets:
+                                    updated = dict(pointer_slots)
+                                    alias_slots.store(updated, offset, 2)
+                                    alternatives.append(updated)
+                                pointer_slots = alternatives[0]
+                                for alternative in alternatives[1:]:
+                                    pointer_slots = {word: frozenset(values)
+                                        for word, values in alias_slots.join(pointer_slots, alternative)}
+                                for position in positions:
+                                    # Any partial overwrite destroys a whole-word saved token.
+                                    stack[position] = ("local", None)
+                                if len(offsets) == 1:
+                                    initialized.update(initialized_units(offsets[0], 2))
+                                halfword_array_writes.add(event)
+                                for offset in offsets:
+                                    mutable_writes.add((site, base, offset, 2))
+                            else:
+                                if any(not set(initialized_units(offset, 2)) <= initialized for offset in offsets):
+                                    raise ValueError("halfword read requires both bytes initialized on every path")
+                                if any(offset < word + 4 and word < offset + 2
+                                        for offset in offsets for word in pointer_slots):
+                                    raise ValueError("halfword read overlaps a possible pointer word")
+                                halfword_array_reads.add(event)
+                                finite_reads.add((site, base, offsets, 2))
+                            allowed_aliases.add(base)
+                            alias_accesses.add(site)
+                            # Partial loads do not restore full-word tokens, numeric or pointer facts.
+                            continue
+                        if low_halfword is not None:
+                            offsets = finite.offsets(aliases[operand.mem.base])
+                            for offset in offsets:
+                                access(offset, 2, stack)
+                                if offset % 4:
+                                    raise ValueError("low halfword read requires an aligned enclosing local word")
+                                if offset not in initialized:
+                                    raise ValueError("low halfword read requires an initialized enclosing local word")
+                                if any(offset < word + 4 and word < offset + 2 for word in pointer_slots):
+                                    raise ValueError("low halfword read overlaps a possible pointer word")
+                            halfword_reads.add((site, bytes(instruction.bytes).hex(), *low_halfword[:2], offsets))
+                            finite_reads.add((site, operand.mem.base, offsets, 2))
+                            allowed_aliases.add(operand.mem.base)
+                            alias_accesses.add(site)
+                            # A partial scalar load restores neither full-word tokens
+                            # nor pointer/numeric facts. Normal destination kills apply.
+                            continue
+                        if name not in (("ldr", "str") if mutable else ("ldr",)) or width != 4 or operand.mem.index:
+                            raise ValueError("mutable local aliases permit only aligned local-word reads/writes" if mutable
+                                else "finite local aliases permit only aligned read-only local words")
                         offsets = tuple(offset + operand.mem.disp for offset in finite.offsets(aliases[operand.mem.base]))
                         slots = [access(offset, width, stack) for offset in offsets]
-                        if any(offset not in initialized for offset in offsets):
-                            raise ValueError("finite local read requires every alternative initialized on every path")
-                        tokens = [stack[position][1] for position in slots]
-                        assigned = (regs[0], tokens[0] if all(value == tokens[0] for value in tokens) else None)
-                        finite_reads.add((site, operand.mem.base, offsets, width))
+                        if name == "str":
+                            if regs[0] in aliases:
+                                raise ValueError("mutable local arrays cannot contain pointer aliases")
+                            if mutable_slots:
+                                # Each concrete STR writes one alternative, not all of them.
+                                alternatives = []
+                                for offset in offsets:
+                                    updated = dict(pointer_slots)
+                                    alias_slots.store(updated, offset, width)
+                                    alternatives.append(updated)
+                                pointer_slots = alternatives[0]
+                                for alternative in alternatives[1:]:
+                                    pointer_slots = {word: frozenset(values)
+                                        for word, values in alias_slots.join(pointer_slots, alternative)}
+                            if mutable_scalar_slots:
+                                alias_slots.word(instruction)
+                            token = stored_word(regs[0]) if len(slots) == 1 else None
+                            for position in slots:
+                                stack[position] = ("local", token)
+                            if mutable_scalar_slots and token is not None and token[0] == "scalar-word":
+                                scalar_stores.add((site, bytes(instruction.bytes).hex(), regs[0], offsets, token[1]))
+                            # A may-write to several alternatives initializes none of them.
+                            if len(offsets) == 1:
+                                initialized.update(initialized_units(offsets[0], 4))
+                            for offset in offsets:
+                                mutable_writes.add((site, operand.mem.base, offset, width))
+                        else:
+                            if any(not set(initialized_units(offset, 4)) <= initialized for offset in offsets):
+                                raise ValueError("finite local read requires every alternative initialized on every path")
+                            if mutable_slots and any(offset in pointer_slots for offset in offsets):
+                                alias_slots.word(instruction)
+                                loaded_alias = (regs[0], frozenset().union(*(
+                                    pointer_slots.get(offset, alias_slots.UNKNOWN) for offset in offsets)))
+                                slot_loads.update((site, offset) for offset in offsets)
+                            else:
+                                tokens = [stack[position][1] for position in slots]
+                                token = tokens[0] if all(value == tokens[0] for value in tokens) else None
+                                assigned = (regs[0], recover_word(regs[0], token, offsets))
+                            finite_reads.add((site, operand.mem.base, offsets, width))
                         allowed_aliases.add(operand.mem.base)
                         alias_accesses.add(site)
                         continue
@@ -454,31 +651,39 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     incoming_reads.add((site, offset, bytes(instruction.bytes).hex()))
                     assigned = (regs[0], None)
                 elif name == "str":
-                    if regs[0] in aliases and slot_states is None:
+                    if regs[0] in aliases and slot_states is None and not mutable_slots:
                         raise ValueError("local aliases cannot be stored or spilled")
                     if stack[slot][0] != "local":
                         raise ValueError("local branch write overwrites a saved register")
-                    if slot_states is not None:
+                    if slot_states is not None or mutable_slots:
                         offset = operand.mem.disp - 4 * len(stack)
                         if regs[0] in aliases:
                             alias_slots.word(instruction)
-                            access(alias_offset(regs[0], aliases), 1, stack)
+                            slot_target = alias_offset(regs[0], aliases)
+                            access(slot_target, 1, stack)
+                            if mutable_slots and slot_target % 4:
+                                raise ValueError("mutable pointer slots require an aligned local target")
                             allowed_aliases.add(regs[0])
-                            slot_stores.add((site, offset, alias_offset(regs[0], aliases)))
+                            slot_stores.add((site, offset, slot_target))
                         alias_slots.store(pointer_slots, offset, 4, aliases.get(regs[0]))
-                    stack[slot] = ("local", registers.get(regs[0]))
+                    if mutable_scalar_slots:
+                        alias_slots.word(instruction)
+                    token = stored_word(regs[0])
+                    stack[slot] = ("local", token)
+                    if mutable_scalar_slots and token is not None and token[0] == "scalar-word":
+                        scalar_stores.add((site, bytes(instruction.bytes).hex(), regs[0], (offset,), token[1]))
                     if finite_states is not None:
-                        initialized.add(operand.mem.disp - 4 * len(stack))
+                        initialized.update(initialized_units(operand.mem.disp - 4 * len(stack), 4))
                 else:
                     offset = operand.mem.disp - 4 * len(stack)
-                    if finite_states is not None and stack[slot][0] == "local" and offset not in initialized:
+                    if finite_states is not None and stack[slot][0] == "local" and not set(initialized_units(offset, 4)) <= initialized:
                         raise ValueError("finite local word is not initialized on every path")
                     if offset in pointer_slots:
                         alias_slots.word(instruction)
                         loaded_alias = (regs[0], pointer_slots[offset])
                         slot_loads.add((site, offset))
                     else:
-                        assigned = (regs[0], stack[slot][1])
+                        assigned = (regs[0], recover_word(regs[0], stack[slot][1], (offset,)))
             if (ARM_REG_SP in regs and assignment is None) or ARM_REG_SP in written:
                 raise ValueError("local branch frame excludes stack-address materialization")
             if (set(read) & aliases.keys()) - allowed_aliases:
@@ -517,10 +722,19 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     tuple(sorted((word, tuple(sorted(values))) for word, values in pointer_slots.items())))
         if finite_states is not None:
             outgoing += (frozenset(initialized),)
-        for successor in edges[site]:
+        next_context = finite.transfer(instruction, constants, comparison, call=site in calls) if mutable else None
+        if loaded_scalar is not None:
+            # Normal transfer kills the load destination first. Recovery is
+            # allowed only after complete initialized, nonpointer word checks.
+            recovered = dict(next_context[0])
+            recovered[loaded_scalar[0]] = loaded_scalar[1]
+            next_context = (tuple(sorted(recovered.items())), next_context[1])
+        successors = finite.successors(instruction, edges[site], comparison) if mutable else edges[site]
+        for successor in successors:
             if successor not in instructions:
                 raise ValueError("local branch frame escaped its complete CFG")
-            previous = states.get(successor)
+            successor_key = (successor, next_context) if mutable else successor
+            previous = states.get(successor_key)
             merged = outgoing
             if previous is not None:
                 if len(previous[1]) != len(stack) or any(a[0] != b[0] for a, b in zip(previous[1], stack)):
@@ -535,7 +749,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                           tuple((kind, old if old == new else None)
                                 for (kind, old), (_, new) in zip(previous[1], stack)), joined_aliases,
                           alias_slots.join({word:frozenset(values) for word,values in previous[3]},pointer_slots)
-                            if slot_states is not None else ())
+                            if slot_states is not None or mutable_slots else ())
                 if finite_states is not None:
                     if any(len(values) > finite.MAX_VALUES for _,values in joined_aliases):
                         raise ValueError("finite local alias alternative budget exceeded")
@@ -545,9 +759,9 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     finite_updates += 1
                     if finite_updates > finite.MAX_UPDATES:
                         raise ValueError("finite local frame proof-state budget exceeded")
-                states[successor] = merged
-                pending.append(successor)
-    if set(states) != set(instructions) or not returns:
+                states[successor_key] = merged
+                pending.append(successor_key)
+    if ({site for site, _ in states} if mutable else set(states)) != set(instructions) or not returns:
         raise ValueError("local branch frame proof does not cover the complete reachable owner")
     proof = {"schema": SCHEMA, "instructions": len(instructions), "maximum_frame_bytes": maximum,
             "returns": sorted(returns), "preserved": "r4-r11,sp,entry-lr",
@@ -569,6 +783,9 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                                   "accesses": sorted(alias_accesses), "buffer_calls": sorted(alias_calls),
                                   "buffer_fingerprint": (bounded_output_proof or buffer_proof).fingerprint()
                                     if bounded_output_proof or buffer_proof else None}
+    if consumer_scratch_proof is not None:
+        proof['three_call_composition' if mutable_three_call else
+              'readonly_leaf_overwrite_aliases' if mutable_overwrite else 'consumer_scratch_aliases'] = consumer_scratch_proof.manifest()
     if discarded_exit_scratch is not None:
         proof['discarded_exit_scratch'] = {'schema': DISCARDED_SCRATCH_SCHEMA,
             'registers': list(discarded_exit_scratch['registers']),
@@ -600,11 +817,72 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 constant_policy=formal_stack_alias_constant_policy,
                 constant_domain="exact MOVS 1/2/3/10 only; all-path intersection; every call kills facts",
                 allowed_MOVS_constants=list(alias_slots.FORMAL_MOVS10_DOMAIN))
-    if finite_states is not None:
+    if mutable_slots:
+        proof["mutable_local_pointer_slots"] = {"schema": "thumb-mutable-local-pointer-slots-v1",
+            "policy": mutable_stack_index_policy, "source_or_ELF_admission": False,
+            "provenance_api": "local_alias_slot_profile.word/store/join/release",
+            "stores": [list(row) for row in sorted(slot_stores)],
+            "loads": [list(row) for row in sorted(slot_loads)],
+            "contract": "aligned allocated direct-SP singleton pointer stores; word reload preserves possible aliases; missing/partial/may-write paths retain taint; release expires lifetime",
+            "pointee_initialization_from_pointer_store": False}
+    if mutable_halfword and not mutable_halfword_array:
+        proof["mutable_low_signed_halfword_reads"] = {
+            "schema": "thumb-mutable-low-signed-halfword-reads-v1",
+            "policy": mutable_stack_index_policy, "source_or_ELF_admission": False,
+            "read_width_bytes": 2, "initialized_enclosing_word_bytes": 4,
+            "initialization_effect": False, "numeric_result_facts": False,
+            "reads": [{"site": site, "bytes": encoded, "base_register": base,
+                "index_register": index, "index_value": 0, "offsets": list(offsets)}
+                for site, encoded, base, index, offsets in sorted(halfword_reads)],
+            "contract": "exact zero-index LDRSH; initialized aligned local low halfword; no pointer overlap, stores or partial-word facts"}
+    if mutable_halfword_array:
+        def halfword_records(events):
+            return [{"site": site, "bytes": encoded, "mnemonic": name,
+                "base_register": base, "index_register": index,
+                "index_value": 0 if index else None, "offsets": list(offsets),
+                "width": 2} for site, encoded, name, base, index, offsets in sorted(events)]
+        proof["mutable_halfword_accesses"] = {
+            "schema": "thumb-mutable-local-halfword-access-v1",
+            "policy": mutable_stack_index_policy, "source_or_ELF_admission": False,
+            "initialization_unit_bytes": 1, "numeric_result_facts": False,
+            "reads": halfword_records(halfword_array_reads),
+            "writes": halfword_records(halfword_array_writes),
+            "initialization": "one byte-coverage initialized state; definite singleton writes cover only actual bytes; joins intersect and release prunes",
+            "pointer_taint": "existing local_alias_slot store/join/release; partial writes retain taint; partial reads reject any overlap",
+            "contract": "live allocated aligned local STRH/LDRH offset0 and exact zero-index LDRSH; no byte access, word-token recovery or new incoming-memory permission"}
+    if mutable_scalar_slots:
+        def scalar_records(events):
+            return [{"site": site, "bytes": encoded, "register": register,
+                "offsets": list(offsets), "width": 4, "value": value}
+                for site, encoded, register, offsets, value in sorted(events)]
+        proof["mutable_scalar_word_slots"] = {
+            "schema": "thumb-mutable-local-scalar-word-slots-v1",
+            "policy": mutable_stack_index_policy, "source_or_ELF_admission": False,
+            "stores": scalar_records(scalar_stores), "loads": scalar_records(scalar_loads),
+            "provenance_api": "existing stack word tokens, exact finite contexts and local_alias_slot_profile.word/store/join/release",
+            "contract": "exact finite scalar facts from authenticated full aligned allocated word stores; all bytes initialized and identical all-path word token for recovery; partial/unknown writes, lifetime release and pointer taint forbid recovery",
+            "incoming_or_partial_memory_facts": False}
+    if mutable:
+        proof["mutable_stack_indices"] = {"schema": finite.SCHEMA, "policy": mutable_stack_index_policy,
+            "assignments": [[site, register, list(offsets)] for site, register, offsets in sorted(finite_additions)],
+            "reads": [[site, base, list(offsets), width] for site, base, offsets, width in sorted(finite_reads)],
+            "writes": [list(row) for row in sorted(mutable_writes)],
+            "contexts": len(states), "source_or_ELF_admission": False,
+            "domain": ("exact 32-bit register constants; selected index additions0/2/4/6/8/12; separate path contexts; resource refusal" if mutable_halfword_array else "exact 32-bit register constants; index additions only 0/4/8/12; separate path contexts; resource refusal"),
+            "initialization": ("singleton writes cover only actual bytes; reads require all bytes; joins intersect; ambiguous writes initialize none" if mutable_halfword_array else "singleton writes initialize their own aligned local word; joins intersect; ambiguous writes initialize none"),
+            "exclusions": ("no nonzero halfword displacements, byte accesses, buffers, incoming words or local aliases in scratch call arguments" if mutable_halfword_array
+                else "no halfword stores/upper lanes, buffers, incoming words or local aliases in scratch call arguments" if mutable_halfword
+                else "no halfwords, buffers, incoming words or local aliases in scratch call arguments" if mutable_slots
+                else "no pointer slots, halfwords, buffers, incoming words or local aliases in scratch call arguments")}
+    elif finite_states is not None:
         proof["finite_stack_indices"] = {"schema": finite.SCHEMA, "policy": finite_stack_index_policy,
             "SP_additions": [[site,register,[[value,list(origins)] for value,origins in alternatives]]
                 for site,register,alternatives in sorted(finite_additions)],
             "reads": [[site,base,list(offsets),width] for site,base,offsets,width in sorted(finite_reads)],
             "constant_domain": "MOVS0/1, exact LSL2, all-path union of at most2 known values in0/1/4; missing arms unknown; caller-saved calls kill facts",
             "alias_domain": "at most2 live allocated offsets; read-only initialized aligned words on every alternative; no spills, buffer or entry-word premise"}
+    if mutable and mutable_three_call:
+        proof['mutable_stack_indices']['exclusions'] = (
+            'no nonzero halfword displacements, byte accesses, buffers or incoming words; '
+            'scratch aliases only at three explicitly selected, independently certified calls')
     return proof

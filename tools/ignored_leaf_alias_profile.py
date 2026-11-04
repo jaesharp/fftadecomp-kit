@@ -96,6 +96,8 @@ def flag_effects(instruction):
 
 class IgnoredLeafAliasProof:
     """Fresh context, restricted to one caller and its exact reached BL sites."""
+    instruction_effects = staticmethod(effects)
+
     def __init__(self, rom, mapping, index, objects, caller, size, calls):
         self.rom, self.mapping, self.index, self.objects = rom, mapping, index, objects
         self.caller, self.size, self.calls = caller, size, dict(calls)
@@ -126,7 +128,7 @@ class IgnoredLeafAliasProof:
             self.mapping, self.index, self.objects, selector=owner.ACYCLIC_SELECTOR)
         if type(rows[0].get('instrs')) is not int or rows[0]['instrs'] != len(verified):
             raise ValueError('ignored leaf JSON reachable instruction count differs')
-        accesses = {site: effects(item) for site, item in instructions.items()}
+        accesses = {site: self.instruction_effects(item) for site, item in instructions.items()}
         pending, seen = [(target, 0)], set()
         while pending:
             current, defined = pending.pop()
@@ -149,6 +151,13 @@ class IgnoredLeafAliasProof:
             raise ValueError('ignored leaf call is not bound to an exact original BL site')
         if pointer_slots:
             raise ValueError('ignored leaf excludes incoming stack pointer slots')
+        return self.prove_incoming_overwrite(site, target, aliases)
+
+    def prove_incoming_overwrite(self, site, target, aliases):
+        """Existing closed complete-leaf overwrite policy, independent of local memory state."""
+        import match
+        if self.calls.get(site) != target or not self.caller <= site < self.caller + self.size:
+            raise ValueError('ignored leaf call is not bound to an exact original BL site')
         registers = sorted(set(aliases) & set(match.CALLER_CLOBBERED))
         if not registers:
             raise ValueError('ignored leaf proof requires an incoming caller-clobbered alias')
