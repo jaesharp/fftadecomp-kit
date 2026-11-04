@@ -760,6 +760,17 @@ Fixed frames, buffer proofs, runtime thunks, indirect transfers, switches,
 callback literals and named object relocations remain excluded. This profile
 does not by itself verify a larger caller combining those features.
 
+The explicit companion `--unsigned-quotient-profile positive-constant-frame-v1`
+uses schema `elf-symbol-thumb-udivsi3-positive-constant-frame-v1`. It requires
+a real fixed caller allocation, balanced stack/save/return provenance and
+the existing bounded stack-alias checks, with unchanged nonzero constant
+divisor facts. It admits optional ordinary mapped direct calls, including
+outgoing word arguments, while retaining the exclusions above for other
+runtime profiles, switches, object relocations and buffer proofs. It requires
+the fixed approved Thumb toolchain and fresh source compilation on report
+replay; a forged source digest cannot replace canonical ELF provenance.
+The default profile remains frameless.
+
 The accepted runtime identity is `agbcc-thumb-udivsi3-v1`: the entire 120-byte
 Thumb function at `[0x08142AB0, 0x08142B28)` and its complete two-byte `__div0`
 dependency at `[0x0814274C, 0x0814274E)`. Their pinned SHA-256 digests are,

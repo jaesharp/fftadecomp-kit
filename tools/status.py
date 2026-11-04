@@ -244,6 +244,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
         owner_profile = False
         constants_profile = False
         typed_outgoing_profile = False
+        unsigned_quotient_frame = False
         quotient_frame = False
         signed_runtime_profile = False
         unsigned_runtime_profile = False
@@ -270,6 +271,8 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                     target_remainder_profile = software_double.target_remainder_selected(saved_report)
                 thunk_profile = function_thunk.selector_for_report(saved_report)
                 spin_profile = inert_spin.selected(saved_report)
+                from match_evidence import UDIVSI3_FRAMED_SCHEMA
+                unsigned_quotient_frame = f"* verification: `{UDIVSI3_FRAMED_SCHEMA}`" in saved_report.splitlines()
                 quotient_frame = f"* verification: `{divsi3.FRAMED_SCHEMA}`" in saved_report.splitlines()
                 saved_flags = compiler_flags(saved_report)
             except ValueError as error:
@@ -287,6 +290,9 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 return 0, 0, problems, []
             if signed_runtime_profile and not report_matches(saved_report, root, int(addr, 16)):
                 problems.append(f"{addr}: invalid saved signed divmod report")
+                return 0, 0, problems, []
+            if unsigned_quotient_frame and not report_matches(saved_report, root, int(addr, 16)):
+                problems.append(f"{addr}: invalid saved framed unsigned quotient report")
                 return 0, 0, problems, []
             if quotient_frame and not report_matches(saved_report, root, int(addr, 16)):
                 problems.append(f"{addr}: invalid saved framed signed quotient report")
@@ -326,6 +332,9 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command += ["--signed-runtime-profile", signed_runtime_profile]
             if addressed_runtime_profile:
                 command += ["--addressed-signed-runtime-profile", addressed_runtime_profile]
+            if unsigned_quotient_frame:
+                from match_evidence import UDIVSI3_FRAMED_SELECTOR
+                command += ["--unsigned-quotient-profile", UDIVSI3_FRAMED_SELECTOR]
             if quotient_frame:
                 command += ["--signed-quotient-profile", divsi3.FRAMED_SELECTOR]
             if saved_flags is not None:
@@ -334,7 +343,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command.append("--no-write")
             result = subprocess.run(command, capture_output=True, text=True)
             ok = result.returncode == 0 and "verdict MATCH - byte identical" in result.stdout.splitlines()
-        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or typed_outgoing_profile or owner_profile or quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
+        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or typed_outgoing_profile or owner_profile or quotient_frame or unsigned_quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
             if os.path.exists(rep):
                 with open(rep, encoding="utf-8") as report_file:
                     report = report_file.read()

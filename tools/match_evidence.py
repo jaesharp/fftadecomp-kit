@@ -53,6 +53,15 @@ STACK_BUFFER_SUMMARY = "ROM-checked bounded register and stack buffer arguments 
 UDIVSI3_SCHEMA = "elf-symbol-thumb-udivsi3-v1"
 UDIVSI3_SUMMARY = "pinned Thumb unsigned division runtime with CFG-proven nonzero constant divisors"
 UDIVSI3_RUNTIME = "agbcc-thumb-udivsi3-v1"
+UDIVSI3_FRAMED_SELECTOR = "positive-constant-frame-v1"
+UDIVSI3_FRAMED_SCHEMA = "elf-symbol-thumb-udivsi3-positive-constant-frame-v1"
+UDIVSI3_FRAMED_SUMMARY = UDIVSI3_SUMMARY + " and a verified caller stack frame"
+
+
+def udivsi3_schema(selector=None):
+    if selector is not None and selector != UDIVSI3_FRAMED_SELECTOR:
+        raise ValueError("unsupported unsigned quotient selector")
+    return UDIVSI3_FRAMED_SCHEMA if selector is not None else UDIVSI3_SCHEMA
 
 
 def report_rom_path(root):
@@ -66,9 +75,9 @@ def udivsi3_manifest(manifest):
     return json.dumps(manifest, sort_keys=True, separators=(",", ":"))
 
 
-def udivsi3_fingerprint(address, data, manifest):
+def udivsi3_fingerprint(address, data, manifest, *, selector=None):
     digest = hashlib.sha256()
-    for payload in (UDIVSI3_SCHEMA.encode("ascii"), address.to_bytes(4, "little"),
+    for payload in (udivsi3_schema(selector).encode("ascii"), address.to_bytes(4, "little"),
                     data, udivsi3_manifest(manifest).encode("ascii")):
         digest.update(len(payload).to_bytes(8, "little"))
         digest.update(payload)
@@ -76,7 +85,7 @@ def udivsi3_fingerprint(address, data, manifest):
 
 
 def udivsi3_report_matches(lines, root, address):
-    from match import verify_udivsi3
+    from match import DEFAULT_CC, DEFAULT_FLAGS, verify_udivsi3, verify_udivsi3_source
 
     def single(prefix):
         marker = prefix.rstrip(" :-")
@@ -103,20 +112,32 @@ def udivsi3_report_matches(lines, root, address):
         return result
 
     try:
+        framed = single("* verification: ") == f"`{UDIVSI3_FRAMED_SCHEMA}`"
+        selector = UDIVSI3_FRAMED_SELECTOR if framed else None
         mapping = mapping_snapshot(root)
-        if single("* verification: ") != f"`{UDIVSI3_SCHEMA}`" or mapping is None or \
+        source_digest = source_fingerprint(root, address)
+        if single("* verification: ") != f"`{udivsi3_schema(selector)}`" or mapping is None or \
                 unquote("* source SHA-256: ") != source_fingerprint(root, address) or \
                 unquote("* mapping SHA-256: ") != mapping_fingerprint(mapping) or \
-                single("* unsigned division: ") != UDIVSI3_SUMMARY or \
+                single("* unsigned division: ") != (UDIVSI3_FRAMED_SUMMARY if framed else UDIVSI3_SUMMARY) or \
                 single("* control flow: ") != CALL_SUMMARY or \
                 single("* source plausibility: ") != "plausible" or \
                 single("* relocations: ") != "none" or \
                 single("* verified extent: ") != "complete ELF function symbol, including literal pools" or \
-                any(line.lstrip().startswith(("* stack frame", "* buffer calls", "* buffer proof SHA-256",
+                any(line.lstrip().startswith(("* buffer calls", "* buffer proof SHA-256",
                                               "* data symbols SHA-256", "* switches", "* switch manifest",
                                               "* switch proof SHA-256", "* function addresses",
                                               "* function address manifest", "* function address proof SHA-256"))
                     for line in lines):
+            return False
+        if framed:
+            if single("* stack frame: ") != STACK_SUMMARY or \
+                    unquote("* compiler: ") != f"{DEFAULT_CC} {DEFAULT_FLAGS}" or \
+                    any(line.lstrip().startswith(("* signed quotient", "* signed remainder",
+                                                 "* unsigned remainder", "* inert spins",
+                                                 "* software", "* owner")) for line in lines):
+                return False
+        elif any(line.lstrip().startswith("* stack frame") for line in lines):
             return False
         encoded = unquote("* compiled : ")
         if re.fullmatch(r"(?:[0-9a-f]{2})+", encoded) is None:
@@ -127,12 +148,17 @@ def udivsi3_report_matches(lines, root, address):
         if udivsi3_manifest(manifest) != encoded_manifest:
             return False
         rom = Path(report_rom_path(root)).read_bytes()
-        verify_udivsi3(data, address, rom, mapping, manifest)
+        if framed:
+            verify_udivsi3_source(root, address, data, rom, mapping, source_digest,
+                                 manifest, selector=selector)
+        else:
+            verify_udivsi3(data, address, rom, mapping, manifest)
         return (single("* ROM bytes: ") == f"`{data.hex()}` ({len(data)} bytes)" and
                 single("**MATCH - byte identical** - ") == f"{len(data)}/{len(data)} bytes" and
                 unquote("* unsigned division proof SHA-256: ") ==
-                udivsi3_fingerprint(address, data, manifest))
-    except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError, RecursionError):
+                udivsi3_fingerprint(address, data, manifest, selector=selector))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError, RecursionError,
+            RuntimeError, subprocess.SubprocessError):
         return False
 
 
@@ -945,7 +971,8 @@ def report_matches(report, root, address):
         return False
     if profiles == [f"* verification: `{PRELOADED_SWITCH_SCHEMA}`"]:
         return preloaded_switch_report_matches(lines, root, address)
-    if profiles == [f"* verification: `{UDIVSI3_SCHEMA}`"]:
+    if profiles in ([f"* verification: `{UDIVSI3_SCHEMA}`"],
+                    [f"* verification: `{UDIVSI3_FRAMED_SCHEMA}`"]):
         return udivsi3_report_matches(lines, root, address)
     if any(line.startswith(("* unsigned division:", "* unsigned division manifest:",
                             "* unsigned division proof SHA-256:")) for line in lines):

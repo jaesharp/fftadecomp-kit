@@ -67,7 +67,8 @@ from match_evidence import (BUFFER_SCHEMA, BUFFER_SUMMARY, CALL_SUMMARY, DATA_SC
                             PRELOADED_SWITCH_SCHEMA, PRELOADED_SWITCH_SUMMARY,
                             PRELOADED_SWITCH_CONTROL_FLOW, preloaded_switch_fingerprint,
                             UDIVSI3_SCHEMA, UDIVSI3_SUMMARY, UDIVSI3_RUNTIME,
-                            udivsi3_fingerprint, udivsi3_manifest,
+                            UDIVSI3_FRAMED_SELECTOR, UDIVSI3_FRAMED_SCHEMA, UDIVSI3_FRAMED_SUMMARY,
+                            udivsi3_schema, udivsi3_fingerprint, udivsi3_manifest,
                             STACK_SUMMARY, data_snapshot, mapping_fingerprint,
                             function_address_fingerprint, function_address_manifest,
                             mapping_snapshot, source_fingerprint, source_paths, report_rom_path,
@@ -1349,6 +1350,63 @@ def verify_divsi3_source(root, address, data, rom, mapping, source_digest, manif
         _signed_replay_active.reset(token)
 
 
+_unsigned_quotient_replay_active = ContextVar("unsigned_quotient_replay_active", default=False)
+
+
+def verify_udivsi3_source(root, address, data, rom, mapping, source_digest, manifest, *, selector=None):
+    udivsi3_schema(selector)
+    if _unsigned_quotient_replay_active.get():
+        raise ValueError("recursive unsigned quotient replay is unsupported")
+    token = _unsigned_quotient_replay_active.set(True)
+    try:
+        root = Path(root)
+        candidates = list((root / "src").rglob(f"{address:08X}.c"))
+        if len(candidates) != 1 or source_fingerprint(root, address) != source_digest or \
+                mapping_snapshot(root) != mapping:
+            raise ValueError("unsigned quotient replay inputs differ")
+        selected_rom = report_rom_path(root)
+        if Path(selected_rom).read_bytes() != rom:
+            raise ValueError("unsigned quotient replay ROM differs")
+        args = argparse.Namespace(cc=DEFAULT_CC, cpp=DEFAULT_CPP, assembler=DEFAULT_AS,
+                                  objcopy=DEFAULT_OBJCOPY, linker=DEFAULT_LD, flags=DEFAULT_FLAGS)
+        (root / "build").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="ffta_unsigned_quotient_replay_", dir=root / "build") as directory:
+            captured = Path(directory)
+            for path in source_paths(root, address):
+                destination = captured / path.relative_to(root)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(path.read_bytes())
+            if source_fingerprint(captured, address) != source_digest:
+                raise ValueError("unsigned quotient source capture differs")
+            runner = Runner(DEFAULT_CC, "Ubuntu", DEFAULT_WSL_PATH, root=captured,
+                            timeout=SIGNED_REPLAY_TIMEOUT)
+            with runner.workspace() as workspace:
+                _, _, original = compile_object(runner, workspace, args, captured, address,
+                                                 candidates[0].relative_to(root).as_posix())
+                bindings = {}
+                got, calls, literals = link_calls(runner, workspace, args, original, address,
+                                                  mapping, len(rom), rom, udivsi3_bindings=bindings)
+                fresh_calls = [[site - address, bindings.get(site, f"func_{target:08X}")]
+                               for site, target in sorted(calls.items())]
+                if not bindings or set(bindings.values()) != {"__udivsi3"} or literals or \
+                        got != data or fresh_calls != manifest.get("calls"):
+                    raise ValueError("unsigned quotient lacks fresh canonical ELF provenance")
+                instructions = verify_udivsi3(got, address, rom, mapping, manifest, selector=selector)
+            checker = Path(__file__).resolve().with_name("plausible.py")
+            result = _run_replay_process(
+                [sys.executable, str(checker), "--quiet", "--addr", f"0x{address:08X}", "--json"] +
+                [str(path) for path in source_paths(captured, address)], captured, SIGNED_REPLAY_TIMEOUT)
+            findings, _ = plausibility_result(result, address)
+            if findings or source_fingerprint(captured, address) != source_digest:
+                raise ValueError("unsigned quotient captured source changed or is implausible")
+        if source_fingerprint(root, address) != source_digest or mapping_snapshot(root) != mapping or \
+                report_rom_path(root) != selected_rom or Path(selected_rom).read_bytes() != rom:
+            raise ValueError("unsigned quotient replay inputs changed")
+        return instructions
+    finally:
+        _unsigned_quotient_replay_active.reset(token)
+
+
 _unsigned_remainder_replay_active = ContextVar("unsigned_remainder_replay_active", default=False)
 
 
@@ -1410,8 +1468,12 @@ def verify_umodsi3_source(root, address, data, rom, mapping, data_mapping, sourc
         _unsigned_remainder_replay_active.reset(token)
 
 
-def verify_udivsi3(data, address, rom, mapping, manifest):
-    if not isinstance(manifest, dict) or set(manifest) != {"calls", "runtime", "divisors"} or \
+def verify_udivsi3(data, address, rom, mapping, manifest, *, selector=None):
+    udivsi3_schema(selector)
+    framed = selector == UDIVSI3_FRAMED_SELECTOR
+    fields = {"calls", "runtime", "divisors"} | ({"frame"} if framed else set())
+    if not isinstance(manifest, dict) or set(manifest) != fields or \
+            framed and manifest.get("frame") is not True or \
             manifest["runtime"] != UDIVSI3_RUNTIME or \
             not isinstance(manifest["calls"], list) or not isinstance(manifest["divisors"], list):
         raise ValueError("invalid division manifest")
@@ -1459,7 +1521,8 @@ def verify_udivsi3(data, address, rom, mapping, manifest):
         raise ValueError("division constants must cover every runtime call exactly once")
     observed = {}
     instructions = verify_leaf_instructions(
-        data, address, True, calls, udivsi3_context=(rom, mapping, observed))
+        data, address, True, calls, udivsi3_context=(rom, mapping, observed),
+        unsigned_quotient_profile=selector)
     if observed != expected:
         raise ValueError("division constants disagree with verified incoming CFG state")
     return instructions
@@ -2853,8 +2916,24 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                              zero_aware_mixed_inventory_context=None,
                              zero_aware_unsigned_quotient_inventory_context=None,
                              addressed_signed_runtime_context=None, entry_recursive_calls=None,
-                             typed_switch_outgoing_frame=None):
+                             typed_switch_outgoing_frame=None, unsigned_quotient_profile=None):
     """Verify a local CFG, optionally applying validated direct-call ABI summaries."""
+    udivsi3_schema(unsigned_quotient_profile)
+    if unsigned_quotient_profile is not None and (
+            not thumb or udivsi3_context is None or preloaded_switch or
+            allow_switch_constants or allow_switch_scalar_frame or any(
+                context is not None for context in (buffer_proof, call_resolver, switch_relocations,
+                    switch_data_relocations, modsi3_context, divsi3_context, inert_spin_context,
+                    double_context, function_thunk_context, umodsi3_context, ashldi3_context,
+                    float_context, acyclic_state_budget, ignored_leaf_alias_proof,
+                    signed_quotient_profile, stack_pointer_compare_profile, signed_runtime_context,
+                    remainder_inventory_context, remainder_ordinary_inventory_context,
+                    remainder_shift_inventory_context, remainder_framed_shift_inventory_context,
+                    remainder_byte_range_inventory_context, bounded_stack_output_inventory_context,
+                    bounded_stack_output_zero_index_inventory_context, zero_aware_mixed_inventory_context,
+                    zero_aware_unsigned_quotient_inventory_context, addressed_signed_runtime_context,
+                    entry_recursive_calls, typed_switch_outgoing_frame))):
+        raise ValueError("framed unsigned quotient requires its isolated canonical Thumb context")
     bounded_output_proof = None
     addressed_dependencies = None
     if typed_switch_outgoing_frame is not None:
@@ -3763,7 +3842,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
     if seen_calls != calls.keys():
         raise ValueError("call relocations are not all reachable verified instructions")
     if division_constants is not None and \
-            (not division_constants or uses_stack_frame(instructions.values())):
+            (not division_constants or unsigned_quotient_profile is None and
+             uses_stack_frame(instructions.values())):
         raise ValueError("division evidence requires runtime calls and a frameless caller")
     if not returns:
         raise ValueError("function has no verified return")
@@ -3863,6 +3943,13 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             raise ValueError("software-double runtime cannot be materialized as a literal")
     if switch_data_relocations is not None:
         verify_data_literals(instructions.values(), address, switch_data_relocations)
+    if unsigned_quotient_profile is not None:
+        if not any((thumb_stack_adjustment(item) or
+                    thumb_literal_stack_adjustment(item, data, address) or 0) < 0
+                   for item in instructions.values()):
+            raise ValueError("framed unsigned quotient requires an allocated caller stack frame")
+        from local_long_branch_profile import prove_frame
+        prove_frame(instructions, edges, address, {}, calls, stack_aliases=True)
     if divsi3_context is not None:
         if signed_quotient_profile == divsi3.FRAMED_SELECTOR:
             # Reached only after the complete CFG, stack/save/return, alias and
@@ -4038,6 +4125,7 @@ def main():
     ap.add_argument("--mode", default="thumb", choices=("thumb", "arm"))
     ap.add_argument("--control-flow-profile", default="ordinary", choices=("ordinary", inert_spin.SELECTOR))
     ap.add_argument("--signed-quotient-profile", choices=(divsi3.FRAMED_SELECTOR,))
+    ap.add_argument("--unsigned-quotient-profile", choices=(UDIVSI3_FRAMED_SELECTOR,))
     ap.add_argument("--signed-runtime-profile", choices=tuple(signed_divmod.SCHEMAS))
     ap.add_argument("--unsigned-runtime-profile", choices=(unsigned_divmod.SELECTOR,))
     ap.add_argument("--addressed-signed-runtime-profile", choices=tuple(addressed_signed_runtime.SCHEMAS))
@@ -4083,6 +4171,15 @@ def main():
         switch_u16_scalar_configuration(args)
     except ValueError as error:
         sys.exit(str(error))
+    if args.unsigned_quotient_profile is not None and (
+            args.mode != "thumb" or args.control_flow_profile != "ordinary" or any((
+                args.signed_quotient_profile, args.signed_runtime_profile, args.unsigned_runtime_profile,
+                args.addressed_signed_runtime_profile, args.software_double_profile,
+                args.software_double_remainder_profile, args.function_address_profile,
+                args.switch_profile, args.switch_data_profile, args.owner_runtime_profile)) or
+            (args.cc, args.cpp, args.assembler, args.objcopy, args.linker, args.flags) !=
+            (DEFAULT_CC, DEFAULT_CPP, DEFAULT_AS, DEFAULT_OBJCOPY, DEFAULT_LD, DEFAULT_FLAGS)):
+        sys.exit("framed unsigned quotient excludes other selectors and requires the fixed Thumb toolchain")
     if args.unsigned_runtime_profile is not None:
         return unsigned_divmod.issue(Path(ROOT), addr, args)
     if args.addressed_signed_runtime_profile is not None:
@@ -4350,14 +4447,17 @@ def main():
             elif udivsi3_bindings:
                 divisors = {}
                 verify_leaf_instructions(got, addr, True, calls,
-                                         udivsi3_context=(rom, mapping, divisors))
+                                         udivsi3_context=(rom, mapping, divisors),
+                                         unsigned_quotient_profile=args.unsigned_quotient_profile)
                 division_evidence = {
                     "calls": [[site - addr, udivsi3_bindings.get(site, f"func_{target:08X}")]
                               for site, target in sorted(calls.items())],
                     "runtime": UDIVSI3_RUNTIME,
                     "divisors": [[site - addr, divisor] for site, divisor in sorted(divisors.items())]}
+                if args.unsigned_quotient_profile is not None:
+                    division_evidence["frame"] = True
                 verified_instructions = verify_udivsi3(
-                    got, addr, rom, mapping, division_evidence)
+                    got, addr, rom, mapping, division_evidence, selector=args.unsigned_quotient_profile)
             elif switch_relocations:
                 switch_evidence = {
                     "calls": [[site - addr, f"func_{target:08X}"]
@@ -4427,6 +4527,8 @@ def main():
                                                                       buffer_proof=buffer_proof)
             if args.signed_quotient_profile is not None and quotient_evidence is None:
                 raise ValueError("framed signed quotient requires canonical __divsi3 ELF calls")
+            if args.unsigned_quotient_profile is not None and division_evidence is None:
+                raise ValueError("framed unsigned quotient requires canonical __udivsi3 ELF calls")
             verify_data_literals(verified_instructions, addr, data_relocations)
             function_thunk.verify_literal_bindings(got, addr, verified_instructions, calls,
                                                     mapping, function_relocations)
@@ -4461,7 +4563,7 @@ def main():
                   SWITCH_MULTIPLE_DATA_SCHEMA if "data_policy" in switch_evidence else
                   SWITCH_DATA_SCHEMA if data_profile else SWITCH_SCHEMA)
     if udivsi3_bindings:
-        schema = UDIVSI3_SCHEMA
+        schema = udivsi3_schema(args.unsigned_quotient_profile)
     if remainder_evidence is not None:
         schema = modsi3.SCHEMA
     if quotient_evidence is not None:
@@ -4576,6 +4678,14 @@ def main():
                                   quotient_evidence, selector=args.signed_quotient_profile)
         except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
             sys.exit(f"framed signed quotient source replay failed: {error}")
+    if args.unsigned_quotient_profile is not None:
+        if hand_asm_allowed or report_rom_path(ROOT) != rom_file:
+            sys.exit("framed unsigned quotient excludes hand-ASM exceptions and ROM selection changes")
+        try:
+            verify_udivsi3_source(ROOT, addr, got_body, rom, mapping, fingerprint,
+                                 division_evidence, selector=args.unsigned_quotient_profile)
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+            sys.exit(f"framed unsigned quotient source replay failed: {error}")
     with open(rom_file, "rb") as original:
         if original.read() != rom:
             sys.exit("base ROM changed during verification; re-run match.py")
@@ -4724,9 +4834,11 @@ def main():
                 proof_digest = umodsi3.fingerprint(addr, got_body, unsigned_remainder_evidence)
                 f.write(f"* unsigned remainder proof SHA-256: `{proof_digest}`\n")
             if udivsi3_bindings:
-                f.write(f"* unsigned division: {UDIVSI3_SUMMARY}\n")
+                summary = UDIVSI3_FRAMED_SUMMARY if args.unsigned_quotient_profile else UDIVSI3_SUMMARY
+                f.write(f"* unsigned division: {summary}\n")
                 f.write(f"* unsigned division manifest: `{udivsi3_manifest(division_evidence)}`\n")
-                proof_digest = udivsi3_fingerprint(addr, got_body, division_evidence)
+                proof_digest = udivsi3_fingerprint(addr, got_body, division_evidence,
+                                                 selector=args.unsigned_quotient_profile)
                 f.write(f"* unsigned division proof SHA-256: `{proof_digest}`\n")
             if remainder_evidence is not None:
                 f.write(f"* signed remainder: {modsi3.SUMMARY}\n")
