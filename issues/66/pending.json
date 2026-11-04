@@ -3774,7 +3774,35 @@
           "who": "sol-08028BDC-543"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5cef84a4a0580aeac1263bcb3735380f942c81a01f4e29efd86da9f8fdeea37b",
+        "acknowledged_cursor": 6629951124,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5cef84a4a0580aeac1263bcb3735380f942c81a01f4e29efd86da9f8fdeea37b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08028BDC\",\"who\":\"sol-08028BDC-543\",\"claim_id\":6629848797,\"reason\":\"Natural complete field update emits76B versus88B target; six discarded byte reads absent. Fully stopped.\",\"unmatchable\":true,\"tried\":\"Natural C/native attempts retained; no steering or unchanged replay; all166 current inputs unchanged.\"}",
+          "created_at": "2026-11-04T11:56:05Z",
+          "id": 6629951117,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:56:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c39f13c4c4f83ce4b8899a025da698df6b4ccb1df215fd12b96393d2a60a8f93",
+        "result": {
+          "address": "0x08028BDC",
+          "claim_id": 6629848797,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6629951117,
+          "status": "accepted",
+          "who": "sol-08028BDC-543"
+        }
+      }
     },
     {
       "claim": {
@@ -3806,7 +3834,35 @@
           "who": "sol-08000670-543"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "594ac66e3f55eb4f6f23b5791cad4b2a475941cae4f4e22f1492a2fee4e3c4d9",
+        "acknowledged_cursor": 6629951124,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "594ac66e3f55eb4f6f23b5791cad4b2a475941cae4f4e22f1492a2fee4e3c4d9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08000670\",\"who\":\"sol-08000670-543\",\"claim_id\":6629848998,\"reason\":\"Two natural full-field forms emit24B versus96B target retaining read/AND-zero sequences. Fully stopped.\",\"unmatchable\":true,\"tried\":\"Natural C/native attempts retained; no steering or unchanged replay; all166 current inputs unchanged.\"}",
+          "created_at": "2026-11-04T11:56:05Z",
+          "id": 6629951124,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T11:56:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c39f13c4c4f83ce4b8899a025da698df6b4ccb1df215fd12b96393d2a60a8f93",
+        "result": {
+          "address": "0x08000670",
+          "claim_id": 6629848998,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6629951124,
+          "status": "accepted",
+          "who": "sol-08000670-543"
+        }
+      }
     },
     {
       "claim": {
