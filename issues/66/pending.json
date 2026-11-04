@@ -59,6 +59,38 @@
           "who": "sol-7660"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "d372355a87dc4020fb899ec23bc26c31febf8863b4f3449ca0302f559a7a6d40",
+        "acknowledged_cursor": 6619113481,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d372355a87dc4020fb899ec23bc26c31febf8863b4f3449ca0302f559a7a6d40",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080E2C00\",\"who\":\"sol-2C00\",\"note\":\"First natural source from frozen complete root and grounded five-word helper ABI; one original native attempt ISO only future225.\"}",
+          "created_at": "2026-11-04T00:28:49Z",
+          "id": 6619113481,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-04T00:28:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "200eb45daab34fd006b91ffdd3493819eec68d5a426ed300540e00a95deab68e",
+        "result": {
+          "address": "0x080E2C00",
+          "claim_id": 6619113481,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6619113481,
+          "status": "accepted",
+          "who": "sol-2C00"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
