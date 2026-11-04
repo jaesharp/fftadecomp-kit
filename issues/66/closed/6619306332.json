@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "6de7ad7f3dff2713229656ba22f736a13bd76f90a3c55016e7a73aedaecd3ed0",
+    "acknowledged_cursor": 6619306332,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "6de7ad7f3dff2713229656ba22f736a13bd76f90a3c55016e7a73aedaecd3ed0",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08027D10\",\"who\":\"sol-7D10\",\"note\":\"First natural source from frozen complete matching qualification; one original native attempt ISO-only future225.\"}",
+      "created_at": "2026-11-04T00:40:53Z",
+      "id": 6619306332,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T00:40:53Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "2ec462eb0b1569bfb86fbd3e0e33c5894592add12d25d81d281a85e16ad051d0",
+    "result": {
+      "address": "0x08027D10",
+      "claim_id": 6619306332,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6619306332,
+      "status": "accepted",
+      "who": "sol-7D10"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "4599b7e3b46d914a7e62e370e9e0de2aedb330d4858aab2e253ef58c5da60dff",
+    "acknowledged_cursor": 6619816472,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "4599b7e3b46d914a7e62e370e9e0de2aedb330d4858aab2e253ef58c5da60dff",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08027D10\",\"who\":\"sol-7D10\",\"claim_id\":6619306332,\"reason\":\"Complete original native MATCH frozen, author stopped for exact-source publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T01:13:36Z",
+      "id": 6619805655,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:13:36Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "5613d09958a4966fc4516d05c4b4bf1c126d0fe3794918c4333724140bce1b4c",
+    "result": {
+      "address": "0x08027D10",
+      "claim_id": 6619306332,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6619805655,
+      "status": "accepted",
+      "who": "sol-7D10"
+    }
+  }
+}

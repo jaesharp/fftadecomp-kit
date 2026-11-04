@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "UNPROVEN",
+    "acknowledged_cursor": 6619688978,
+    "body_provenance": "snapshot-at-archive",
+    "body_sha256": "9c95f20df456bbde9fd14e1dca2edc6c193c35c31e02d5b20508431bb6e04988",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0814224C\",\"who\":\"opencode-w-224C\",\"note\":\"hand-match wave2\"}",
+      "created_at": "2026-11-04T01:06:00Z",
+      "id": 6619688914,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:06:00Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "2f434c399163ff38dd029336c24c53f0202ad5b0ed5b38c1569547d0b38f7336",
+    "result": {
+      "address": "0x0814224C",
+      "claim_id": 6619688914,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6619688914,
+      "status": "accepted",
+      "who": "opencode-w-224C"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "744223a6574a191c7ec41c57791fef85543ec66604d128eeb0990c87787adca7",
+    "acknowledged_cursor": 6619816472,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "744223a6574a191c7ec41c57791fef85543ec66604d128eeb0990c87787adca7",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814224C\",\"who\":\"opencode-w-224C\",\"claim_id\":6619688914,\"reason\":\"canonical Thumb return-thunk table (bx rN), not a real function\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T01:13:38Z",
+      "id": 6619806230,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:13:38Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "5613d09958a4966fc4516d05c4b4bf1c126d0fe3794918c4333724140bce1b4c",
+    "result": {
+      "address": "0x0814224C",
+      "claim_id": 6619688914,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6619806230,
+      "status": "accepted",
+      "who": "opencode-w-224C"
+    }
+  }
+}

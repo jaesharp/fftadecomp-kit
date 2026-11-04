@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "78d025d06dc48ed91c79498ba46fb20535c0cd3aab6757cd76af2f29e500cc94",
+    "acknowledged_cursor": 6619735074,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "78d025d06dc48ed91c79498ba46fb20535c0cd3aab6757cd76af2f29e500cc94",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08142264\",\"who\":\"opencode-w-2264\",\"note\":\"hand-match wave2\"}",
+      "created_at": "2026-11-04T01:08:41Z",
+      "id": 6619732426,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:08:41Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "b29ab7679f9ec6cb386b888b0446329e928be93eb5505b25abaf7188d3d6a0ca",
+    "result": {
+      "address": "0x08142264",
+      "claim_id": 6619732426,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6619732426,
+      "status": "accepted",
+      "who": "opencode-w-2264"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "be75b85d0a1d81a8ccbf6ebae1a7d719fd50491246267a3948df51b3eca5b98f",
+    "acknowledged_cursor": 6619816472,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "be75b85d0a1d81a8ccbf6ebae1a7d719fd50491246267a3948df51b3eca5b98f",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08142264\",\"who\":\"opencode-w-2264\",\"claim_id\":6619732426,\"reason\":\"canonical Thumb return-thunk table (bx rN), not a real function\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-04T01:13:38Z",
+      "id": 6619806229,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-04T01:13:38Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "5613d09958a4966fc4516d05c4b4bf1c126d0fe3794918c4333724140bce1b4c",
+    "result": {
+      "address": "0x08142264",
+      "claim_id": 6619732426,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6619806229,
+      "status": "accepted",
+      "who": "opencode-w-2264"
+    }
+  }
+}
