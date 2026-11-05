@@ -3742,7 +3742,35 @@
           "who": "sol-0813EC74-1107"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "fd506b14ba37906e869b8f23385b94d1148e83b0783046c7e2b5277a7ca721b1",
+        "acknowledged_cursor": 6647748933,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "fd506b14ba37906e869b8f23385b94d1148e83b0783046c7e2b5277a7ca721b1",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0813EC74\",\"who\":\"sol-0813EC74-1107\",\"claim_id\":6647641256,\"reason\":\"Three natural field representations converge to68-byte FUNC versus80-byte target. Discarded RAM reads and readback remain; no forced reads or RAM volatile introduced, originals and166 inputs preserved.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T02:13:21Z",
+          "id": 6647748933,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T02:13:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a59ea9e1fead22498215f46847fabe07cdc943d41e203e00e768e7bc3e550c51",
+        "result": {
+          "address": "0x0813EC74",
+          "claim_id": 6647641256,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6647748933,
+          "status": "accepted",
+          "who": "sol-0813EC74-1107"
+        }
+      }
     },
     {
       "claim": {
