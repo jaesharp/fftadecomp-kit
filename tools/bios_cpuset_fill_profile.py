@@ -66,6 +66,70 @@ def scalar_control_words(instructions, edges, calls, partition, address):
     return result
 
 
+def saved_scalar_control_words(instructions, edges, calls, partition, address):
+    """Closed linear scalar-only copies from a low callee-saved literal load."""
+    result = []
+    low_saved = set(range(ARM_REG_R0 + 4, ARM_REG_R0 + 8))
+    arguments = set(range(ARM_REG_R0, ARM_REG_R0 + 4))
+    control = ARM_REG_R0 + 2
+    for word in partition['words']:
+        if not word['load_sites'] or word['switch_word'] or not word['value'] & (1 << 24):
+            continue
+        observations = []
+        for load in word['load_sites']:
+            item = instructions[load]
+            op = item.operands
+            code = int.from_bytes(item.bytes, 'little')
+            if item.size != 2 or code & 0xFC00 != 0x4C00 or item.mnemonic != 'ldr' or \
+                    len(op) != 2 or op[0].type != ARM_OP_REG or \
+                    op[0].reg != ARM_REG_R0 + ((code >> 8) & 7) or \
+                    op[0].reg not in low_saved or op[1].type != ARM_OP_MEM or \
+                    op[1].mem.base != ARM_REG_PC or op[1].mem.index or item.writeback or \
+                    ((load + 4) & ~3) + op[1].mem.disp != word['address']:
+                break
+            aliases, cursor, visited, uses = {op[0].reg}, load, {load}, []
+            valid = True
+            while aliases:
+                successor = cursor + instructions[cursor].size
+                if edges[cursor] != (successor,) or successor in visited:
+                    valid = False
+                    break
+                visited.add(successor)
+                following = instructions[successor]
+                if successor in calls:
+                    if aliases & (arguments - {control}) or \
+                            control in aliases and calls[successor] != ADDRESS:
+                        valid = False
+                        break
+                    if control in aliases:
+                        uses.append(successor - address)
+                    # Exactly the existing conditional ordinary returning ABI.
+                    aliases -= arguments
+                else:
+                    reads, writes = map(set, following.regs_access())
+                    copied = None
+                    if aliases & reads:
+                        code = int.from_bytes(following.bytes, 'little')
+                        if following.size == 2 and (code & 0xFF00 == 0x4600 or
+                                                    code & 0xFFC0 == 0x1C00):
+                            copied = transfer(following,
+                                {reg: exact(word['value']) for reg in aliases}, b'', 0)
+                        if copied is None or copied[0] not in low_saved | {control} or \
+                                copied[1] != exact(word['value']):
+                            valid = False
+                            break
+                    aliases -= writes
+                    if copied is not None:
+                        aliases.add(copied[0])
+                cursor = successor
+            if not valid or not uses:
+                break
+            observations.append([load - address, uses])
+        if len(observations) == len(word['load_sites']):
+            result.append([word['address'] - address, word['value'], observations])
+    return result
+
+
 def exact(value):
     value &= MASK
     return value, MASK ^ value
