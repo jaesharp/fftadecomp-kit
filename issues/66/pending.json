@@ -3774,7 +3774,35 @@
           "who": "sol-0810FD78-1369"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "493896b298821690a726819766570b8ad0a396e63750a519f0b05886f20a415b",
+        "acknowledged_cursor": 6654498627,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "493896b298821690a726819766570b8ad0a396e63750a519f0b05886f20a415b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810FD78\",\"who\":\"sol-0810FD78-1369\",\"claim_id\":6654213572,\"reason\":\"Five diagnostics; best completeFUNC1102B versus1122B. Nine discarded RAM byte loads and fill setup/register allocation remain, no grounded next form. Frozen result02c0a3eb9cb6eda648e68909972ec68491100347a39b4d4e8cc0b02ca5045e83; zero native attempts.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:29:58Z",
+          "id": 6654498627,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:29:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "22332cde1b5da45fb3ecd1c99a96d95193679890ccf170c05ae908a2dd3778ea",
+        "result": {
+          "address": "0x0810FD78",
+          "claim_id": 6654213572,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6654498627,
+          "status": "accepted",
+          "who": "sol-0810FD78-1369"
+        }
+      }
     },
     {
       "claim": {
