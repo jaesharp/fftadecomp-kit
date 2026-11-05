@@ -52,7 +52,9 @@ BIOS_SCALAR_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-data-v1'
 BIOS_R2_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-r2-callback-data-v1'
 BIOS_READONLY_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-word0-data-v1'
 BIOS_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-function-literals-data-v1'
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_FUNCTION_DATA_SELECTOR)
+BIOS_SCALAR_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-function-literals-data-v1'
+FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, *FUNCTION_DATA_SELECTORS)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
@@ -73,7 +75,7 @@ INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_S
 UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
                              UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
-DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
                   BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
@@ -85,7 +87,8 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
                         'no callback numeric, buffer, memory or termination equivalence facts')
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
-SCHEMAS = {BIOS_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-function-literals-data-v1',
+SCHEMAS = {BIOS_SCALAR_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-function-literals-data-v1',
+            BIOS_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-function-literals-data-v1',
             BIOS_R2_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-r2-callback-data-v1',
             BIOS_READONLY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-word0-data-v1',
             BIOS_ORDINARY_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-v1',
@@ -184,7 +187,7 @@ def object_value(name, addend, objects, entries, address, size):
 
 
 def function_literal(name, selector):
-    return selector == BIOS_FUNCTION_DATA_SELECTOR and isinstance(name, str) and \
+    return selector in FUNCTION_DATA_SELECTORS and isinstance(name, str) and \
         re.fullmatch(r'func_[0-9A-F]{8}', name) is not None
 
 
@@ -205,7 +208,7 @@ def data_literals(data, address, rom, mapping, objects, records, *, selector=DAT
             functions.append([offset, name])
         else:
             data_records.append(list(row))
-    if selector == BIOS_FUNCTION_DATA_SELECTOR and not functions:
+    if selector in FUNCTION_DATA_SELECTORS and not functions:
         raise ValueError('BIOS function-literal selector requires an actual typed function literal')
     calls, literals = match.function_address_bindings(data, address, rom, mapping, objects,
         {'calls': [], 'data': data_records, 'functions': functions}, allow_empty_functions=True)
@@ -528,7 +531,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in DATA_SELECTORS:
         literals = data_literals(data, address, context[0], context[1], context[6], context[7], selector=selector)
         match.verify_data_literals(instructions.values(), address, literals)
-        if selector == BIOS_SCALAR_DATA_SELECTOR:
+        if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR):
             from bios_cpuset_fill_profile import scalar_control_words
             scalar_controls = scalar_control_words(instructions, edges, calls, partition, address)
             if not scalar_controls:
@@ -629,7 +632,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in BIOS_SELECTORS:
         context[4]['native_buffers']['bios_fill'] = bios.manifest()
         context[4]['native_buffers']['contract'] += '; ' + bios_cpuset_fill_profile.CONTRACT
-    if selector == BIOS_SCALAR_DATA_SELECTOR:
+    if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR):
         context[4]['bios_scalar_control'] = dict(words=scalar_controls,
             contract='Exact native PC literal loaded only into R2 and consumed by '
                      'the next actual CpuSet call without an intervening R2 read, '
@@ -650,7 +653,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in DATA_SELECTORS:
         context[4].update(data_bindings=[list(row) for row in context[7]],
             data_contract=DATA_CONTRACT)
-    if selector == BIOS_FUNCTION_DATA_SELECTOR:
+    if selector in FUNCTION_DATA_SELECTORS:
         context[4].update(function_literal_bindings=[list(row[:2]) for row in context[7]
             if function_literal(row[1], selector)],
             data_contract='Separate typed ABS32 named objects and exact unique indexed Thumb function entries; '
