@@ -15,7 +15,9 @@ WRAPPER = bytes.fromhex('0bdf7047')
 SCHEMA = 'conditional-bios-cpuset-local-fill-source-v1'
 CONTRACT = ('conditional returning GBA BIOS CpuSet fill boundary: bit24 selects '
             'one source unit, bit26 selects 16/32-bit width; local source span '
-            'only, external destination is caller supplied; no initialization, '
+            'only, external destination is caller supplied; known bits in '
+            'r4-r11 survive calls under the conditional ordinary returning ABI; '
+            'no initialization, '
             'physical readability, physical nonalias, destination bounds, '
             'numeric result or termination theorem')
 MASK = 0xFFFFFFFF
@@ -85,7 +87,7 @@ def transfer(instruction, incoming, data, address):
 
 
 def prove_bits(instructions, edges, address, data):
-    """Intersect known bits at every join; any call destroys every bit fact."""
+    """Intersect joins, retaining only ABI callee-saved facts across calls."""
     if address not in instructions or set(edges) != set(instructions):
         raise ValueError('BIOS fill bits require an exact closed native CFG')
     states, pending, updates = {address:{}}, [address], 0
@@ -94,7 +96,8 @@ def prove_bits(instructions, edges, address, data):
         instruction, incoming = instructions[site], states[site]
         outgoing = dict(incoming)
         if CS_GRP_CALL in instruction.groups:
-            outgoing.clear()
+            outgoing = {register:bits for register,bits in incoming.items()
+                        if ARM_REG_R0 + 4 <= register <= ARM_REG_R0 + 11}
         else:
             for register in instruction.regs_access()[1]:
                 outgoing.pop(register, None)
