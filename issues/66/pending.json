@@ -3774,7 +3774,35 @@
           "who": "sol-080BF5A4-1803"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "07af8297dd7a5b28ae940e0fa3af52abfc30f8c84c94e0b060c1ce18bd0f68b1",
+        "acknowledged_cursor": 6667217564,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "07af8297dd7a5b28ae940e0fa3af52abfc30f8c84c94e0b060c1ce18bd0f68b1",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080BF5A4\",\"who\":\"sol-080BF5A4-1803\",\"claim_id\":6666966790,\"reason\":\"One grounded named row-record diagnostic complete542B539bytes equal; three ADD operand-order bytes remain. Zero native/proof/MATCH or replay. Original artifacts and all167/reference/runtime receipts retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T19:27:42Z",
+          "id": 6667217564,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T19:27:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7610369fa3a675aa7952617a124c90930bed35a0c2000a735848a37f6931979b",
+        "result": {
+          "address": "0x080BF5A4",
+          "claim_id": 6666966790,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6667217564,
+          "status": "accepted",
+          "who": "sol-080BF5A4-1803"
+        }
+      }
     },
     {
       "claim": {
