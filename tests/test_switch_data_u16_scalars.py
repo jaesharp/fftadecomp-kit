@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import struct
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -297,6 +298,7 @@ class ConfigurationTests(unittest.TestCase):
             switch_data_profile=evidence.SWITCH_U16_SCALAR_SELECTOR,
             mode="thumb", control_flow_profile="ordinary", signed_quotient_profile=None,
             signed_runtime_profile=None, addressed_signed_runtime_profile=None,
+            unsigned_runtime_profile=None,
             software_double_profile=None, software_double_remainder_profile=None,
             function_address_profile=None, switch_profile=None, owner_runtime_profile=None,
             cc=match.DEFAULT_CC, cpp=match.DEFAULT_CPP, assembler=match.DEFAULT_AS,
@@ -313,7 +315,7 @@ class ConfigurationTests(unittest.TestCase):
 
     def test_other_selectors_mode_flags_and_tools_are_rejected(self):
         for field in ("signed_quotient_profile", "signed_runtime_profile",
-                      "addressed_signed_runtime_profile", "software_double_profile",
+                      "addressed_signed_runtime_profile", "unsigned_runtime_profile", "software_double_profile",
                       "software_double_remainder_profile", "function_address_profile",
                       "switch_profile", "owner_runtime_profile", "mode", "control_flow_profile",
                       "cc", "cpp", "assembler", "objcopy", "linker", "flags", "switch_data_profile"):
@@ -429,6 +431,66 @@ class ReportTests(unittest.TestCase):
         duplicate = evidence.switch_manifest(self.manifest).replace(
             '"scalar_policy":', '"scalar_policy":"other","scalar_policy":')
         self.assertFalse(self.valid(report.replace(evidence.switch_manifest(self.manifest), duplicate)))
+
+    def prepare_status(self):
+        import status
+        (self.root / "config").mkdir()
+        (self.root / "config/functions.json").write_bytes(self.functions)
+        (self.root / "config/data_symbols.json").write_bytes(self.objects)
+        (self.root / "docs/match").mkdir(parents=True)
+        report = self.root / "docs/match/08000000.md"
+        report.write_text(self.report())
+        self.enterContext(mock.patch.object(evidence.empty_body, "has_empty_body", return_value=False))
+        output = (f"extent    {len(self.body)} bytes (complete ELF symbol)\n"
+                  "verdict MATCH - byte identical\n")
+        return status, report, output
+
+    def test_status_restores_scalar_selector_for_read_only_and_write_verification(self):
+        status, report, output = self.prepare_status()
+        self.assertTrue(evidence.report_matches(report.read_text(), self.root, BASE))
+        for write in (False, True):
+            with self.subTest(write=write):
+                def invoke(command, **kwargs):
+                    self.assertIn("--switch-data-profile", command)
+                    self.assertEqual(command[command.index("--switch-data-profile") + 1],
+                                     evidence.SWITCH_U16_SCALAR_SELECTOR)
+                    self.assertEqual("--no-write" in command, not write)
+                    return subprocess.CompletedProcess(command, 0, output, "")
+                with mock.patch.object(status.subprocess, "run", side_effect=invoke) as native:
+                    result = status.collect(str(self.root), True, write_reports=write)
+                    self.assertEqual(result[1], 1)
+                    self.assertEqual(result[4], [])
+                    native.assert_called_once()
+
+    def test_status_rejects_stale_or_forged_scalar_evidence_before_compilation(self):
+        status, report, _ = self.prepare_status()
+        original = report.read_text()
+        source = self.root / "src/08000000.c"
+        saved_source = source.read_bytes()
+        variants = [original + f"\n* verification: `{SCHEMA}`",
+                    original.replace(POLICY, "invalid-scalar-policy"), original]
+        for index, text in enumerate(variants):
+            with self.subTest(index=index):
+                report.write_text(text)
+                if index == 2:
+                    source.write_bytes(saved_source + b"\n")
+                with mock.patch.object(status.subprocess, "run") as native:
+                    result = status.collect(str(self.root), True)
+                    self.assertEqual(result[1], 0)
+                    self.assertIn("invalid saved u16 scalar switch report", result[4][0])
+                    native.assert_not_called()
+                source.write_bytes(saved_source)
+
+    def test_status_native_success_cannot_bypass_missing_scalar_report(self):
+        status, report, output = self.prepare_status()
+        def invoke(command, **kwargs):
+            report.unlink()
+            return subprocess.CompletedProcess(command, 0, output, "")
+        with mock.patch.object(status.subprocess, "run", side_effect=invoke) as native:
+            result = status.collect(str(self.root), True)
+            self.assertEqual(result[1], 0)
+            self.assertIn("no match report", result[4][0])
+            native.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -111,7 +111,8 @@ class StatusParallelTests(unittest.TestCase):
         with patch.object(status.switch_constants, "selected_policy", side_effect=constants), \
                 patch.object(status.inert_spin, "selected", side_effect=lambda text: text == "spin"), \
                 patch.object(status.software_double, "selected", side_effect=lambda text: text == "double"), \
-                patch.object(status.function_thunk, "selected", side_effect=lambda text: "thunk" in text):
+                patch.object(status.function_thunk, "selector_for_report", side_effect=lambda text:
+                             status.function_thunk.SELECTOR if "thunk" in text else None):
             for jobs in (1, 6):
                 with self.subTest(jobs=jobs), \
                         patch.object(status, "report_matches",
