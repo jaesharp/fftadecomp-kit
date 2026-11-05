@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "d1d7b8892337dd76b62f110df7dc14e302fed7d46c425494f1861496117f0741",
+    "acknowledged_cursor": 6650795075,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "d1d7b8892337dd76b62f110df7dc14e302fed7d46c425494f1861496117f0741",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D5FD8\",\"who\":\"sol-080D5FD8-1220\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T05:47:51Z",
+      "id": 6650794957,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:47:51Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "3f9c463c04b03300391ca7efe9a9ba555f4111f0a3425d1b893f3ef6de9e64ad",
+    "result": {
+      "address": "0x080D5FD8",
+      "claim_id": 6650794957,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6650794957,
+      "status": "accepted",
+      "who": "sol-080D5FD8-1220"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "02eb456b2c8ff3795c1020ff01df8f55a4a7bb3a657ca0df9354cb088df05861",
+    "acknowledged_cursor": 6650978615,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "02eb456b2c8ff3795c1020ff01df8f55a4a7bb3a657ca0df9354cb088df05861",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D5FD8\",\"who\":\"sol-080D5FD8-1220\",\"claim_id\":6650794957,\"reason\":\"Exact192B diagnostic retained privately; callback function literal and helper local-alias provenance prerequisites unsupported. Zero native MATCH.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T06:00:51Z",
+      "id": 6650978565,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T06:00:51Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "5cf3af92fc3af75f656281d1ed9382c6f175aeba46970c9cf60c439ffd594c9a",
+    "result": {
+      "address": "0x080D5FD8",
+      "claim_id": 6650794957,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6650978565,
+      "status": "accepted",
+      "who": "sol-080D5FD8-1220"
+    }
+  }
+}
