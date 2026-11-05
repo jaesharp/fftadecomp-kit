@@ -3866,7 +3866,35 @@
           "who": "sol-081051A0-1890"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7f75436de982f79c20d8df852758802db1fd7f89394171e6a61f82079b1926e2",
+        "acknowledged_cursor": 6669861447,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7f75436de982f79c20d8df852758802db1fd7f89394171e6a61f82079b1926e2",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081051A0\",\"who\":\"sol-081051A0-1890\",\"claim_id\":6669461675,\"reason\":\"Complete138B diagnostic exact privately preserved; native nested callback admission prerequisite unresolved. No native MATCH claimed; source matching stopped pending separately qualified context.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T21:20:58Z",
+          "id": 6669861447,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T21:20:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a7d715817461aaef626d6dadc3fbdc4921bc3f2403121b85a555cf8a95a61081",
+        "result": {
+          "address": "0x081051A0",
+          "claim_id": 6669461675,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6669861447,
+          "status": "accepted",
+          "who": "sol-081051A0-1890"
+        }
+      }
     },
     {
       "claim": {
