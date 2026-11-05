@@ -3902,7 +3902,35 @@
           "who": "sol-080D4DEC-1813"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7c04ff018fd7631b7e0aa82bc9e3acc88625147455a72f439067a9cdb68a5acd",
+        "acknowledged_cursor": 6667542763,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7c04ff018fd7631b7e0aa82bc9e3acc88625147455a72f439067a9cdb68a5acd",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D4DEC\",\"who\":\"sol-080D4DEC-1813\",\"claim_id\":6667351545,\"reason\":\"Three original compiler diagnostics including retained flexible-array syntax error, two authentic bodies832 and834 versus828B; no independent grounded next representation; zero native/proof, unchanged fixed/reference inputs.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T19:42:37Z",
+          "id": 6667542763,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T19:42:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a0aed6c402e93820bf8602b958a07f0ccecb1a05b7123c634feb5f3a2928e454",
+        "result": {
+          "address": "0x080D4DEC",
+          "claim_id": 6667351545,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6667542763,
+          "status": "accepted",
+          "who": "sol-080D4DEC-1813"
+        }
+      }
     },
     {
       "claim": {
