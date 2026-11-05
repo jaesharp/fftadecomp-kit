@@ -3802,7 +3802,35 @@
           "who": "sol-080DB838-1953"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "08464aa4e16da22ece43f7db43c291946185f443b0712603006ae377f1743b96",
+        "acknowledged_cursor": 6671978149,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "08464aa4e16da22ece43f7db43c291946185f443b0712603006ae377f1743b96",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DB838\",\"who\":\"sol-080DB838-1953\",\"claim_id\":6671902843,\"reason\":\"Original complete frozen agent-authored C passed first native MATCH, plausible and byte-identical. Source, full ELF artifacts, report and all end checks frozen; matching stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T23:12:55Z",
+          "id": 6671978149,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T23:12:55Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d6facbae5f7c288ddb3b06f1097177d658ca7971292c714d2838c3774ea88399",
+        "result": {
+          "address": "0x080DB838",
+          "claim_id": 6671902843,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6671978149,
+          "status": "accepted",
+          "who": "sol-080DB838-1953"
+        }
+      }
     },
     {
       "claim": {
@@ -3834,7 +3862,35 @@
           "who": "sol-080DC12C-1953"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "41924b90cfc9d6f8b24670455caf5c51ad563d9339e31db6bfb07fb2bc4193d8",
+        "acknowledged_cursor": 6671978149,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "41924b90cfc9d6f8b24670455caf5c51ad563d9339e31db6bfb07fb2bc4193d8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DC12C\",\"who\":\"sol-080DC12C-1953\",\"claim_id\":6671902917,\"reason\":\"Original complete frozen agent-authored C passed first native MATCH, plausible and byte-identical. Source, full ELF artifacts, report and all end checks frozen; matching stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T23:12:54Z",
+          "id": 6671978075,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T23:12:54Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d6facbae5f7c288ddb3b06f1097177d658ca7971292c714d2838c3774ea88399",
+        "result": {
+          "address": "0x080DC12C",
+          "claim_id": 6671902917,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6671978075,
+          "status": "accepted",
+          "who": "sol-080DC12C-1953"
+        }
+      }
     },
     {
       "claim": {
