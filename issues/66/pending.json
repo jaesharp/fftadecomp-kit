@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "2957ea2eca2a9377b18ef8a7253922aece1c32daa83a795ac86ec2fe2fb26e3d",
-        "acknowledged_cursor": 6656745406,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "2957ea2eca2a9377b18ef8a7253922aece1c32daa83a795ac86ec2fe2fb26e3d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0811B888\",\"who\":\"sol-0811B888-1450\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:23:43Z",
-          "id": 6656744934,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:23:43Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a83dcf3d458eecde3469536bc946ab060ddd0311df4152895184255b40e1117b",
-        "result": {
-          "address": "0x0811B888",
-          "claim_id": 6656744934,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656744934,
-          "status": "accepted",
-          "who": "sol-0811B888-1450"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "20db31ed551f0f79bc3622153e1538e6bd376f47e7ca143e8aa7593f0c22edf7",
-        "acknowledged_cursor": 6656866076,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "20db31ed551f0f79bc3622153e1538e6bd376f47e7ca143e8aa7593f0c22edf7",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811B888\",\"who\":\"sol-0811B888-1450\",\"claim_id\":6656744934,\"reason\":\"One original diagnostic remained594 versus638 complete bytes. Twelve discarded target shadow-byte loads and address/phase scheduling are unsupported by genuine retained storage evidence. Zero native, no further grounded form or impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T11:30:02Z",
-          "id": 6656866076,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:30:02Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7556548a0c37a8d93e80393d285f9c6ff474b1dbee69e15ad7a59921c20c7ef6",
-        "result": {
-          "address": "0x0811B888",
-          "claim_id": 6656744934,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6656866076,
-          "status": "accepted",
-          "who": "sol-0811B888-1450"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "e2b14b61933fdfa5c5b7573af450d32d5d45149678495206dbfbbda3f639beff",
         "acknowledged_cursor": 6656745406,
         "body_provenance": "acceptance-time",
