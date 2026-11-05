@@ -3742,7 +3742,35 @@
           "who": "sol-0809FA1C-1113"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4dcac95e3a91fefd5051d49f544b4e33e634e70a42d89d6c6a6ebb9aa179e266",
+        "acknowledged_cursor": 6648140910,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4dcac95e3a91fefd5051d49f544b4e33e634e70a42d89d6c6a6ebb9aa179e266",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809FA1C\",\"who\":\"sol-0809FA1C-1113\",\"claim_id\":6647947408,\"reason\":\"Seven original distinct natural forms retained. Best complete470B,464same-offset bytes equal; six-byte initial segment setup ordering unresolved. No scheduling or register steering.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T02:36:13Z",
+          "id": 6648140910,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T02:36:13Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6dfe96b1c85d064b9ed10505dd7475abea3ddde66c80ed5d32c3c8fced924bfd",
+        "result": {
+          "address": "0x0809FA1C",
+          "claim_id": 6647947408,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6648140910,
+          "status": "accepted",
+          "who": "sol-0809FA1C-1113"
+        }
+      }
     },
     {
       "claim": {
