@@ -3867,66 +3867,6 @@
           "who": "sol-08009728-1492"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "04f76283f3f6c3cc60b4d34d532ceb2451e408db5b39f7b7a8e14cc6b0653074",
-        "acknowledged_cursor": 6658603787,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "04f76283f3f6c3cc60b4d34d532ceb2451e408db5b39f7b7a8e14cc6b0653074",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080096E0\",\"who\":\"sol-080096E0-1492\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T12:59:28Z",
-          "id": 6658603787,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:59:28Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "9b1a05a44b475e1e3aa44fc5ed23f52c2e6ccd4dc5c521469944935286402f77",
-        "result": {
-          "address": "0x080096E0",
-          "claim_id": 6658603787,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6658603787,
-          "status": "accepted",
-          "who": "sol-080096E0-1492"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "29d7bd40a2b940339c4cad0b7dccb9d4caecc4c6d6c3714fd0d6e77b537b617f",
-        "acknowledged_cursor": 6658716893,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "29d7bd40a2b940339c4cad0b7dccb9d4caecc4c6d6c3714fd0d6e77b537b617f",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080096E0\",\"who\":\"sol-080096E0-1492\",\"claim_id\":6658603787,\"reason\":\"Metadata-only reservation closed before new C/compiler/native. Retained earlier natural forms already expose six discarded target byte loads with no grounded new reconstruction.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T13:04:48Z",
-          "id": 6658716893,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T13:04:48Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "97ffb29f00c1e3a2c62a664492a7e5d046adc444e7b4edf115c2addf2167dd09",
-        "result": {
-          "address": "0x080096E0",
-          "claim_id": 6658603787,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6658716893,
-          "status": "accepted",
-          "who": "sol-080096E0-1492"
-        }
-      }
     }
   ],
   "issue": 66,
