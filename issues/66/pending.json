@@ -3771,66 +3771,6 @@
           "who": "sol-08145608-1427"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "99aa64731624df171aa836cd9f6f74924fa5918edccfce0dc98562fc64707eb1",
-        "acknowledged_cursor": 6656415344,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "99aa64731624df171aa836cd9f6f74924fa5918edccfce0dc98562fc64707eb1",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802E68C\",\"who\":\"sol-0802E68C-1437\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:06:31Z",
-          "id": 6656415344,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:06:31Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "bbaaf4fcc4f7a37241751d397f3f9fde5076ae09de090c0fa6d2084be976b267",
-        "result": {
-          "address": "0x0802E68C",
-          "claim_id": 6656415344,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656415344,
-          "status": "accepted",
-          "who": "sol-0802E68C-1437"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "db4e89671e9c450cd620863cfc5fb3d5b50d9611d8d6302d3f660eb0a46ec613",
-        "acknowledged_cursor": 6656705167,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "db4e89671e9c450cd620863cfc5fb3d5b50d9611d8d6302d3f660eb0a46ec613",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802E68C\",\"who\":\"sol-0802E68C-1437\",\"claim_id\":6656415344,\"reason\":\"Six distinct natural diagnostics remained inexact. Structurally closest508 versus516 bytes; latest504. Target discarded reads and pointer/address scheduling unsupported; no native or further grounded source form. Unexpected convergent bodies retained. No impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T11:21:34Z",
-          "id": 6656705167,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:21:34Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c127a167b7179f5d5d26b99c152f0f44eed1c0aabe470e2059e52532681f4915",
-        "result": {
-          "address": "0x0802E68C",
-          "claim_id": 6656415344,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6656705167,
-          "status": "accepted",
-          "who": "sol-0802E68C-1437"
-        }
-      }
     }
   ],
   "issue": 66,
