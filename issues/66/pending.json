@@ -3717,66 +3717,6 @@
         "acceptance_body_sha256": "UNPROVEN",
         "acknowledged_cursor": 6662875630,
         "body_provenance": "snapshot-at-archive",
-        "body_sha256": "33a8b8e8c4b344050b74c3307acb8b8c4f0214a63572b6a77f844b49c15c371c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08008F94\",\"who\":\"sol-08008F94-1647\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T16:08:07Z",
-          "id": 6662850598,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T16:08:07Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3b575c9eb093d5c0daf94df55431c22c03a7e69bb2ea6c7ac9e65b430cb54011",
-        "result": {
-          "address": "0x08008F94",
-          "claim_id": 6662850598,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6662850598,
-          "status": "accepted",
-          "who": "sol-08008F94-1647"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5858e23703d65d4a3bad7e1baf68bf68265d91dbbea80623be0b1503b4d1fa09",
-        "acknowledged_cursor": 6663121540,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5858e23703d65d4a3bad7e1baf68bf68265d91dbbea80623be0b1503b4d1fa09",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08008F94\",\"who\":\"sol-08008F94-1647\",\"claim_id\":6662850598,\"reason\":\"Three distinct diagnostics; best complete156B150equal, six setup bytes remain reordered. No grounded next representation without scheduling steering; zero native/MATCH. All167+36refs/runtime/ROM unchanged, originals frozen.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T16:20:25Z",
-          "id": 6663121540,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T16:20:25Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8467280b7a08803ad48fe4d6cb837dd62bb23bd2f1b5d3f17761bb465c727fe1",
-        "result": {
-          "address": "0x08008F94",
-          "claim_id": 6662850598,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6663121540,
-          "status": "accepted",
-          "who": "sol-08008F94-1647"
-        }
-      }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "UNPROVEN",
-        "acknowledged_cursor": 6662875630,
-        "body_provenance": "snapshot-at-archive",
         "body_sha256": "54be764304288992a0c2e7309f30916fe408249f9148b3e633456e8c21e880f0",
         "comment": {
           "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08058104\",\"who\":\"sol-08058104-1650\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
