@@ -184,11 +184,31 @@ def hardware_volatile_offsets(text, code, data_symbols):
         local_uses = re.finditer(r"\b" + re.escape(match["local"]) + r"\b", code)
         declarations = [item.span("local") for item in bindings
                         if item["local"] == match["local"]]
+        def conditional_dereference(before):
+            prefix = before.rstrip()
+            if not prefix.endswith("*"):
+                return False
+            prefix = prefix[:-1].rstrip()
+            if re.search(r"\belse$", prefix):
+                return True
+            if not prefix.endswith(")"):
+                return False
+            depth = 0
+            for index in range(len(prefix) - 1, -1, -1):
+                if prefix[index] == ")":
+                    depth += 1
+                elif prefix[index] == "(":
+                    depth -= 1
+                    if depth == 0:
+                        return re.search(r"\bif\s*$", prefix[:index]) is not None
+            return False
+
         def direct_access(ref):
             before, after = code[:ref.start()], code[ref.end():]
             if re.match(r"\s*->", after):
                 return not re.search(r"&\s*$", before)
-            return (re.search(r"(?:^|[=(:,;{}!~?&|^<>+\-/%\[\]])\s*\*\s*$|\breturn\s+\*\s*$", before) is not None and
+            return ((re.search(r"(?:^|[=(:,;{}!~?&|^<>+\-/%\[\]])\s*\*\s*$|\breturn\s+\*\s*$", before) is not None or
+                     conditional_dereference(before)) and
                     re.search(r"&\s*\*\s*$", before) is None and
                     re.match(r"\s*(?:\[|\+\+|--|\+=|-=|->|\.)", after) is None)
 

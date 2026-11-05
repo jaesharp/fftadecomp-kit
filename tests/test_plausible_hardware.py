@@ -44,6 +44,25 @@ class HardwareVolatileTests(unittest.TestCase):
             with self.subTest(mapping=mapping):
                 self.assertIn('volatile', self.rules(source, mapping))
 
+    def test_scalar_register_stores_in_unbraced_conditional_arms(self):
+        prefix = ('extern u16 rcnt;\n' + self.comment +
+                  'volatile u16 *port = &rcnt;\n')
+        for statement in ('if (flags & 1)\n *port = 0x8055;\nelse\n *port = 0x8050;',
+                          'if ((flags & mask) == ready()) *port = value;',
+                          'if (flags) *port = first; else if (other) *port = second;'):
+            with self.subTest(statement=statement):
+                self.assertEqual(self.rules(prefix + statement,
+                                            {'rcnt': '0x04000134'}), [])
+        for statement in ('if (flags) (factor) * port;',
+                          'if (flags) factor *\n port;',
+                          'if (flags) escape(port);',
+                          'if (flags) *port++;',
+                          'if (flags) *port = value; else port = ram;',
+                          'if (flags) *port = value; else escape(&*port);'):
+            with self.subTest(statement=statement):
+                self.assertIn('volatile', self.rules(prefix + statement,
+                                                    {'rcnt': '0x04000134'}))
+
     def test_scalar_register_pointer_cannot_escape_or_be_retargeted(self):
         prefix = ('extern u16 rcnt;\n' + self.comment +
                   'volatile u16 *port = &rcnt;\n')
