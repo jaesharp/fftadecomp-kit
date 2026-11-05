@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "f8146d230a88156dc42f266fa0ef9466454638e362580c73ee413b6e7ead8484",
-        "acknowledged_cursor": 6658115023,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f8146d230a88156dc42f266fa0ef9466454638e362580c73ee413b6e7ead8484",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808D624\",\"who\":\"sol-0808D624-1477\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T12:34:50Z",
-          "id": 6658114760,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:34:50Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "556dae6642266798f22ef07da06a7afab71e59135334a1b1301b6fe10b12ae10",
-        "result": {
-          "address": "0x0808D624",
-          "claim_id": 6658114760,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6658114760,
-          "status": "accepted",
-          "who": "sol-0808D624-1477"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "2e84dea4a46354f609bc90e4b68592c5a78e08b338cf2fe7914af2cb11c64c06",
-        "acknowledged_cursor": 6658818851,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "2e84dea4a46354f609bc90e4b68592c5a78e08b338cf2fe7914af2cb11c64c06",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808D624\",\"who\":\"sol-0808D624-1477\",\"claim_id\":6658114760,\"reason\":\"Eight natural compiler diagnostics retained; complete final FUNC6248B versus6224B, closest6244B, zero native/MATCH. Remaining frame/slot and branch/call-tail/pool lowering has no grounded further form. Actual167 fixed files and133 references unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T13:09:46Z",
-          "id": 6658818851,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T13:09:46Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4b552f4c5ed628d8a0c2c77ec085fc8d1d05c2c16e370a3a4e2405204ae7dbe8",
-        "result": {
-          "address": "0x0808D624",
-          "claim_id": 6658114760,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6658818851,
-          "status": "accepted",
-          "who": "sol-0808D624-1477"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "183149771e7b791790da12ae7cc3f843c60002bcbd212ba5484e6f540353b890",
         "acknowledged_cursor": 6658115023,
         "body_provenance": "acceptance-time",
