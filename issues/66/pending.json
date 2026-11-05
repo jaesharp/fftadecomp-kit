@@ -3742,7 +3742,35 @@
           "who": "sol-0801BDBC-1455"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "58c077d2034ada1d52565aec96072472ff00c784edecd9c5298c9189ebf6eb11",
+        "acknowledged_cursor": 6657699910,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "58c077d2034ada1d52565aec96072472ff00c784edecd9c5298c9189ebf6eb11",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801BDBC\",\"who\":\"sol-0801BDBC-1455\",\"claim_id\":6656935018,\"reason\":\"Twenty distinct natural collision C diagnostics retained, no complete exact 2908-byte body and no native or standalone proof. Local BL and buffer composition prerequisite retained separately. Matching agent fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T12:13:40Z",
+          "id": 6657699910,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T12:13:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4c07530f0f79a279bca0c086af1d8394e65b82933d65a75ca8ce73304e2a8bbd",
+        "result": {
+          "address": "0x0801BDBC",
+          "claim_id": 6656935018,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6657699910,
+          "status": "accepted",
+          "who": "sol-0801BDBC-1455"
+        }
+      }
     },
     {
       "claim": {
