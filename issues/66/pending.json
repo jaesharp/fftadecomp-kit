@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "6b9d12a50b803f166e8b0e2e82ee322b6c87e0bb69f912213f411bdd25e39aef",
-        "acknowledged_cursor": 6655544345,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6b9d12a50b803f166e8b0e2e82ee322b6c87e0bb69f912213f411bdd25e39aef",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0801DE88\",\"who\":\"sol-0801DE88-1408\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T10:22:23Z",
-          "id": 6655544283,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T10:22:23Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8dfee416493ba25e52d20ec74839747b19be7acb792c0d0074994b367d97c8d9",
-        "result": {
-          "address": "0x0801DE88",
-          "claim_id": 6655544283,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6655544283,
-          "status": "accepted",
-          "who": "sol-0801DE88-1408"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "dd4bb447e827cb13c29f5facf894f6f2b445b8f705b6c64df6263c01cc7fa617",
-        "acknowledged_cursor": 6656004380,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "dd4bb447e827cb13c29f5facf894f6f2b445b8f705b6c64df6263c01cc7fa617",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801DE88\",\"who\":\"sol-0801DE88-1408\",\"claim_id\":6655544283,\"reason\":\"First native MATCH: plausible, whole 260-byte FUNC exact; result1413 SHA 96691b3eca8af40b248d2245051e4d5bce6c107d21b6a2a3005bfc8645ed0fb5. Original artifacts frozen, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T10:45:43Z",
-          "id": 6656004380,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T10:45:43Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e55aa156fbdc6444624e16019a2e8b262b7a4cd64237033050acac268bb22918",
-        "result": {
-          "address": "0x0801DE88",
-          "claim_id": 6655544283,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6656004380,
-          "status": "accepted",
-          "who": "sol-0801DE88-1408"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "bace3874e9c5c65d58af47dbccbfd45a6eea217840d067363867b82e2dc03c20",
         "acknowledged_cursor": 6655947857,
         "body_provenance": "acceptance-time",
