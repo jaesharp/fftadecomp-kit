@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "7ae72ab40439133e8741aa9cef5332fb368819371543cad78f44b9ca9ac7d5dd",
+    "acknowledged_cursor": 6650476708,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "7ae72ab40439133e8741aa9cef5332fb368819371543cad78f44b9ca9ac7d5dd",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080701BC\",\"who\":\"sol-080701BC-1206\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T05:25:01Z",
+      "id": 6650476691,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:25:01Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "0c6fbd46b7638a26cf4cf3e233f26799765b633ac4d1b3268d9e22202ac642fd",
+    "result": {
+      "address": "0x080701BC",
+      "claim_id": 6650476691,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6650476691,
+      "status": "accepted",
+      "who": "sol-080701BC-1206"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "71a8bf3d65a4448989a7e4b3d1feb08e5eb921fcdaf36bedb4c1627a293994e3",
+    "acknowledged_cursor": 6650763503,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "71a8bf3d65a4448989a7e4b3d1feb08e5eb921fcdaf36bedb4c1627a293994e3",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080701BC\",\"who\":\"sol-080701BC-1206\",\"claim_id\":6650476691,\"reason\":\"Exact164B compiler diagnostic retained privately. Native proof prerequisite CB9E0 through05318 buffer return unsupported; zero native MATCH.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T05:45:09Z",
+      "id": 6650756763,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:45:09Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "947fc48de645d1bd231c409aa0fe5aae23e5085529996f3f74f9dbd211c7378d",
+    "result": {
+      "address": "0x080701BC",
+      "claim_id": 6650476691,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6650756763,
+      "status": "accepted",
+      "who": "sol-080701BC-1206"
+    }
+  }
+}

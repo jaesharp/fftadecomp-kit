@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "2daf7218950461c33deace6c3c2eea5662588c261acc154a7eadcc727ea76301",
+    "acknowledged_cursor": 6650152926,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2daf7218950461c33deace6c3c2eea5662588c261acc154a7eadcc727ea76301",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DC414\",\"who\":\"sol-080DC414-1193\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T05:02:12Z",
+      "id": 6650152926,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:02:12Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "b7eeb72802ef028cdc8722d165f790a751a30ea65599f308dced86f08fa0e7e4",
+    "result": {
+      "address": "0x080DC414",
+      "claim_id": 6650152926,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6650152926,
+      "status": "accepted",
+      "who": "sol-080DC414-1193"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "6dde7551e2d065324fbc818e57db874ca7f1ac8a370d46e8e945164428555036",
+    "acknowledged_cursor": 6650763503,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "6dde7551e2d065324fbc818e57db874ca7f1ac8a370d46e8e945164428555036",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DC414\",\"who\":\"sol-080DC414-1193\",\"claim_id\":6650152926,\"reason\":\"Exact132B compiler diagnostic retained privately. Helper CFG stack-alias join prerequisite remains unsupported; zero native MATCH.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T05:45:35Z",
+      "id": 6650762875,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:45:35Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "947fc48de645d1bd231c409aa0fe5aae23e5085529996f3f74f9dbd211c7378d",
+    "result": {
+      "address": "0x080DC414",
+      "claim_id": 6650152926,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6650762875,
+      "status": "accepted",
+      "who": "sol-080DC414-1193"
+    }
+  }
+}

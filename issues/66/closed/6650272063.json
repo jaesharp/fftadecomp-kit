@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "dee53fa5c6ce5d9c6898ec4f2ae5281b16972c024fda3e6347a1214d50188b10",
+    "acknowledged_cursor": 6650278084,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "dee53fa5c6ce5d9c6898ec4f2ae5281b16972c024fda3e6347a1214d50188b10",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0804C8C4\",\"who\":\"sol-0804C8C4-1198\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T05:10:34Z",
+      "id": 6650272063,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:10:34Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "c1c07d5f8326bf4cf3df220b5c4e85e695ff166c0bdb41314ac1cd39b56c4210",
+    "result": {
+      "address": "0x0804C8C4",
+      "claim_id": 6650272063,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6650272063,
+      "status": "accepted",
+      "who": "sol-0804C8C4-1198"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "2181f04208094660f9f1021112bca5fcc6ef399b58a0f0aad377f0bbc88fd81e",
+    "acknowledged_cursor": 6650763503,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2181f04208094660f9f1021112bca5fcc6ef399b58a0f0aad377f0bbc88fd81e",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0804C8C4\",\"who\":\"sol-0804C8C4-1198\",\"claim_id\":6650272063,\"reason\":\"Exact184B compiler diagnostic retained privately. Typed function-address plus BIOS and callback composition remains unsupported; zero native MATCH.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T05:45:09Z",
+      "id": 6650756742,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T05:45:09Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "947fc48de645d1bd231c409aa0fe5aae23e5085529996f3f74f9dbd211c7378d",
+    "result": {
+      "address": "0x0804C8C4",
+      "claim_id": 6650272063,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6650756742,
+      "status": "accepted",
+      "who": "sol-0804C8C4-1198"
+    }
+  }
+}
