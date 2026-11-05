@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "183149771e7b791790da12ae7cc3f843c60002bcbd212ba5484e6f540353b890",
-        "acknowledged_cursor": 6658115023,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "183149771e7b791790da12ae7cc3f843c60002bcbd212ba5484e6f540353b890",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08059454\",\"who\":\"sol-08059454-1477\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T12:34:50Z",
-          "id": 6658114777,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:34:50Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "556dae6642266798f22ef07da06a7afab71e59135334a1b1301b6fe10b12ae10",
-        "result": {
-          "address": "0x08059454",
-          "claim_id": 6658114777,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6658114777,
-          "status": "accepted",
-          "who": "sol-08059454-1477"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d56e292f51acaaaf2fda188fb353acf8e03a8d04c3b38e804555d31ad03ebc93",
-        "acknowledged_cursor": 6658861506,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d56e292f51acaaaf2fda188fb353acf8e03a8d04c3b38e804555d31ad03ebc93",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08059454\",\"who\":\"sol-08059454-1477\",\"claim_id\":6658114777,\"reason\":\"Eight distinct natural diagnostic sources; two complete5716B FUNCs differ,2093 positional equal bytes at best,zero native/MATCH. Strict composition refusal retained. No grounded next form.167 fixed inputs and499 consumed references unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T13:11:50Z",
-          "id": 6658861506,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T13:11:50Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1af5ff9bb2bf03d5f77c6e659d1ddcbe41bf8b39f15720f49e2eafdecaa24191",
-        "result": {
-          "address": "0x08059454",
-          "claim_id": 6658114777,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6658861506,
-          "status": "accepted",
-          "who": "sol-08059454-1477"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "f5eba56549cfd728a12c34d7ef5860bd512a98a8acd5f5bc4ea6fedcce006868",
         "acknowledged_cursor": 6658115023,
         "body_provenance": "acceptance-time",
