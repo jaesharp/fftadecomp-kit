@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "7849fa520c9813b6bb8c7880be52eadc5982d58c62dba5ff962771835a2fdc82",
-        "acknowledged_cursor": 6669462000,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7849fa520c9813b6bb8c7880be52eadc5982d58c62dba5ff962771835a2fdc82",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800D95C\",\"who\":\"sol-0800D95C-1890\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T21:03:41Z",
-          "id": 6669461450,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:03:41Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "b3ac7d4c37227963e048cee30f989835ff75190756f7abc4d0486523226e5961",
-        "result": {
-          "address": "0x0800D95C",
-          "claim_id": 6669461450,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6669461450,
-          "status": "accepted",
-          "who": "sol-0800D95C-1890"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "bb7f18c489340a88f38e2d3eb57c28fbd30243997c21fb82a76adb8e97095ce5",
-        "acknowledged_cursor": 6669901852,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "bb7f18c489340a88f38e2d3eb57c28fbd30243997c21fb82a76adb8e97095ce5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800D95C\",\"who\":\"sol-0800D95C-1890\",\"claim_id\":6669461450,\"reason\":\"Complete132B native MATCH with plausible unchanged C and new explicit two-incoming-word bounded BIOS fill profile. One native/compiler, genuine original ET_REL/linked ELF/FUNC retained; original167+native167 unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T21:22:59Z",
-          "id": 6669901852,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:22:59Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8fbc0561ef36a0c0ab914f013738cde3b0fcc3067d18fd4abc1f0ca7cc4e986c",
-        "result": {
-          "address": "0x0800D95C",
-          "claim_id": 6669461450,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6669901852,
-          "status": "accepted",
-          "who": "sol-0800D95C-1890"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "e4a1a9c64cf0b8809efb239a81da069665fbfb1e4231aff4f356960ffd6c4ce9",
         "acknowledged_cursor": 6669883218,
         "body_provenance": "acceptance-time",
