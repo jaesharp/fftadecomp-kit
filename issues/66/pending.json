@@ -3742,7 +3742,35 @@
           "who": "sol-0807F168-1377"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "38d64b9a44e6728dd5122a86365c8e5f72f439a81402cd312c53e5b0504fd3c8",
+        "acknowledged_cursor": 6655003120,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "38d64b9a44e6728dd5122a86365c8e5f72f439a81402cd312c53e5b0504fd3c8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0807F168\",\"who\":\"sol-0807F168-1377\",\"claim_id\":6654475160,\"reason\":\"Eight diagnostics including1 declaration error,0native; best1612B FUNC1521 aligned bytes equal,607vs606 instructions. Case0 pool hoist and cached address remain. Frozen result9557d39882d5bb168e7691dfa512a428a3386f8dc47ced5a34c3e7b966198819; all167+81refs/runtime unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:55:35Z",
+          "id": 6655003120,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:55:35Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ee6dea040309bf7526fba1cb3c5ec00de22016cdae14126032932707f631da4b",
+        "result": {
+          "address": "0x0807F168",
+          "claim_id": 6654475160,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6655003120,
+          "status": "accepted",
+          "who": "sol-0807F168-1377"
+        }
+      }
     },
     {
       "claim": {
