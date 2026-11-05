@@ -31,6 +31,8 @@ READONLY_TWO_SELECTOR = 'addressed-signed-runtime-readonly-two-words-v1'
 READONLY_TWO_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-readonly-two-words-v1'
 DATA_SELECTOR = 'addressed-signed-runtime-data-v1'
 DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-data-v1'
+COMPILER_DATA_SELECTOR = 'compiler-signed-runtime-data-v1'
+COMPILER_DATA_SCHEMA = 'elf-symbol-thumb-compiler-signed-runtime-data-v1'
 READONLY_TWO_DATA_SELECTOR = 'addressed-signed-runtime-readonly-two-words-data-v1'
 READONLY_TWO_DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-readonly-two-words-data-v1'
 CALLBACK_SELECTOR = 'addressed-signed-runtime-r2-callback-data-v1'
@@ -85,7 +87,7 @@ UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGN
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
 DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
-                  BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
+                  BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR, COMPILER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -95,7 +97,8 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
                         'no callback numeric, buffer, memory or termination equivalence facts')
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
-SCHEMAS = {BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-function-literals-data-v1',
+SCHEMAS = {COMPILER_DATA_SELECTOR: COMPILER_DATA_SCHEMA,
+            BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-function-literals-data-v1',
             BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-saved-scalar-control-numeric-mmio-data-v1',
             BIOS_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-numeric-mmio-data-v1',
             BIOS_READONLY_FOUR_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-four-words-data-v1',
@@ -125,6 +128,12 @@ SCHEMAS = {BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-nati
             INTEGER_READONLY_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-word0-v1',
             INTEGER_THREE_DATA_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-three-words-data-v1'}
 OPERATIONS = {'func_081426B8': quotient.ADDRESS, remainder.ADDRESSED_NAME: remainder.ADDRESS}
+COMPILER_ALIASES = {'__divsi3': 'func_081426B8', '__modsi3': remainder.ADDRESSED_NAME}
+COMPILER_CONTRACT = ('actual compiler-emitted signed-runtime names at original Thumb BL relocations; '
+                     'explicit runtime identifiers excluded from preprocessed C; '
+                     'original and linked ELF names preserved; exact canonical runtime identities; '
+                     'conditional returning ARM ABI only, no numeric result, definedness, '
+                     'termination or arithmetic C equivalence theorem')
 UNSIGNED_OPERATIONS = {'func_08142AB0': 0x08142AB0,
                        'func_08142B28': unsigned_remainder.ADDRESS}
 ABI = 'conditional returning ARM ABI; arbitrary incoming word patterns; no numeric return facts'
@@ -137,6 +146,12 @@ def sha(data):
 
 def text(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'))
+
+
+def compiler_namespace(source):
+    identifiers = set(re.findall(r'[A-Za-z_][A-Za-z_0-9]*', source))
+    if identifiers & (set(COMPILER_ALIASES) | set(COMPILER_ALIASES.values())):
+        raise ValueError('compiler runtime identifiers cannot occur in preprocessed C')
 
 
 def buffer_scratch_policy(selector):
@@ -651,6 +666,11 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         ordinary_calls='conditional returning r4-r11/SP preserving ABI only; no transitive callee proof',
         termination='every reached region has a checked return path; universal termination unproved',
         frame=restored, partition=partition, producer_source_sha256=pins)
+    if selector == COMPILER_DATA_SELECTOR:
+        aliases = {name: alias for alias, name in COMPILER_ALIASES.items()}
+        context[4]['compiler_runtime'] = dict(contract=COMPILER_CONTRACT,
+            calls=[[site-address, aliases[name], name]
+                   for site, name in sorted(context[3].items())])
     if selector in BIOS_ORDINARY_SELECTORS:
         context[4]['bios_ordinary'] = dict(contract=BIOS_ORDINARY_CONTRACT,
             calls=[site-address for site,target in sorted(calls.items())
@@ -789,7 +809,8 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
     objects = match.parse_data_symbols(data_mapping) if with_data else {}
     if selector not in SCHEMAS or selector in CALLBACK_SELECTORS and not with_data:
         raise ValueError('callback linking requires its exact selector and typed data')
-    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR) and not with_data:
+    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
+                    COMPILER_DATA_SELECTOR) and not with_data:
         raise ValueError('addressed readonly data requires actual typed bindings')
     symbol = original_function(image, address)
     entries = json.loads(mapping)
@@ -830,7 +851,12 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
                     target_symbol['type'] not in (0, 2) or \
                     sum(item['name'] == name for item in image['symbols']) != 1:
                 raise ValueError('addressed calls require unique undefined zero-valued global functions')
-            target = operations(selector).get(name)
+            canonical = COMPILER_ALIASES.get(name) if selector == COMPILER_DATA_SELECTOR else None
+            if canonical is not None and target_symbol['size'] != 0:
+                raise ValueError('compiler runtime symbols require zero original size')
+            if selector == COMPILER_DATA_SELECTOR and name in OPERATIONS:
+                raise ValueError('compiler runtime linking requires original compiler-emitted names')
+            target = operations(selector).get(canonical or name)
             if target is None:
                 if selector in CALLBACK_SELECTORS and name == callback_alias(selector):
                     target = match.function_thunk.ALIASES[name]
@@ -838,7 +864,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
                 else:
                     target = match.function_address_target(name, entries, address, symbol['size'], len(rom))
             else:
-                bindings[address+offset] = name
+                bindings[address+offset] = canonical or name
             decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
             decoder.detail = True
             instruction = next(decoder.disasm(image['text'][offset:offset+4],address+offset),None)
@@ -927,6 +953,8 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, *,
     from inert_spin_profile import fixed_configuration
     fixed_configuration(args)
     data = {} if selector in DATA_SELECTORS else None
+    if selector == COMPILER_DATA_SELECTOR:
+        compiler_namespace(runner.read_binary(f'{workspace}/f.i').decode('utf-8'))
     if selector in CALLBACK_SELECTORS:
         match.function_thunk.namespace(runner.read_binary(f'{workspace}/f.i').decode('utf-8'))
     calls, bindings, targets = original_bindings(original,address,rom,mapping,
