@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "7655d105c55c073655eee3e8666d0d6de19251e224bc731663038f6e465a124a",
+    "acknowledged_cursor": 6664356226,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "7655d105c55c073655eee3e8666d0d6de19251e224bc731663038f6e465a124a",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D4020\",\"who\":\"sol-080D4020-1700\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T17:13:28Z",
+      "id": 6664340378,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T17:13:28Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "50b84654911f366fb9b251c2637741434eba835b02e1b454aa4aeacc6e6a35ae",
+    "result": {
+      "address": "0x080D4020",
+      "claim_id": 6664340378,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6664340378,
+      "status": "accepted",
+      "who": "sol-080D4020-1700"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "2b20b1277626323e0625025b34787d066fefcfaf5ae5f712f22136920dbdf775",
+    "acknowledged_cursor": 6664476796,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2b20b1277626323e0625025b34787d066fefcfaf5ae5f712f22136920dbdf775",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D4020\",\"who\":\"sol-080D4020-1700\",\"claim_id\":6664340378,\"reason\":\"Two discarded RAM byte reads remain unsupported beyond retained forms. Zero new compiler/native; all167 plus22 refs unchanged; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T17:19:26Z",
+      "id": 6664474398,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T17:19:26Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "ac862f2630b8906c357869e278c19c9747958fdd737f3784fec92b1372517c46",
+    "result": {
+      "address": "0x080D4020",
+      "claim_id": 6664340378,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6664474398,
+      "status": "accepted",
+      "who": "sol-080D4020-1700"
+    }
+  }
+}
