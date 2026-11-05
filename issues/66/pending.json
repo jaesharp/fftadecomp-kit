@@ -3838,7 +3838,35 @@
           "who": "sol-08005C54-1824"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "bd2c7c691ad8fccd1a45c1be74dc46d2c1f74d55d00f1c1f6b7dd3792c1e1873",
+        "acknowledged_cursor": 6667914612,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bd2c7c691ad8fccd1a45c1be74dc46d2c1f74d55d00f1c1f6b7dd3792c1e1873",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08005C54\",\"who\":\"sol-08005C54-1824\",\"claim_id\":6667705858,\"reason\":\"Three grounded descriptor/count diagnostics with private prospective linking retained, best whole526 versus550B; no independent grounded next representation, zero native/proof, unchanged fixed/reference/proposed map inputs.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T20:00:05Z",
+          "id": 6667914612,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T20:00:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "879bfe9f140188a41fca5bb9e424c7b5bdbbe813536d7e0d1c47381e5d31b1f6",
+        "result": {
+          "address": "0x08005C54",
+          "claim_id": 6667705858,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6667914612,
+          "status": "accepted",
+          "who": "sol-08005C54-1824"
+        }
+      }
     },
     {
       "claim": {
