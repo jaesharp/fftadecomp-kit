@@ -3806,7 +3806,35 @@
           "who": "sol-081448DC-1702"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "046ccd1ae9a0187ffdb8b23b04a4652fba966fc0d0de3ba0edfc1daac9ac3894",
+        "acknowledged_cursor": 6664548564,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "046ccd1ae9a0187ffdb8b23b04a4652fba966fc0d0de3ba0edfc1daac9ac3894",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081448DC\",\"who\":\"sol-081448DC-1702\",\"claim_id\":6664428692,\"reason\":\"One grounded next-slot-pointer form retained; complete40B versus32B target. No native or independently grounded next form; fixed167 plus16 refs unchanged; fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T17:22:46Z",
+          "id": 6664548564,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T17:22:46Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7dfb092030de0049460b354f01439abc77d0b9a3dd173d5c39d7d19889837854",
+        "result": {
+          "address": "0x081448DC",
+          "claim_id": 6664428692,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6664548564,
+          "status": "accepted",
+          "who": "sol-081448DC-1702"
+        }
+      }
     },
     {
       "claim": {
@@ -3934,7 +3962,35 @@
           "who": "sol-0814195C-1705"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1bdf7d824a6c5859eb718537f39462dd4c711cf0db90ecfa684f18689ef7940b",
+        "acknowledged_cursor": 6664548564,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1bdf7d824a6c5859eb718537f39462dd4c711cf0db90ecfa684f18689ef7940b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814195C\",\"who\":\"sol-0814195C-1705\",\"claim_id\":6664476796,\"reason\":\"Prior countdown/inline forms cover recovered behavior; repeated target RAM halfword read has no grounded new source form. Zero new compiler/native; fixed167 plus13 refs unchanged; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T17:22:45Z",
+          "id": 6664548450,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T17:22:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7dfb092030de0049460b354f01439abc77d0b9a3dd173d5c39d7d19889837854",
+        "result": {
+          "address": "0x0814195C",
+          "claim_id": 6664476796,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6664548450,
+          "status": "accepted",
+          "who": "sol-0814195C-1705"
+        }
+      }
     },
     {
       "claim": {
