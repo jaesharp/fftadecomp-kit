@@ -3742,7 +3742,35 @@
           "who": "sol-08145608-1427"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "421c0fabd85175513762c1f994539b8225ddbdc41124748584d5d849ebbfbd87",
+        "acknowledged_cursor": 6656724174,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "421c0fabd85175513762c1f994539b8225ddbdc41124748584d5d849ebbfbd87",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08145608\",\"who\":\"sol-08145608-1427\",\"claim_id\":6656156195,\"reason\":\"Final plausible source passes native complete164B byte equality under published compiler-numeric-MMIO context. Earlier implausible empty polling syntax refusal and all original artifacts retained. Genuine source correction; final continued1441/result.json frozen. No unchanged successful replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T11:22:36Z",
+          "id": 6656724174,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T11:22:36Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b8d84156357a97d37e71ec6c8034a27332d7053410d6983303f93a1397f1d472",
+        "result": {
+          "address": "0x08145608",
+          "claim_id": 6656156195,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6656724174,
+          "status": "accepted",
+          "who": "sol-08145608-1427"
+        }
+      }
     },
     {
       "claim": {
