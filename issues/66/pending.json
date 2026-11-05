@@ -3742,7 +3742,35 @@
           "who": "sol-0809A890-1924"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "838e8c14d171308c3114b738dcd647a9324961eae61d10a1ad33468e4614cdce",
+        "acknowledged_cursor": 6670801667,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "838e8c14d171308c3114b738dcd647a9324961eae61d10a1ad33468e4614cdce",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809A890\",\"who\":\"sol-0809A890-1924\",\"claim_id\":6670641416,\"reason\":\"Six natural diagnostic forms exhausted, best40/56B equal with local initialization/context setup ordering residual;0 native. All originals and source retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T22:07:46Z",
+          "id": 6670801667,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T22:07:46Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1c3b69e7ab5c7406243c7b441ed8cd2474120d41eab878b8e5d1b29602909120",
+        "result": {
+          "address": "0x0809A890",
+          "claim_id": 6670641416,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6670801667,
+          "status": "accepted",
+          "who": "sol-0809A890-1924"
+        }
+      }
     },
     {
       "claim": {
