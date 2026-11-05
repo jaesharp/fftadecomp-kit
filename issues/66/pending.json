@@ -4090,7 +4090,35 @@
           "who": "sol-081151A0-1831"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d78e4fe59216c3a3b18637ca6ec17384511ddaf5172df1a825c9a335ab2699e6",
+        "acknowledged_cursor": 6668119199,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d78e4fe59216c3a3b18637ca6ec17384511ddaf5172df1a825c9a335ab2699e6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081151A0\",\"who\":\"sol-081151A0-1831\",\"claim_id\":6667886867,\"reason\":\"One natural complete 808B FUNC versus 824B target; seven discarded RAM byte loads lack genuine storage evidence. Originals frozen, zero native/proof/MATCH credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T20:09:59Z",
+          "id": 6668119199,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T20:09:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "fd0cd2134d3c85ef8789591c39ac05f0d9de785294999619c406025bebf921c3",
+        "result": {
+          "address": "0x081151A0",
+          "claim_id": 6667886867,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6668119199,
+          "status": "accepted",
+          "who": "sol-081151A0-1831"
+        }
+      }
     },
     {
       "claim": {
