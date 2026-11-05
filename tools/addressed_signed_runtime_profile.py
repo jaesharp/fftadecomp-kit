@@ -49,6 +49,7 @@ BUFFER_SCRATCH_SELECTOR = 'addressed-signed-runtime-native-buffer-zero-index-dis
 BIOS_SELECTOR = 'addressed-native-bios-fill-buffer-v1'
 BIOS_DATA_SELECTOR = 'addressed-native-bios-fill-buffer-data-v1'
 BIOS_SCALAR_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-data-v1'
+BIOS_SCALAR_MMIO_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-numeric-mmio-data-v1'
 BIOS_R2_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-r2-callback-data-v1'
 BIOS_READONLY_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-word0-data-v1'
 BIOS_READONLY_THREE_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-three-words-data-v1'
@@ -56,7 +57,7 @@ BIOS_READONLY_FOUR_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-four-wor
 BIOS_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-function-literals-data-v1'
 BIOS_SCALAR_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-function-literals-data-v1'
 FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, *FUNCTION_DATA_SELECTORS)
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_MMIO_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, *FUNCTION_DATA_SELECTORS)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR = 'addressed-native-bios-ordinary-readonly-two-words-data-v1'
@@ -78,7 +79,7 @@ INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_S
 UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
                              UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
-DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_MMIO_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
                   BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
@@ -90,7 +91,8 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
                         'no callback numeric, buffer, memory or termination equivalence facts')
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
-SCHEMAS = {BIOS_READONLY_FOUR_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-four-words-data-v1',
+SCHEMAS = {BIOS_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-numeric-mmio-data-v1',
+            BIOS_READONLY_FOUR_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-four-words-data-v1',
             BIOS_SCALAR_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-function-literals-data-v1',
             BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-readonly-two-words-data-v1',
             BIOS_READONLY_THREE_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-three-words-data-v1',
@@ -534,10 +536,11 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     partition = graph.partition(data, address, refinement, instructions, words)
     selector = context_selector(context)
     scalar_controls = []
+    numeric_mmio = []
     if selector in DATA_SELECTORS:
         literals = data_literals(data, address, context[0], context[1], context[6], context[7], selector=selector)
         match.verify_data_literals(instructions.values(), address, literals)
-        if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR):
+        if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_MMIO_DATA_SELECTOR):
             from bios_cpuset_fill_profile import scalar_control_words
             scalar_controls = scalar_control_words(instructions, edges, calls, partition, address)
             if not scalar_controls:
@@ -547,6 +550,17 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         address_words = {row['address'] - address for row in partition['words']
                          if remainder.address_literal(row['value'])}
         address_words -= {row[0] for row in scalar_controls}
+        if selector == BIOS_SCALAR_MMIO_DATA_SELECTOR:
+            numeric_mmio = [[row['address'] - address, row['value'],
+                             [site - address for site in row['load_sites']]]
+                            for row in partition['words']
+                            if 0x04000000 <= row['value'] < 0x04000400 and not row['value'] % 2]
+            if not numeric_mmio:
+                raise ValueError('numeric MMIO selector requires actual reached MMIO literal words')
+            offsets = {row[0] for row in numeric_mmio}
+            if offsets & (set(literals) | {row[0] for row in scalar_controls}):
+                raise ValueError('numeric MMIO cannot also be a typed object or BIOS scalar control')
+            address_words -= offsets
         if address_words != set(literals):
             raise ValueError('addressed data requires exact typed coverage of reached address words')
     elif any(remainder.address_literal(row['value']) for row in partition['words']):
@@ -643,7 +657,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in BIOS_SELECTORS:
         context[4]['native_buffers']['bios_fill'] = bios.manifest()
         context[4]['native_buffers']['contract'] += '; ' + bios_cpuset_fill_profile.CONTRACT
-    if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR):
+    if selector in (BIOS_SCALAR_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_MMIO_DATA_SELECTOR):
         context[4]['bios_scalar_control'] = dict(words=scalar_controls,
             contract='Exact native PC literal loaded only into R2 and consumed by '
                      'the next actual CpuSet call without an intervening R2 read, '
@@ -651,6 +665,16 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
                      'binding. Existing fill source frame bounds still apply. '
                      'No BIOS effects, initialization, physical readability, '
                      'nonalias, destination bounds, numeric return or termination theorem.')
+    if selector == BIOS_SCALAR_MMIO_DATA_SELECTOR:
+        context[4]['numeric_mmio_literals'] = dict(
+            schema='reached-halfword-aligned-numeric-mmio-literals-v1', words=numeric_mmio,
+            contract='Reached PC-loaded numeric literals in [0x04000000,0x04000400), '
+                     'halfword aligned, separately classified from typed ABS32 named objects '
+                     'and BIOS scalar controls. Original ELF words have no data relocation; '
+                     'the linker must preserve them exactly. Literal identity only, no typed '
+                     'symbol, pointee type, hardware access validity, physical readability, '
+                     'memory effects, initialization, nonalias, bounds, numeric result, '
+                     'termination or C semantic equivalence theorem.')
     if selector == BUFFER_SCRATCH_SELECTOR:
         from local_long_branch_profile import DISCARDED_SCRATCH_CONTRACT
         context[4]['native_buffers'].update(
