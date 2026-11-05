@@ -3742,7 +3742,35 @@
           "who": "sol-081141EC-1421"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "93e1455df93d8d9c55cb52ae6fb979be9c3a596544075d0d88dac62079169797",
+        "acknowledged_cursor": 6656191399,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "93e1455df93d8d9c55cb52ae6fb979be9c3a596544075d0d88dac62079169797",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081141EC\",\"who\":\"sol-081141EC-1421\",\"claim_id\":6656044715,\"reason\":\"Two natural diagnostics, best 360 versus 368 bytes; six omitted discarded RAM loads remain. No native, forced reads or invented representation. Original artifacts frozen, result SHA 77b1bb4c60c14434e7fa9662ad0de91095434c01c00a259e4cadc378053b1059.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T10:55:30Z",
+          "id": 6656191399,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T10:55:30Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ec1d1c6c055dbeacef42ca1295e633a3a265d29e034c367a9132f1c11a4bf378",
+        "result": {
+          "address": "0x081141EC",
+          "claim_id": 6656044715,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6656191399,
+          "status": "accepted",
+          "who": "sol-081141EC-1421"
+        }
+      }
     },
     {
       "claim": {
