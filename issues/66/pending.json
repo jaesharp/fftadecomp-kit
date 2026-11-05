@@ -3806,7 +3806,35 @@
           "who": "sol-080D963C-1215"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "84b254b690b16a4702173934bea522d153048f1b2b00e5d2a679a67b30af5249",
+        "acknowledged_cursor": 6650818823,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "84b254b690b16a4702173934bea522d153048f1b2b00e5d2a679a67b30af5249",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D963C\",\"who\":\"sol-080D963C-1215\",\"claim_id\":6650629574,\"reason\":\"Compiler diagnostic frozen; authentic stored callback080D9BC1 lacks indexed owner, so no linked byte comparison or native MATCH. Matching stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T05:49:32Z",
+          "id": 6650818823,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T05:49:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "99220c2a91b2c595f60fbfe24524be1b0054a00b7d5c6375c010f870e8080d84",
+        "result": {
+          "address": "0x080D963C",
+          "claim_id": 6650629574,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6650818823,
+          "status": "accepted",
+          "who": "sol-080D963C-1215"
+        }
+      }
     },
     {
       "claim": {
@@ -3902,7 +3930,35 @@
           "who": "sol-08118A08-1215"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "88b320c39a051ed8cf3d005036a9aacbf94d8b0a6ec241fe10824996ceaee24f",
+        "acknowledged_cursor": 6650818823,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "88b320c39a051ed8cf3d005036a9aacbf94d8b0a6ec241fe10824996ceaee24f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08118A08\",\"who\":\"sol-08118A08-1215\",\"claim_id\":6650629892,\"reason\":\"Exact184B compiler diagnostic retained privately; local outgoing stack pointer provenance prerequisite still unsupported. Zero native MATCH, matching stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T05:49:32Z",
+          "id": 6650818803,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T05:49:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "99220c2a91b2c595f60fbfe24524be1b0054a00b7d5c6375c010f870e8080d84",
+        "result": {
+          "address": "0x08118A08",
+          "claim_id": 6650629892,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6650818803,
+          "status": "accepted",
+          "who": "sol-08118A08-1215"
+        }
+      }
     },
     {
       "claim": {
