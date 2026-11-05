@@ -3898,7 +3898,35 @@
           "who": "sol-080970E8-1939"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "26de993f9940be0d5ad3a4951a3cde7430585dbe39744be4b744e2e46fbacaf2",
+        "acknowledged_cursor": 6671009670,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "26de993f9940be0d5ad3a4951a3cde7430585dbe39744be4b744e2e46fbacaf2",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080970E8\",\"who\":\"sol-080970E8-1939\",\"claim_id\":6670928830,\"reason\":\"Original132B diagnostic exact first form; native buffer/callback proof remains pending, no MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T22:18:42Z",
+          "id": 6671009670,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T22:18:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7f2196ce44f6ae07b94ed89dde2b544e83a22e98da3f07ba3d0e7ec50c779807",
+        "result": {
+          "address": "0x080970E8",
+          "claim_id": 6670928830,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6671009670,
+          "status": "accepted",
+          "who": "sol-080970E8-1939"
+        }
+      }
     },
     {
       "claim": {
