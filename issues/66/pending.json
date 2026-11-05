@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "6fa691e08ab902c9a8b7d12e5070bb31726bb96926b03d1766e864d33df2665b",
-        "acknowledged_cursor": 6656745406,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6fa691e08ab902c9a8b7d12e5070bb31726bb96926b03d1766e864d33df2665b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080EEB50\",\"who\":\"sol-080EEB50-1450\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:23:44Z",
-          "id": 6656745319,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:23:44Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a83dcf3d458eecde3469536bc946ab060ddd0311df4152895184255b40e1117b",
-        "result": {
-          "address": "0x080EEB50",
-          "claim_id": 6656745319,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656745319,
-          "status": "accepted",
-          "who": "sol-080EEB50-1450"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "44f99701e1974da5babf196c73f54e2f6f2d4bf754f6465f514b7ce504361925",
-        "acknowledged_cursor": 6657010758,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "44f99701e1974da5babf196c73f54e2f6f2d4bf754f6465f514b7ce504361925",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080EEB50\",\"who\":\"sol-080EEB50-1450\",\"claim_id\":6656745319,\"reason\":\"Five natural source diagnostics remained inexact; corrected retained form548 versus568 complete bytes. Six discarded shadow reads lack grounded storage support. Zero native. Transient unpinned peer source view disappeared after being read; original pinned references and167/runtime unchanged, earlier matched-sibling description retracted. No impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T11:37:40Z",
-          "id": 6657010758,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:37:40Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ae2d86cffcb8b40367b4df7ec07b04010f6abb2eb3011ccf73fd6ee375a257f5",
-        "result": {
-          "address": "0x080EEB50",
-          "claim_id": 6656745319,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6657010758,
-          "status": "accepted",
-          "who": "sol-080EEB50-1450"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "178d88b405635381d09a8a85239f87a07bcefd38925acb4ff43d32d58968d3b1",
         "acknowledged_cursor": 6656935018,
         "body_provenance": "acceptance-time",
