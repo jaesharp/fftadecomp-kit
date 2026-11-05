@@ -3774,7 +3774,35 @@
           "who": "sol-080CEECC-1657"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3adc3a577a3ac2e110d05cdd6c08ca3b29f4696615822e315d7ecfd8cbe30886",
+        "acknowledged_cursor": 6663402220,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3adc3a577a3ac2e110d05cdd6c08ca3b29f4696615822e315d7ecfd8cbe30886",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CEECC\",\"who\":\"sol-080CEECC-1657\",\"claim_id\":6663041131,\"reason\":\"Two distinct grounded named-member diagnostics:164B then172B/69instr,152/172 bytes exact with20 register-operand residuals at historical sites. Unexpected convergence retained, no retry/native/MATCH. All167+31refs/runtime/ROM unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T16:32:18Z",
+          "id": 6663402220,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T16:32:18Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "52119adc4cd3cb366df967d4f7dd699fec6ca67bc6d366bae217201e19e3fa14",
+        "result": {
+          "address": "0x080CEECC",
+          "claim_id": 6663041131,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6663402220,
+          "status": "accepted",
+          "who": "sol-080CEECC-1657"
+        }
+      }
     },
     {
       "claim": {
