@@ -3806,7 +3806,35 @@
           "who": "sol-080CD9A4-1501"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c24c1c072b2a02368df5cf70c1403197db453acecccf283ed353124b3804f8b6",
+        "acknowledged_cursor": 6659059143,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c24c1c072b2a02368df5cf70c1403197db453acecccf283ed353124b3804f8b6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CD9A4\",\"who\":\"sol-080CD9A4-1501\",\"claim_id\":6658861397,\"reason\":\"First original native MATCH:24/24B wholeFUNC,12instructions,plausible. One native,unchanged exact natural source; same-invocation i/s/o/FUNC retained. Primary publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T13:21:15Z",
+          "id": 6659059143,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T13:21:15Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "86f67c3c79ee33cf096a3ea198a68fe5c68f4c181af54fc2643292c927af2db9",
+        "result": {
+          "address": "0x080CD9A4",
+          "claim_id": 6658861397,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6659059143,
+          "status": "accepted",
+          "who": "sol-080CD9A4-1501"
+        }
+      }
     },
     {
       "claim": {
