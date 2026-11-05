@@ -3392,7 +3392,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             if ashldi3.reserved(target):
                 if ashldi3_context is None or target != ashldi3.ADDRESS or current not in ashldi3_context[3]:
                     raise ValueError("ashldi3 requires its canonical target-machine proof")
-            if umodsi3.reserved(target):
+            if umodsi3.reserved(target) and not addressed_signed_runtime.binds_unsigned(
+                    addressed_signed_runtime_context, current, target):
                 if umodsi3_context is None or target != umodsi3.ADDRESS or \
                         current not in umodsi3_context[2]:
                     raise ValueError("unsigned remainder requires its canonical constant-divisor proof")
@@ -3428,7 +3429,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                 if target != modsi3.ADDRESS or current not in modsi3_context[2]:
                     raise ValueError("signed remainder call lacks a canonical binding")
             if is_udivsi3_address(target):
-                if zero_aware_unsigned_quotient_inventory_context is not None and \
+                if addressed_signed_runtime.binds_unsigned(
+                        addressed_signed_runtime_context, current, target):
+                    pass  # prepare authenticated the exact conditional returning ABI entry.
+                elif zero_aware_unsigned_quotient_inventory_context is not None and \
                         target == UDIVSI3_ADDRESS and \
                         zero_aware_unsigned_quotient_inventory_context[3].get(current) == '__udivsi3':
                     pass  # prepare proved the complete exact zero/nonzero native closure.
@@ -4130,7 +4134,8 @@ def main():
     ap.add_argument("--unsigned-quotient-profile", choices=(UDIVSI3_FRAMED_SELECTOR,))
     ap.add_argument("--signed-runtime-profile", choices=tuple(signed_divmod.SCHEMAS))
     ap.add_argument("--unsigned-runtime-profile", choices=(unsigned_divmod.SELECTOR,))
-    ap.add_argument("--addressed-signed-runtime-profile", choices=tuple(addressed_signed_runtime.SCHEMAS))
+    ap.add_argument("--addressed-signed-runtime-profile", "--addressed-runtime-profile",
+                    dest="addressed_signed_runtime_profile", choices=tuple(addressed_signed_runtime.SCHEMAS))
     ap.add_argument("--software-double-profile", choices=(software_double.SELECTOR,))
     ap.add_argument("--software-double-remainder-profile", choices=(software_double.REMAINDER_TARGET_SELECTOR,))
     ap.add_argument("--function-address-profile", choices=function_thunk.SELECTORS)

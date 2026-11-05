@@ -332,9 +332,9 @@ class R3CallbackTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'source|inputs'): profile.build(root,A,selector=SELECTOR)
         with self.build_fixture() as (root,*_):
             actual = profile.data_producer_fingerprint; count = 0
-            def changed():
+            def changed(selector=None):
                 nonlocal count
-                count += 1; value = actual()
+                count += 1; value = actual(selector)
                 if count >= 3: value['addressed_signed_runtime_profile.py']='0'*64
                 return value
             with patch.object(profile,'data_producer_fingerprint',side_effect=changed):

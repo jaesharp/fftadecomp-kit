@@ -282,9 +282,9 @@ class R2CallbackTests(unittest.TestCase):
             profile.issue(HERE, A, args)
         with self.build_fixture() as (root, f, commands, capture):
             actual=profile.data_producer_fingerprint; count=0
-            def changed():
+            def changed(selector=None):
                 nonlocal count
-                count+=1; result=actual()
+                count+=1; result=actual(selector)
                 if count>=3:result['function_thunk_profile.py']='0'*64
                 return result
             with patch.object(profile,'data_producer_fingerprint',side_effect=changed):

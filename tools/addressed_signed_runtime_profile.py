@@ -21,6 +21,7 @@ import tempfile
 
 import divsi3_profile as quotient
 import modsi3_profile as remainder
+import umodsi3_profile as unsigned_remainder
 
 SELECTOR = 'addressed-signed-runtime-v1'
 SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-v1'
@@ -36,8 +37,14 @@ CALLBACK_SELECTOR = 'addressed-signed-runtime-r2-callback-data-v1'
 CALLBACK_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-r2-callback-data-v1'
 R3_CALLBACK_SELECTOR = 'addressed-signed-runtime-r3-callback-data-v1'
 R3_CALLBACK_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-r3-callback-data-v1'
+UNSIGNED_SELECTOR = 'addressed-unsigned-runtime-v1'
+UNSIGNED_SCHEMA = 'elf-symbol-thumb-addressed-unsigned-runtime-v1'
+UNSIGNED_DATA_SELECTOR = 'addressed-unsigned-runtime-data-v1'
+UNSIGNED_DATA_SCHEMA = 'elf-symbol-thumb-addressed-unsigned-runtime-data-v1'
+UNSIGNED_SELECTORS = (UNSIGNED_SELECTOR, UNSIGNED_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR)
-DATA_SELECTORS = (DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS)
+DATA_SELECTORS = (DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+                  UNSIGNED_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -50,8 +57,11 @@ DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readabilit
 SCHEMAS = {SELECTOR: SCHEMA, READONLY_SELECTOR: READONLY_SCHEMA,
             READONLY_TWO_SELECTOR: READONLY_TWO_SCHEMA, DATA_SELECTOR: DATA_SCHEMA,
             READONLY_TWO_DATA_SELECTOR: READONLY_TWO_DATA_SCHEMA,
-            CALLBACK_SELECTOR: CALLBACK_SCHEMA, R3_CALLBACK_SELECTOR: R3_CALLBACK_SCHEMA}
+            CALLBACK_SELECTOR: CALLBACK_SCHEMA, R3_CALLBACK_SELECTOR: R3_CALLBACK_SCHEMA,
+            UNSIGNED_SELECTOR: UNSIGNED_SCHEMA, UNSIGNED_DATA_SELECTOR: UNSIGNED_DATA_SCHEMA}
 OPERATIONS = {'func_081426B8': quotient.ADDRESS, remainder.ADDRESSED_NAME: remainder.ADDRESS}
+UNSIGNED_OPERATIONS = {'func_08142AB0': 0x08142AB0,
+                       'func_08142B28': unsigned_remainder.ADDRESS}
 ABI = 'conditional returning ARM ABI; arbitrary incoming word patterns; no numeric return facts'
 _replay = ContextVar('addressed_signed_runtime_replay', default=False)
 
@@ -72,9 +82,22 @@ def context_selector(context):
             return READONLY_SELECTOR
         if len(context) == 6 and type(context[5]) is str and context[5] == READONLY_TWO_SELECTOR:
             return READONLY_TWO_SELECTOR
+        if len(context) == 6 and type(context[5]) is str and context[5] == UNSIGNED_SELECTOR:
+            return UNSIGNED_SELECTOR
         if len(context) == 8 and type(context[5]) is str and context[5] in DATA_SELECTORS:
             return context[5]
     raise ValueError('addressed signed runtimes require an exact explicit context')
+
+
+def operations(selector):
+    return UNSIGNED_OPERATIONS if selector in UNSIGNED_SELECTORS else OPERATIONS
+
+
+def binds_unsigned(context, site, target):
+    """Only a prepared explicit unsigned context may authorize an exact entry."""
+    return context is not None and context_selector(context) in UNSIGNED_SELECTORS and \
+        context[3].get(site) in UNSIGNED_OPERATIONS and \
+        UNSIGNED_OPERATIONS[context[3][site]] == target
 
 
 def object_value(name, addend, objects, entries, address, size):
@@ -357,16 +380,22 @@ def prepare(data, address, calls, context):
         callback_dependencies(rom, mapping, index, selector)
         if match.function_thunk.ALIASES[callback_alias(selector)] not in calls.values():
             raise ValueError('callback selector requires its actual canonical callback call')
-    if any(type(site) is not int or type(name) is not str or name not in OPERATIONS or
-           calls.get(site) != OPERATIONS[name] for site, name in bindings.items()) or \
-            set(bindings) != {site for site, target in calls.items() if target in OPERATIONS.values()}:
+    selected_operations = operations(selector)
+    if any(type(site) is not int or type(name) is not str or name not in selected_operations or
+           calls.get(site) != selected_operations[name] for site, name in bindings.items()) or \
+            set(bindings) != {site for site, target in calls.items() if target in selected_operations.values()}:
         raise ValueError('addressed signed runtimes require complete canonical addressed bindings')
     selected = []
-    for module in (quotient, remainder):
-        if module.ADDRESS not in {calls[site] for site in bindings}:
+    identities = ((match.UDIVSI3_ADDRESS, match.verify_udivsi3_identity, match.UDIVSI3_IDENTITIES),
+                  (unsigned_remainder.ADDRESS, unsigned_remainder.verify_identity,
+                   unsigned_remainder.IDENTITIES)) if selector in UNSIGNED_SELECTORS else tuple(
+                       (module.ADDRESS, module.verify_identity, module.IDENTITIES)
+                       for module in (quotient, remainder))
+    for entry, verify_identity, spans in identities:
+        if entry not in {calls[site] for site in bindings}:
             continue
-        module.verify_identity(rom, mapping)
-        for lo, hi, digest in module.IDENTITIES:
+        verify_identity(rom, mapping)
+        for lo, hi, digest in spans:
             owner.validate_span(rom[lo-match.ROM_BASE:hi-match.ROM_BASE], lo, rom, mapping, index)
             selected.append([lo, hi, digest])
     for site, target in calls.items():
@@ -412,6 +441,8 @@ def finish(data, address, calls, context, verified, dependencies):
     else:
         restored = frame.prove_frame(instructions, edges, address, {}, calls)
     modules = (match, owner, graph, frame, quotient, remainder)
+    if selector in UNSIGNED_SELECTORS:
+        modules += (unsigned_remainder,)
     if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR):
         modules += (incoming,)
     pins = {Path(module.__file__).name: sha(Path(module.__file__).read_bytes()) for module in modules}
@@ -447,7 +478,7 @@ def verify(data, address, rom, mapping, index, calls, bindings, manifest=None, *
         raise ValueError('unknown addressed signed runtime selector')
     observed = {}
     context = (rom, mapping, index, bindings, observed)
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR):
         context += (selector,)
     elif selector in DATA_SELECTORS:
         context += (selector, data_mapping, data_bindings)
@@ -539,7 +570,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
                     target_symbol['type'] not in (0, 2) or \
                     sum(item['name'] == name for item in image['symbols']) != 1:
                 raise ValueError('addressed calls require unique undefined zero-valued global functions')
-            target = OPERATIONS.get(name)
+            target = operations(selector).get(name)
             if target is None:
                 if selector in CALLBACK_SELECTORS and name == callback_alias(selector):
                     target = match.function_thunk.ALIASES[name]
@@ -690,7 +721,7 @@ def build(root, address, args=None, expected=None, *, selector=SELECTOR):
     fixed_configuration(args)
     if selector not in SCHEMAS:
         raise ValueError('unknown addressed signed runtime selector')
-    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, *DATA_SELECTORS) else None
+    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, *DATA_SELECTORS) else None
     producers = data_producer_fingerprint(selector) if selector in DATA_SELECTORS else None
     source,mapping,index = source_fingerprint(root,address),mapping_snapshot(root),index_snapshot(root)
     objects,selected_rom = data_snapshot(root),report_rom_path(root)
@@ -817,7 +848,7 @@ def report_matches(report, root, address):
                 saved['rom_sha256'] != sha(Path(report_rom_path(root)).read_bytes()) or \
                 saved['toolchain'] != toolchain_fingerprint():
             return False
-        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
+        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
             return False
         return render(build(root,address,expected=saved['manifest'],selector=selector)) == report
     except (OSError,ValueError,KeyError,TypeError,IndexError,RuntimeError,subprocess.SubprocessError):

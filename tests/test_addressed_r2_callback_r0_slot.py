@@ -12,11 +12,10 @@ import unittest
 from unittest.mock import patch
 
 sys.dont_write_bytecode = True
-CASE = Path(__file__).resolve().parents[2]
-BASE = CASE.parents[1]
-KIT = BASE / 'repos/fftadecomp-kit'
-SWITCH = BASE / 'state/matching-08062248-switch-scalar-prerequisite/proposed/tools'
-sys.path[:0] = [str(CASE / 'proposed/tools'), str(SWITCH), str(KIT / 'tools'), str(KIT / 'tests')]
+CASE = Path(__file__).resolve().parents[1]
+KIT = Path(os.environ.get('FFTA_CALLBACK_RUNTIME_KIT', CASE))
+SWITCH = KIT / 'tools'
+sys.path[:0] = [str(SWITCH), str(KIT / 'tests')]
 import match
 import match_evidence as evidence
 import addressed_signed_runtime_profile as profile
