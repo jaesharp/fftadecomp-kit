@@ -3774,7 +3774,35 @@
           "who": "sol-08000788-1053"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7fa9e018be68689ef92680b8872a645894255ec8ad916599a12ff5e30888f622",
+        "acknowledged_cursor": 6646572449,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7fa9e018be68689ef92680b8872a645894255ec8ad916599a12ff5e30888f622",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08000788\",\"who\":\"sol-08000788-1053\",\"claim_id\":6646414664,\"reason\":\"One natural documented-MMIO form emits52 versus64B; original native artifacts retained. Fully stopped and all166inputs unchanged. No grounded operations justify extra frame/RAM reloads; no MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T00:55:45Z",
+          "id": 6646572192,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T00:55:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "96f5307c24b60625e67dd5805d25c3893b0c843c1f909901e1a11fbd39b5ff61",
+        "result": {
+          "address": "0x08000788",
+          "claim_id": 6646414664,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6646572192,
+          "status": "accepted",
+          "who": "sol-08000788-1053"
+        }
+      }
     },
     {
       "claim": {
@@ -3806,7 +3834,35 @@
           "who": "sol-08013794-1053"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d21fd337f2f7815c0db6dc243f9d8fad8cfcb9074eecb7c3cc5e43cb6c6146b6",
+        "acknowledged_cursor": 6646572449,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d21fd337f2f7815c0db6dc243f9d8fad8cfcb9074eecb7c3cc5e43cb6c6146b6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08013794\",\"who\":\"sol-08013794-1053\",\"claim_id\":6646414723,\"reason\":\"Plausible complete44/44B and16/16instructions MATCH, second distinct natural form. Original successful native proof frozen; all166inputs unchanged. Parent integrates exact frozen source.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T00:55:46Z",
+          "id": 6646572449,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T00:55:46Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "96f5307c24b60625e67dd5805d25c3893b0c843c1f909901e1a11fbd39b5ff61",
+        "result": {
+          "address": "0x08013794",
+          "claim_id": 6646414723,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6646572449,
+          "status": "accepted",
+          "who": "sol-08013794-1053"
+        }
+      }
     },
     {
       "claim": {
