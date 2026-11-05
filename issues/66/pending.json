@@ -3742,7 +3742,35 @@
           "who": "sol-08075FA8-1784"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4d446dd80cfcb003b509d5a6a2a298c01cd120d84106de65c85a6d59432a240a",
+        "acknowledged_cursor": 6666672890,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4d446dd80cfcb003b509d5a6a2a298c01cd120d84106de65c85a6d59432a240a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08075FA8\",\"who\":\"sol-08075FA8-1784\",\"claim_id\":6666411064,\"reason\":\"Four grounded compiler diagnostics, no exact420B function. All actual artifacts and two honest inspection errors preserved. Zero native/proof replay; fixed inputs and consumed references unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T19:03:12Z",
+          "id": 6666672890,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T19:03:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e05329bfbf77d5b7dc9ca0b1cda23f0aad96bac762443d5b990e317258ce6051",
+        "result": {
+          "address": "0x08075FA8",
+          "claim_id": 6666411064,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6666672890,
+          "status": "accepted",
+          "who": "sol-08075FA8-1784"
+        }
+      }
     },
     {
       "claim": {
