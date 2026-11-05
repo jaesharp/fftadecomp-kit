@@ -3746,66 +3746,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "3e229fded52cf6aed41e6c8ca9b737d3c5c9f5f9e1bc287b68bb12ccd0a3f11e",
-        "acknowledged_cursor": 6669462000,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3e229fded52cf6aed41e6c8ca9b737d3c5c9f5f9e1bc287b68bb12ccd0a3f11e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D4870\",\"who\":\"sol-080D4870-1890\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T21:03:41Z",
-          "id": 6669461528,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:03:41Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "b3ac7d4c37227963e048cee30f989835ff75190756f7abc4d0486523226e5961",
-        "result": {
-          "address": "0x080D4870",
-          "claim_id": 6669461528,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6669461528,
-          "status": "accepted",
-          "who": "sol-080D4870-1890"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "95a46d0c14127cf385046477cb909f2bb1523fdf534fe646842904ca7d3cded9",
-        "acknowledged_cursor": 6669852417,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "95a46d0c14127cf385046477cb909f2bb1523fdf534fe646842904ca7d3cded9",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D4870\",\"who\":\"sol-080D4870-1890\",\"claim_id\":6669461528,\"reason\":\"Complete108B diagnostic exact privately preserved; native nested callback admission prerequisite remains unresolved. No native MATCH claimed; source matching stopped pending separately qualified context.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T21:20:32Z",
-          "id": 6669852417,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:20:32Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "31fe2455ca6fbedec3a5fbc4257edf7f4b70fd6c7675637b735857061185d2ec",
-        "result": {
-          "address": "0x080D4870",
-          "claim_id": 6669461528,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6669852417,
-          "status": "accepted",
-          "who": "sol-080D4870-1890"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "5f4444205c80b032ff87ef82ca2f82ed3ac93f4c370f25e53394e10b181a39db",
         "acknowledged_cursor": 6669462000,
         "body_provenance": "acceptance-time",
