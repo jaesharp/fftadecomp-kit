@@ -3778,66 +3778,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "270ffb58c8946cef05b7488c2049c75152ec26ca746ba9ba68085f264980d5e8",
-        "acknowledged_cursor": 6669462000,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "270ffb58c8946cef05b7488c2049c75152ec26ca746ba9ba68085f264980d5e8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081051A0\",\"who\":\"sol-081051A0-1890\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T21:03:41Z",
-          "id": 6669461675,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:03:41Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "b3ac7d4c37227963e048cee30f989835ff75190756f7abc4d0486523226e5961",
-        "result": {
-          "address": "0x081051A0",
-          "claim_id": 6669461675,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6669461675,
-          "status": "accepted",
-          "who": "sol-081051A0-1890"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "7f75436de982f79c20d8df852758802db1fd7f89394171e6a61f82079b1926e2",
-        "acknowledged_cursor": 6669861447,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7f75436de982f79c20d8df852758802db1fd7f89394171e6a61f82079b1926e2",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081051A0\",\"who\":\"sol-081051A0-1890\",\"claim_id\":6669461675,\"reason\":\"Complete138B diagnostic exact privately preserved; native nested callback admission prerequisite unresolved. No native MATCH claimed; source matching stopped pending separately qualified context.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T21:20:58Z",
-          "id": 6669861447,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:20:58Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a7d715817461aaef626d6dadc3fbdc4921bc3f2403121b85a555cf8a95a61081",
-        "result": {
-          "address": "0x081051A0",
-          "claim_id": 6669461675,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6669861447,
-          "status": "accepted",
-          "who": "sol-081051A0-1890"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "528dd6cbaad613569479489c706361291c4ee6c4fc1a898723196bbff208a004",
         "acknowledged_cursor": 6669462000,
         "body_provenance": "acceptance-time",
@@ -3893,66 +3833,6 @@
           "request_id": 6669883218,
           "status": "accepted",
           "who": "sol-0802BA40-1890"
-        }
-      }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "a260ca01619811d85065d5c022d24b6b9a11059d89dae54a4bb287f65a131088",
-        "acknowledged_cursor": 6669462000,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a260ca01619811d85065d5c022d24b6b9a11059d89dae54a4bb287f65a131088",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08099494\",\"who\":\"sol-08099494-1890\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T21:03:42Z",
-          "id": 6669462000,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:03:42Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "b3ac7d4c37227963e048cee30f989835ff75190756f7abc4d0486523226e5961",
-        "result": {
-          "address": "0x08099494",
-          "claim_id": 6669462000,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6669462000,
-          "status": "accepted",
-          "who": "sol-08099494-1890"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d51a3780fc2cba071d0dd9289cd4b769876fa987210fca6781bb5c9c8b0956c3",
-        "acknowledged_cursor": 6669883218,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d51a3780fc2cba071d0dd9289cd4b769876fa987210fca6781bb5c9c8b0956c3",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08099494\",\"who\":\"sol-08099494-1890\",\"claim_id\":6669462000,\"reason\":\"Complete138B diagnostic exact privately preserved; bounded callback output admission prerequisite unresolved. No native MATCH claimed; source matching stopped pending separately qualified context.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T21:21:27Z",
-          "id": 6669871011,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T21:21:27Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ad7e27b8db362ef257456651c099dabd6feb69743934e5b0c8bd14d8e0ac2be1",
-        "result": {
-          "address": "0x08099494",
-          "claim_id": 6669462000,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6669871011,
-          "status": "accepted",
-          "who": "sol-08099494-1890"
         }
       }
     },
