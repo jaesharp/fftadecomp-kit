@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "25b5a2ec13aa1313f6488ae72cfd4128d0a91a949250e8891ab707f1958d3ea1",
-        "acknowledged_cursor": 6656935018,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "25b5a2ec13aa1313f6488ae72cfd4128d0a91a949250e8891ab707f1958d3ea1",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C69C8\",\"who\":\"sol-080C69C8-1455\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:33:39Z",
-          "id": 6656935011,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:33:39Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "cfd6641ee6790c0c6e7392df6772eb794807ef4ba18b714d3b7ad1bc18c8e3ac",
-        "result": {
-          "address": "0x080C69C8",
-          "claim_id": 6656935011,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656935011,
-          "status": "accepted",
-          "who": "sol-080C69C8-1455"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "37e3a861ec94228b391fafdc45c4d0040d5a0163db124712830ee47e15054317",
-        "acknowledged_cursor": 6657586472,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "37e3a861ec94228b391fafdc45c4d0040d5a0163db124712830ee47e15054317",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C69C8\",\"who\":\"sol-080C69C8-1455\",\"claim_id\":6656935011,\"reason\":\"Thirteen distinct natural diagnostics retained; no complete byte-exact 1712-byte body and no native or proof attempt. Actual producer refusal retained. Matching agent fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T12:07:57Z",
-          "id": 6657584127,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:07:57Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4ae875c0557d938f44176d972ddac2f9d9a76ee7fc4ddd809cf24b82fd7d4f45",
-        "result": {
-          "address": "0x080C69C8",
-          "claim_id": 6656935011,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6657584127,
-          "status": "accepted",
-          "who": "sol-080C69C8-1455"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "16cf693f26f3fea3c547fd96c754d7338cd15a03eb88caa6da98d2ef37fa064c",
         "acknowledged_cursor": 6656935018,
         "body_provenance": "acceptance-time",
