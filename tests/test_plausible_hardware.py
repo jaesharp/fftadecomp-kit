@@ -35,6 +35,26 @@ class HardwareVolatileTests(unittest.TestCase):
         self.assertEqual(self.rules("/* header\ntext */\n" + self.comment +
             "*(volatile u16 *)0x04000000 = value;"), [])
 
+    def test_mapped_scalar_register_read_and_write(self):
+        source = ('extern u16 rcnt;\n' + self.comment +
+                  'volatile u16 *port = &rcnt;\n'
+                  'u8 input = *port;\n*port = 0x8055;\n')
+        self.assertEqual(self.rules(source, {'rcnt': '0x04000134'}), [])
+        for mapping in ({}, {'rcnt': '0x02000134'}, {'rcnt': '0x04000400'}):
+            with self.subTest(mapping=mapping):
+                self.assertIn('volatile', self.rules(source, mapping))
+
+    def test_scalar_register_pointer_cannot_escape_or_be_retargeted(self):
+        prefix = ('extern u16 rcnt;\n' + self.comment +
+                  'volatile u16 *port = &rcnt;\n')
+        for suffix in ('escape(port);', 'escape(&port);', 'escape(&*port);',
+                       'port = ram;', 'port++;', '++port;', '*port++;',
+                       '*port += 1;', 'value = port[0];', 'int port;',
+                       'value = factor * port;', 'value = factor*port;'):
+            with self.subTest(suffix=suffix):
+                self.assertIn('volatile', self.rules(prefix + suffix,
+                                                    {'rcnt': '0x04000134'}))
+
     def test_unjustified_or_fake_comment_remains_rejected(self):
         access = "*(volatile u16 *)0x04000000 = value;"
         for prefix in ("", 'const char *s = "plausible: hardware";\n', self.comment + "\n"):

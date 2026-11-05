@@ -46,6 +46,11 @@ class _CallbackResult(dict):
 
 
 class StaticCallbackTargetPreservationProof(callback.StaticCallbackBufferProof):
+    # Existing composed R7 policies initialize their own independent bases.
+    # Keep their inherited preservation hook on its original R7 policy.
+    _target_register = REGISTER
+    _target_thunk = THUNK
+
     def __init__(self, rom, mapping, index, objects, *, policy):
         if policy != SELECTOR:
             raise ValueError('callback target preservation requires its explicit exact policy')

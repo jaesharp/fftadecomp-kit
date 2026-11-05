@@ -184,9 +184,16 @@ def hardware_volatile_offsets(text, code, data_symbols):
         local_uses = re.finditer(r"\b" + re.escape(match["local"]) + r"\b", code)
         declarations = [item.span("local") for item in bindings
                         if item["local"] == match["local"]]
-        if any(ref.span() not in declarations and
-               (not re.match(r"\s*->", code[ref.end():]) or
-                re.search(r"&\s*$", code[:ref.start()])) for ref in local_uses):
+        def direct_access(ref):
+            before, after = code[:ref.start()], code[ref.end():]
+            if re.match(r"\s*->", after):
+                return not re.search(r"&\s*$", before)
+            return (re.search(r"(?:^|[=(:,;{}!~?&|^<>+\-/%\[\]])\s*\*\s*$|\breturn\s+\*\s*$", before) is not None and
+                    re.search(r"&\s*\*\s*$", before) is None and
+                    re.match(r"\s*(?:\[|\+\+|--|\+=|-=|->|\.)", after) is None)
+
+        if any(ref.span() not in declarations and not direct_access(ref)
+               for ref in local_uses):
             continue
         if justified_io(match.start("v"), address):
             allowed.add(match.start("v"))
