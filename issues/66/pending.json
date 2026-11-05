@@ -3742,7 +3742,35 @@
           "who": "sol-08135890-1741"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8110d8cb1b1c93a820c6a2d35481eb544efde15f6f9ff6953aaf601fc585780f",
+        "acknowledged_cursor": 6665531797,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8110d8cb1b1c93a820c6a2d35481eb544efde15f6f9ff6953aaf601fc585780f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08135890\",\"who\":\"sol-08135890-1741\",\"claim_id\":6665287860,\"reason\":\"Actual complete callback evidence and natural conditional diagnostic retained230B versus242B. Correct Thumb named function relocation; zero native.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T18:09:29Z",
+          "id": 6665531797,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T18:09:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1b5526098b5839519ca2ba359765832631371bc88f284d8c826cf734a2d7b1da",
+        "result": {
+          "address": "0x08135890",
+          "claim_id": 6665287860,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6665531797,
+          "status": "accepted",
+          "who": "sol-08135890-1741"
+        }
+      }
     },
     {
       "claim": {
