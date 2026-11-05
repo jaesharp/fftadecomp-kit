@@ -3742,7 +3742,35 @@
           "who": "sol-08008F94-1647"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5858e23703d65d4a3bad7e1baf68bf68265d91dbbea80623be0b1503b4d1fa09",
+        "acknowledged_cursor": 6663121540,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5858e23703d65d4a3bad7e1baf68bf68265d91dbbea80623be0b1503b4d1fa09",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08008F94\",\"who\":\"sol-08008F94-1647\",\"claim_id\":6662850598,\"reason\":\"Three distinct diagnostics; best complete156B150equal, six setup bytes remain reordered. No grounded next representation without scheduling steering; zero native/MATCH. All167+36refs/runtime/ROM unchanged, originals frozen.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T16:20:25Z",
+          "id": 6663121540,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T16:20:25Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8467280b7a08803ad48fe4d6cb837dd62bb23bd2f1b5d3f17761bb465c727fe1",
+        "result": {
+          "address": "0x08008F94",
+          "claim_id": 6662850598,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6663121540,
+          "status": "accepted",
+          "who": "sol-08008F94-1647"
+        }
+      }
     },
     {
       "claim": {
