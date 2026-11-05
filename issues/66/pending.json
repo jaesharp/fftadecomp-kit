@@ -3742,7 +3742,35 @@
           "who": "sol-0807A79C-1468"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2abca14446b69d807144775fc6b32a219f8f5b5c455c79f3e440a7e995ba4794",
+        "acknowledged_cursor": 6658291687,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2abca14446b69d807144775fc6b32a219f8f5b5c455c79f3e440a7e995ba4794",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0807A79C\",\"who\":\"sol-0807A79C-1468\",\"claim_id\":6657688732,\"reason\":\"Eight distinct original natural C compiler attempts retained; best corrected4308B versus4284B. Actual memcpy and intra-owner BL refusals preserved; map-backed links diagnostic only. Zero native/proof;167 fixed inputs and88 references/runtime unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T12:43:51Z",
+          "id": 6658291687,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T12:43:51Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1c1061fe196ec3dafebefe98cdad38702b0e52f68f93fc37b9c33e3d1da6977c",
+        "result": {
+          "address": "0x0807A79C",
+          "claim_id": 6657688732,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6658291687,
+          "status": "accepted",
+          "who": "sol-0807A79C-1468"
+        }
+      }
     },
     {
       "claim": {
