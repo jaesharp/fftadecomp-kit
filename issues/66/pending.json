@@ -3802,7 +3802,35 @@
           "who": "sol-0808B984-1624"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8d31b833c5d77aaa7ba5014c93007c5202c916ab8c8236fe893c9629295b34f8",
+        "acknowledged_cursor": 6662220602,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8d31b833c5d77aaa7ba5014c93007c5202c916ab8c8236fe893c9629295b34f8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808B984\",\"who\":\"sol-0808B984-1624\",\"claim_id\":6661972659,\"reason\":\"Zero new C/compiler/native: discarded RAM LDRH at8B9D0 lacks defining access-layout evidence; ordinary shadow differs from MMIO. Prior forms and all inputs retained; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T15:40:23Z",
+          "id": 6662220602,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T15:40:23Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5309c918be38a5942ca9b6d643b017195bd45ef488926b4a1b712e152e612c36",
+        "result": {
+          "address": "0x0808B984",
+          "claim_id": 6661972659,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6662220602,
+          "status": "accepted",
+          "who": "sol-0808B984-1624"
+        }
+      }
     },
     {
       "claim": {
