@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "24490f7f85cfa82f61e141d84141a38790256906148da42b1cf1e83c8220878b",
+    "acknowledged_cursor": 6671196001,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "24490f7f85cfa82f61e141d84141a38790256906148da42b1cf1e83c8220878b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08126B3C\",\"who\":\"sol-08126B3C-1945\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T22:28:15Z",
+      "id": 6671193720,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T22:28:15Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "ee19289b855b8dcc221923753e8e6a472696c033fdfc76fba9289ce72323fce0",
+    "result": {
+      "address": "0x08126B3C",
+      "claim_id": 6671193720,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6671193720,
+      "status": "accepted",
+      "who": "sol-08126B3C-1945"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "0245883a39d61732fa6943bf6b2787487cd7c9a292ea1e095a16dd259fec80e6",
+    "acknowledged_cursor": 6671327569,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "0245883a39d61732fa6943bf6b2787487cd7c9a292ea1e095a16dd259fec80e6",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08126B3C\",\"who\":\"sol-08126B3C-1945\",\"claim_id\":6671193720,\"reason\":\"Complete first natural diagnostic exact; native prerequisite pending. Original source and genuine artifacts frozen; matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T22:35:30Z",
+      "id": 6671327537,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T22:35:30Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "16c7f7d26930002787ebb8d5801dcad8b6f8bf13b05e8604afc71039f2f633ae",
+    "result": {
+      "address": "0x08126B3C",
+      "claim_id": 6671193720,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6671327537,
+      "status": "accepted",
+      "who": "sol-08126B3C-1945"
+    }
+  }
+}
