@@ -3962,7 +3962,35 @@
           "who": "sol-0811AB44-1788"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "51ae8fac4108c8e5d7fdaa43d8a0670dcc581f68566618da68012f9942fe577b",
+        "acknowledged_cursor": 6666686640,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "51ae8fac4108c8e5d7fdaa43d8a0670dcc581f68566618da68012f9942fe577b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811AB44\",\"who\":\"sol-0811AB44-1788\",\"claim_id\":6666535933,\"reason\":\"Finite actual target and published source evidence found no independent natural representation for the RAM reads before full-byte stores. Zero new C/compiler/native/proof, all references preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T19:03:52Z",
+          "id": 6666686640,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T19:03:52Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "90890e096857be7785900a2f73ec795a8f4f25a0af4220f911e8620e34acc7cc",
+        "result": {
+          "address": "0x0811AB44",
+          "claim_id": 6666535933,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6666686640,
+          "status": "accepted",
+          "who": "sol-0811AB44-1788"
+        }
+      }
     },
     {
       "claim": {
