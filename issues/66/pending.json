@@ -3962,7 +3962,35 @@
           "who": "sol-080FD6E8-1359"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3c0a7a3597876686ea9c5f75c166f78b03ce1b58f61a94722474307500dc4795",
+        "acknowledged_cursor": 6654104598,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3c0a7a3597876686ea9c5f75c166f78b03ce1b58f61a94722474307500dc4795",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080FD6E8\",\"who\":\"sol-080FD6E8-1359\",\"claim_id\":6653967037,\"reason\":\"Frozen source blocker: six discarded old-byte loads require grounded storage declaration. Existing Parked constructions and helpers inspected, zero compilers/native and no source authored; matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:09:16Z",
+          "id": 6654104598,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:09:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1e597845f04401a043f04de405260735d74e651315a6d8ef3d4235af63a1bd26",
+        "result": {
+          "address": "0x080FD6E8",
+          "claim_id": 6653967037,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6654104598,
+          "status": "accepted",
+          "who": "sol-080FD6E8-1359"
+        }
+      }
     },
     {
       "claim": {
