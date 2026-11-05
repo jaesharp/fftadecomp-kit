@@ -3806,7 +3806,35 @@
           "who": "sol-080F2680-1338"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "97fa438219362ff50e7accf6cc0cabda9715f5131ddd32dc28c56885301589ca",
+        "acknowledged_cursor": 6653604432,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "97fa438219362ff50e7accf6cc0cabda9715f5131ddd32dc28c56885301589ca",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F2680\",\"who\":\"sol-080F2680-1338\",\"claim_id\":6653326648,\"reason\":\"First original native exit0, plausible complete500B MATCH. Final source, report and same-invocation artifacts frozen, matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T08:41:50Z",
+          "id": 6653604432,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:41:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "48ed8c2419f815c305aa49d06c1eb3baf1bc9a7ac0f0d3834503b6d9643cf52c",
+        "result": {
+          "address": "0x080F2680",
+          "claim_id": 6653326648,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6653604432,
+          "status": "accepted",
+          "who": "sol-080F2680-1338"
+        }
+      }
     },
     {
       "claim": {
