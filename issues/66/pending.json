@@ -3834,7 +3834,35 @@
           "who": "sol-08072C78-1435"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4945ed2d6fb9f9109502b2168e4f7fb5967a7118079f4b39a6eb0779d014e826",
+        "acknowledged_cursor": 6656601896,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4945ed2d6fb9f9109502b2168e4f7fb5967a7118079f4b39a6eb0779d014e826",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08072C78\",\"who\":\"sol-08072C78-1435\",\"claim_id\":6656338465,\"reason\":\"First original native succeeded and plausible complete1500B FUNC is byte-identical. All original same-invocation artifacts frozen; parent publication pending. No replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T11:16:08Z",
+          "id": 6656601896,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T11:16:08Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7628540a13bdb7d3f6d7b4906d60946ab9b826d7634b2382131037774c3c6278",
+        "result": {
+          "address": "0x08072C78",
+          "claim_id": 6656338465,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6656601896,
+          "status": "accepted",
+          "who": "sol-08072C78-1435"
+        }
+      }
     },
     {
       "claim": {
