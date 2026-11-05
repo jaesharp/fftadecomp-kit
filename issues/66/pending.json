@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "c0f747ce94661a163720eea823548938d2efcaff7017b5dc1d5947e1c1b0f973",
-        "acknowledged_cursor": 6661973033,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c0f747ce94661a163720eea823548938d2efcaff7017b5dc1d5947e1c1b0f973",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808B984\",\"who\":\"sol-0808B984-1624\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T15:29:55Z",
-          "id": 6661972659,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T15:29:55Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "0a8d7b2623a34258d7fc68c23fb6230d3c1cb819d1a092d22bf5685b1473fa76",
-        "result": {
-          "address": "0x0808B984",
-          "claim_id": 6661972659,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6661972659,
-          "status": "accepted",
-          "who": "sol-0808B984-1624"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "8d31b833c5d77aaa7ba5014c93007c5202c916ab8c8236fe893c9629295b34f8",
-        "acknowledged_cursor": 6662220602,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "8d31b833c5d77aaa7ba5014c93007c5202c916ab8c8236fe893c9629295b34f8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808B984\",\"who\":\"sol-0808B984-1624\",\"claim_id\":6661972659,\"reason\":\"Zero new C/compiler/native: discarded RAM LDRH at8B9D0 lacks defining access-layout evidence; ordinary shadow differs from MMIO. Prior forms and all inputs retained; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T15:40:23Z",
-          "id": 6662220602,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T15:40:23Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5309c918be38a5942ca9b6d643b017195bd45ef488926b4a1b712e152e612c36",
-        "result": {
-          "address": "0x0808B984",
-          "claim_id": 6661972659,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6662220602,
-          "status": "accepted",
-          "who": "sol-0808B984-1624"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "d1361cc42bf5a9bea774be3ca6c26e36c59e218f468e6140c61e2a47043252db",
         "acknowledged_cursor": 6661973033,
         "body_provenance": "acceptance-time",
