@@ -3802,7 +3802,35 @@
           "who": "sol-08058104-1650"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a93a84c8407d54c877754671bc935d79ee35396fa3d30c9cab09d7dec3f7c7c9",
+        "acknowledged_cursor": 6663134208,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a93a84c8407d54c877754671bc935d79ee35396fa3d30c9cab09d7dec3f7c7c9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08058104\",\"who\":\"sol-08058104-1650\",\"claim_id\":6662864787,\"reason\":\"Zero new C/compiler/native: actual family/helper evidence corroborates prior156vs166B allocation residual; no independently grounded correction. All167+29refs/runtime/ROM unchanged. Frozen finite diagnosis, zero MATCH.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T16:20:56Z",
+          "id": 6663134208,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T16:20:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3786d770febfff1af7d89d55918f8c5bb2dab8daed44185431d1f5281bce5c84",
+        "result": {
+          "address": "0x08058104",
+          "claim_id": 6662864787,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6663134208,
+          "status": "accepted",
+          "who": "sol-08058104-1650"
+        }
+      }
     },
     {
       "claim": {
