@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "16cf693f26f3fea3c547fd96c754d7338cd15a03eb88caa6da98d2ef37fa064c",
-        "acknowledged_cursor": 6656935018,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "16cf693f26f3fea3c547fd96c754d7338cd15a03eb88caa6da98d2ef37fa064c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0801BDBC\",\"who\":\"sol-0801BDBC-1455\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:33:39Z",
-          "id": 6656935018,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:33:39Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "cfd6641ee6790c0c6e7392df6772eb794807ef4ba18b714d3b7ad1bc18c8e3ac",
-        "result": {
-          "address": "0x0801BDBC",
-          "claim_id": 6656935018,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656935018,
-          "status": "accepted",
-          "who": "sol-0801BDBC-1455"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "58c077d2034ada1d52565aec96072472ff00c784edecd9c5298c9189ebf6eb11",
-        "acknowledged_cursor": 6657699910,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "58c077d2034ada1d52565aec96072472ff00c784edecd9c5298c9189ebf6eb11",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801BDBC\",\"who\":\"sol-0801BDBC-1455\",\"claim_id\":6656935018,\"reason\":\"Twenty distinct natural collision C diagnostics retained, no complete exact 2908-byte body and no native or standalone proof. Local BL and buffer composition prerequisite retained separately. Matching agent fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T12:13:40Z",
-          "id": 6657699910,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:13:40Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4c07530f0f79a279bca0c086af1d8394e65b82933d65a75ca8ce73304e2a8bbd",
-        "result": {
-          "address": "0x0801BDBC",
-          "claim_id": 6656935018,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6657699910,
-          "status": "accepted",
-          "who": "sol-0801BDBC-1455"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c1cf67797ff0d5935369dce3e70f735dccb71a74f07f617b1eedd9a17e8d5d20",
         "acknowledged_cursor": 6657345512,
         "body_provenance": "acceptance-time",
@@ -3803,66 +3743,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "24bbbc4cc30e18e47a9f20d8636da7a55d3a79419302c99bba3b5b7b9e3ce55f",
-        "acknowledged_cursor": 6657407282,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "24bbbc4cc30e18e47a9f20d8636da7a55d3a79419302c99bba3b5b7b9e3ce55f",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080EBB58\",\"who\":\"sol-080EBB58-1461\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:58:58Z",
-          "id": 6657407282,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:58:58Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "297dfca3f54bff30f6e706cb1c9364565e07b9f36366fecca56292c10cfc3957",
-        "result": {
-          "address": "0x080EBB58",
-          "claim_id": 6657407282,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6657407282,
-          "status": "accepted",
-          "who": "sol-080EBB58-1461"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5b9cde073328acd5b34cf64f3d7137bda3d6bbc88d778a3299580cdd449e6c81",
-        "acknowledged_cursor": 6657865760,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5b9cde073328acd5b34cf64f3d7137bda3d6bbc88d778a3299580cdd449e6c81",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080EBB58\",\"who\":\"sol-080EBB58-1461\",\"claim_id\":6657407282,\"reason\":\"Eight original C diagnostics retained, including one syntax failure; seven linked complete bodies remain nonexact. Smallest body 3050 versus 2942 bytes. Zero native or proof, matching agent fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T12:21:56Z",
-          "id": 6657862291,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T12:21:56Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "0dbf7c1764c797589423fc7100085ef674f73b007f8b56950173a4b530b6cacf",
-        "result": {
-          "address": "0x080EBB58",
-          "claim_id": 6657407282,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6657862291,
-          "status": "accepted",
-          "who": "sol-080EBB58-1461"
-        }
-      }
     },
     {
       "claim": {
