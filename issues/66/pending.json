@@ -3774,7 +3774,35 @@
           "who": "sol-0811F95C-1359"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "97a0d65fddb3fd4fb7231d356e39089776427b7aa5dbebf6865359e738fd3932",
+        "acknowledged_cursor": 6654414256,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "97a0d65fddb3fd4fb7231d356e39089776427b7aa5dbebf6865359e738fd3932",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811F95C\",\"who\":\"sol-0811F95C-1359\",\"claim_id\":6653966961,\"reason\":\"Seven distinct natural forms; complete1048B best835 positional equal, exact538B suffix; scheduling and phase-advance composition remain. Frozen result8672ad41454319143cf641190d26f9c9608ce090316470258b07835df3795d6b; zero native attempts.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:25:31Z",
+          "id": 6654414256,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:25:31Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "be2a7ca33ea8bd3521fa96448fd4e60204674504682b25898f7ee1bc78a8424d",
+        "result": {
+          "address": "0x0811F95C",
+          "claim_id": 6653966961,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6654414256,
+          "status": "accepted",
+          "who": "sol-0811F95C-1359"
+        }
+      }
     },
     {
       "claim": {
