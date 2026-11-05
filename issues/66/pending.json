@@ -3838,7 +3838,35 @@
           "who": "sol-08022CD4-1737"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f739459e045d06e1806d20446ad67586709b3a706b4654944e8195de37bf6b4c",
+        "acknowledged_cursor": 6665333505,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f739459e045d06e1806d20446ad67586709b3a706b4654944e8195de37bf6b4c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08022CD4\",\"who\":\"sol-08022CD4-1737\",\"claim_id\":6665227214,\"reason\":\"Retained natural forms omit target discarded RAM loads; no independent new grounded source view. Zero new C/compiler/native.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T17:59:29Z",
+          "id": 6665333505,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T17:59:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9df3194d318eede8df322ff07a63d277dc54bb4fc0c42d0d5e7df3ca2780007a",
+        "result": {
+          "address": "0x08022CD4",
+          "claim_id": 6665227214,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6665333505,
+          "status": "accepted",
+          "who": "sol-08022CD4-1737"
+        }
+      }
     },
     {
       "claim": {
