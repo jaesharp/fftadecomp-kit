@@ -3834,7 +3834,35 @@
           "who": "sol-080DCBBC-1765"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a465193aaf7e306f2cf20e7caee014877e37755fc128b48249d61dff3992fde0",
+        "acknowledged_cursor": 6666197284,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a465193aaf7e306f2cf20e7caee014877e37755fc128b48249d61dff3992fde0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DCBBC\",\"who\":\"sol-080DCBBC-1765\",\"claim_id\":6665993142,\"reason\":\"Four original grounded forms; best complete330B differs only one commutative ADD operand order. No independently grounded correction without steering; original errors retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T18:41:09Z",
+          "id": 6666197284,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T18:41:09Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9160e714f991fe5efe50a39911a181ab512a4580dd6cf1acb1a11b18d17287fc",
+        "result": {
+          "address": "0x080DCBBC",
+          "claim_id": 6665993142,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6666197284,
+          "status": "accepted",
+          "who": "sol-080DCBBC-1765"
+        }
+      }
     },
     {
       "claim": {
