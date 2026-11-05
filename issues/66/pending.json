@@ -3742,7 +3742,35 @@
           "who": "sol-0804AA20-1349"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c959e0933f2c87bdd4d5b543145d4311f896077162dc96eb6a9d1861cbacb034",
+        "acknowledged_cursor": 6654195567,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c959e0933f2c87bdd4d5b543145d4311f896077162dc96eb6a9d1861cbacb034",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0804AA20\",\"who\":\"sol-0804AA20-1349\",\"claim_id\":6653624596,\"reason\":\"Frozen792B versus804B target,12 original diagnostics and0 native. Precise source residual and original peer-reference delta retained; own failed C private and matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:13:59Z",
+          "id": 6654195567,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:13:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9b1b94c6965de4ebbe1ab77685e61269d99cd744e29bdf8931bd93fa056267bb",
+        "result": {
+          "address": "0x0804AA20",
+          "claim_id": 6653624596,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6654195567,
+          "status": "accepted",
+          "who": "sol-0804AA20-1349"
+        }
+      }
     },
     {
       "claim": {
@@ -3898,7 +3926,35 @@
           "who": "sol-0812A084-1359"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "9f1a5d3984e466a03050665d3adda0cb549504c02a0df4eb271e13d6682261f0",
+        "acknowledged_cursor": 6654195567,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9f1a5d3984e466a03050665d3adda0cb549504c02a0df4eb271e13d6682261f0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812A084\",\"who\":\"sol-0812A084-1359\",\"claim_id\":6653967175,\"reason\":\"First original native exit0, plausible complete956B MATCH; final immutable result and original compiler artifacts frozen before notice, matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T09:13:59Z",
+          "id": 6654195542,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T09:13:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9b1b94c6965de4ebbe1ab77685e61269d99cd744e29bdf8931bd93fa056267bb",
+        "result": {
+          "address": "0x0812A084",
+          "claim_id": 6653967175,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6654195542,
+          "status": "accepted",
+          "who": "sol-0812A084-1359"
+        }
+      }
     },
     {
       "claim": {
