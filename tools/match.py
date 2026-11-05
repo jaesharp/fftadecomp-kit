@@ -2498,13 +2498,20 @@ class BufferCallProof:
 
     """Check bounded buffer arguments and their aliases against the current ROM."""
 
-    def __init__(self, rom, mapping, stack_arguments=False, *, discarded_exit_scratch=None):
+    def __init__(self, rom, mapping, stack_arguments=False, *, discarded_exit_scratch=None, bios_fill_proof=None):
         if discarded_exit_scratch is not None:
             from local_long_branch_profile import validate_discarded_exit_scratch
             validate_discarded_exit_scratch(discarded_exit_scratch)
             if stack_arguments:
                 raise ValueError("discarded scratch is separate from stack-passed buffer aliases")
             discarded_exit_scratch = json.loads(json.dumps(discarded_exit_scratch))
+        if bios_fill_proof is not None:
+            from bios_cpuset_fill_profile import BiosFillProof
+            if type(bios_fill_proof) is not BiosFillProof or stack_arguments or \
+                    discarded_exit_scratch is not None or bios_fill_proof.rom != rom or \
+                    bios_fill_proof.mapping != mapping:
+                raise ValueError("BIOS fill requires its separate fresh exact local proof")
+        self.bios_fill_proof = bios_fill_proof
         self.discarded_exit_scratch = discarded_exit_scratch
         self.discarded_exit_scratch_sites = set()
         self.rom = rom
@@ -2572,6 +2579,12 @@ class BufferCallProof:
         arguments = {register: offset for register, offset in aliases.items()
                      if register in CALLER_CLOBBERED}
         slots = slots or {}
+        if self.bios_fill_proof is not None and address == self.bios_fill_proof.calls.get(site) == 0x0814186C:
+            if slots or words:
+                raise ValueError("BIOS fill excludes local pointer slots")
+            result = self.bios_fill_proof.check_call(site, arguments, stack)
+            self.dependencies[address] = self.bios_fill_proof.wrapper
+            return result
         if slots and not self.stack_arguments:
             raise ValueError("stack-passed buffer pointers require versioned evidence")
         for offset in slots:
@@ -2896,6 +2909,8 @@ class BufferCallProof:
 
     def fingerprint(self):
         digest = hashlib.sha256()
+        if self.bios_fill_proof is not None:
+            digest.update(self.bios_fill_proof.fingerprint().encode())
         if self.discarded_exit_scratch is not None:
             from local_long_branch_profile import validate_discarded_exit_scratch
             validate_discarded_exit_scratch(self.discarded_exit_scratch)
@@ -3011,7 +3026,9 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             buffer_proof = BufferCallProof(addressed_signed_runtime_context[0],
                 addressed_signed_runtime_context[1],
                 discarded_exit_scratch=addressed_signed_runtime.buffer_scratch_policy(
-                    addressed_signed_runtime.context_selector(addressed_signed_runtime_context)))
+                    addressed_signed_runtime.context_selector(addressed_signed_runtime_context)),
+                bios_fill_proof=addressed_signed_runtime.bios_fill_proof(
+                    data, address, validated_calls or {}, addressed_signed_runtime_context))
     if zero_aware_unsigned_quotient_inventory_context is not None:
         if any(value is not None for value in (remainder_inventory_context,
                 remainder_ordinary_inventory_context, remainder_shift_inventory_context,

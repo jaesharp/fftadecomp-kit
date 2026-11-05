@@ -426,7 +426,8 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                                 for kind, _ in stack]
                 if (bounded_output_proof.check_call(calls[site],offsets,native_stack,site=site)
                         if bounded_output_proof is not None else
-                        buffer_proof.check_call(calls[site], offsets, native_stack)):
+                        buffer_proof.check_call(calls[site], offsets, native_stack,
+                            **({'site':site} if buffer_proof.bios_fill_proof is not None else {}))):
                     raise ValueError("local alias return requires a separate provenance policy")
                 # A proved callee may write through any passed local buffer.
                 # Do not retain a saved-register token in potentially changed bytes.
