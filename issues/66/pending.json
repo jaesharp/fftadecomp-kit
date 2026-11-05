@@ -3870,7 +3870,35 @@
           "who": "sol-08009FF8-1482"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3af07dcb3059eb3cbb72b6807ad520288b9963fb45b5edd2b547b0172c9ab05a",
+        "acknowledged_cursor": 6658426716,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3af07dcb3059eb3cbb72b6807ad520288b9963fb45b5edd2b547b0172c9ab05a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08009FF8\",\"who\":\"sol-08009FF8-1482\",\"claim_id\":6658318640,\"reason\":\"No new C or compiler invocation: actual helper and caller contracts confirm old natural source; no independently grounded new representation beyond forbidden lifetime/load steering. All167 inputs and21 references/runtime unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T12:50:39Z",
+          "id": 6658426716,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T12:50:39Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e468ceb58f657a0cf872735dee5042464a1f62de28d027470f08a91de54633b9",
+        "result": {
+          "address": "0x08009FF8",
+          "claim_id": 6658318640,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6658426716,
+          "status": "accepted",
+          "who": "sol-08009FF8-1482"
+        }
+      }
     },
     {
       "claim": {
