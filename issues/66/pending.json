@@ -3746,66 +3746,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "ddd2e9d081f6df1b3d69607a1f01ff4d77f83147d5ce54e855870c795d34707e",
-        "acknowledged_cursor": 6656415344,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "ddd2e9d081f6df1b3d69607a1f01ff4d77f83147d5ce54e855870c795d34707e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0811AF98\",\"who\":\"sol-0811AF98-1437\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T11:06:30Z",
-          "id": 6656414946,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:06:30Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "bbaaf4fcc4f7a37241751d397f3f9fde5076ae09de090c0fa6d2084be976b267",
-        "result": {
-          "address": "0x0811AF98",
-          "claim_id": 6656414946,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656414946,
-          "status": "accepted",
-          "who": "sol-0811AF98-1437"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "980e9658d72aab5a0f98495ddce9e4e4968b53b00684a20a4f9ac44d93d32ff2",
-        "acknowledged_cursor": 6656663933,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "980e9658d72aab5a0f98495ddce9e4e4968b53b00684a20a4f9ac44d93d32ff2",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811AF98\",\"who\":\"sol-0811AF98-1437\",\"claim_id\":6656414946,\"reason\":\"Four original diagnostics did not produce exact560B function; three linked bodies552/560/552B remain unequal. Three discarded target byte loads unsupported and split layouts add different mask operations. No native invocation or impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T11:19:22Z",
-          "id": 6656663933,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:19:22Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8738d29b5254a4758229fcc35e85a89e337238375661e0c9553c9fbe96f01411",
-        "result": {
-          "address": "0x0811AF98",
-          "claim_id": 6656414946,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6656663933,
-          "status": "accepted",
-          "who": "sol-0811AF98-1437"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "99aa64731624df171aa836cd9f6f74924fa5918edccfce0dc98562fc64707eb1",
         "acknowledged_cursor": 6656415344,
         "body_provenance": "acceptance-time",
