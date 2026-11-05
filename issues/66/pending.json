@@ -3742,7 +3742,35 @@
           "who": "sol-08057454-1082"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f4de53383891dfb3fd840dd2e3971218df83790798767ff00554b94294e9a8f6",
+        "acknowledged_cursor": 6647236129,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f4de53383891dfb3fd840dd2e3971218df83790798767ff00554b94294e9a8f6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08057454\",\"who\":\"sol-08057454-1082\",\"claim_id\":6647137363,\"reason\":\"Four distinct named-data-buffer route forms frozen result309de5e411dafda760695061589f4623ce54103f175bb1d2cf5db3c3c21095a7; current168B vs172B exact-span mismatch. Fully stopped, original DEFAULT preserved.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T01:38:42Z",
+          "id": 6647236129,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T01:38:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "502ac458aa3abe308181b84aff609f8ebd20ffdb5532ab916be33d9022cc1c5e",
+        "result": {
+          "address": "0x08057454",
+          "claim_id": 6647137363,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6647236129,
+          "status": "accepted",
+          "who": "sol-08057454-1082"
+        }
+      }
     },
     {
       "claim": {
