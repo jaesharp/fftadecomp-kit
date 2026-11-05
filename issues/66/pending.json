@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "683f13c04cc945607ee07bc8dfb153ccd1cf925210c8c9e6d42d8b91f240e284",
-        "acknowledged_cursor": 6658861506,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "683f13c04cc945607ee07bc8dfb153ccd1cf925210c8c9e6d42d8b91f240e284",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CD92C\",\"who\":\"sol-080CD92C-1501\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T13:11:49Z",
-          "id": 6658861143,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T13:11:49Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1af5ff9bb2bf03d5f77c6e659d1ddcbe41bf8b39f15720f49e2eafdecaa24191",
-        "result": {
-          "address": "0x080CD92C",
-          "claim_id": 6658861143,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6658861143,
-          "status": "accepted",
-          "who": "sol-080CD92C-1501"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "53a5f3a038c5b811c9ded46190bbf0e2d5ef5d42ec769a47b926a6e49ce5d274",
-        "acknowledged_cursor": 6659114001,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "53a5f3a038c5b811c9ded46190bbf0e2d5ef5d42ec769a47b926a6e49ce5d274",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CD92C\",\"who\":\"sol-080CD92C-1501\",\"claim_id\":6658861143,\"reason\":\"First original native MATCH:plausible complete24/24B,12instructions. Exactly1native,original sized ET_REL FUNC/i/s/o retained;all167files+51refs/runtime/ROM/source unchanged. Primary publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T13:23:54Z",
-          "id": 6659114001,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T13:23:54Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a5da4375febacc3038221a811d45e442cbae12320a94c9131c044c55e74ed268",
-        "result": {
-          "address": "0x080CD92C",
-          "claim_id": 6658861143,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6659114001,
-          "status": "accepted",
-          "who": "sol-080CD92C-1501"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "56ccda9865f1bd1960aaee50eaeb0fb484eb98e24bcff0b92dc5e714bb1f2b98",
         "acknowledged_cursor": 6658943820,
         "body_provenance": "acceptance-time",
