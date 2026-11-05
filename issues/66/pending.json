@@ -3874,66 +3874,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "ff592068a666394837804e278f1e4d76bdc7c1b6f2be8791522b704845268ef6",
-        "acknowledged_cursor": 6653967175,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "ff592068a666394837804e278f1e4d76bdc7c1b6f2be8791522b704845268ef6",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080FD6E8\",\"who\":\"sol-080FD6E8-1359\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T09:01:53Z",
-          "id": 6653967037,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T09:01:53Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c246c42e49847d103bc05b15fc9de0ebfaf6c774bfbb12f6ab1f15bbf4c39efe",
-        "result": {
-          "address": "0x080FD6E8",
-          "claim_id": 6653967037,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6653967037,
-          "status": "accepted",
-          "who": "sol-080FD6E8-1359"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "3c0a7a3597876686ea9c5f75c166f78b03ce1b58f61a94722474307500dc4795",
-        "acknowledged_cursor": 6654104598,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3c0a7a3597876686ea9c5f75c166f78b03ce1b58f61a94722474307500dc4795",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080FD6E8\",\"who\":\"sol-080FD6E8-1359\",\"claim_id\":6653967037,\"reason\":\"Frozen source blocker: six discarded old-byte loads require grounded storage declaration. Existing Parked constructions and helpers inspected, zero compilers/native and no source authored; matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T09:09:16Z",
-          "id": 6654104598,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T09:09:16Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1e597845f04401a043f04de405260735d74e651315a6d8ef3d4235af63a1bd26",
-        "result": {
-          "address": "0x080FD6E8",
-          "claim_id": 6653967037,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6654104598,
-          "status": "accepted",
-          "who": "sol-080FD6E8-1359"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "fca958dd034c47c1a00c87b0663da0ff65dfa7179fe967ffef3cc9a43b904b8a",
         "acknowledged_cursor": 6653967175,
         "body_provenance": "acceptance-time",
