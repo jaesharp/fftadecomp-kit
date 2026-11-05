@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "c7bb2e14986fb277346f980d449724f0124e82f9b1d331683e6d7ca4b1df3794",
+    "acknowledged_cursor": 6649439414,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "c7bb2e14986fb277346f980d449724f0124e82f9b1d331683e6d7ca4b1df3794",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08137B20\",\"who\":\"sol-08137B20-1169\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T04:09:55Z",
+      "id": 6649439226,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T04:09:55Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "32465dfd557b5979bf6c9fcf2ca0f3ba0ce6be2c2705fe1d0f3f5f69aca3aa8d",
+    "result": {
+      "address": "0x08137B20",
+      "claim_id": 6649439226,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6649439226,
+      "status": "accepted",
+      "who": "sol-08137B20-1169"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "659124639e07cd989a7bb50a38186aabf22aabf283eda5e8cca913fb46bb4253",
+    "acknowledged_cursor": 6649742743,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "659124639e07cd989a7bb50a38186aabf22aabf283eda5e8cca913fb46bb4253",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08137B20\",\"who\":\"sol-08137B20-1169\",\"claim_id\":6649439226,\"reason\":\"First native MATCH under published conditional BIOS fill profile; exact complete C and original evidence frozen, compiler work fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T04:32:32Z",
+      "id": 6649742743,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T04:32:32Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "8c6035ef9c48cdbeea95cdd1dbed139b066037ae991a6c44564af7ce7816d933",
+    "result": {
+      "address": "0x08137B20",
+      "claim_id": 6649439226,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6649742743,
+      "status": "accepted",
+      "who": "sol-08137B20-1169"
+    }
+  }
+}
