@@ -48,7 +48,8 @@ UNSIGNED_BUFFER_DATA_SELECTOR = 'addressed-unsigned-runtime-native-buffer-data-v
 BUFFER_SCRATCH_SELECTOR = 'addressed-signed-runtime-native-buffer-zero-index-discarded-scratch-v1'
 BIOS_SELECTOR = 'addressed-native-bios-fill-buffer-v1'
 BIOS_DATA_SELECTOR = 'addressed-native-bios-fill-buffer-data-v1'
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR)
+BIOS_SCALAR_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-data-v1'
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR)
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_CONTRACT = ('exact CpuSet SWI0B returning wrapper under conditional ordinary '
                           'r4-r11/SP preserving ABI; all arguments have no local stack provenance; '
@@ -67,7 +68,7 @@ INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_S
 UNSIGNED_CAPABLE_SELECTORS = (BIOS_ORDINARY_DATA_SELECTOR, *BIOS_SELECTORS, *UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
                              UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR)
-DATA_SELECTORS = (BIOS_ORDINARY_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+DATA_SELECTORS = (BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
                   BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
@@ -80,6 +81,7 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
 SCHEMAS = {BIOS_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-data-v1',
+            BIOS_SCALAR_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-data-v1',
             BIOS_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-buffer-v1',
             BIOS_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-buffer-data-v1',
             SELECTOR: SCHEMA, READONLY_SELECTOR: READONLY_SCHEMA,
@@ -491,11 +493,20 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         raise ValueError('addressed signed runtimes require the exact closed direct-call CFG')
     partition = graph.partition(data, address, refinement, instructions, words)
     selector = context_selector(context)
+    scalar_controls = []
     if selector in DATA_SELECTORS:
         literals = data_literals(data, address, context[0], context[1], context[6], context[7])
         match.verify_data_literals(instructions.values(), address, literals)
+        if selector == BIOS_SCALAR_DATA_SELECTOR:
+            from bios_cpuset_fill_profile import scalar_control_words
+            scalar_controls = scalar_control_words(instructions, edges, calls, partition, address)
+            if not scalar_controls:
+                raise ValueError('scalar BIOS control selector requires an actual literal control use')
+            if set(literals) & {row[0] for row in scalar_controls}:
+                raise ValueError('BIOS scalar control cannot also be a typed object binding')
         address_words = {row['address'] - address for row in partition['words']
                          if remainder.address_literal(row['value'])}
+        address_words -= {row[0] for row in scalar_controls}
         if address_words != set(literals):
             raise ValueError('addressed data requires exact typed coverage of reached address words')
     elif any(remainder.address_literal(row['value']) for row in partition['words']):
@@ -582,6 +593,14 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in BIOS_SELECTORS:
         context[4]['native_buffers']['bios_fill'] = bios.manifest()
         context[4]['native_buffers']['contract'] += '; ' + bios_cpuset_fill_profile.CONTRACT
+    if selector == BIOS_SCALAR_DATA_SELECTOR:
+        context[4]['bios_scalar_control'] = dict(words=scalar_controls,
+            contract='Exact native PC literal loaded only into R2 and consumed by '
+                     'the next actual CpuSet call without an intervening R2 read, '
+                     'write or escape; scalar control identity, not an object '
+                     'binding. Existing fill source frame bounds still apply. '
+                     'No BIOS effects, initialization, physical readability, '
+                     'nonalias, destination bounds, numeric return or termination theorem.')
     if selector == BUFFER_SCRATCH_SELECTOR:
         from local_long_branch_profile import DISCARDED_SCRATCH_CONTRACT
         context[4]['native_buffers'].update(

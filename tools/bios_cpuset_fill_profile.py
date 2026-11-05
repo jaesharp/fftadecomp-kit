@@ -24,6 +24,48 @@ MASK = 0xFFFFFFFF
 MAX_UPDATES = 4096
 
 
+def scalar_control_words(instructions, edges, calls, partition, address):
+    """Recognize literal words used solely as the actual CpuSet R2 control."""
+    result = []
+    register = ARM_REG_R0 + 2
+    for word in partition['words']:
+        if not word['load_sites'] or word['switch_word'] or not word['value'] & (1 << 24):
+            continue
+        sites = []
+        for load in word['load_sites']:
+            item = instructions[load]
+            op = item.operands
+            code = int.from_bytes(item.bytes, 'little')
+            if item.size != 2 or code & 0xFF00 != 0x4A00 or \
+                    item.mnemonic != 'ldr' or len(op) != 2 or \
+                    op[0].type != ARM_OP_REG or op[0].reg != register or \
+                    op[1].type != ARM_OP_MEM or op[1].mem.base != ARM_REG_PC or \
+                    op[1].mem.index or item.writeback or \
+                    ((load + 4) & ~3) + op[1].mem.disp != word['address']:
+                break
+            cursor, visited, use = load, {load}, None
+            while len(edges[cursor]) == 1:
+                successor = edges[cursor][0]
+                if successor in visited or successor != cursor + instructions[cursor].size:
+                    break
+                visited.add(successor)
+                following = instructions[successor]
+                if successor in calls:
+                    if calls[successor] == ADDRESS:
+                        use = successor
+                    break
+                reads, writes = following.regs_access()
+                if register in reads or register in writes:
+                    break
+                cursor = successor
+            if use is None:
+                break
+            sites.append([load-address, use-address])
+        if len(sites) == len(word['load_sites']):
+            result.append([word['address']-address, word['value'], sites])
+    return result
+
+
 def exact(value):
     value &= MASK
     return value, MASK ^ value
