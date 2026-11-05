@@ -3742,7 +3742,35 @@
           "who": "sol-081255C8-1720"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "27c5e9edf2681b1514e7e06c5ae424de4c5366658589ed32b0d870dd7097e2cf",
+        "acknowledged_cursor": 6665090357,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "27c5e9edf2681b1514e7e06c5ae424de4c5366658589ed32b0d870dd7097e2cf",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081255C8\",\"who\":\"sol-081255C8-1720\",\"claim_id\":6664826067,\"reason\":\"Exactly one first native exit0, plausible complete90B sized FUNC byte identical39/39 instructions. Fixed167 and all refs/runtime/ROM/source unchanged; historic98B failure and zero-native observer refusal preserved; no native retry; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T17:47:46Z",
+          "id": 6665090357,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T17:47:46Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9cbeccd028d8a507deeefe8dd43d0317cc58bd375c85a49b2afa52f81cb55910",
+        "result": {
+          "address": "0x081255C8",
+          "claim_id": 6664826067,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6665090357,
+          "status": "accepted",
+          "who": "sol-081255C8-1720"
+        }
+      }
     },
     {
       "claim": {
