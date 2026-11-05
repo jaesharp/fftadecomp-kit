@@ -3802,7 +3802,35 @@
           "who": "sol-08038324-1314"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "db1268da4e17e93169d88d222d5cc11a39657613c7705aa865192f9a75343a3d",
+        "acknowledged_cursor": 6652894774,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "db1268da4e17e93169d88d222d5cc11a39657613c7705aa865192f9a75343a3d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08038324\",\"who\":\"sol-08038324-1314\",\"claim_id\":6652677013,\"reason\":\"First original native exit0, plausible complete460-byte MATCH; final immutable result and same-invocation artifacts frozen, fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T08:01:33Z",
+          "id": 6652892457,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:01:33Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d20364b537c5b2e426629aa82020d5b2bb9327b476789b5465b6426454adbeb1",
+        "result": {
+          "address": "0x08038324",
+          "claim_id": 6652677013,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6652892457,
+          "status": "accepted",
+          "who": "sol-08038324-1314"
+        }
+      }
     },
     {
       "claim": {
@@ -3834,7 +3862,35 @@
           "who": "sol-080570D8-1314"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2b7b804faac527dca1139844dfb50eb728bc1d301f7df5d73205fdf9850dd121",
+        "acknowledged_cursor": 6652894774,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2b7b804faac527dca1139844dfb50eb728bc1d301f7df5d73205fdf9850dd121",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080570D8\",\"who\":\"sol-080570D8-1314\",\"claim_id\":6652677161,\"reason\":\"Four natural diagnostic forms retained, best403/408 complete bytes with R8/R9 role difference; zero native/MATCH, final immutable result frozen and fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T08:01:33Z",
+          "id": 6652892467,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:01:33Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d20364b537c5b2e426629aa82020d5b2bb9327b476789b5465b6426454adbeb1",
+        "result": {
+          "address": "0x080570D8",
+          "claim_id": 6652677161,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6652892467,
+          "status": "accepted",
+          "who": "sol-080570D8-1314"
+        }
+      }
     },
     {
       "claim": {
@@ -3928,6 +3984,70 @@
           "request_id": 6652780258,
           "status": "accepted",
           "who": "sol-080E4B40-1314"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "5891666f6b643ab697801b404aa4e2438ce006e90232c3fb6d15fbe48b84a6f1",
+        "acknowledged_cursor": 6652894774,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5891666f6b643ab697801b404aa4e2438ce006e90232c3fb6d15fbe48b84a6f1",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08030E50\",\"who\":\"sol-08030E50-1323\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-05T08:01:41Z",
+          "id": 6652894632,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:01:41Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d20364b537c5b2e426629aa82020d5b2bb9327b476789b5465b6426454adbeb1",
+        "result": {
+          "address": "0x08030E50",
+          "claim_id": 6652894632,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6652894632,
+          "status": "accepted",
+          "who": "sol-08030E50-1323"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "a28479edc648788440c4170f2687e0990dbabc7bb373edaccc43d3fb756d7c18",
+        "acknowledged_cursor": 6652894774,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a28479edc648788440c4170f2687e0990dbabc7bb373edaccc43d3fb756d7c18",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08137CC4\",\"who\":\"sol-08137CC4-1323\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-05T08:01:41Z",
+          "id": 6652894774,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:01:41Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d20364b537c5b2e426629aa82020d5b2bb9327b476789b5465b6426454adbeb1",
+        "result": {
+          "address": "0x08137CC4",
+          "claim_id": 6652894774,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6652894774,
+          "status": "accepted",
+          "who": "sol-08137CC4-1323"
         }
       },
       "release": null
