@@ -3838,7 +3838,35 @@
           "who": "sol-080CC348-1624"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "95e4c634c8079132a71488bc6cc16e679e076e8f2ed1fc9e7b84fdf69eb8370f",
+        "acknowledged_cursor": 6662274084,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "95e4c634c8079132a71488bc6cc16e679e076e8f2ed1fc9e7b84fdf69eb8370f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CC348\",\"who\":\"sol-080CC348-1624\",\"claim_id\":6661973024,\"reason\":\"One grounded member-view diagnostic124B vs128B target; saved allocation/product-move/pool residual. Originals retained,0native, fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T15:42:38Z",
+          "id": 6662273976,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T15:42:38Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5b7e6b07820db071c0c92cf617bfcdb206edf9594b372265bdf42d3258265133",
+        "result": {
+          "address": "0x080CC348",
+          "claim_id": 6661973024,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6662273976,
+          "status": "accepted",
+          "who": "sol-080CC348-1624"
+        }
+      }
     },
     {
       "claim": {
@@ -3870,7 +3898,35 @@
           "who": "sol-08133A58-1624"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4c05ac6dfae97814f34f9b23595fe5253da768085a398fbc857ecaaf4c46cc22",
+        "acknowledged_cursor": 6662274084,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4c05ac6dfae97814f34f9b23595fe5253da768085a398fbc857ecaaf4c46cc22",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08133A58\",\"who\":\"sol-08133A58-1624\",\"claim_id\":6661973033,\"reason\":\"Two grounded two-word snapshot diagnostics118B and136B versus132B; saved-value/address allocation residual retained.0native, fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T15:42:38Z",
+          "id": 6662274084,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T15:42:38Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5b7e6b07820db071c0c92cf617bfcdb206edf9594b372265bdf42d3258265133",
+        "result": {
+          "address": "0x08133A58",
+          "claim_id": 6661973033,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6662274084,
+          "status": "accepted",
+          "who": "sol-08133A58-1624"
+        }
+      }
     },
     {
       "claim": {
