@@ -3742,7 +3742,35 @@
           "who": "sol-08082924-1391"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f0f689237a4a110d7adb908aa400e58f44acab3ed2fc0ed1ce956d636d49eeca",
+        "acknowledged_cursor": 6655372628,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f0f689237a4a110d7adb908aa400e58f44acab3ed2fc0ed1ce956d636d49eeca",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08082924\",\"who\":\"sol-08082924-1391\",\"claim_id\":6654904773,\"reason\":\"15 original natural compiler forms frozen; closest complete452B vs456B target. Field address folding/register allocation unresolved, zero native/MATCH; result377754c50c5a1c04461b00a724632275f3b71c3d07d5a814e1683217764042ae.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T10:13:44Z",
+          "id": 6655372628,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T10:13:44Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7002f4ca29b29ca0074069ec96bd09f84aa1d526726c69d81a66f25c95814cdb",
+        "result": {
+          "address": "0x08082924",
+          "claim_id": 6654904773,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6655372628,
+          "status": "accepted",
+          "who": "sol-08082924-1391"
+        }
+      }
     },
     {
       "claim": {
