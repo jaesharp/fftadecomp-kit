@@ -3898,7 +3898,35 @@
           "who": "sol-080AB358-1157"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1a7eb14a67a49b8dc7b08b9b6f9e439418c9327787e9e9f7e9f63a4c63b5ddcd",
+        "acknowledged_cursor": 6649368438,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1a7eb14a67a49b8dc7b08b9b6f9e439418c9327787e9e9f7e9f63a4c63b5ddcd",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080AB358\",\"who\":\"sol-080AB358-1157\",\"claim_id\":6649090206,\"reason\":\"First original native MATCH under published zero-index/discarded-scratch context:794 complete bytes. Original compiler/proof artifacts frozen; no replays.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T04:04:44Z",
+          "id": 6649368438,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T04:04:44Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e5d7fd2af375b1f58f98e1f77d62e9eee95d2f11ba703eb1f06dafc4318ad6b8",
+        "result": {
+          "address": "0x080AB358",
+          "claim_id": 6649090206,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6649368438,
+          "status": "accepted",
+          "who": "sol-080AB358-1157"
+        }
+      }
     }
   ],
   "issue": 66,
