@@ -3742,7 +3742,35 @@
           "who": "sol-08004D68-1669"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7a91b0f78bcdd2a2bcdf4c692198c0915118a0bb9b84e7dae2ad6a25772d1c1a",
+        "acknowledged_cursor": 6663934829,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7a91b0f78bcdd2a2bcdf4c692198c0915118a0bb9b84e7dae2ad6a25772d1c1a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08004D68\",\"who\":\"sol-08004D68-1669\",\"claim_id\":6663392513,\"reason\":\"Native1681 MATCH plausible166B in newly published conditional MMIO classifier context. Prior1652 refusal preserved, unchanged C, no successful replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T16:55:40Z",
+          "id": 6663934754,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T16:55:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "646727c28692bbd17d1396806a458d0848790cd3debbd1ad8833a8b2c7173a51",
+        "result": {
+          "address": "0x08004D68",
+          "claim_id": 6663392513,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6663934754,
+          "status": "accepted",
+          "who": "sol-08004D68-1669"
+        }
+      }
     },
     {
       "claim": {
@@ -3774,7 +3802,35 @@
           "who": "sol-081459D0-1678"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "73a4bbc3af5960b368db5b556fc83eedf50a4d1a7a0e1f53d699157b814ff9e5",
+        "acknowledged_cursor": 6663934829,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "73a4bbc3af5960b368db5b556fc83eedf50a4d1a7a0e1f53d699157b814ff9e5",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081459D0\",\"who\":\"sol-081459D0-1678\",\"claim_id\":6663769851,\"reason\":\"No grounded operation/type/layout correction for retained200B allocation and mask-load ordering residual. Zero new C/compiler/native; all originals retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T16:55:40Z",
+          "id": 6663934829,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T16:55:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "646727c28692bbd17d1396806a458d0848790cd3debbd1ad8833a8b2c7173a51",
+        "result": {
+          "address": "0x081459D0",
+          "claim_id": 6663769851,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6663934829,
+          "status": "accepted",
+          "who": "sol-081459D0-1678"
+        }
+      }
     },
     {
       "claim": {
