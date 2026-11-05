@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "cac77a097d768be6b9febf77aa655da3e6120afa2da952c224504ad78653c499",
+    "acknowledged_cursor": 6646683842,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "cac77a097d768be6b9febf77aa655da3e6120afa2da952c224504ad78653c499",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802CABC\",\"who\":\"sol-0802CABC-1065\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T01:03:05Z",
+      "id": 6646683842,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T01:03:05Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "475dd0a8c23992f436b253e7e5f493177de44019f168f070ff4760697708856a",
+    "result": {
+      "address": "0x0802CABC",
+      "claim_id": 6646683842,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6646683842,
+      "status": "accepted",
+      "who": "sol-0802CABC-1065"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "bd4590fc45d514510cd43ed7546a5a3915c265bf1a0295f57d49d6312b8621ac",
+    "acknowledged_cursor": 6646911181,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "bd4590fc45d514510cd43ed7546a5a3915c265bf1a0295f57d49d6312b8621ac",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802CABC\",\"who\":\"sol-0802CABC-1065\",\"claim_id\":6646683842,\"reason\":\"Four distinct natural form outcomes preserved, including exact original symbol-name error and byte/size mismatches. Best complete280B has263positionalbytes equal. Fixed166unchanged, fully stopped; no MATCH or semantic impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+      "created_at": "2026-11-05T01:17:25Z",
+      "id": 6646911181,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T01:17:25Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "dbfeaed23f3271fc54a7faa64ac5dc81baf2bbde174838a58d2214d6fc030749",
+    "result": {
+      "address": "0x0802CABC",
+      "claim_id": 6646683842,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6646911181,
+      "status": "accepted",
+      "who": "sol-0802CABC-1065"
+    }
+  }
+}
