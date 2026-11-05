@@ -3834,7 +3834,35 @@
           "who": "sol-080F4A70-1435"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "591fb71ac1103dd3fd7fcb44e151060357f3195ee195e97b564112250fa2bade",
+        "acknowledged_cursor": 6656571961,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "591fb71ac1103dd3fd7fcb44e151060357f3195ee195e97b564112250fa2bade",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F4A70\",\"who\":\"sol-080F4A70-1435\",\"claim_id\":6656338231,\"reason\":\"Two distinct natural source forms unexpectedly converged to 480 versus 508 complete bytes. Thirteen discarded byte loads are unsupported by retained layout evidence. No native invocation, no further grounded form, and no impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T11:14:36Z",
+          "id": 6656571961,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T11:14:36Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "68a9b5e3ae912fa7ba822eaab16b3e7e3a0fbfb719b840406cc339c051266fd4",
+        "result": {
+          "address": "0x080F4A70",
+          "claim_id": 6656338231,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6656571961,
+          "status": "accepted",
+          "who": "sol-080F4A70-1435"
+        }
+      }
     },
     {
       "claim": {
