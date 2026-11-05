@@ -3774,7 +3774,35 @@
           "who": "sol-0808BF24-1338"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "9abb9e87a7ea1ebba2d929b2b89851447591d173751004d57741c62214ac62f5",
+        "acknowledged_cursor": 6653835790,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9abb9e87a7ea1ebba2d929b2b89851447591d173751004d57741c62214ac62f5",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808BF24\",\"who\":\"sol-0808BF24-1338\",\"claim_id\":6653326727,\"reason\":\"Frozen complete584B diagnostic with8 operand bytes different;12 natural forms, zero native. Final evidence retained, matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T08:54:37Z",
+          "id": 6653835790,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:54:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7636fbd05a6393e288a19a907a3f1ab98c36cbb5e211c12be9df5534d2378768",
+        "result": {
+          "address": "0x0808BF24",
+          "claim_id": 6653326727,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6653835790,
+          "status": "accepted",
+          "who": "sol-0808BF24-1338"
+        }
+      }
     },
     {
       "claim": {
