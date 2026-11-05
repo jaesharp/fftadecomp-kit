@@ -3746,66 +3746,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "6f8815485e192a5a07a62bb67231a21fb64c76d7fb3b0c32c2f5c1187bbc8583",
-        "acknowledged_cursor": 6651462496,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6f8815485e192a5a07a62bb67231a21fb64c76d7fb3b0c32c2f5c1187bbc8583",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080178A4\",\"who\":\"sol-080178A4-1258\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T06:33:05Z",
-          "id": 6651462496,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T06:33:05Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "61f4ec7a927802edaff05b2d64313bb5d51d0918d78061e85f9d7ef7984e9f4a",
-        "result": {
-          "address": "0x080178A4",
-          "claim_id": 6651462496,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6651462496,
-          "status": "accepted",
-          "who": "sol-080178A4-1258"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a5eb87605ca0a0c10680e26873c3a4cee3e8ac4ad05eea0ae207e47ac7ad1f90",
-        "acknowledged_cursor": 6651660492,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a5eb87605ca0a0c10680e26873c3a4cee3e8ac4ad05eea0ae207e47ac7ad1f90",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080178A4\",\"who\":\"sol-080178A4-1258\",\"claim_id\":6651462496,\"reason\":\"Seven natural diagnostics retained,244/248 equal, commuted ADD operands remain. Zero native and unchanged runtime-thunk refusal not replayed. Fully stopped; original artifacts retained.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T06:46:01Z",
-          "id": 6651660492,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T06:46:01Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "9ae76d17af23f5191a3ec46f377950f6394941c8fde247b8bf9a6799f10ade7f",
-        "result": {
-          "address": "0x080178A4",
-          "claim_id": 6651462496,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6651660492,
-          "status": "accepted",
-          "who": "sol-080178A4-1258"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "90b5584661bbdf5a408ac702b996e052b85805520e45c40cdb600db411d617d0",
         "acknowledged_cursor": 6651540283,
         "body_provenance": "acceptance-time",
