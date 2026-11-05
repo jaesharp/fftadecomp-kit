@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "96201979873e85ecaf86e115d39ddc7c341b3c498f66428cb94691ef9296c970",
+    "acknowledged_cursor": 6665870203,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "96201979873e85ecaf86e115d39ddc7c341b3c498f66428cb94691ef9296c970",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0803CEF8\",\"who\":\"sol-0803CEF8-1761\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T18:25:57Z",
+      "id": 6665861269,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T18:25:57Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "de724216fc449144e7f5b8c125811d99074459749a76e08f7245cee0f3478cbb",
+    "result": {
+      "address": "0x0803CEF8",
+      "claim_id": 6665861269,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6665861269,
+      "status": "accepted",
+      "who": "sol-0803CEF8-1761"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "33abc86d14417d4ff0a9d8849cd60fbe0f1166b7beb57060ceb2ea82b8c873f9",
+    "acknowledged_cursor": 6665997509,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "33abc86d14417d4ff0a9d8849cd60fbe0f1166b7beb57060ceb2ea82b8c873f9",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0803CEF8\",\"who\":\"sol-0803CEF8-1761\",\"claim_id\":6665861269,\"reason\":\"Zero new C/compiler/native executions. Existing316-byte prior representations cover justified forms; no independent fresh correction identified.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T18:31:32Z",
+      "id": 6665978351,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T18:31:32Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "ab581c52bef220bd75d27d9d71a19eda06098708bb7217e04e3ed433b0e1ffad",
+    "result": {
+      "address": "0x0803CEF8",
+      "claim_id": 6665861269,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6665978351,
+      "status": "accepted",
+      "who": "sol-0803CEF8-1761"
+    }
+  }
+}
