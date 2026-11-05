@@ -3774,7 +3774,35 @@
           "who": "sol-0812D474-1014"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "84f0f60d910957ec2e8b02baf0fc683c94d4c683659e2fa3d4ef3ccde74777cd",
+        "acknowledged_cursor": 6645710262,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "84f0f60d910957ec2e8b02baf0fc683c94d4c683659e2fa3d4ef3ccde74777cd",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D474\",\"who\":\"sol-0812D474-1014\",\"claim_id\":6645582993,\"reason\":\"Four natural C forms/native outcomes retained, best308B vs300B, ordinary boolean and common-return layout mismatch; no semantic impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T00:04:29Z",
+          "id": 6645710262,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T00:04:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "296a84144941d1e5b3f8f3a5fe1bb4f20e1f82e5655b2fe6045141ec7fad3529",
+        "result": {
+          "address": "0x0812D474",
+          "claim_id": 6645582993,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6645710262,
+          "status": "accepted",
+          "who": "sol-0812D474-1014"
+        }
+      }
     },
     {
       "claim": {
