@@ -3774,66 +3774,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "7e82795783960cdd3b0bd2a9d45c2da229a44fee6c87ca883c23c774a65ee58c",
-        "acknowledged_cursor": 6664428811,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7e82795783960cdd3b0bd2a9d45c2da229a44fee6c87ca883c23c774a65ee58c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0814511C\",\"who\":\"sol-0814511C-1702\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T17:17:25Z",
-          "id": 6664428720,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:17:25Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8df7d33a00f1d5f4b049a8ca5927e35287422c9146182482fd4bb2c3ce1c84d2",
-        "result": {
-          "address": "0x0814511C",
-          "claim_id": 6664428720,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6664428720,
-          "status": "accepted",
-          "who": "sol-0814511C-1702"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "85be67cd2b1f7870305548961f038cc9d42d6610f1d8d67ca9e0130c398662a5",
-        "acknowledged_cursor": 6664567952,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "85be67cd2b1f7870305548961f038cc9d42d6610f1d8d67ca9e0130c398662a5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814511C\",\"who\":\"sol-0814511C-1702\",\"claim_id\":6664428720,\"reason\":\"Prior guarded stores cover actual void AudioState,u16 interface; LR frame residual has no independent correction. Zero new compiler/native; fixed167 plus27 refs unchanged; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T17:23:36Z",
-          "id": 6664567952,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:23:36Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ba6099ea0b876a4b8c9c58c4e48d971a7dbdbdb3d7e3d5bcf51248ff968f48ad",
-        "result": {
-          "address": "0x0814511C",
-          "claim_id": 6664428720,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6664567952,
-          "status": "accepted",
-          "who": "sol-0814511C-1702"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "05c13f6d32b17d4b34d3316a7066c36698fea38a91d3fbe3bc812c1e83ccb0cb",
         "acknowledged_cursor": 6664476796,
         "body_provenance": "acceptance-time",
