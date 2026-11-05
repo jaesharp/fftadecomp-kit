@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "5f0bca981ba09a4d7e8e99fee056f120d96bd1c172c48c3c5c68fcbf33e64f25",
-        "acknowledged_cursor": 6656087188,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5f0bca981ba09a4d7e8e99fee056f120d96bd1c172c48c3c5c68fcbf33e64f25",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DA3B8\",\"who\":\"sol-080DA3B8-1423\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T10:50:03Z",
-          "id": 6656087188,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T10:50:03Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7512697cb622fd3bbd462ca9ec17a31925e5957a118a1cce3a532a2d3f679d9d",
-        "result": {
-          "address": "0x080DA3B8",
-          "claim_id": 6656087188,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6656087188,
-          "status": "accepted",
-          "who": "sol-080DA3B8-1423"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4282228c9b4147cb4366b3222a86b377c362b279e76452451a18fcbfec39137a",
-        "acknowledged_cursor": 6656510591,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4282228c9b4147cb4366b3222a86b377c362b279e76452451a18fcbfec39137a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DA3B8\",\"who\":\"sol-080DA3B8-1423\",\"claim_id\":6656087188,\"reason\":\"Seven diagnostic candidates remained inexact; final 448 versus 480 complete bytes. Discarded loads and clipping layout remain unsupported. No native run. Later-read sibling source disappeared after peer freeze; original observed text retained. No impossibility claim.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-05T11:11:26Z",
-          "id": 6656510591,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T11:11:26Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4b0c1ac2bc5dc9a15cef11d8b98bcd5ecc608d819f8f925f0c384a2a7adbe763",
-        "result": {
-          "address": "0x080DA3B8",
-          "claim_id": 6656087188,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6656510591,
-          "status": "accepted",
-          "who": "sol-080DA3B8-1423"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "b29d94ae2040d50f4c428e71d50c8cff6164f36391837936eb9b5b42f5865402",
         "acknowledged_cursor": 6656156306,
         "body_provenance": "acceptance-time",
