@@ -3742,7 +3742,35 @@
           "who": "sol-080098F4-1504"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "64dc08002685ec388f8b4d794f0d07a045e9788533d15b153210af960cbc7e98",
+        "acknowledged_cursor": 6659186087,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "64dc08002685ec388f8b4d794f0d07a045e9788533d15b153210af960cbc7e98",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080098F4\",\"who\":\"sol-080098F4-1504\",\"claim_id\":6658943586,\"reason\":\"First original native MATCH:plausible44/44B wholeFUNC,19instructions,exact1native/1compiler/1linker. Original same-invocation artifacts frozen,167fixed/refs/runtime/ROM/source unchanged. Primary publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T13:27:22Z",
+          "id": 6659186087,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T13:27:22Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "869d4bd98c55220087acf130e98474aae50a396d47e2f9c53dc66ae401fe2e90",
+        "result": {
+          "address": "0x080098F4",
+          "claim_id": 6658943586,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6659186087,
+          "status": "accepted",
+          "who": "sol-080098F4-1504"
+        }
+      }
     },
     {
       "claim": {
