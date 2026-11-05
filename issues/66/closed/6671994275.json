@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "d96fe42f0e76b90ba93af4e1af8a9039ff6d2c52d87adf45d7046ea6e39797ad",
+    "acknowledged_cursor": 6671994304,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "d96fe42f0e76b90ba93af4e1af8a9039ff6d2c52d87adf45d7046ea6e39797ad",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080E308C\",\"who\":\"sol-080E308C-1959\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T23:13:54Z",
+      "id": 6671994275,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T23:13:54Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "bfc1280247531a75d23ca1e0564c25ba0b22478f2495dde061d236ffe0c85ee0",
+    "result": {
+      "address": "0x080E308C",
+      "claim_id": 6671994275,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6671994275,
+      "status": "accepted",
+      "who": "sol-080E308C-1959"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "27a6a5b0bf9c18f2fa054dd340ca39d75bf4eb5ebbc9f8a1a2a0b0a6c48a7007",
+    "acknowledged_cursor": 6672170482,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "27a6a5b0bf9c18f2fa054dd340ca39d75bf4eb5ebbc9f8a1a2a0b0a6c48a7007",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080E308C\",\"who\":\"sol-080E308C-1959\",\"claim_id\":6671994275,\"reason\":\"First natural form diagnostic exact 240B, native prerequisite pending. Frozen complete genuine artifacts and source; matching fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T23:21:29Z",
+      "id": 6672123573,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T23:21:29Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "e9e503e8020ea9de6479343c772b7542075c595259178e82f6a7c51d7bb8c76c",
+    "result": {
+      "address": "0x080E308C",
+      "claim_id": 6671994275,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6672123573,
+      "status": "accepted",
+      "who": "sol-080E308C-1959"
+    }
+  }
+}
