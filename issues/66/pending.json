@@ -3802,7 +3802,35 @@
           "who": "sol-0801B6C8-1327"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "440590486015389e42dc7191c002b6adc6b1563bf305313854b730fd9621f274",
+        "acknowledged_cursor": 6653156697,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "440590486015389e42dc7191c002b6adc6b1563bf305313854b730fd9621f274",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801B6C8\",\"who\":\"sol-0801B6C8-1327\",\"claim_id\":6652933838,\"reason\":\"Five natural diagnostics retained, best120-byte body vs116-byte target because repeated controls cached in R6; zero native/MATCH, final result frozen and fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T08:16:40Z",
+          "id": 6653156697,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T08:16:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "75c0ea0e1f534a5a7f17038e5daf63bb7a8f7d6452243982544edcda7f24feb6",
+        "result": {
+          "address": "0x0801B6C8",
+          "claim_id": 6652933838,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6653156697,
+          "status": "accepted",
+          "who": "sol-0801B6C8-1327"
+        }
+      }
     },
     {
       "claim": {
