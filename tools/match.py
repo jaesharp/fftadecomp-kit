@@ -4203,6 +4203,7 @@ def main():
                                                       "static-callback-buffer-v1",
                                                       "static-callback-unwritten-r7-v1",
                                                       "static-callback-restoring-r6-v1",
+                                                      "static-callback-restoring-r6-target-v1",
                                                       "static-callback-local-output-word-return-r7-v1",
                                                       "standalone-local-output-word-return-v1",
             "entry-recursive-ordinary-call-v1",

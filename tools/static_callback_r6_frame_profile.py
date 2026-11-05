@@ -1,4 +1,4 @@
-"""Explicit R6 constants through replayed ordinary frames and leaf R7 callbacks.
+"""Explicit R6 constants through replayed frames and selected R6/R7 callbacks.
 
 No ABI declaration grants preservation. Each ordinary call restores its entry
 frame under certificates for all nested calls, and independently replays the
@@ -19,25 +19,37 @@ import static_callback_target_preservation_profile as r7
 SELECTOR = 'static-callback-restoring-r6-v1'
 SCHEMA = 'elf-symbol-thumb-static-callback-restoring-r6-v1'
 CONTROL_FLOW = 'complete ordinary frames with authenticated R6 restoration and bounded leaf R7 callbacks'
+TARGET_SELECTOR = 'static-callback-restoring-r6-target-v1'
+TARGET_SCHEMA = 'elf-symbol-thumb-static-callback-restoring-r6-target-v1'
+TARGET_CONTROL_FLOW = 'complete ordinary and R6 callback frames with authenticated restoration and bounded effects'
+PROFILES = {SELECTOR: (SCHEMA, CONTROL_FLOW), TARGET_SELECTOR: (TARGET_SCHEMA, TARGET_CONTROL_FLOW)}
+SCHEMAS = (SCHEMA, TARGET_SCHEMA)
 MAX_DEPENDENCIES = r7.MAX_DEPENDENCIES
 REGISTER = match.ARM_REG_R0 + 6
 PRESERVED = frozenset(range(match.ARM_REG_R0 + 4, match.ARM_REG_R0 + 12))
 REPLAY_GUARD = match.ARM_REG_R0 + 11
 
 
-def policy_manifest():
+def policy_manifest(policy=SELECTOR):
+    if policy not in PROFILES:
+        raise ValueError('unknown R6 restoration policy')
+    target = policy == TARGET_SELECTOR
     modules = ('static_callback_r6_frame_profile', 'static_callback_target_preservation_profile',
                'static_callback_buffer_profile', 'named_data_buffer_profile',
                'local_long_branch_profile', 'owner_graph_profile', 'owner_admission_profile',
                'function_thunk_profile', 'analyze', 'inert_spin_profile', 'match')
-    return dict(schema='thumb-static-callback-restoring-r6-policy-v1', selector=SELECTOR,
-        register=6, callbacks='exact canonical R7, complete leaf, R4-R11 and SP unwritten',
+    result = dict(schema='thumb-static-callback-restoring-r6-target-policy-v1' if target else 'thumb-static-callback-restoring-r6-policy-v1', selector=policy,
+        register=6, callbacks='exact canonical R6, complete restoring frames, R6/R11 unwritten' if target else 'exact canonical R7, complete leaf, R4-R11 and SP unwritten',
         ordinary_calls='complete existing restoring frame with exact completed nested call certificates',
         replay='fresh existing buffer alias/effect replay; R11 unwritten guard',
         attestation='same proof instance, result identity and aliases, site, target and incoming R6; once',
         returning='conditional compatible normal return only', descriptor_words=False,
         source_sha256={name+'.py': hashlib.sha256(Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                        for name in modules})
+    if target:
+        result['normal_return_scratch'] = dict(schema=frame.DISCARDED_SCRATCH_SCHEMA,
+            registers=[2, 3], contract=frame.DISCARDED_SCRATCH_CONTRACT)
+    return result
 
 
 class _Result(dict):
@@ -46,14 +58,64 @@ class _Result(dict):
 
 class R6FrameCallbackProof(r7.StaticCallbackTargetPreservationProof):
     def __init__(self, rom, mapping, index, objects, *, policy):
-        if policy != SELECTOR:
+        if policy not in PROFILES:
             raise ValueError('R6 restoration requires its exact explicit policy')
         super().__init__(rom, mapping, index, objects, policy=r7.SELECTOR)
+        self._restoring_target = policy == TARGET_SELECTOR
+        if policy == TARGET_SELECTOR:
+            self._target_register = REGISTER
+            self._target_thunk = r7.thunk.ALIASES['_call_via_r6']
         self._frames = []
         self._structure_only = False
         self._restorations = {}
         self._ordinary_completed = {}
         self._leaf_completed = {}
+        self._scratch_returns = {}
+
+    def normal_return_aliases(self, address, site, aliases):
+        if not self._restoring_target:
+            return super().normal_return_aliases(address, site, aliases)
+        # This selector explicitly assumes R2/R3 are discarded at compatible
+        # normal returns. The actual complete consumer must also leave those
+        # aliases unobserved until a write or normal return kills them.
+        scratch = {match.ARM_REG_R0 + 2, match.ARM_REG_R0 + 3}
+        projected = {register: offset for register, offset in aliases.items() if register in scratch}
+        if projected:
+            if not self._frames or self._frames[-1]['address'] != address:
+                raise ValueError('scratch projection requires its active exact callee')
+            active = self._frames[-1]
+            call_site = active['site']
+            owners = [row for row in self.entries if int(row['rom'],16) <= call_site < int(row['end'],16)]
+            if len(owners) != 1:
+                raise ValueError('scratch projection requires one complete consumer owner')
+            consumer = int(owners[0]['rom'],16)
+            data, ins, edges, calls, partition = self._graph(consumer)
+            if calls.get(call_site) != active['call_target']:
+                raise ValueError('scratch projection differs from the actual consumer call')
+            pending = [(call_site+ins[call_site].size, frozenset(projected))]
+            seen = set()
+            while pending:
+                current, live = pending.pop()
+                if (current, live) in seen:
+                    continue
+                seen.add((current, live))
+                instruction = ins[current]
+                read, written = instruction.regs_access()
+                if set(read) & live or current in calls and live:
+                    raise ValueError('consumer observes projected return scratch before a killing write')
+                live -= set(written)
+                pending.extend((target, live) for target in edges[current] if live)
+            receipt = dict(address=address, site=site, consumer=consumer,
+                call_site=call_site, call_target=active['call_target'],
+                consumer_sha256=hashlib.sha256(data).hexdigest(), partition=partition,
+                projected=[[register-match.ARM_REG_R0, offset]
+                           for register, offset in sorted(projected.items())],
+                continuation_states=len(seen))
+            self._scratch_returns[json.dumps(receipt, sort_keys=True)] = receipt
+        return {register: offset for register, offset in aliases.items() if register not in scratch}
+
+    def scratch_return_observations(self):
+        return [self._scratch_returns[key] for key in sorted(self._scratch_returns)]
 
     def inspect(self, address, data):
         # The inherited preliminary instruction check has no entry constants.
@@ -78,9 +140,9 @@ class R6FrameCallbackProof(r7.StaticCallbackTargetPreservationProof):
 
     def _leaf(self, value):
         if type(value) is not int or value % 2 != 1:
-            raise ValueError('R7 callback requires an exact odd Thumb target')
+            raise ValueError('callback requires an exact odd Thumb target')
         address = match.function_address_target(f'func_{value & ~1:08X}', self.entries,
-                                               r7.THUNK, 2, len(self.rom))
+                                               self._target_thunk, 2, len(self.rom))
         data, ins, edges, calls, partition = self._graph(address)
         if calls:
             raise ValueError('R6 restoration requires a complete no-call callback')
@@ -92,6 +154,16 @@ class R6FrameCallbackProof(r7.StaticCallbackTargetPreservationProof):
         return dict(address=address, body_sha256=hashlib.sha256(data).hexdigest(),
                     partition=partition, frame=certificate)
 
+    def _restoring_frame(self, address, active):
+        data, ins, edges, calls, partition = self._graph(address)
+        if calls != {site: row['target'] for site, row in active['calls'].items()}:
+            raise ValueError('ordinary frame has an unbound or incomplete nested call certificate')
+        certificate = frame.prove_frame(ins, edges, address, {}, calls,
+            call_preservation={site: PRESERVED for site in calls})
+        return dict(body_sha256=hashlib.sha256(data).hexdigest(), partition=partition,
+                    frame=certificate, calls=[dict(site=site, **active['calls'][site])
+                                             for site in sorted(active['calls'])])
+
     def check_arguments(self, address, arguments, stack, incoming, protected, *,
                         constants=None, site=None, **context):
         if type(site) is not int or context.get('words'):
@@ -100,35 +172,49 @@ class R6FrameCallbackProof(r7.StaticCallbackTargetPreservationProof):
         context = dict(words={}, frame_base=context.get('frame_base'),
                        root_frame=context.get('root_frame'), **{key: value for key, value in context.items()
                        if key not in ('words', 'frame_base', 'root_frame')})
-        if address == r7.THUNK:
+        if address == self._target_thunk:
             if not self._frames:
                 raise ValueError('R6 callback certificate requires an active ordinary caller')
-            certificate = self._leaf(facts.get(r7.REGISTER))
-            watched = tuple(sorted(set(context.get('watched', ())) | PRESERVED))
-            result = super().check_arguments(address, arguments, stack, incoming, protected,
-                constants=facts, site=site, **dict(context, watched=watched))
+            if self._restoring_target:
+                value = facts.get(self._target_register)
+                if type(value) is not int or value % 2 != 1:
+                    raise ValueError('callback requires an exact odd Thumb target')
+                target = match.function_address_target(f'func_{value & ~1:08X}', self.entries,
+                    self._target_thunk, 2, len(self.rom))
+                _, ins, _, _, _ = self._graph(target)
+                guards = {REGISTER, REPLAY_GUARD}
+                for instruction in ins.values():
+                    if set(instruction.regs_access()[1]) & guards:
+                        raise ValueError('callback writes a required unwritten target or replay guard')
+                watched = tuple(sorted(set(context.get('watched', ())) | guards))
+                active = dict(address=target, site=site, call_target=address, calls={})
+                self._frames.append(active)
+                try:
+                    result = super().check_arguments(address, arguments, stack, incoming, protected,
+                        constants=facts, site=site, **dict(context, watched=watched))
+                    certificate = dict(address=target, **self._restoring_frame(target, active))
+                finally:
+                    self._frames.pop()
+            else:
+                certificate = self._leaf(facts.get(self._target_register))
+                watched = tuple(sorted(set(context.get('watched', ())) | PRESERVED))
+                result = super().check_arguments(address, arguments, stack, incoming, protected,
+                    constants=facts, site=site, **dict(context, watched=watched))
             self._leaf_completed[id(result)] = (result, tuple(sorted(result.items())),
                                                 site, certificate)
             return result
         # The extra unwritten watch forces complete effect replay even for a
         # no-buffer call; it does not infer callee-saved restoration itself.
         watched = tuple(sorted(set(context.get('watched', ())) | {REPLAY_GUARD}))
-        active = dict(address=address, calls={})
+        active = dict(address=address, site=site, call_target=address, calls={})
         self._frames.append(active)
         try:
             aliases = super().check_arguments(address, arguments, stack, incoming, protected,
                 constants=facts, site=site, **dict(context, watched=watched))
-            data, ins, edges, calls, partition = self._graph(address)
-            if calls != {call_site: row['target'] for call_site, row in active['calls'].items()}:
-                raise ValueError('ordinary frame has an unbound or incomplete nested call certificate')
             # Every nested site has independently completed its effects and a
             # frame or no-write callback proof. No arbitrary preserved set enters.
-            certificate = frame.prove_frame(ins, edges, address, {}, calls,
-                call_preservation={call_site: PRESERVED for call_site in calls})
             receipt = dict(site=site, target=address, value=facts.get(REGISTER),
-                body_sha256=hashlib.sha256(data).hexdigest(), partition=partition,
-                frame=certificate, calls=[dict(site=key, **active['calls'][key])
-                                         for key in sorted(active['calls'])])
+                           **self._restoring_frame(address, active))
             result = _Result(aliases)
             self._ordinary_completed[id(result)] = (result, tuple(sorted(result.items())), receipt)
             return result
@@ -145,7 +231,7 @@ class R6FrameCallbackProof(r7.StaticCallbackTargetPreservationProof):
         if leaf is not None:
             original, aliases, call_site, certificate = leaf
             if original is not result or aliases != tuple(sorted(result.items())) or \
-                    site != call_site or target != r7.THUNK or not self._frames:
+                    site != call_site or target != self._target_thunk or not self._frames:
                 raise ValueError('callback frame certificate differs from completed call')
             self._record_call(site, target, certificate)
         elif ordinary is not None:

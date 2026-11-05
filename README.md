@@ -1919,6 +1919,25 @@ that any stored word survived aliasing writes or frame lifetime changes.
 original agbcc `-mthumb-interwork -O2`; it needs the fixed compiler and ARM tools
 on `PATH`, and contains no extracted original ROM bodies or tables.
 
+### Restoring frames with exact R6 callback targets
+
+`--owner-runtime-profile static-callback-restoring-r6-target-v1` explicitly
+selects complete R6 callback and ordinary restoring frames. Every nested call
+needs a completed frame certificate and fresh bounded alias/effect replay.
+The callback leaves R6 and the R11 replay guard unwritten; other saved registers,
+SP and the entry return address must be restored on every normal-return path.
+Canonical thunk identity, typed original ELF relocations and full report replay
+remain required. Descriptor-word composition remains excluded.
+
+The selector states the compatible normal-return premise that R2/R3 are
+discarded scratch. Projecting a returned local alias also requires its actual
+unique complete consumer and a continuation that never reads or passes that
+register before a killing write or normal return. Reports bind these consumer
+bytes, sites and observations. R0/R1 are never projected. Earlier selectors,
+including `static-callback-restoring-r6-v1` with its leaf R7 target, retain their
+policies. No physical-memory, nominal C type, numeric or termination theorem
+follows. Synthetic boundaries are in `tests/test_static_callback_r6_target.py`.
+
 ### Exact protected descriptor words
 
 `--owner-runtime-profile protected-descriptor-word-v1` selects

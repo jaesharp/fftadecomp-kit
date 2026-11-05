@@ -50,6 +50,8 @@ class StaticCallbackTargetPreservationProof(callback.StaticCallbackBufferProof):
         if policy != SELECTOR:
             raise ValueError('callback target preservation requires its explicit exact policy')
         super().__init__(rom, mapping, index, objects)
+        self._target_register = REGISTER
+        self._target_thunk = THUNK
         self._completed = {}
         self._preservations = {}
 
@@ -67,13 +69,13 @@ class StaticCallbackTargetPreservationProof(callback.StaticCallbackBufferProof):
                         constants=None, site=None, **word_context):
         if word_context.get('words'):
             raise ValueError('unwritten-R7 policy excludes descriptor word provenance composition')
-        if address != THUNK:
+        if address != self._target_thunk:
             return super().check_arguments(address, arguments, stack, incoming, protected,
                 constants=constants, site=site, **word_context)
         if type(site) is not int:
             raise ValueError('preserved callback fact requires an exact caller site')
         facts = dict(constants or {})
-        watched = tuple(sorted(set(word_context.get('watched', ())) | {REGISTER}))
+        watched = tuple(sorted(set(word_context.get('watched', ())) | {self._target_register}))
         context = dict(word_context, words={},
             frame_base=word_context.get('frame_base'), root_frame=word_context.get('root_frame'),
             watched=watched)
@@ -82,9 +84,9 @@ class StaticCallbackTargetPreservationProof(callback.StaticCallbackBufferProof):
         aliases = super().check_arguments(address, arguments, stack, incoming, protected,
             constants=constants, site=site, **context)
         result = _CallbackResult(aliases)
-        receipt = dict(site=site, thunk=address, register=REGISTER, value=facts[REGISTER],
-            target=facts[REGISTER] & ~1, watched=list(watched),
-            precondition='no reached instruction writes watched R7 in callback or inspected dependencies',
+        receipt = dict(site=site, thunk=address, register=self._target_register, value=facts[self._target_register],
+            target=facts[self._target_register] & ~1, watched=list(watched),
+            precondition=f'no reached instruction writes watched R{self._target_register - match.ARM_REG_R0} in callback or inspected dependencies',
             returning='conditional normal return only')
         # Holding the exact object prevents id reuse and copied/forged aliases
         # from acquiring a preservation fact. It is consumed at the real call.
@@ -99,11 +101,11 @@ class StaticCallbackTargetPreservationProof(callback.StaticCallbackBufferProof):
             return
         original, receipt = completed
         if original is not result or receipt['site'] != site or receipt['thunk'] != target or \
-                incoming.get(REGISTER) != receipt['value']:
+                incoming.get(self._target_register) != receipt['value']:
             raise ValueError('preserved callback fact does not match the exact completed call context')
-        # The callback entry/return proof forbids every R7 write, rather than
+        # The callback entry/return proof forbids every target-register write, rather than
         # inferring restoration from a compatible prototype or a PUSH/POP pair.
-        constants[REGISTER] = receipt['value']
+        constants[self._target_register] = receipt['value']
         key = json.dumps(receipt, sort_keys=True, separators=(',', ':'))
         self._preservations[key] = receipt
 
