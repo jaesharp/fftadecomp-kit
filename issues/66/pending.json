@@ -3774,7 +3774,35 @@
           "who": "sol-08084BD0-1227"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "961ad89a9d436e856a3b3789a0ee1e3c709b2accadd2421cdef4281eac365e7b",
+        "acknowledged_cursor": 6651181829,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "961ad89a9d436e856a3b3789a0ee1e3c709b2accadd2421cdef4281eac365e7b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08084BD0\",\"who\":\"sol-08084BD0-1227\",\"claim_id\":6650957445,\"reason\":\"Stopped after15 distinct natural diagnostics. Complete200B best184 equal bytes, scalar allocation and narrowing/load schedule differ. Zero native or MATCH credit, no impossibility claim; originals retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T06:14:19Z",
+          "id": 6651181829,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T06:14:19Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c85e24e3044b5eb92d5dd24be1ad6fe5986d3d5ba2ee457a6ac44253f221b948",
+        "result": {
+          "address": "0x08084BD0",
+          "claim_id": 6650957445,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6651181829,
+          "status": "accepted",
+          "who": "sol-08084BD0-1227"
+        }
+      }
     },
     {
       "claim": {
@@ -3806,7 +3834,35 @@
           "who": "sol-08081B24-1227"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "dbcda679502a17df65de4d468a36b4500d0b5033aabc6931ff6cb903fb46b84c",
+        "acknowledged_cursor": 6651181829,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "dbcda679502a17df65de4d468a36b4500d0b5033aabc6931ff6cb903fb46b84c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08081B24\",\"who\":\"sol-08081B24-1227\",\"claim_id\":6650957461,\"reason\":\"First native exit0 and plausible completeMATCH200B. Frozen source, report and actual compiler artifacts retained; all167 fixed inputs unchanged. Queued for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T06:14:18Z",
+          "id": 6651181552,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T06:14:18Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c85e24e3044b5eb92d5dd24be1ad6fe5986d3d5ba2ee457a6ac44253f221b948",
+        "result": {
+          "address": "0x08081B24",
+          "claim_id": 6650957461,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6651181552,
+          "status": "accepted",
+          "who": "sol-08081B24-1227"
+        }
+      }
     },
     {
       "claim": {
