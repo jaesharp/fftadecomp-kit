@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "cfebce9809eef7963099579e8cb001005811cf97060be16a421f78009c73e572",
+    "acknowledged_cursor": 6645654155,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "cfebce9809eef7963099579e8cb001005811cf97060be16a421f78009c73e572",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080A780C\",\"who\":\"sol-080A780C-1019\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T00:01:21Z",
+      "id": 6645654155,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T00:01:21Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "ba7156302be5df81f558e3214322eaafdb13ca4aa276370f0a429cf949246340",
+    "result": {
+      "address": "0x080A780C",
+      "claim_id": 6645654155,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6645654155,
+      "status": "accepted",
+      "who": "sol-080A780C-1019"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "a527680f3934754740e982e527131bfdaaa18286e87f298e2dadef1373b14406",
+    "acknowledged_cursor": 6646048949,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "a527680f3934754740e982e527131bfdaaa18286e87f298e2dadef1373b14406",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080A780C\",\"who\":\"sol-080A780C-1019\",\"claim_id\":6645654155,\"reason\":\"No C authored. Actual complete typed/u16 route refuses interposed object layout; original leaf-only switch qualification retained, prerequisite held.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T00:23:44Z",
+      "id": 6646048949,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T00:23:44Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d05d49ff65a201a3b4302b07042dacf7440e84fb7155aae80167c3f3c6f70394",
+    "result": {
+      "address": "0x080A780C",
+      "claim_id": 6645654155,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6646048949,
+      "status": "accepted",
+      "who": "sol-080A780C-1019"
+    }
+  }
+}
