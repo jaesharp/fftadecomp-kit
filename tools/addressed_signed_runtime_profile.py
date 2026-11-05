@@ -33,6 +33,9 @@ DATA_SELECTOR = 'addressed-signed-runtime-data-v1'
 DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-data-v1'
 COMPILER_DATA_SELECTOR = 'compiler-signed-runtime-data-v1'
 COMPILER_DATA_SCHEMA = 'elf-symbol-thumb-compiler-signed-runtime-data-v1'
+COMPILER_MMIO_DATA_SELECTOR = 'compiler-signed-runtime-numeric-mmio-data-v1'
+COMPILER_MMIO_DATA_SCHEMA = 'elf-symbol-thumb-compiler-signed-runtime-numeric-mmio-data-v1'
+COMPILER_SELECTORS = (COMPILER_DATA_SELECTOR, COMPILER_MMIO_DATA_SELECTOR)
 READONLY_TWO_DATA_SELECTOR = 'addressed-signed-runtime-readonly-two-words-data-v1'
 READONLY_TWO_DATA_SCHEMA = 'elf-symbol-thumb-addressed-signed-runtime-readonly-two-words-data-v1'
 CALLBACK_SELECTOR = 'addressed-signed-runtime-r2-callback-data-v1'
@@ -87,7 +90,7 @@ UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGN
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
 DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
-                  BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR, COMPILER_DATA_SELECTOR)
+                  BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR, *COMPILER_SELECTORS)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -98,6 +101,7 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
 SCHEMAS = {COMPILER_DATA_SELECTOR: COMPILER_DATA_SCHEMA,
+            COMPILER_MMIO_DATA_SELECTOR: COMPILER_MMIO_DATA_SCHEMA,
             BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-function-literals-data-v1',
             BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-saved-scalar-control-numeric-mmio-data-v1',
             BIOS_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-numeric-mmio-data-v1',
@@ -222,8 +226,12 @@ def function_literal(name, selector):
 
 def data_literals(data, address, rom, mapping, objects, records, *, selector=DATA_SELECTOR):
     import match
-    if type(objects) is not bytes or type(records) is not list or not records:
+    if type(objects) is not bytes or type(records) is not list or \
+            not records and selector != COMPILER_MMIO_DATA_SELECTOR:
         raise ValueError('addressed data requires an actual typed data snapshot and bindings')
+    if not records:
+        match.parse_data_symbols(objects)
+        return {}  # This distinct selector still requires actual reached MMIO in finish.
     # Calls are authenticated separately by prepare; do not send reserved runtime
     # names through the ordinary function-address validator.
     functions, data_records = [], []
@@ -577,7 +585,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         address_words = {row['address'] - address for row in partition['words']
                          if remainder.address_literal(row['value'])}
         address_words -= {row[0] for row in scalar_controls + saved_controls}
-        if selector in NUMERIC_MMIO_SELECTORS:
+        if selector in (*NUMERIC_MMIO_SELECTORS, COMPILER_MMIO_DATA_SELECTOR):
             numeric_mmio = [[row['address'] - address, row['value'],
                              [site - address for site in row['load_sites']]]
                             for row in partition['words']
@@ -666,7 +674,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         ordinary_calls='conditional returning r4-r11/SP preserving ABI only; no transitive callee proof',
         termination='every reached region has a checked return path; universal termination unproved',
         frame=restored, partition=partition, producer_source_sha256=pins)
-    if selector == COMPILER_DATA_SELECTOR:
+    if selector in COMPILER_SELECTORS:
         aliases = {name: alias for alias, name in COMPILER_ALIASES.items()}
         context[4]['compiler_runtime'] = dict(contract=COMPILER_CONTRACT,
             calls=[[site-address, aliases[name], name]
@@ -706,7 +714,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
                      'arithmetic, joins and alias cycles refuse. Callee-saved retention is '
                      'an explicit ordinary ABI premise. No BIOS effects, initialization, '
                      'physical readability/nonalias, bounds, numeric or termination theorem.')
-    if selector in NUMERIC_MMIO_SELECTORS:
+    if selector in (*NUMERIC_MMIO_SELECTORS, COMPILER_MMIO_DATA_SELECTOR):
         context[4]['numeric_mmio_literals'] = dict(
             schema='reached-halfword-aligned-numeric-mmio-literals-v1', words=numeric_mmio,
             contract='Reached PC-loaded numeric literals in [0x04000000,0x04000400), '
@@ -810,7 +818,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
     if selector not in SCHEMAS or selector in CALLBACK_SELECTORS and not with_data:
         raise ValueError('callback linking requires its exact selector and typed data')
     if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
-                    COMPILER_DATA_SELECTOR) and not with_data:
+                    *COMPILER_SELECTORS) and not with_data:
         raise ValueError('addressed readonly data requires actual typed bindings')
     symbol = original_function(image, address)
     entries = json.loads(mapping)
@@ -851,10 +859,10 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
                     target_symbol['type'] not in (0, 2) or \
                     sum(item['name'] == name for item in image['symbols']) != 1:
                 raise ValueError('addressed calls require unique undefined zero-valued global functions')
-            canonical = COMPILER_ALIASES.get(name) if selector == COMPILER_DATA_SELECTOR else None
+            canonical = COMPILER_ALIASES.get(name) if selector in COMPILER_SELECTORS else None
             if canonical is not None and target_symbol['size'] != 0:
                 raise ValueError('compiler runtime symbols require zero original size')
-            if selector == COMPILER_DATA_SELECTOR and name in OPERATIONS:
+            if selector in COMPILER_SELECTORS and name in OPERATIONS:
                 raise ValueError('compiler runtime linking requires original compiler-emitted names')
             target = operations(selector).get(canonical or name)
             if target is None:
@@ -875,7 +883,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
             calls[address+offset] = target
             targets[name] = target
             occupied.update(range(offset,offset+4))
-    if not bindings or with_data and not data_relocations or any(
+    if not bindings or with_data and not data_relocations and selector != COMPILER_MMIO_DATA_SELECTOR or any(
                            item['name'] and not item['section'] and item['name'] not in targets
                            for item in image['symbols']):
         raise ValueError('addressed runtime ELF requires actual addressed calls and no unresolved symbols')
@@ -953,7 +961,7 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, *,
     from inert_spin_profile import fixed_configuration
     fixed_configuration(args)
     data = {} if selector in DATA_SELECTORS else None
-    if selector == COMPILER_DATA_SELECTOR:
+    if selector in COMPILER_SELECTORS:
         compiler_namespace(runner.read_binary(f'{workspace}/f.i').decode('utf-8'))
     if selector in CALLBACK_SELECTORS:
         match.function_thunk.namespace(runner.read_binary(f'{workspace}/f.i').decode('utf-8'))
@@ -987,7 +995,7 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, *,
     linked = match.elf_image(runner.read_binary(f'{workspace}/f.elf'))
     if runner.read_binary(f'{workspace}/f.linked.bin') != linked['text']:
         raise ValueError('addressed runtime objcopy differs from linked ELF text')
-    result = linked_bytes(original,linked,address,calls,targets,data_relocations=data,
+    result = linked_bytes(original,linked,address,calls,targets,data_relocations=(None if selector == COMPILER_MMIO_DATA_SELECTOR and not data else data),
                           function_literals=function_literals),calls,bindings
     if data is not None:
         result += ([[offset,name,addend] for offset,(name,addend) in sorted(data.items())],)
