@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "4a43e13faf955f5b98cf525ee534865e8a302f5c43465d3f57b5557a391fadda",
+    "acknowledged_cursor": 6651693744,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "4a43e13faf955f5b98cf525ee534865e8a302f5c43465d3f57b5557a391fadda",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0801A320\",\"who\":\"sol-0801A320-1270\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-05T06:48:12Z",
+      "id": 6651693744,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T06:48:12Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "1a382455a30949f8189d5636dda1fb104bb784dd38463545062b38f32ed185d5",
+    "result": {
+      "address": "0x0801A320",
+      "claim_id": 6651693744,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6651693744,
+      "status": "accepted",
+      "who": "sol-0801A320-1270"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "dab574a1ca350d0a9b50697cc4ce8c05a7763514a84b1abb127f66557d57fb9c",
+    "acknowledged_cursor": 6651847375,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "dab574a1ca350d0a9b50697cc4ce8c05a7763514a84b1abb127f66557d57fb9c",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801A320\",\"who\":\"sol-0801A320-1270\",\"claim_id\":6651693744,\"reason\":\"First natural form exact268/268B diagnostically; zero native/MATCH. Genuine indexed-data overlap and BIOS-LZ77/callback composition prerequisite remains. Exact source and original successful diagnostic frozen; do not replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-05T06:58:08Z",
+      "id": 6651845893,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-05T06:58:08Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "a872daace774d9a3db57a395df305eb7d2c2cefedeb4f08a68da9ca5895cbe51",
+    "result": {
+      "address": "0x0801A320",
+      "claim_id": 6651693744,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6651845893,
+      "status": "accepted",
+      "who": "sol-0801A320-1270"
+    }
+  }
+}
