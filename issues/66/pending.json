@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "f9cefaf06cbaa38a66f264968938cae88324f6a41088860b5ffe2690600dd3be",
-        "acknowledged_cursor": 6664611178,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f9cefaf06cbaa38a66f264968938cae88324f6a41088860b5ffe2690600dd3be",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080583C8\",\"who\":\"sol-080583C8-1709\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T17:25:29Z",
-          "id": 6664610317,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:25:29Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2f9dc9f3785aa18caee56190064aed72c8bf43046cc139cec3ba47cc6b06069c",
-        "result": {
-          "address": "0x080583C8",
-          "claim_id": 6664610317,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6664610317,
-          "status": "accepted",
-          "who": "sol-080583C8-1709"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "0647a48af55bbdab710c7239b020d6c92e3264eb801c08531826ca05d9846ff9",
-        "acknowledged_cursor": 6664736357,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0647a48af55bbdab710c7239b020d6c92e3264eb801c08531826ca05d9846ff9",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080583C8\",\"who\":\"sol-080583C8-1709\",\"claim_id\":6664610317,\"reason\":\"Confirmed baseline caller halfword layout adds no independent source model beyond retained direction/guard forms. Branch organization residual; zero new compiler/native; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T17:31:19Z",
-          "id": 6664736286,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:31:19Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "50029df261fcb5469be06f79c794602cf20a6aa1e3cdd79521c4009148ccee8f",
-        "result": {
-          "address": "0x080583C8",
-          "claim_id": 6664610317,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6664736286,
-          "status": "accepted",
-          "who": "sol-080583C8-1709"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "759062aecffec7fa6572a8c92fee52e0af6acd43122d4c91571d62efd79fa31e",
         "acknowledged_cursor": 6664611178,
         "body_provenance": "acceptance-time",
@@ -3803,66 +3743,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "dadf8ad6140fe828d8b50900d8bca21ba2ec66be99858efec6b54cc8d9e25070",
-        "acknowledged_cursor": 6664611178,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "dadf8ad6140fe828d8b50900d8bca21ba2ec66be99858efec6b54cc8d9e25070",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080258C4\",\"who\":\"sol-080258C4-1709\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-05T17:25:30Z",
-          "id": 6664610763,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:25:30Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2f9dc9f3785aa18caee56190064aed72c8bf43046cc139cec3ba47cc6b06069c",
-        "result": {
-          "address": "0x080258C4",
-          "claim_id": 6664610763,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6664610763,
-          "status": "accepted",
-          "who": "sol-080258C4-1709"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "fca33ff6bda875e3468b2a1dcc0a1c3792a3a154b769e0d63579da8cf291a015",
-        "acknowledged_cursor": 6664719640,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "fca33ff6bda875e3468b2a1dcc0a1c3792a3a154b769e0d63579da8cf291a015",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080258C4\",\"who\":\"sol-080258C4-1709\",\"claim_id\":6664610763,\"reason\":\"Confirmed helper low-byte result and actual low16 entry boundary add no grounded form beyond saved50/52-byte register residual. Zero new compiler/native; fixed167 plus20 refs unchanged; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-05T17:30:33Z",
-          "id": 6664719640,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-05T17:30:33Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "be4e0bd5e0b5a146d525d1e1014479c8b869abb32e288c1ab0073a5f8094b179",
-        "result": {
-          "address": "0x080258C4",
-          "claim_id": 6664610763,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6664719640,
-          "status": "accepted",
-          "who": "sol-080258C4-1709"
-        }
-      }
     },
     {
       "claim": {
