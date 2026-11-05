@@ -31,7 +31,7 @@ POLICY = "complete-reachable-u16-scalar-words-v1"
 SCHEMA = "elf-symbol-thumb-switch-data-u16-scalars-v1"
 
 
-def fixture(*, call=True, two_scalars=False, interleaved_scalar=False):
+def fixture(*, call=True, two_scalars=False, interleaved_scalar=False, early_pool=False):
     body, labels, fixups = bytearray(), {}, []
 
     def half(value):
@@ -51,6 +51,16 @@ def fixture(*, call=True, two_scalars=False, interleaved_scalar=False):
     if call:
         half(0xB500)  # push {lr}
     emit("ldr", "object0", 2)
+    if early_pool:
+        emit("ldr", "early_scalar", 3)
+        half(0x18D2)  # adds r2,r2,r3: numeric member offset
+        label("skip_early_pool")
+        emit("b", "comparison")
+        align()
+        label("object0")
+        body.extend(struct.pack("<I", OBJECT))
+        label("early_scalar")
+        body.extend(struct.pack("<I", 0x20))
     label("comparison")
     half(0x2801)
     label("guard")
@@ -62,8 +72,9 @@ def fixture(*, call=True, two_scalars=False, interleaved_scalar=False):
     half(0x6800)
     half(0x4687)
     align()
-    label("object0")
-    body.extend(struct.pack("<I", OBJECT))
+    if not early_pool:
+        label("object0")
+        body.extend(struct.pack("<I", OBJECT))
     label("pointer")
     emit("word", "table")
     label("table")
@@ -132,6 +143,8 @@ def fixture(*, call=True, two_scalars=False, interleaved_scalar=False):
                 "scalar_policy": POLICY,
                 "scalars": [[labels[f"scalar{i}"], 0x219E + i]
                             for i in range(2 if two_scalars else 1)]}
+    if early_pool:
+        manifest["scalars"].insert(0, [labels["early_scalar"], 0x20])
     mapping = [{"rom": f"0x{BASE:08X}", "end": f"0x{BASE + len(body):08X}", "mode": "thumb"},
                {"rom": f"0x{CALLEE:08X}", "end": f"0x{CALLEE + 2:08X}", "mode": "thumb"}]
     return body, labels, manifest, mapping
@@ -146,6 +159,41 @@ def verify(body, manifest, mapping, *, rom=None, objects=None):
 
 
 class RegressionTests(unittest.TestCase):
+    def test_reached_object_and_u16_pools_before_guard(self):
+        for call in (False, True):
+            with self.subTest(call=call):
+                body, labels, manifest, mapping = fixture(call=call, early_pool=True)
+                self.assertLess(labels["early_scalar"], labels["comparison"])
+                instructions, _ = verify(body, manifest, mapping)
+                objects = {offset: (name, OBJECT + addend)
+                           for offset, name, addend in manifest["data"]}
+                self.assertEqual(match.switch_u16_scalar_records(
+                    body, BASE, instructions, manifest["switch"], objects),
+                    manifest["scalars"])
+
+    def test_early_pool_requires_every_object_and_scalar_binding(self):
+        for field in ("data", "scalars"):
+            with self.subTest(field=field):
+                body, _, manifest, mapping = fixture(early_pool=True)
+                manifest[field].pop(0)
+                with self.assertRaises(ValueError):
+                    verify(body, manifest, mapping)
+
+    def test_control_flow_cannot_enter_early_literal_pool(self):
+        body, labels, manifest, mapping = fixture(early_pool=True)
+        displacement = (labels["object0"] - labels["skip_early_pool"] - 4) // 2
+        struct.pack_into("<H", body, labels["skip_early_pool"],
+                         0xE000 | (displacement & 0x7FF))
+        with self.assertRaises(ValueError):
+            verify(body, manifest, mapping)
+
+    def test_early_numeric_pool_still_requires_explicit_u16_policy(self):
+        body, _, manifest, mapping = fixture(early_pool=True)
+        manifest.pop("scalar_policy")
+        manifest.pop("scalars")
+        with self.assertRaisesRegex(ValueError, "complete switch-data literal-word coverage"):
+            verify(body, manifest, mapping)
+
     def test_explicit_u16_scalar_member_offset(self):
         body, _, manifest, mapping = fixture()
         _, summary = verify(body, manifest, mapping)

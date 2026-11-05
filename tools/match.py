@@ -1931,17 +1931,17 @@ def switch_layout(data, address, relocations, data_relocations=None, *, interpos
             raise ValueError("switch-data requires a finite nonempty object-word manifest")
         for offset, binding in data_relocations.items():
             if type(offset) is not int or offset < 0 or offset + 4 > len(data) or \
-                    (offset not in (literal - 8, literal - 4) and offset < table_end) or \
+                    literal <= offset < table_end or \
                     (address + offset) % 4 or not isinstance(binding, (tuple, list)) or \
                     len(binding) != 2 or not isinstance(binding[0], str) or \
                     type(binding[1]) is not int or not 0 <= binding[1] <= 0xFFFFFFFF or \
                     address <= binding[1] < address + len(data) or \
                     struct.unpack_from("<I", data, offset)[0] != binding[1]:
                 raise ValueError("invalid interposed switch-data object word")
-        before = sorted(offset for offset in data_relocations if offset < literal)
-        if before != list(range(literal - 4 * len(before), literal, 4)):
-            raise ValueError("interposed switch-data object words must be adjacent to the table pointer")
-        object_words_before_table = len(before)
+        # Only the contiguous suffix belongs to the dispatch's adjacent pool.
+        # Earlier pools have their own reached PC loads and CFG ownership checks.
+        while literal - 4 * (object_words_before_table + 1) in data_relocations:
+            object_words_before_table += 1
     decoder = Cs(CS_ARCH_ARM, CS_MODE_THUMB)
     decoder.detail = True
 
@@ -2050,8 +2050,9 @@ def switch_u16_scalar_records(data, address, instructions, descriptor, data_relo
     table_end = descriptor["table"] + 4 * (descriptor["bound"] + 1)
     for literal in sorted(reached - known):
         offset = literal - address
-        if literal % 4 or offset < table_end or offset + 4 > len(data):
-            raise ValueError("u16 scalar word must be aligned, complete and after the switch table")
+        if literal % 4 or offset < 0 or descriptor["literal"] <= offset < table_end or \
+                offset + 4 > len(data):
+            raise ValueError("u16 scalar word must be aligned, complete and outside the switch table")
         value = struct.unpack_from("<I", data, offset)[0]
         if value > 0xFFFF:
             raise ValueError("switch scalar policy admits only u16 literal values")
@@ -2129,7 +2130,8 @@ def verify_switches(data, address, rom, mapping, manifest, *, data_mapping=None)
             if not isinstance(record, list) or len(record) != 2:
                 raise ValueError("invalid u16 scalar word record")
             offset, value = record
-            if type(offset) is not int or offset <= previous or offset < table_end or \
+            if type(offset) is not int or offset <= previous or offset < 0 or \
+                    descriptor["literal"] <= offset < table_end or \
                     (address + offset) % 4 or offset + 4 > len(data) or \
                     type(value) is not int or not 0 <= value <= 0xFFFF or \
                     offset in relocations or offset in data_relocations or \
