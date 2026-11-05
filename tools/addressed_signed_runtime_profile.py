@@ -58,12 +58,14 @@ BIOS_READONLY_THREE_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-three-w
 BIOS_READONLY_FOUR_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-four-words-data-v1'
 BIOS_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-function-literals-data-v1'
 BIOS_SCALAR_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-function-literals-data-v1'
-FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, *FUNCTION_DATA_SELECTORS)
+BIOS_ORDINARY_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-ordinary-function-literals-data-v1'
+FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR,
+                           BIOS_ORDINARY_FUNCTION_DATA_SELECTOR)
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR = 'addressed-native-bios-ordinary-readonly-two-words-data-v1'
-BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR)
+BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_ORDINARY_FUNCTION_DATA_SELECTOR)
 BIOS_ORDINARY_CONTRACT = ('exact CpuSet SWI0B returning wrapper under conditional ordinary '
                           'r4-r11/SP preserving ABI; all arguments have no local stack provenance; '
                           'typed named object identity only; no BIOS memory effects, source or '
@@ -93,7 +95,8 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
                         'no callback numeric, buffer, memory or termination equivalence facts')
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
-SCHEMAS = {BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-saved-scalar-control-numeric-mmio-data-v1',
+SCHEMAS = {BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-function-literals-data-v1',
+            BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-saved-scalar-control-numeric-mmio-data-v1',
             BIOS_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-numeric-mmio-data-v1',
             BIOS_READONLY_FOUR_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-four-words-data-v1',
             BIOS_SCALAR_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-function-literals-data-v1',
