@@ -3802,7 +3802,35 @@
           "who": "sol-080033C8-1609"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "58ca18e1231f908df1adcf35f399eac0d88ef13be896cf5ac7cccb68c35308c6",
+        "acknowledged_cursor": 6661826620,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "58ca18e1231f908df1adcf35f399eac0d88ef13be896cf5ac7cccb68c35308c6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080033C8\",\"who\":\"sol-080033C8-1609\",\"claim_id\":6661697551,\"reason\":\"Original native1611 MATCH plausible complete72B under published corrected documented-MMIO polling policy. Prior native1600 false-positive rejection retained immutable. One new-context native, no successful replay; all167 and original ET_REL/FUNC preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T15:23:54Z",
+          "id": 6661826620,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T15:23:54Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "84c487d70e25ad9efe4b3b2ff3c694b87a5019c010e90b40a7e4fe69413c3e48",
+        "result": {
+          "address": "0x080033C8",
+          "claim_id": 6661697551,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6661826620,
+          "status": "accepted",
+          "who": "sol-080033C8-1609"
+        }
+      }
     },
     {
       "claim": {
