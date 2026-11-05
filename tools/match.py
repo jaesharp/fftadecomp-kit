@@ -4200,6 +4200,7 @@ def main():
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
                                                       "named-data-buffer-v1",
+                                                      "bounded-buffer-discarded-return-scratch-v1",
                                                       "static-callback-buffer-v1",
                                                       "static-callback-unwritten-r7-v1",
                                                       "static-callback-restoring-r6-v1",
