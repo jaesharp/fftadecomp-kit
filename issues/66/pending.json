@@ -3802,7 +3802,35 @@
           "who": "sol-08030200-1466"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "495b4dd03ac7f36df223c944cca5dfa49711eb36a1b2466ece21a07a588fc3dd",
+        "acknowledged_cursor": 6658204678,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "495b4dd03ac7f36df223c944cca5dfa49711eb36a1b2466ece21a07a588fc3dd",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08030200\",\"who\":\"sol-08030200-1466\",\"claim_id\":6657586472,\"reason\":\"Twelve distinct original natural C compiler diagnostics retained. Best complete3148B versus3152B with710 versus711 reached instructions. Residual reset operand lifetime unresolved; zero native/proof. All167 inputs and consumed references/runtime unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T12:39:20Z",
+          "id": 6658204678,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T12:39:20Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "29d66783f8bf85ca04185ac2b2a6bcc51e511b85179c3079bd24768ae8c50fc6",
+        "result": {
+          "address": "0x08030200",
+          "claim_id": 6657586472,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6658204678,
+          "status": "accepted",
+          "who": "sol-08030200-1466"
+        }
+      }
     },
     {
       "claim": {
