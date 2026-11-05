@@ -12,8 +12,11 @@ SCHEMA = 'elf-symbol-thumb-named-data-buffer-calls-v1'
 SCRATCH_SELECTOR = 'bounded-buffer-discarded-return-scratch-v1'
 SCRATCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-discarded-return-scratch-v1'
 SCRATCH_CONTROL_FLOW = 'bounded buffer calls with exact unobserved R2/R3 normal-return scratch'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA)
+BIOS_SQRT_SELECTOR = 'bounded-buffer-bios-sqrt-scratch-v1'
+BIOS_SQRT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-bios-sqrt-scratch-v1'
+BIOS_SQRT_CONTROL_FLOW = 'bounded buffer calls with an exact scalar BIOS Sqrt wrapper and killed return scratch'
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -196,3 +199,101 @@ class DiscardedReturnScratchProof(NamedDataBufferProof):
                 Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                 for name in producers},
             observations=[self._scratch_returns[key] for key in sorted(self._scratch_returns)])
+
+
+class BiosSqrtScratchProof(DiscardedReturnScratchProof):
+    """An explicit conditional scalar ABI for one exact two-instruction wrapper."""
+
+    wrapper_bytes = b'\x08\xdf\x70\x47'
+    bios_contract = (
+        'conditional compatible BIOS service 8 normal-return ABI: R0 is a scalar '
+        'input and scalar result, no memory access or pointer result, R4-R11/SP '
+        'are preserved; R1-R3 may be clobbered and must each be killed on every '
+        'consumer path before any observation or normal return; no numerical '
+        'Sqrt equivalence, BIOS implementation, physical memory, initialization, '
+        'nonalias or termination theorem')
+
+    def __init__(self, rom, mapping, index, objects):
+        super().__init__(rom, mapping, index, objects)
+        self._bios_calls = {}
+
+    def check_arguments(self, address, arguments, stack, incoming, protected,
+                        *, constants=None, site=None, **context):
+        offset = address - match.ROM_BASE
+        prefix = self.rom[offset:offset + 2] if offset >= 0 else b''
+        if len(prefix) != 2 or prefix[1] != 0xdf:
+            return super().check_arguments(address, arguments, stack, incoming,
+                protected, constants=constants, site=site, **context)
+        data = self.span(address)
+        if data != self.wrapper_bytes:
+            raise ValueError('BIOS Sqrt requires exact complete svc #8; bx lr wrapper')
+        scratch = {match.ARM_REG_R0 + n for n in (1, 2, 3)}
+        if set(arguments) - scratch:
+            raise ValueError('BIOS Sqrt requires scalar R0 and excludes control-register aliases')
+        if context.get('words'):
+            raise ValueError('BIOS Sqrt excludes word-provenance composition')
+        # The exact wrapper never reads SP or memory. Incoming pointer slots
+        # remain untouched under this explicit memory-free BIOS ABI premise.
+        for value in (*arguments.values(), *incoming.values()):
+            self.validate_pointer_value(value, stack)
+        if type(site) is not int:
+            raise ValueError('BIOS Sqrt requires an actual direct consumer call site')
+        owners = [row for row in self.entries
+                  if int(row['rom'], 16) <= site < int(row['end'], 16)]
+        if len(owners) != 1:
+            raise ValueError('BIOS Sqrt requires one complete consumer')
+        consumer = int(owners[0]['rom'], 16)
+        consumer_data = match.BufferCallProof.span(self, consumer)
+        if len(consumer_data) > MAX_BYTES:
+            raise ValueError('BIOS Sqrt consumer exceeds bounded owner size')
+        validate_owner(consumer_data, consumer, self.rom, self.mapping, self.index)
+        import owner_admission_profile as owner
+        refinement = owner.refine(consumer_data, consumer, self.mapping)
+        ins, edges, branches, calls, words = graph.graph(consumer_data, consumer, refinement)
+        if branches or words or calls.get(site) != address:
+            raise ValueError('BIOS Sqrt differs from the exact ordinary consumer call')
+        pending = [(site + ins[site].size, frozenset(scratch))]
+        seen = set()
+        while pending:
+            current, live = pending.pop()
+            if (current, live) in seen:
+                continue
+            if len(seen) >= 4096:
+                raise ValueError('BIOS Sqrt continuation state budget exceeded')
+            seen.add((current, live))
+            instruction = ins[current]
+            read, written = instruction.regs_access()
+            if set(read) & live or current in calls and live:
+                raise ValueError('consumer observes BIOS Sqrt scratch before a killing write')
+            live -= set(written)
+            if live and not edges[current]:
+                raise ValueError('BIOS Sqrt scratch reaches normal return before a killing write')
+            pending.extend((target, live) for target in edges[current] if live)
+        self.dependencies[address] = data
+        self.records[address] = dict(address=address, end=address + len(data),
+            bytes=len(data), body_sha256=hashlib.sha256(data).hexdigest(),
+            structure=dict(kind='exact-scalar-bios-sqrt-wrapper-v1', instructions=2,
+                           bytes_hex=data.hex(), conditional_ABI=self.bios_contract),
+            **self.identities)
+        receipt = dict(address=address, call_site=site, consumer=consumer,
+            consumer_sha256=hashlib.sha256(consumer_data).hexdigest(),
+            partition=graph.partition(consumer_data, consumer, refinement, ins, words),
+            incoming_aliases=[[r-match.ARM_REG_R0, v] for r, v in sorted(arguments.items())],
+            untouched_incoming_slots=sorted(incoming.items()),
+            protected_slots=sorted(protected),
+            killed_registers=[1, 2, 3], continuation_states=len(seen))
+        self._bios_calls[json.dumps(receipt, sort_keys=True)] = receipt
+        return self.word_result({}, {})
+
+    def bios_manifest(self):
+        from pathlib import Path
+        import importlib
+        producers = ('named_data_buffer_profile', 'owner_admission_profile',
+                     'owner_graph_profile', 'analyze', 'inert_spin_profile',
+                     'local_long_branch_profile', 'match')
+        return dict(schema='exact-scalar-bios-sqrt-conditional-abi-v1',
+            wrapper_hex=self.wrapper_bytes.hex(), contract=self.bios_contract,
+            source_sha256={name+'.py': hashlib.sha256(
+                Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
+                for name in producers},
+            observations=[self._bios_calls[key] for key in sorted(self._bios_calls)])
