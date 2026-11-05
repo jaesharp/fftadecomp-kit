@@ -3802,7 +3802,35 @@
           "who": "sol-080BD7D4-1744"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "9defdd73065c1ac65b8f2db38a34459878985cc9307dda6a1165e5d075545100",
+        "acknowledged_cursor": 6665778172,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9defdd73065c1ac65b8f2db38a34459878985cc9307dda6a1165e5d075545100",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080BD7D4\",\"who\":\"sol-080BD7D4-1744\",\"claim_id\":6665363707,\"reason\":\"Three grounded movement/turn forms retained274/266/248B versus246B target; no independent next form. Zero native.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T18:21:45Z",
+          "id": 6665778172,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T18:21:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5a4ff30fe289245034ff492cef0401dafe44445e20fdbd081cbcd80faa0b4e2b",
+        "result": {
+          "address": "0x080BD7D4",
+          "claim_id": 6665363707,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6665778172,
+          "status": "accepted",
+          "who": "sol-080BD7D4-1744"
+        }
+      }
     },
     {
       "claim": {
@@ -3834,7 +3862,35 @@
           "who": "sol-080DE818-1744"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "757508d73acc60763ad464c66d6645f6e461ad4fa5e90cb0773df10f650329b7",
+        "acknowledged_cursor": 6665778172,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "757508d73acc60763ad464c66d6645f6e461ad4fa5e90cb0773df10f650329b7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DE818\",\"who\":\"sol-080DE818-1744\",\"claim_id\":6665364013,\"reason\":\"First native exit0 plausible256/256B113/113instructions from complete genuine same-native linked FUNC. Old167+47refs and new167+97refs separately unchanged, no replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T18:21:44Z",
+          "id": 6665777700,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T18:21:44Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5a4ff30fe289245034ff492cef0401dafe44445e20fdbd081cbcd80faa0b4e2b",
+        "result": {
+          "address": "0x080DE818",
+          "claim_id": 6665364013,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6665777700,
+          "status": "accepted",
+          "who": "sol-080DE818-1744"
+        }
+      }
     },
     {
       "claim": {
