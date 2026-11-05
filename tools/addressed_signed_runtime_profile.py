@@ -59,6 +59,7 @@ BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR = 'addressed-native-bios-fill-saved-scalar-
 NUMERIC_MMIO_SELECTORS = (BIOS_SCALAR_MMIO_DATA_SELECTOR, BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR)
 BIOS_R2_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-r2-callback-data-v1'
 BIOS_READONLY_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-word0-data-v1'
+BIOS_READONLY_TWO_SELECTOR = 'addressed-native-bios-fill-readonly-two-words-v1'
 BIOS_READONLY_THREE_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-three-words-data-v1'
 BIOS_READONLY_FOUR_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-four-words-data-v1'
 BIOS_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-function-literals-data-v1'
@@ -66,7 +67,7 @@ BIOS_SCALAR_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-
 BIOS_ORDINARY_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-ordinary-function-literals-data-v1'
 FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR,
                            BIOS_ORDINARY_FUNCTION_DATA_SELECTOR)
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, *NUMERIC_MMIO_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DATA_SELECTOR)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR = 'addressed-native-bios-ordinary-readonly-two-words-data-v1'
@@ -101,6 +102,7 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
 SCHEMAS = {COMPILER_DATA_SELECTOR: COMPILER_DATA_SCHEMA,
+            BIOS_READONLY_TWO_SELECTOR: 'elf-symbol-thumb-addressed-native-bios-fill-readonly-two-words-v1',
             COMPILER_MMIO_DATA_SELECTOR: COMPILER_MMIO_DATA_SCHEMA,
             BIOS_ORDINARY_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-function-literals-data-v1',
             BIOS_SAVED_SCALAR_MMIO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-saved-scalar-control-numeric-mmio-data-v1',
@@ -180,7 +182,7 @@ def context_selector(context):
             return READONLY_SELECTOR
         if len(context) == 6 and type(context[5]) is str and context[5] == READONLY_TWO_SELECTOR:
             return READONLY_TWO_SELECTOR
-        if len(context) == 6 and type(context[5]) is str and context[5] in (UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
+        if len(context) == 6 and type(context[5]) is str and context[5] in (UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
             return context[5]
         if len(context) == 8 and type(context[5]) is str and context[5] in DATA_SELECTORS:
             return context[5]
@@ -628,9 +630,10 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         if selector == BIOS_READONLY_DATA_SELECTOR:
             import readonly_entry_stack_profile as incoming
             zero_policy['entry_stack_policy'] = {'schema': incoming.SCHEMA, 'words': [0]}
-        if selector in (BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR):
+        if selector in (BIOS_READONLY_TWO_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR):
             import readonly_entry_stack_words_profile as incoming
-            zero_policy['entry_stack_policy'] = {'schema': incoming.SCHEMA, 'words': list(range(4 if selector == BIOS_READONLY_FOUR_DATA_SELECTOR else 3))}
+            count = 2 if selector == BIOS_READONLY_TWO_SELECTOR else 4 if selector == BIOS_READONLY_FOUR_DATA_SELECTOR else 3
+            zero_policy['entry_stack_policy'] = {'schema': incoming.SCHEMA, 'words': list(range(count))}
         if selector == BUFFER_SCRATCH_SELECTOR:
             import zero_index_stack_profile as zero_index
             zero_policy['zero_index_profile'] = zero_index.SELECTOR
@@ -638,7 +641,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
             stack_aliases=True, buffer_proof=buffer_proof, **zero_policy)
         if selector == BIOS_READONLY_DATA_SELECTOR and not restored['entry_stack']['reads']:
             raise ValueError('BIOS incoming word selector requires actual checked word0 reads')
-        if selector in (BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR) and not restored['entry_stack']['reads']:
+        if selector in (BIOS_READONLY_TWO_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR) and not restored['entry_stack']['reads']:
             raise ValueError('BIOS incoming words selector requires actual checked declared word reads')
         if not buffer_proof.dependencies:
             raise ValueError('addressed buffer selector requires an actual inspected buffer callee')
@@ -658,7 +661,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         modules += (zero_index,)
     if selector in UNSIGNED_CAPABLE_SELECTORS:
         modules += (unsigned_remainder,)
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, INTEGER_READONLY_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, INTEGER_READONLY_SELECTOR, BIOS_READONLY_TWO_SELECTOR):
         modules += (incoming,)
     pins = {Path(module.__file__).name: sha(Path(module.__file__).read_bytes()) for module in modules}
     pins[Path(__file__).name] = sha(Path(__file__).read_bytes())
@@ -759,7 +762,7 @@ def verify(data, address, rom, mapping, index, calls, bindings, manifest=None, *
         raise ValueError('unknown addressed signed runtime selector')
     observed = {}
     context = (rom, mapping, index, bindings, observed)
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
         context += (selector,)
     elif selector in DATA_SELECTORS:
         context += (selector, data_mapping, data_bindings)
@@ -1027,7 +1030,7 @@ def build(root, address, args=None, expected=None, *, selector=SELECTOR):
     fixed_configuration(args)
     if selector not in SCHEMAS:
         raise ValueError('unknown addressed signed runtime selector')
-    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) else None
+    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) else None
     producers = data_producer_fingerprint(selector) if selector in DATA_SELECTORS else None
     source,mapping,index = source_fingerprint(root,address),mapping_snapshot(root),index_snapshot(root)
     objects,selected_rom = data_snapshot(root),report_rom_path(root)
@@ -1082,7 +1085,7 @@ def render(result):
     selector = next((key for key,value in SCHEMAS.items() if value == result['manifest']['schema']),None)
     if selector is None:
         raise ValueError('unknown addressed signed runtime manifest schema')
-    premise = [] if selector not in (BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR) else [
+    premise = [] if selector not in (BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_READONLY_FOUR_DATA_SELECTOR, READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR) else [
         '* incoming stack ABI: ' + result['manifest']['frame']['entry_stack']['contract']]
     if selector in DATA_SELECTORS:
         premise.append('* named data binding: ' + result['manifest']['data_contract'])
@@ -1156,7 +1159,7 @@ def report_matches(report, root, address):
                 saved['rom_sha256'] != sha(Path(report_rom_path(root)).read_bytes()) or \
                 saved['toolchain'] != toolchain_fingerprint():
             return False
-        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
+        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, BIOS_SELECTOR, BIOS_READONLY_TWO_SELECTOR, BIOS_ORDINARY_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
             return False
         return render(build(root,address,expected=saved['manifest'],selector=selector)) == report
     except (OSError,ValueError,KeyError,TypeError,IndexError,RuntimeError,subprocess.SubprocessError):
