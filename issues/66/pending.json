@@ -3898,7 +3898,35 @@
           "who": "sol-080F244C-1840"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "98a129febbad2d157b7eef339e5f6bc80b5e347d246463d384c833f67e841eb9",
+        "acknowledged_cursor": 6668509528,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "98a129febbad2d157b7eef339e5f6bc80b5e347d246463d384c833f67e841eb9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F244C\",\"who\":\"sol-080F244C-1840\",\"claim_id\":6668245686,\"reason\":\"Frozen diagnostic closure: no new independently grounded C form beyond retained instruction scheduling mismatch; no compiler or native execution in this lease.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T20:29:05Z",
+          "id": 6668509528,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T20:29:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c606aca7354e987d5a19dfbb680de43d3feed60f6bdc240aa77f916dc313070d",
+        "result": {
+          "address": "0x080F244C",
+          "claim_id": 6668245686,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6668509528,
+          "status": "accepted",
+          "who": "sol-080F244C-1840"
+        }
+      }
     },
     {
       "claim": {
