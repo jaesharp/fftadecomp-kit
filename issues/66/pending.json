@@ -3742,7 +3742,35 @@
           "who": "sol-0800FC04-1624"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3030aef5cc7af79ec3519ff85cde17fcb31d29dd0ab071384e9df2f61e58c153",
+        "acknowledged_cursor": 6662405300,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3030aef5cc7af79ec3519ff85cde17fcb31d29dd0ab071384e9df2f61e58c153",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800FC04\",\"who\":\"sol-0800FC04-1624\",\"claim_id\":6661972854,\"reason\":\"One grounded nested record diagnostic144B vs136B target; both actual member offsets live adds saved registers. Authentic callback remains function identity, no proposed data substitution. Originals retained,0native, fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T15:48:05Z",
+          "id": 6662405300,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T15:48:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "aa538d487ef4fba0c64801ee88094b70f1aaa1e8cffd9c79b92e856c8e330af8",
+        "result": {
+          "address": "0x0800FC04",
+          "claim_id": 6661972854,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6662405300,
+          "status": "accepted",
+          "who": "sol-0800FC04-1624"
+        }
+      }
     },
     {
       "claim": {
