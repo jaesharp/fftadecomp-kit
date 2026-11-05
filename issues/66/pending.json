@@ -3742,7 +3742,35 @@
           "who": "sol-0800D95C-1890"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "bb7f18c489340a88f38e2d3eb57c28fbd30243997c21fb82a76adb8e97095ce5",
+        "acknowledged_cursor": 6669901852,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bb7f18c489340a88f38e2d3eb57c28fbd30243997c21fb82a76adb8e97095ce5",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800D95C\",\"who\":\"sol-0800D95C-1890\",\"claim_id\":6669461450,\"reason\":\"Complete132B native MATCH with plausible unchanged C and new explicit two-incoming-word bounded BIOS fill profile. One native/compiler, genuine original ET_REL/linked ELF/FUNC retained; original167+native167 unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T21:22:59Z",
+          "id": 6669901852,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T21:22:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8fbc0561ef36a0c0ab914f013738cde3b0fcc3067d18fd4abc1f0ca7cc4e986c",
+        "result": {
+          "address": "0x0800D95C",
+          "claim_id": 6669461450,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6669901852,
+          "status": "accepted",
+          "who": "sol-0800D95C-1890"
+        }
+      }
     },
     {
       "claim": {
@@ -3774,7 +3802,35 @@
           "who": "sol-0800AF04-1890"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d29dccb97e1e762801b83d8d50fa60f39b970c5b84828050b51c5a1015da29f8",
+        "acknowledged_cursor": 6669901852,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d29dccb97e1e762801b83d8d50fa60f39b970c5b84828050b51c5a1015da29f8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800AF04\",\"who\":\"sol-0800AF04-1890\",\"claim_id\":6669461611,\"reason\":\"Complete134B diagnostic exact privately preserved; scratch return alias admission prerequisite unresolved. No native MATCH claimed; source matching stopped pending separately qualified context.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T21:22:14Z",
+          "id": 6669886800,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T21:22:14Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8fbc0561ef36a0c0ab914f013738cde3b0fcc3067d18fd4abc1f0ca7cc4e986c",
+        "result": {
+          "address": "0x0800AF04",
+          "claim_id": 6669461611,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6669886800,
+          "status": "accepted",
+          "who": "sol-0800AF04-1890"
+        }
+      }
     },
     {
       "claim": {
