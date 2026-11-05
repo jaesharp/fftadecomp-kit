@@ -3834,7 +3834,35 @@
           "who": "sol-0813D6A0-1831"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "bf521a9f6b4e4683f7e542935693bfc2237f71878a24f5d4c4876e9b6eaf20b2",
+        "acknowledged_cursor": 6668401218,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bf521a9f6b4e4683f7e542935693bfc2237f71878a24f5d4c4876e9b6eaf20b2",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0813D6A0\",\"who\":\"sol-0813D6A0-1831\",\"claim_id\":6667886797,\"reason\":\"Three natural forms, best complete1104B versus1116B; discarded RAM loads and case2 allocation remain without grounded correction. Originals frozen, zero native/proof/MATCH credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T20:23:40Z",
+          "id": 6668401218,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T20:23:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "15461015948a3ac212bbdf286d922f2afe9f378440d43ade5ec3dd5081e5337d",
+        "result": {
+          "address": "0x0813D6A0",
+          "claim_id": 6667886797,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6668401218,
+          "status": "accepted",
+          "who": "sol-0813D6A0-1831"
+        }
+      }
     },
     {
       "claim": {
