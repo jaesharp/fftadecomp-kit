@@ -3742,7 +3742,35 @@
           "who": "sol-08146264-1702"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "786bd121c9c0e9029a803fc5c27a57bf390e25cce07bfb9224f106d3844a9d92",
+        "acknowledged_cursor": 6664589710,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "786bd121c9c0e9029a803fc5c27a57bf390e25cce07bfb9224f106d3844a9d92",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08146264\",\"who\":\"sol-08146264-1702\",\"claim_id\":6664428465,\"reason\":\"Three grounded original diagnostics retained, best new32B versus30B target. Corrected packed layout still differs in flag loads and return frame; zero native, no independently grounded next form; fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-05T17:24:32Z",
+          "id": 6664589710,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T17:24:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e8c3d2a9e94b4d6c8c6299352c946eebf975d28c164cfdafcf48cb23de680fac",
+        "result": {
+          "address": "0x08146264",
+          "claim_id": 6664428465,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6664589710,
+          "status": "accepted",
+          "who": "sol-08146264-1702"
+        }
+      }
     },
     {
       "claim": {
