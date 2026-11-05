@@ -51,7 +51,8 @@ BIOS_DATA_SELECTOR = 'addressed-native-bios-fill-buffer-data-v1'
 BIOS_SCALAR_DATA_SELECTOR = 'addressed-native-bios-fill-scalar-control-data-v1'
 BIOS_R2_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-r2-callback-data-v1'
 BIOS_READONLY_DATA_SELECTOR = 'addressed-native-bios-fill-readonly-word0-data-v1'
-BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR)
+BIOS_FUNCTION_DATA_SELECTOR = 'addressed-native-bios-fill-function-literals-data-v1'
+BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_FUNCTION_DATA_SELECTOR)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
 BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
@@ -72,7 +73,7 @@ INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_S
 UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
                              UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
-DATA_SELECTORS = (BIOS_READONLY_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
                   BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
@@ -84,7 +85,8 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
                         'no callback numeric, buffer, memory or termination equivalence facts')
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
-SCHEMAS = {BIOS_R2_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-r2-callback-data-v1',
+SCHEMAS = {BIOS_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-function-literals-data-v1',
+            BIOS_R2_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-r2-callback-data-v1',
             BIOS_READONLY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-word0-data-v1',
             BIOS_ORDINARY_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-v1',
             BIOS_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-data-v1',
@@ -181,16 +183,36 @@ def object_value(name, addend, objects, entries, address, size):
     return value
 
 
-def data_literals(data, address, rom, mapping, objects, records):
+def function_literal(name, selector):
+    return selector == BIOS_FUNCTION_DATA_SELECTOR and isinstance(name, str) and \
+        re.fullmatch(r'func_[0-9A-F]{8}', name) is not None
+
+
+def data_literals(data, address, rom, mapping, objects, records, *, selector=DATA_SELECTOR):
     import match
     if type(objects) is not bytes or type(records) is not list or not records:
         raise ValueError('addressed data requires an actual typed data snapshot and bindings')
     # Calls are authenticated separately by prepare; do not send reserved runtime
     # names through the ordinary function-address validator.
+    functions, data_records = [], []
+    for row in records:
+        if not isinstance(row, (list, tuple)) or len(row) != 3:
+            raise ValueError('addressed literal requires its complete typed binding')
+        offset, name, addend = row
+        if function_literal(name, selector):
+            if type(addend) is not int or addend != 0:
+                raise ValueError('function literals require their exact Thumb entry without an addend')
+            functions.append([offset, name])
+        else:
+            data_records.append(list(row))
+    if selector == BIOS_FUNCTION_DATA_SELECTOR and not functions:
+        raise ValueError('BIOS function-literal selector requires an actual typed function literal')
     calls, literals = match.function_address_bindings(data, address, rom, mapping, objects,
-        {'calls': [], 'data': records, 'functions': []}, allow_empty_functions=True)
+        {'calls': [], 'data': data_records, 'functions': functions}, allow_empty_functions=True)
     parsed, entries = match.parse_data_symbols(objects), json.loads(mapping)
-    for offset, name, addend in records:
+    if any(name in parsed for _, name in functions):
+        raise ValueError('function literal cannot also have an object identity')
+    for offset, name, addend in data_records:
         value = object_value(name, addend, parsed, entries, address, len(data))
         if literals[offset] != (name, value):
             raise ValueError('addressed data lost its typed object identity')
@@ -445,7 +467,7 @@ def prepare(data, address, calls, context):
     rom, mapping, index, bindings, _ = context[:5]
     entries = owner.validate_span(data, address, rom, mapping, index)
     if selector in DATA_SELECTORS:
-        data_literals(data, address, rom, mapping, context[6], context[7])
+        data_literals(data, address, rom, mapping, context[6], context[7], selector=selector)
     if selector in CALLBACK_SELECTORS:
         callback_dependencies(rom, mapping, index, selector)
         if match.function_thunk.ALIASES[callback_alias(selector)] not in calls.values():
@@ -504,7 +526,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     selector = context_selector(context)
     scalar_controls = []
     if selector in DATA_SELECTORS:
-        literals = data_literals(data, address, context[0], context[1], context[6], context[7])
+        literals = data_literals(data, address, context[0], context[1], context[6], context[7], selector=selector)
         match.verify_data_literals(instructions.values(), address, literals)
         if selector == BIOS_SCALAR_DATA_SELECTOR:
             from bios_cpuset_fill_profile import scalar_control_words
@@ -628,6 +650,12 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
     if selector in DATA_SELECTORS:
         context[4].update(data_bindings=[list(row) for row in context[7]],
             data_contract=DATA_CONTRACT)
+    if selector == BIOS_FUNCTION_DATA_SELECTOR:
+        context[4].update(function_literal_bindings=[list(row[:2]) for row in context[7]
+            if function_literal(row[1], selector)],
+            data_contract='Separate typed ABS32 named objects and exact unique indexed Thumb function entries; '
+                'function literals are not objects or proof of a callback signature, invocation, return, '
+                'memory effects, physical readability, allocation or C semantic equivalence.')
     if selector in CALLBACK_SELECTORS:
         context[4]['callback'] = dict(
             contract=R3_CALLBACK_CONTRACT if selector == R3_CALLBACK_SELECTOR else CALLBACK_CONTRACT,
@@ -721,15 +749,22 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
             target_symbol = symbols[info >> 8]
             name = target_symbol['name']
             if info & 255 == 2:
+                callable_literal = function_literal(name, selector)
                 if (address + offset) % 4 or target_symbol['section'] or target_symbol['value'] or \
                         target_symbol['size'] or target_symbol['bind'] != 1 or \
-                        target_symbol['type'] not in (0, 1) or \
+                        target_symbol['type'] not in ((0, 2) if callable_literal else (0, 1)) or \
                         sum(item['name'] == name for item in image['symbols']) != 1:
-                    raise ValueError('addressed ABS32 requires an aligned unique undefined global object')
+                    raise ValueError('addressed ABS32 requires an aligned unique undefined global with its exact type')
                 addend = struct.unpack_from('<i', image['text'], offset)[0]
-                object_value(name, addend, objects, entries, address, symbol['size'])
+                if callable_literal:
+                    if addend != 0 or name in objects:
+                        raise ValueError('function literal cannot have an addend or an object identity')
+                    target = match.function_address_target(name, entries, address, symbol['size'], len(rom))
+                else:
+                    object_value(name, addend, objects, entries, address, symbol['size'])
+                    target = objects[name]
                 data_relocations[offset] = (name, addend)
-                targets[name] = objects[name]
+                targets[name] = target
                 occupied.update(range(offset, offset+4))
                 continue
             if target_symbol['section'] or target_symbol['value'] or target_symbol['bind'] != 1 or \
@@ -764,7 +799,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
     return calls, bindings, targets
 
 
-def linked_bytes(original, linked, address, calls, targets, *, data_relocations=None):
+def linked_bytes(original, linked, address, calls, targets, *, data_relocations=None, function_literals=()):
     import match
     if linked['type'] != 2 or linked['relocations']:
         raise ValueError('addressed runtime link requires executable ELF without relocations')
@@ -780,7 +815,12 @@ def linked_bytes(original, linked, address, calls, targets, *, data_relocations=
     if data_relocations is not None and (type(data_relocations) is not dict or not data_relocations):
         raise ValueError('addressed data linker requires actual original bindings')
     data_relocations = data_relocations or {}
-    data_names = {record[0] for record in data_relocations.values()}
+    function_literals = frozenset(function_literals)
+    if not function_literals <= {record[0] for record in data_relocations.values()} or any(
+            not re.fullmatch(r'func_[0-9A-F]{8}', name) or name not in targets
+            for name in function_literals):
+        raise ValueError('linked function literals require their original canonical bindings')
+    data_names = {record[0] for record in data_relocations.values()} - function_literals
     functions = [item['name'] for item in linked['symbols'] if item['type'] == 2]
     objects = [item['name'] for item in linked['symbols'] if item['type'] == 1]
     expected_functions = {name} | (set(targets) - data_names)
@@ -811,7 +851,9 @@ def linked_bytes(original, linked, address, calls, targets, *, data_relocations=
                 target_name not in targets or occupied.intersection(range(offset,offset+4)) or \
                 struct.unpack_from('<i', original['text'], offset)[0] != addend or \
                 not 0 <= targets[target_name]+addend <= 0xFFFFFFFF or \
-                struct.unpack_from('<I', linked['text'], offset)[0] != targets[target_name]+addend:
+                target_name in function_literals and addend != 0 or \
+                struct.unpack_from('<I', linked['text'], offset)[0] != \
+                    ((targets[target_name] | 1) if target_name in function_literals else targets[target_name]+addend):
             raise ValueError('addressed linked data differs from its original typed ABS32 addend')
         occupied.update(range(offset,offset+4))
     if any(index not in occupied and first != second for index, (first,second) in
@@ -830,7 +872,9 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, *,
         match.function_thunk.namespace(runner.read_binary(f'{workspace}/f.i').decode('utf-8'))
     calls, bindings, targets = original_bindings(original,address,rom,mapping,
         data_mapping=data_mapping if data is not None else None, data_relocations=data, selector=selector)
-    data_names = {record[0] for record in (data or {}).values()}
+    function_literals = {record[0] for record in (data or {}).values()
+                         if function_literal(record[0], selector)}
+    data_names = {record[0] for record in (data or {}).values()} - function_literals
     definitions = ['.syntax unified','.thumb']
     for name,target in sorted(targets.items()):
         if name in data_names:
@@ -856,7 +900,8 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, *,
     linked = match.elf_image(runner.read_binary(f'{workspace}/f.elf'))
     if runner.read_binary(f'{workspace}/f.linked.bin') != linked['text']:
         raise ValueError('addressed runtime objcopy differs from linked ELF text')
-    result = linked_bytes(original,linked,address,calls,targets,data_relocations=data),calls,bindings
+    result = linked_bytes(original,linked,address,calls,targets,data_relocations=data,
+                          function_literals=function_literals),calls,bindings
     if data is not None:
         result += ([[offset,name,addend] for offset,(name,addend) in sorted(data.items())],)
     return result
