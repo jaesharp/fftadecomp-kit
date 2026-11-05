@@ -58,7 +58,8 @@ FUNCTION_DATA_SELECTORS = (BIOS_FUNCTION_DATA_SELECTOR, BIOS_SCALAR_FUNCTION_DAT
 BIOS_SELECTORS = (BIOS_SELECTOR, BIOS_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, *FUNCTION_DATA_SELECTORS)
 BIOS_ORDINARY_SELECTOR = 'addressed-native-bios-ordinary-v1'
 BIOS_ORDINARY_DATA_SELECTOR = 'addressed-native-bios-ordinary-data-v1'
-BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
+BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR = 'addressed-native-bios-ordinary-readonly-two-words-data-v1'
+BIOS_ORDINARY_SELECTORS = (BIOS_ORDINARY_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR)
 BIOS_ORDINARY_CONTRACT = ('exact CpuSet SWI0B returning wrapper under conditional ordinary '
                           'r4-r11/SP preserving ABI; all arguments have no local stack provenance; '
                           'typed named object identity only; no BIOS memory effects, source or '
@@ -76,7 +77,7 @@ INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_S
 UNSIGNED_CAPABLE_SELECTORS = (*BIOS_ORDINARY_SELECTORS, *BIOS_SELECTORS, *UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
                              UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR, BIOS_R2_ORDINARY_DATA_SELECTOR)
-DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
+DATA_SELECTORS = (*FUNCTION_DATA_SELECTORS, BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_ORDINARY_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR, BIOS_SCALAR_DATA_SELECTOR, BIOS_DATA_SELECTOR, DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
                   UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
                   BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
@@ -89,6 +90,7 @@ R3_CALLBACK_CONTRACT = ('conditional returning typed source callback via canonic
 DATA_CONTRACT = ('typed named ABS32 object identity only; no physical readability, '
                  'allocation, pointee type, memory safety or C semantic facts')
 SCHEMAS = {BIOS_SCALAR_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-scalar-control-function-literals-data-v1',
+            BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-readonly-two-words-data-v1',
             BIOS_READONLY_THREE_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-readonly-three-words-data-v1',
             BIOS_FUNCTION_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-fill-function-literals-data-v1',
             BIOS_R2_ORDINARY_DATA_SELECTOR:'elf-symbol-thumb-addressed-native-bios-ordinary-r2-callback-data-v1',
@@ -241,7 +243,7 @@ def data_producer_fingerprint(selector=DATA_SELECTOR):
         paths.add(Path(importlib.import_module('bios_cpuset_fill_profile').__file__))
     if selector == BIOS_READONLY_DATA_SELECTOR:
         paths.add(Path(importlib.import_module('readonly_entry_stack_profile').__file__))
-    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR):
+    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR):
         paths.add(Path(importlib.import_module('readonly_entry_stack_words_profile').__file__))
     return {path.name: sha(path.read_bytes()) for path in sorted(paths)}
 
@@ -547,8 +549,8 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
             raise ValueError('addressed data requires exact typed coverage of reached address words')
     elif any(remainder.address_literal(row['value']) for row in partition['words']):
         raise ValueError('addressed signed runtimes exclude address literals and data bindings')
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR):
-        if selector in (READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR):
+        if selector in (READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR):
             import readonly_entry_stack_words_profile as incoming
             policy = {'schema': incoming.SCHEMA, 'words': ([0, 1, 2] if selector == INTEGER_THREE_DATA_SELECTOR else [0, 1])}
         else:
@@ -997,7 +999,7 @@ def render(result):
     selector = next((key for key,value in SCHEMAS.items() if value == result['manifest']['schema']),None)
     if selector is None:
         raise ValueError('unknown addressed signed runtime manifest schema')
-    premise = [] if selector not in (BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR) else [
+    premise = [] if selector not in (BIOS_READONLY_DATA_SELECTOR, BIOS_READONLY_THREE_DATA_SELECTOR, READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR, BIOS_ORDINARY_READONLY_TWO_DATA_SELECTOR) else [
         '* incoming stack ABI: ' + result['manifest']['frame']['entry_stack']['contract']]
     if selector in DATA_SELECTORS:
         premise.append('* named data binding: ' + result['manifest']['data_contract'])
