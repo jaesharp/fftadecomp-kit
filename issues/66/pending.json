@@ -3902,7 +3902,35 @@
           "who": "sol-08087160-1304"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "14cd91990c31984b863bcdc3376c13ae36d6faa825e2f120f96657d7e8b7592b",
+        "acknowledged_cursor": 6652581393,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "14cd91990c31984b863bcdc3376c13ae36d6faa825e2f120f96657d7e8b7592b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08087160\",\"who\":\"sol-08087160-1304\",\"claim_id\":6652492308,\"reason\":\"Three natural storage-view diagnostics retained; target includes discarded RAM-shadow loads absent in emitted forms. No forced reads or RAM volatile, zero native/MATCH, fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T07:43:16Z",
+          "id": 6652581393,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T07:43:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "70abf0d655cd79ffbc1c9f9238b8e61f6f89e2c9d09c419e3290c3f87e296b93",
+        "result": {
+          "address": "0x08087160",
+          "claim_id": 6652492308,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6652581393,
+          "status": "accepted",
+          "who": "sol-08087160-1304"
+        }
+      }
     },
     {
       "claim": {
