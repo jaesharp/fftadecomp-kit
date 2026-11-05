@@ -2498,7 +2498,15 @@ class BufferCallProof:
 
     """Check bounded buffer arguments and their aliases against the current ROM."""
 
-    def __init__(self, rom, mapping, stack_arguments=False):
+    def __init__(self, rom, mapping, stack_arguments=False, *, discarded_exit_scratch=None):
+        if discarded_exit_scratch is not None:
+            from local_long_branch_profile import validate_discarded_exit_scratch
+            validate_discarded_exit_scratch(discarded_exit_scratch)
+            if stack_arguments:
+                raise ValueError("discarded scratch is separate from stack-passed buffer aliases")
+            discarded_exit_scratch = json.loads(json.dumps(discarded_exit_scratch))
+        self.discarded_exit_scratch = discarded_exit_scratch
+        self.discarded_exit_scratch_sites = set()
         self.rom = rom
         self.entries = json.loads(mapping) if mapping is not None else []
         if not isinstance(self.entries, list):
@@ -2875,10 +2883,25 @@ class BufferCallProof:
         return False
 
     def normal_return_aliases(self, address, site, aliases):
-        return aliases
+        if self.discarded_exit_scratch is None:
+            return aliases
+        from local_long_branch_profile import validate_discarded_exit_scratch
+        validate_discarded_exit_scratch(self.discarded_exit_scratch)
+        scratch = {ARM_REG_R0 + 2, ARM_REG_R0 + 3}
+        self.discarded_exit_scratch_sites.update(
+            (address, site, register - ARM_REG_R0, offset)
+            for register, offset in aliases.items() if register in scratch)
+        return {register: offset for register, offset in aliases.items()
+                if register not in scratch}
 
     def fingerprint(self):
         digest = hashlib.sha256()
+        if self.discarded_exit_scratch is not None:
+            from local_long_branch_profile import validate_discarded_exit_scratch
+            validate_discarded_exit_scratch(self.discarded_exit_scratch)
+            digest.update(json.dumps(dict(policy=self.discarded_exit_scratch,
+                sites=sorted(self.discarded_exit_scratch_sites)),
+                sort_keys=True, separators=(",", ":")).encode())
         for address, data in sorted(self.dependencies.items()):
             digest.update(struct.pack("<II", address, len(data)))
             digest.update(data)
@@ -2983,10 +3006,12 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             raise ValueError('addressed signed runtimes require their isolated explicit Thumb context')
         addressed_dependencies = addressed_signed_runtime.prepare(
             data, address, validated_calls or {}, addressed_signed_runtime_context)
-        if addressed_signed_runtime.context_selector(addressed_signed_runtime_context) == \
-                addressed_signed_runtime.UNSIGNED_BUFFER_SELECTOR:
+        if addressed_signed_runtime.context_selector(addressed_signed_runtime_context) in \
+                addressed_signed_runtime.BUFFER_SELECTORS:
             buffer_proof = BufferCallProof(addressed_signed_runtime_context[0],
-                                          addressed_signed_runtime_context[1])
+                addressed_signed_runtime_context[1],
+                discarded_exit_scratch=addressed_signed_runtime.buffer_scratch_policy(
+                    addressed_signed_runtime.context_selector(addressed_signed_runtime_context)))
     if zero_aware_unsigned_quotient_inventory_context is not None:
         if any(value is not None for value in (remainder_inventory_context,
                 remainder_ordinary_inventory_context, remainder_shift_inventory_context,

@@ -42,6 +42,12 @@ UNSIGNED_SCHEMA = 'elf-symbol-thumb-addressed-unsigned-runtime-v1'
 UNSIGNED_DATA_SELECTOR = 'addressed-unsigned-runtime-data-v1'
 UNSIGNED_DATA_SCHEMA = 'elf-symbol-thumb-addressed-unsigned-runtime-data-v1'
 UNSIGNED_BUFFER_SELECTOR = 'addressed-unsigned-runtime-native-buffer-v1'
+BUFFER_SELECTOR = 'addressed-signed-runtime-native-buffer-v1'
+BUFFER_DATA_SELECTOR = 'addressed-signed-runtime-native-buffer-data-v1'
+UNSIGNED_BUFFER_DATA_SELECTOR = 'addressed-unsigned-runtime-native-buffer-data-v1'
+BUFFER_SCRATCH_SELECTOR = 'addressed-signed-runtime-native-buffer-zero-index-discarded-scratch-v1'
+BUFFER_SELECTORS = (BUFFER_SCRATCH_SELECTOR, BUFFER_SELECTOR, BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_SELECTOR,
+                    UNSIGNED_BUFFER_DATA_SELECTOR)
 UNSIGNED_SELECTORS = (UNSIGNED_SELECTOR, UNSIGNED_DATA_SELECTOR)
 INTEGER_SELECTOR = 'addressed-integer-runtime-v1'
 INTEGER_DATA_SELECTOR = 'addressed-integer-runtime-data-v1'
@@ -49,10 +55,12 @@ INTEGER_READONLY_SELECTOR = 'addressed-integer-runtime-readonly-word0-v1'
 INTEGER_THREE_DATA_SELECTOR = 'addressed-integer-runtime-readonly-three-words-data-v1'
 INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_SELECTOR,
                      INTEGER_THREE_DATA_SELECTOR)
-UNSIGNED_CAPABLE_SELECTORS = (*UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR)
+UNSIGNED_CAPABLE_SELECTORS = (*UNSIGNED_SELECTORS, *INTEGER_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
+                             UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR)
 DATA_SELECTORS = (DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
-                  UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR)
+                  UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR,
+                  BUFFER_DATA_SELECTOR, UNSIGNED_BUFFER_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -68,6 +76,10 @@ SCHEMAS = {SELECTOR: SCHEMA, READONLY_SELECTOR: READONLY_SCHEMA,
             CALLBACK_SELECTOR: CALLBACK_SCHEMA, R3_CALLBACK_SELECTOR: R3_CALLBACK_SCHEMA,
             UNSIGNED_SELECTOR: UNSIGNED_SCHEMA, UNSIGNED_DATA_SELECTOR: UNSIGNED_DATA_SCHEMA,
             UNSIGNED_BUFFER_SELECTOR: 'elf-symbol-thumb-addressed-unsigned-runtime-native-buffer-v1',
+            BUFFER_SELECTOR: 'elf-symbol-thumb-addressed-signed-runtime-native-buffer-v1',
+            BUFFER_SCRATCH_SELECTOR: 'elf-symbol-thumb-addressed-signed-runtime-native-buffer-zero-index-discarded-scratch-v1',
+            BUFFER_DATA_SELECTOR: 'elf-symbol-thumb-addressed-signed-runtime-native-buffer-data-v1',
+            UNSIGNED_BUFFER_DATA_SELECTOR: 'elf-symbol-thumb-addressed-unsigned-runtime-native-buffer-data-v1',
             INTEGER_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-v1',
             INTEGER_DATA_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-data-v1',
             INTEGER_READONLY_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-word0-v1',
@@ -87,6 +99,13 @@ def text(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'))
 
 
+def buffer_scratch_policy(selector):
+    if selector != BUFFER_SCRATCH_SELECTOR:
+        return None
+    from local_long_branch_profile import DISCARDED_SCRATCH_SCHEMA
+    return {'schema': DISCARDED_SCRATCH_SCHEMA, 'registers': [2, 3]}
+
+
 def context_selector(context):
     if type(context) is tuple:
         if len(context) == 5:
@@ -95,7 +114,7 @@ def context_selector(context):
             return READONLY_SELECTOR
         if len(context) == 6 and type(context[5]) is str and context[5] == READONLY_TWO_SELECTOR:
             return READONLY_TWO_SELECTOR
-        if len(context) == 6 and type(context[5]) is str and context[5] in (UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
+        if len(context) == 6 and type(context[5]) is str and context[5] in (UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
             return context[5]
         if len(context) == 8 and type(context[5]) is str and context[5] in DATA_SELECTORS:
             return context[5]
@@ -105,7 +124,8 @@ def context_selector(context):
 def operations(selector):
     if selector in INTEGER_SELECTORS:
         return dict(OPERATIONS, **UNSIGNED_OPERATIONS)
-    return UNSIGNED_OPERATIONS if selector in (*UNSIGNED_SELECTORS, UNSIGNED_BUFFER_SELECTOR) else OPERATIONS
+    return UNSIGNED_OPERATIONS if selector in (*UNSIGNED_SELECTORS, UNSIGNED_BUFFER_SELECTOR,
+                                               UNSIGNED_BUFFER_DATA_SELECTOR) else OPERATIONS
 
 
 def binds_unsigned(context, site, target):
@@ -460,19 +480,28 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
             entry_stack_policy=policy)
         if not restored['entry_stack']['reads']:
             raise ValueError('addressed readonly ABI requires actual checked incoming reads')
-    elif selector == UNSIGNED_BUFFER_SELECTOR:
+    elif selector in BUFFER_SELECTORS:
         if type(buffer_proof) is not match.BufferCallProof or buffer_proof.stack_arguments or \
-                buffer_proof.rom != context[0] or buffer_proof.entries != json.loads(context[1]):
+                buffer_proof.rom != context[0] or buffer_proof.entries != json.loads(context[1]) or \
+                buffer_proof.discarded_exit_scratch != buffer_scratch_policy(selector):
             raise ValueError('addressed buffers require their fresh exact native buffer proof')
+        zero_policy = {}
+        if selector == BUFFER_SCRATCH_SELECTOR:
+            import zero_index_stack_profile as zero_index
+            zero_policy['zero_index_profile'] = zero_index.SELECTOR
         restored = frame.prove_frame(instructions, edges, address, {}, calls,
-            stack_aliases=True, buffer_proof=buffer_proof)
+            stack_aliases=True, buffer_proof=buffer_proof, **zero_policy)
         if not buffer_proof.dependencies:
             raise ValueError('addressed buffer selector requires an actual inspected buffer callee')
         for target, body in buffer_proof.dependencies.items():
             owner.validate_span(body, target, context[0], context[1], context[2])
+        if selector == BUFFER_SCRATCH_SELECTOR and not buffer_proof.discarded_exit_scratch_sites:
+            raise ValueError('discarded scratch selector requires actual native scratch aliases')
     else:
         restored = frame.prove_frame(instructions, edges, address, {}, calls)
     modules = (match, owner, graph, frame, quotient, remainder)
+    if selector == BUFFER_SCRATCH_SELECTOR:
+        modules += (zero_index,)
     if selector in UNSIGNED_CAPABLE_SELECTORS:
         modules += (unsigned_remainder,)
     if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, INTEGER_READONLY_SELECTOR):
@@ -491,7 +520,7 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
         ordinary_calls='conditional returning r4-r11/SP preserving ABI only; no transitive callee proof',
         termination='every reached region has a checked return path; universal termination unproved',
         frame=restored, partition=partition, producer_source_sha256=pins)
-    if selector == UNSIGNED_BUFFER_SELECTOR:
+    if selector in BUFFER_SELECTORS:
         context[4]['native_buffers'] = dict(
             fingerprint=buffer_proof.fingerprint(),
             dependencies=[[target, len(body), sha(body)]
@@ -500,6 +529,16 @@ def finish(data, address, calls, context, verified, dependencies, *, buffer_proo
                      'stack-passed pointers, returned aliases or unproved escapes; '
                      'ordinary callees remain conditional returning ABI; '
                      'no initialization, physical nonalias or numeric result theorem')
+    if selector == BUFFER_SCRATCH_SELECTOR:
+        from local_long_branch_profile import DISCARDED_SCRATCH_CONTRACT
+        context[4]['native_buffers'].update(
+            discarded_exit_scratch=buffer_scratch_policy(selector),
+            discarded_exit_scratch_sites=[list(row) for row in sorted(buffer_proof.discarded_exit_scratch_sites)])
+        context[4]['native_buffers']['contract'] = (
+            'native bounded local-buffer proof with exact native zero-index signed loads; no pointer spills, stack-passed pointers, '
+            'r0/r1 returned aliases or unproved escapes; ' + DISCARDED_SCRATCH_CONTRACT +
+            '; explicit conditional ordinary returning ABI; no initialization, '
+            'physical nonalias, numeric result or termination theorem')
     if selector in DATA_SELECTORS:
         context[4].update(data_bindings=[list(row) for row in context[7]],
             data_contract=DATA_CONTRACT)
@@ -519,7 +558,7 @@ def verify(data, address, rom, mapping, index, calls, bindings, manifest=None, *
         raise ValueError('unknown addressed signed runtime selector')
     observed = {}
     context = (rom, mapping, index, bindings, observed)
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR):
         context += (selector,)
     elif selector in DATA_SELECTORS:
         context += (selector, data_mapping, data_bindings)
@@ -762,7 +801,7 @@ def build(root, address, args=None, expected=None, *, selector=SELECTOR):
     fixed_configuration(args)
     if selector not in SCHEMAS:
         raise ValueError('unknown addressed signed runtime selector')
-    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) else None
+    runtime = runtime_fingerprint() if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) else None
     producers = data_producer_fingerprint(selector) if selector in DATA_SELECTORS else None
     source,mapping,index = source_fingerprint(root,address),mapping_snapshot(root),index_snapshot(root)
     objects,selected_rom = data_snapshot(root),report_rom_path(root)
@@ -821,7 +860,7 @@ def render(result):
         '* incoming stack ABI: ' + result['manifest']['frame']['entry_stack']['contract']]
     if selector in DATA_SELECTORS:
         premise.append('* named data binding: ' + result['manifest']['data_contract'])
-    if selector == UNSIGNED_BUFFER_SELECTOR:
+    if selector in BUFFER_SELECTORS:
         premise.append('* local buffer boundary: ' + result['manifest']['native_buffers']['contract'])
     if selector in CALLBACK_SELECTORS:
         register = 'r3' if selector == R3_CALLBACK_SELECTOR else 'r2'
@@ -891,7 +930,7 @@ def report_matches(report, root, address):
                 saved['rom_sha256'] != sha(Path(report_rom_path(root)).read_bytes()) or \
                 saved['toolchain'] != toolchain_fingerprint():
             return False
-        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
+        if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, UNSIGNED_SELECTOR, UNSIGNED_BUFFER_SELECTOR, BUFFER_SELECTOR, BUFFER_SCRATCH_SELECTOR, INTEGER_SELECTOR, INTEGER_READONLY_SELECTOR, *DATA_SELECTORS) and saved['runtime'] != runtime_fingerprint():
             return False
         return render(build(root,address,expected=saved['manifest'],selector=selector)) == report
     except (OSError,ValueError,KeyError,TypeError,IndexError,RuntimeError,subprocess.SubprocessError):
