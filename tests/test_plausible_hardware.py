@@ -71,6 +71,36 @@ class HardwareVolatileTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertIn(rule, self.rules(self.comment + source))
 
+    def test_empty_fixed_mmio_polling_loops(self):
+        source = self.comment + '#define STATUS (*(volatile u16 *)0x04000004)\n'
+        source += 'void wait(u16 count) { while (STATUS & 1) {} while (!(STATUS & 1)) {} }'
+        self.assertEqual(self.rules(source), [])
+
+    def test_empty_polling_exemption_is_not_general_empty_body_permission(self):
+        prefix = self.comment + '#define STATUS (*(volatile u16 *)0x04000004)\n'
+        for condition in ('local & 1', 'STATUS & 0', '!(STATUS & 0)', 'read_status()',
+                          'STATUS | 1', '0 && (STATUS & 1)', '(STATUS = 1)', 'STATUS & local'):
+            with self.subTest(condition=condition):
+                self.assertIn('empty-body', self.rules(prefix + 'while (' + condition + ') {}'))
+        self.assertIn('empty-body', self.rules(prefix + 'void empty(void) {}'))
+        self.assertIn('empty-body', self.rules(prefix + 'if (STATUS & 1) {}'))
+
+    def test_polling_requires_one_documented_hardware_definition(self):
+        definition = '#define STATUS (*(volatile u16 *)0x04000004)\n'
+        loop = 'while (STATUS & 1) {}'
+        for source in (definition + loop, self.comment + definition.replace('04000004', '02000004') + loop,
+                       self.comment + definition + '#undef STATUS\n#define STATUS local\n' + loop,
+                       self.comment + definition + definition + loop,
+                       loop + '\n' + self.comment + definition,
+                       self.comment + '#define STATUS read_status()\n' + loop):
+            with self.subTest(source=source):
+                self.assertIn('empty-body', self.rules(source))
+
+    def test_line_spliced_macro_replacement_is_not_a_hardware_binding(self):
+        source = self.comment + '#define STATUS (*(volatile u16 *)0x04000004)\n'
+        source += '#undef STA\\\nTUS\n#define STA\\\nTUS local\nwhile (STATUS & 1) {}'
+        self.assertIn('empty-body', self.rules(source))
+
 
 if __name__ == "__main__":
     unittest.main()

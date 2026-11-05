@@ -216,6 +216,35 @@ def inert_control_flow(text):
     return hits
 
 
+def hardware_polling_bodies(code, hardware_qualifiers):
+    """Empty while bodies may poll a documented, fixed volatile MMIO macro.
+
+    Only one object-like direct-access definition and a nonzero constant mask
+    qualify. Function bodies, RAM reads, calls and mutable aliases still fail.
+    """
+    bodies = set()
+    if re.search(r"\\\r?\n", code):
+        return bodies
+    definitions = list(re.finditer(
+        r"(?m)^[ \t]*#[ \t]*define[ \t]+(?P<name>[A-Za-z_]\w*)[ \t]+"
+        r"\(\s*\*\s*\(\s*(?P<v>volatile)\s+(?:u8|u16|u32)\s*\*\s*\)"
+        r"\s*0x[0-9a-fA-F]+[uUlL]*\s*\)[ \t]*$", code))
+    for definition in definitions:
+        name = re.escape(definition['name'])
+        directives = list(re.finditer(
+            r"(?m)^[ \t]*#[ \t]*(?:define|undef)[ \t]+" + name + r"\b", code))
+        if definition.start('v') not in hardware_qualifiers or len(directives) != 1:
+            continue
+        masked = name + r"\s*&\s*(?P<mask>0x[0-9a-fA-F]+|[0-9]+)[uUlL]*"
+        condition = r"(?:" + masked + r"|!\s*\(\s*" + masked.replace('?P<mask>', '?P<negated_mask>') + r"\s*\))"
+        for loop in re.finditer(r"\bwhile\s*\(\s*" + condition +
+                                r"\s*(?P<body>\)\s*\{\s*\})", code):
+            mask = loop['mask'] or loop['negated_mask']
+            if loop.start() > definition.end() and int(mask, 16 if mask.lower().startswith('0x') else 10):
+                bodies.add(loop.start('body'))
+    return bodies
+
+
 def statement_macro_tails(code):
     """Offsets of `while (0)` closing complete, nonempty do-statement macros.
 
@@ -264,12 +293,15 @@ def check_text(text, origin="", data_symbols=None):
     code = strip_comments_and_strings(text)
     macro_tails = statement_macro_tails(code)
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
+    polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
     findings = []
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
             if rid == "volatile" and m.start() in hardware_qualifiers:
                 continue
             if rid == "dead-code" and m.start() in macro_tails:
+                continue
+            if rid == "empty-body" and m.start() in polling_bodies:
                 continue
             line = code.count("\n", 0, m.start()) + 1
             if sev == "suspect" and justified(text, line):
