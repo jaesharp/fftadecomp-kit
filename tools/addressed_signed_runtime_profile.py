@@ -45,11 +45,13 @@ UNSIGNED_SELECTORS = (UNSIGNED_SELECTOR, UNSIGNED_DATA_SELECTOR)
 INTEGER_SELECTOR = 'addressed-integer-runtime-v1'
 INTEGER_DATA_SELECTOR = 'addressed-integer-runtime-data-v1'
 INTEGER_READONLY_SELECTOR = 'addressed-integer-runtime-readonly-word0-v1'
-INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_SELECTOR)
+INTEGER_THREE_DATA_SELECTOR = 'addressed-integer-runtime-readonly-three-words-data-v1'
+INTEGER_SELECTORS = (INTEGER_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_READONLY_SELECTOR,
+                     INTEGER_THREE_DATA_SELECTOR)
 UNSIGNED_CAPABLE_SELECTORS = (*UNSIGNED_SELECTORS, *INTEGER_SELECTORS)
 CALLBACK_SELECTORS = (CALLBACK_SELECTOR, R3_CALLBACK_SELECTOR)
 DATA_SELECTORS = (DATA_SELECTOR, READONLY_TWO_DATA_SELECTOR, *CALLBACK_SELECTORS,
-                  UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR)
+                  UNSIGNED_DATA_SELECTOR, INTEGER_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR)
 CALLBACK_ALIAS = '_call_via_r2'
 CALLBACK_CONTRACT = ('conditional returning typed source callback via canonical r2; '
                      'r0/r1 are caller arguments, r2 is the target, not a third C formal; '
@@ -66,7 +68,8 @@ SCHEMAS = {SELECTOR: SCHEMA, READONLY_SELECTOR: READONLY_SCHEMA,
             UNSIGNED_SELECTOR: UNSIGNED_SCHEMA, UNSIGNED_DATA_SELECTOR: UNSIGNED_DATA_SCHEMA,
             INTEGER_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-v1',
             INTEGER_DATA_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-data-v1',
-            INTEGER_READONLY_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-word0-v1'}
+            INTEGER_READONLY_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-word0-v1',
+            INTEGER_THREE_DATA_SELECTOR: 'elf-symbol-thumb-addressed-integer-runtime-readonly-three-words-data-v1'}
 OPERATIONS = {'func_081426B8': quotient.ADDRESS, remainder.ADDRESSED_NAME: remainder.ADDRESS}
 UNSIGNED_OPERATIONS = {'func_08142AB0': 0x08142AB0,
                        'func_08142B28': unsigned_remainder.ADDRESS}
@@ -154,7 +157,7 @@ def data_producer_fingerprint(selector=DATA_SELECTOR):
     paths = {Path(module.__file__) for module in modules} | {Path(__file__)}
     paths.update(Path(importlib.import_module(name).__file__) for name in
                  ('match_evidence', 'inert_spin_profile', 'analyze', 'plausible'))
-    if selector == READONLY_TWO_DATA_SELECTOR:
+    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR):
         paths.add(Path(importlib.import_module('readonly_entry_stack_words_profile').__file__))
     return {path.name: sha(path.read_bytes()) for path in sorted(paths)}
 
@@ -444,10 +447,10 @@ def finish(data, address, calls, context, verified, dependencies):
             raise ValueError('addressed data requires exact typed coverage of reached address words')
     elif any(remainder.address_literal(row['value']) for row in partition['words']):
         raise ValueError('addressed signed runtimes exclude address literals and data bindings')
-    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR):
-        if selector in (READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR):
+    if selector in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR):
+        if selector in (READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR):
             import readonly_entry_stack_words_profile as incoming
-            policy = {'schema': incoming.SCHEMA, 'words': [0, 1]}
+            policy = {'schema': incoming.SCHEMA, 'words': ([0, 1, 2] if selector == INTEGER_THREE_DATA_SELECTOR else [0, 1])}
         else:
             import readonly_entry_stack_profile as incoming
             policy = {'schema': incoming.SCHEMA, 'words': [0]}
@@ -553,7 +556,7 @@ def original_bindings(image, address, rom, mapping, *, data_mapping=None, data_r
     objects = match.parse_data_symbols(data_mapping) if with_data else {}
     if selector not in SCHEMAS or selector in CALLBACK_SELECTORS and not with_data:
         raise ValueError('callback linking requires its exact selector and typed data')
-    if selector == READONLY_TWO_DATA_SELECTOR and not with_data:
+    if selector in (READONLY_TWO_DATA_SELECTOR, INTEGER_THREE_DATA_SELECTOR) and not with_data:
         raise ValueError('addressed readonly data requires actual typed bindings')
     symbol = original_function(image, address)
     entries = json.loads(mapping)
@@ -793,7 +796,7 @@ def render(result):
     selector = next((key for key,value in SCHEMAS.items() if value == result['manifest']['schema']),None)
     if selector is None:
         raise ValueError('unknown addressed signed runtime manifest schema')
-    premise = [] if selector not in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR) else [
+    premise = [] if selector not in (READONLY_SELECTOR, READONLY_TWO_SELECTOR, READONLY_TWO_DATA_SELECTOR, INTEGER_READONLY_SELECTOR, INTEGER_THREE_DATA_SELECTOR) else [
         '* incoming stack ABI: ' + result['manifest']['frame']['entry_stack']['contract']]
     if selector in DATA_SELECTORS:
         premise.append('* named data binding: ' + result['manifest']['data_contract'])
