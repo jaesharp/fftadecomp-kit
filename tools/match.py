@@ -2983,6 +2983,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             raise ValueError('addressed signed runtimes require their isolated explicit Thumb context')
         addressed_dependencies = addressed_signed_runtime.prepare(
             data, address, validated_calls or {}, addressed_signed_runtime_context)
+        if addressed_signed_runtime.context_selector(addressed_signed_runtime_context) == \
+                addressed_signed_runtime.UNSIGNED_BUFFER_SELECTOR:
+            buffer_proof = BufferCallProof(addressed_signed_runtime_context[0],
+                                          addressed_signed_runtime_context[1])
     if zero_aware_unsigned_quotient_inventory_context is not None:
         if any(value is not None for value in (remainder_inventory_context,
                 remainder_ordinary_inventory_context, remainder_shift_inventory_context,
@@ -4007,7 +4011,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                              instructions.values(), divsi3_context[3], transfers)
     if addressed_signed_runtime_context is not None:
         addressed_signed_runtime.finish(data, address, calls, addressed_signed_runtime_context,
-                                        instructions.values(), addressed_dependencies)
+                                        instructions.values(), addressed_dependencies,
+                                        buffer_proof=buffer_proof)
     if bounded_stack_output_inventory_context is not None:
         remainder_inventory.finish(data,address,calls,remainder_inventory_context,
                                    instructions.values(),bounded_output_proof)
