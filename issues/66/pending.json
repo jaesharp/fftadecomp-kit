@@ -3742,7 +3742,35 @@
           "who": "sol-080457B0-1262"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1226cedb923416e308986889bd79fd49bbfdf57698d4040dfb44113f044e6a15",
+        "acknowledged_cursor": 6651705830,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1226cedb923416e308986889bd79fd49bbfdf57698d4040dfb44113f044e6a15",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080457B0\",\"who\":\"sol-080457B0-1262\",\"claim_id\":6651540141,\"reason\":\"Native MATCH0 plausible244/244 whole FUNC. One new source-pointer form, first diagnostic exact then first native; fully stopped, original artifacts retained for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-05T06:48:58Z",
+          "id": 6651705830,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-05T06:48:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9971f4f18699e3c6948adb1db4579fc98aaa0ff4c39b83e48d7d280d1d7bcccb",
+        "result": {
+          "address": "0x080457B0",
+          "claim_id": 6651540141,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6651705830,
+          "status": "accepted",
+          "who": "sol-080457B0-1262"
+        }
+      }
     },
     {
       "claim": {
