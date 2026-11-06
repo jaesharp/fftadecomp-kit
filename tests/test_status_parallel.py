@@ -193,12 +193,45 @@ class StatusParallelTests(unittest.TestCase):
         executor.assert_not_called()
 
     def test_direct_jobs_bounds(self):
-        for jobs in (0, -1, 7):
-            with self.subTest(jobs=jobs), self.assertRaisesRegex(ValueError, "between 1 and 6"):
+        for jobs in (0, -1, 25):
+            with self.subTest(jobs=jobs), self.assertRaisesRegex(ValueError, "between 1 and 24"):
                 self.collect(jobs)
 
+    def test_twenty_four_workers_preserve_serial_counts_and_failures(self):
+        self.fixture([0x08000000 + i * 16 for i in range(32)])
+        lock, barrier = Lock(), Barrier(24)
+        active, peak, started = 0, 0, 0
+
+        def response(command):
+            code = int(command[4] == "080001F0")
+            return subprocess.CompletedProcess(command, code, matched_output(), "")
+
+        with patch.object(status.subprocess, "run", side_effect=lambda command, **_: response(command)):
+            serial = self.collect(1)
+
+        def invoke(command, **_):
+            nonlocal active, peak, started
+            with lock:
+                started += 1
+                first_batch = started <= 24
+                active += 1
+                peak = max(peak, active)
+            if first_batch:
+                barrier.wait(timeout=5)
+            try:
+                return response(command)
+            finally:
+                with lock:
+                    active -= 1
+
+        with patch.object(status.subprocess, "run", side_effect=invoke) as invocation:
+            self.assertEqual(self.collect(24), serial)
+        self.assertEqual(serial, (32, 31, 256, 248, ["080001F0: DOES NOT MATCH"], 0, 0))
+        self.assertEqual(invocation.call_count, 32)
+        self.assertEqual(peak, 24)
+
     def test_status_cli_passes_jobs_and_preserves_check_no_write(self):
-        for suffix, expected in (([], 1), (["--jobs", "6"], 6)):
+        for suffix, expected in (([], 1), (["--jobs", "6"], 6), (["--jobs", "24"], 24)):
             with self.subTest(jobs=expected), patch.object(sys, "argv", [
                     "status.py", "--root", str(self.root), "--verify", "--check", "--write", *suffix]), \
                     patch.object(status, "collect", return_value=(0, 0, 0, 0, [], 0, 0)) as collect, \
@@ -210,7 +243,7 @@ class StatusParallelTests(unittest.TestCase):
 
     def test_both_clis_reject_jobs_outside_bounds_before_io(self):
         for module in (status, push):
-            for jobs in ("0", "7", "-1", "many"):
+            for jobs in ("0", "25", "-1", "many"):
                 with self.subTest(module=module.__name__, jobs=jobs), \
                         patch.object(sys, "argv", [module.__name__, "--jobs", jobs]), \
                         patch.object(module.subprocess, "run") as invocation, \
@@ -244,7 +277,7 @@ class StatusParallelTests(unittest.TestCase):
         self.assertEqual(results[0][2], "README status is stale - run: python tools/status.py --write")
 
     def test_push_check_forwards_only_opt_in_jobs_to_status(self):
-        for jobs in (1, 6):
+        for jobs in (1, 6, 24):
             with self.subTest(jobs=jobs), patch.object(push, "run", return_value=(0, "up to date")) as run, \
                     contextlib.redirect_stdout(io.StringIO()):
                 self.assertTrue(push.check_matches(str(self.root), "fixture-badges", jobs=jobs))
@@ -259,7 +292,7 @@ class StatusParallelTests(unittest.TestCase):
         archive = self.root / "archive"
         archive.mkdir()
         snapshot = ("refs/heads/main", "a" * 40)
-        with patch.object(sys, "argv", ["push.py", "--repo", str(self.root), "--check-only", "--jobs", "6"]), \
+        with patch.object(sys, "argv", ["push.py", "--repo", str(self.root), "--check-only", "--jobs", "24"]), \
                 patch.object(push, "publish_snapshot", return_value=snapshot) as capture, \
                 patch.object(push, "committed_tree", return_value=str(archive)) as archived, \
                 patch.object(push, "check_history", return_value=True) as history, \
@@ -275,7 +308,7 @@ class StatusParallelTests(unittest.TestCase):
         archived.assert_called_once_with(str(self.root), snapshot[1])
         history.assert_called_once_with(str(self.root), "origin", "main", force=False)
         no_rom.assert_called_once_with(str(self.root), commit=snapshot[1])
-        matches.assert_called_once_with(str(archive), "fixture-badges", jobs=6)
+        matches.assert_called_once_with(str(archive), "fixture-badges", jobs=24)
         plausible.assert_called_once_with(str(archive))
         reports.assert_called_once_with(str(archive))
         publish.assert_not_called()

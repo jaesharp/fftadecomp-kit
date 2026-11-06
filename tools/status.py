@@ -182,8 +182,8 @@ def late_mapping(root, address, entries):
 
 
 def collect(root, verify, quiet=False, write_reports=False, jobs=1):
-    if not 1 <= jobs <= 6:
-        raise ValueError("jobs must be between 1 and 6")
+    if not 1 <= jobs <= 24:
+        raise ValueError("jobs must be between 1 and 24")
     cfg = os.path.join(root, "config", "functions.json")
     if not os.path.exists(cfg):
         sys.exit(f"no {cfg} - run analyze first")
@@ -483,8 +483,8 @@ def main():
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"))
     ap.add_argument("--verify", action="store_true",
                     help="recompile every src/*.c instead of trusting the reports")
-    ap.add_argument("--jobs", type=int, choices=range(1, 7), default=1, metavar="N",
-                    help="verify up to N sources concurrently (1..6; default: 1)")
+    ap.add_argument("--jobs", type=int, choices=range(1, 25), default=1, metavar="N",
+                    help="verify up to N sources concurrently (1..24; default: 1)")
     ap.add_argument("--write", action="store_true",
                     help="update status files; with --verify, regenerate match reports too")
     ap.add_argument("--check", action="store_true")
