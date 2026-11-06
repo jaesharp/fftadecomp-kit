@@ -3774,66 +3774,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "1ab98b4aa11e908ac32de4b8fa59889192357e5447ba40138d43506ab60274d4",
-        "acknowledged_cursor": 6684398632,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1ab98b4aa11e908ac32de4b8fa59889192357e5447ba40138d43506ab60274d4",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081426B8\",\"who\":\"sol-081426B8-2542\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T12:04:52Z",
-          "id": 6684398390,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:04:52Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "49974b1e9ef97cd1efbe5bb1b93c33d9f2734af1c73fb24d1bee7ceffaf25413",
-        "result": {
-          "address": "0x081426B8",
-          "claim_id": 6684398390,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684398390,
-          "status": "accepted",
-          "who": "sol-081426B8-2542"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "ec8e043102c99b0dff578cd744bebb6cd02a69deb0873f2f69dcf19d3d6d003b",
-        "acknowledged_cursor": 6684529375,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "ec8e043102c99b0dff578cd744bebb6cd02a69deb0873f2f69dcf19d3d6d003b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081426B8\",\"who\":\"sol-081426B8-2542\",\"claim_id\":6684398390,\"reason\":\"One grounded form emits152B against146B target; conditional saves/returns, register roles and scale-loop layout differ. Original strict runtime alias refusal retained; diagnostic link to actual indexed target only. Fully stopped; zero native/proof credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T12:12:19Z",
-          "id": 6684529375,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:12:19Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "6ca55206267451b2e076dcc3cbe0a91b099fef578a723ba6e9bb5572540a04d3",
-        "result": {
-          "address": "0x081426B8",
-          "claim_id": 6684398390,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684529375,
-          "status": "accepted",
-          "who": "sol-081426B8-2542"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "4d2733494a69987bfdec15976af90e9c4ad4c49bfc75d473285cf42e4529f81d",
         "acknowledged_cursor": 6684398632,
         "body_provenance": "acceptance-time",
@@ -3863,66 +3803,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "7dfec3473e8b9cb777bd8d296e63114fd3a5826c7e4d9522cf794f639dbcda95",
-        "acknowledged_cursor": 6684398632,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7dfec3473e8b9cb777bd8d296e63114fd3a5826c7e4d9522cf794f639dbcda95",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800DFB0\",\"who\":\"sol-0800DFB0-2542\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T12:04:52Z",
-          "id": 6684398632,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:04:52Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "49974b1e9ef97cd1efbe5bb1b93c33d9f2734af1c73fb24d1bee7ceffaf25413",
-        "result": {
-          "address": "0x0800DFB0",
-          "claim_id": 6684398632,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684398632,
-          "status": "accepted",
-          "who": "sol-0800DFB0-2542"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "eb1d3b3bac283dddbb106dcdafa79a22100dec2925ed57f08f0c06e5477ca2d2",
-        "acknowledged_cursor": 6684601492,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "eb1d3b3bac283dddbb106dcdafa79a22100dec2925ed57f08f0c06e5477ca2d2",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800DFB0\",\"who\":\"sol-0800DFB0-2542\",\"claim_id\":6684398632,\"reason\":\"Three grounded natural forms frozen, closest168B versus170B; endpoint and coordinate lifetimes differ. No independently supported further representation; no native/proof.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T12:16:19Z",
-          "id": 6684601447,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:16:19Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "0b630212a01d07fd08aee92d2bf8a2fe30d3d7fe88cc469eb8dafe6c1d4ab53d",
-        "result": {
-          "address": "0x0800DFB0",
-          "claim_id": 6684398632,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684601447,
-          "status": "accepted",
-          "who": "sol-0800DFB0-2542"
-        }
-      }
     }
   ],
   "issue": 66,
