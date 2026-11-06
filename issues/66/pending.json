@@ -4030,7 +4030,35 @@
           "who": "sol-0814011C-3032"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "523467e17cfa1e1eddb6bef369c7c2fc2f6956c753d6240f2458c193432a7580",
+        "acknowledged_cursor": 6695856171,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "523467e17cfa1e1eddb6bef369c7c2fc2f6956c753d6240f2458c193432a7580",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814011C\",\"who\":\"sol-0814011C-3032\",\"claim_id\":6695595750,\"reason\":\"First natural164B original128 equal36 different from fill-pointer reuse and branch offsets, final pool exact. No independent semantic correction. Frozen stopped native/proof0.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T21:18:23Z",
+          "id": 6695856171,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T21:18:23Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ee172e504d250a6e05ebe60fff551330138d5c5e79ecc3b142c51014af8c576d",
+        "result": {
+          "address": "0x0814011C",
+          "claim_id": 6695595750,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6695856171,
+          "status": "accepted",
+          "who": "sol-0814011C-3032"
+        }
+      }
     },
     {
       "claim": {
