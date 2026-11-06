@@ -3862,7 +3862,35 @@
           "who": "sol-0814374C-2417"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "88cdb2d441faec1d6173b0d833ea541f3db8f142b0cbcde9ab6e9d1e49e890ca",
+        "acknowledged_cursor": 6682073611,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "88cdb2d441faec1d6173b0d833ea541f3db8f142b0cbcde9ab6e9d1e49e890ca",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814374C\",\"who\":\"sol-0814374C-2417\",\"claim_id\":6681956063,\"reason\":\"First actual native MATCH with published private-double-comparison-v1; all167/native167/refs/tools/currentruntime/freshROM/source unchanged; originals frozen, publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T09:51:59Z",
+          "id": 6682073611,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T09:51:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "2f0ebe3acd0cd370fe6c8008b5fe1c5c45a0c9f289ab0e3dc94c0b1cb570a707",
+        "result": {
+          "address": "0x0814374C",
+          "claim_id": 6681956063,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6682073611,
+          "status": "accepted",
+          "who": "sol-0814374C-2417"
+        }
+      }
     },
     {
       "claim": {
