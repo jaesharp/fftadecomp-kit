@@ -127,7 +127,8 @@ def dependency_records():
 def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=None,
                   scalar_entries=None, allowed_writes=None, stack_load_widths=(4,),
                   stack_store_widths=(4,), stack_input_words=(), stack_adjusted_returns=False, thumb_pc_returns=(),
-                  argument_effect_policy=None):
+                  argument_effect_policy=None, return_pointer_policy=None,
+                  compose_pointer_returns=False):
     """Prove this pinned body's local returns and callee-saved/write ABI.
 
     This is deliberately separate from the caller verifier. Loads are target
@@ -166,6 +167,24 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
         if allowed_writes is not None and set(allowed_writes) != effect_writes:
             raise ValueError("software-float argument effect and write policies differ")
         allowed_writes = effect_writes
+    if type(compose_pointer_returns) is not bool or \
+            (return_pointer_policy is not None or compose_pointer_returns) and argument_effect_policy is None:
+        raise ValueError("software-float pointer returns require explicit argument effects")
+
+    def pointer_records(value):
+        if type(value) is not list or not value or any(
+                type(item) is not list or len(item) != 3 or type(item[0]) is not str or
+                type(item[1]) is not int or type(item[2]) is not int or
+                not ((item[0] == "argument" and 0 <= item[1] <= 3 and
+                      -0x7FFFFFFF <= item[2] <= 0x7FFFFFFF) or
+                     (item[0] == "constant" and 0 <= item[1] <= 0xFFFFFFFF and item[2] == 0))
+                for item in value) or value != sorted(value) or \
+                len({tuple(item) for item in value}) != len(value) or len(value) > 16:
+            raise ValueError("software-float pointer returns require ordered finite provenance records")
+        return {tuple(item) for item in value}
+
+    pointer_policy = None if return_pointer_policy is None else pointer_records(return_pointer_policy)
+    finite_pointers = pointer_policy is not None or compose_pointer_returns
     body = rom[start - 0x08000000:end - 0x08000000]
     layout = refine_function(body, start, entries, max_bytes=end - start,
                              max_instructions=1024, rom_end=0x08000000 + len(rom),
@@ -201,10 +220,28 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
     states, pending, edges, returns, writes = {start: (initial, {}, frozenset())}, [start], {}, set(), set()
     stack_reads = set()
     argument_reads, argument_accesses = set(), set()
+    returned_pointers = {}
+
+    def alternatives(value):
+        return value[1] if value is not None and value[0] == "alternatives" else (value,)
+
+    def joined(left, right):
+        if left == right:
+            return left
+        if not finite_pointers or left is None or right is None:
+            return unknown
+        values = set(alternatives(left)) | set(alternatives(right))
+        return ("alternatives", tuple(sorted(values)), 0) if len(values) <= 16 else unknown
 
     def adjusted(value, distance):
         if value is None:
             return None
+        if value[0] == "alternatives":
+            values = [adjusted(item, distance) for item in alternatives(value)]
+            result = values[0]
+            for item in values[1:]:
+                result = joined(result, item)
+            return result
         kind, base, offset = value
         if kind == "constant":
             return (kind, (base + distance) & 0xFFFFFFFF, 0)
@@ -222,6 +259,15 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
         regs = [op.reg for op in operands if op.type == ARM_OP_REG]
 
         def access(pointer, loading, value=None, width=4, argument_read=False):
+            if pointer is not None and pointer[0] == "alternatives":
+                # A store can affect any one alternative. Invalidate each
+                # possible slot rather than assigning the value to all slots.
+                results = [access(item, loading, None, width, argument_read)
+                           for item in alternatives(pointer)]
+                result = results[0]
+                for item in results[1:]:
+                    result = joined(result, item)
+                return result
             if pointer is not None and pointer[0] == "stack":
                 offset = pointer[2]
                 if argument_read and any(offset < slot + 4 and slot < offset + width for slot in saved):
@@ -279,6 +325,7 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                                            for r in range(ARM_REG_R4, ARM_REG_R11 + 1)):
                     raise ValueError("software-float Thumb POP PC return/restoration is unproved")
                 returns.add(site)
+                returned_pointers[site] = registers.get(ARM_REG_R0)
                 successors = ()
         elif mnemonic in ("mov", "movs") and regs and regs[0] == ARM_REG_PC:
             if site not in thumb_pc_returns or instruction.size != 2 or regs != [ARM_REG_PC, ARM_REG_LR] or \
@@ -286,18 +333,21 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                     any(registers.get(r) != ("entry", r, 0) for r in range(ARM_REG_R4, ARM_REG_R11 + 1)):
                 raise ValueError("software-float Thumb MOV PC return/restoration is unproved")
             returns.add(site)
+            returned_pointers[site] = registers.get(ARM_REG_R0)
             successors = ()
         elif mnemonic == "bx":
             if len(regs) != 1 or registers.get(regs[0]) != ("entry", ARM_REG_LR, 0) or sp or saved or \
                     any(registers.get(r) != ("entry", r, 0) for r in range(ARM_REG_R4, ARM_REG_R11 + 1)):
                 raise ValueError("software-float runtime return/register restoration is unproved")
             returns.add(site)
+            returned_pointers[site] = registers.get(ARM_REG_R0)
             successors = ()
         elif mnemonic == "bl":
             target = expected_calls.get(site)
             if target not in dependencies or operands[0].imm != target:
                 raise ValueError("software-float runtime call has no native dependency proof")
             child = dependencies[target]
+            projected_return = unknown
             if argument_effect_policy is not None:
                 effect = child.get("argument_effects") if type(child) is dict else None
                 keys = {"schema", "complete", "address", "end", "body_sha256", "policy",
@@ -315,6 +365,24 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                 if not child_reads <= bounds[0] or not child_writes <= bounds[1] or \
                         child_writes != {tuple(item) for item in child["writes"]}:
                     raise ValueError("software-float child actual effects differ from its bound receipt")
+                if compose_pointer_returns and "return_pointers" in child:
+                    receipt = child["return_pointers"]
+                    if type(receipt) is not dict or set(receipt) != {
+                            "schema", "complete", "address", "end", "body_sha256", "policy", "values"} or \
+                            receipt["schema"] != "thumb-finite-pointer-return-v1" or \
+                            receipt["complete"] is not True or type(receipt["address"]) is not int or \
+                            type(receipt["end"]) is not int or receipt["address"] != target or \
+                            receipt["end"] != effect["end"] or receipt["body_sha256"] != effect["body_sha256"]:
+                        raise ValueError("software-float child pointer-return receipt differs")
+                    values = pointer_records(receipt["values"])
+                    if not values <= pointer_records(receipt["policy"]):
+                        raise ValueError("software-float child pointer returns exceed their policy")
+                    projected = [adjusted(registers.get(ARM_REG_R0+number), offset)
+                                 if kind == "argument" else ("constant", number, 0)
+                                 for kind, number, offset in sorted(values)]
+                    projected_return = projected[0]
+                    for value in projected[1:]:
+                        projected_return = joined(projected_return, value)
                 for number, offset, width in sorted(child_reads):
                     pointer = adjusted(registers.get(ARM_REG_R0 + number), offset)
                     access(pointer, True, width=width, argument_read=True)
@@ -333,6 +401,8 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                 access(("stack", 0, slot), True, width=width)
             for reg in (*range(ARM_REG_R0, ARM_REG_R3 + 1), ARM_REG_R12, ARM_REG_LR):
                 registers[reg] = unknown
+            if compose_pointer_returns:
+                registers[ARM_REG_R0] = projected_return
         elif mnemonic.startswith(("ldm", "stm")):
             pointer = registers.get(regs[0])
             for position, reg in enumerate(regs[1:]):
@@ -401,8 +471,8 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
             else:
                 if previous[0][ARM_REG_SP] != registers[ARM_REG_SP] or previous[2] != outgoing[2]:
                     raise ValueError("software-float runtime frame differs at a CFG join")
-                merged = ({r: value if value == registers.get(r) else unknown for r, value in previous[0].items()},
-                          {offset: value if value == memory[offset] else unknown
+                merged = ({r: joined(value, registers.get(r)) for r, value in previous[0].items()},
+                          {offset: joined(value, memory[offset])
                            for offset, value in previous[1].items() if offset in memory}, previous[2])
             if previous != merged:
                 states[successor] = merged
@@ -422,6 +492,21 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
         raise ValueError("software-float public scalar helper has external writes")
     proof = {"writes": sorted(writes), "stack_reads": sorted(stack_reads),
              "returns": sorted(returns), "layout": layout}
+    if pointer_policy is not None:
+        actual = set()
+        for site in returns:
+            for value in alternatives(returned_pointers[site]):
+                if value is None or not (value[0] == "constant" or value[0] == "entry" and
+                                        ARM_REG_R0 <= value[1] <= ARM_REG_R3):
+                    raise ValueError("software-float reached return has unknown pointer provenance")
+                record = ("argument", value[1]-ARM_REG_R0, value[2]) if value[0] == "entry" else value
+                if record not in pointer_policy:
+                    raise ValueError("software-float reached pointer return exceeds its policy")
+                actual.add(record)
+        proof["return_pointers"] = {"schema": "thumb-finite-pointer-return-v1", "complete": True,
+            "address": start, "end": end, "body_sha256": hashlib.sha256(body).hexdigest(),
+            "policy": [list(item) for item in sorted(pointer_policy)],
+            "values": [list(item) for item in sorted(actual)]}
     if argument_effect_policy is not None:
         proof["native_edges"] = [[site, list(targets)] for site, targets in sorted(edges.items())]
         proof["argument_effects"] = {"schema": effect_schema, "complete": True,
