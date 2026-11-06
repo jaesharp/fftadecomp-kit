@@ -3806,7 +3806,35 @@
           "who": "sol-080DF31C-3108"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "06a1025f2545f76d60becebd355356de41bf6faf6c9618498bbaa48411e52c5a",
+        "acknowledged_cursor": 6697930472,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "06a1025f2545f76d60becebd355356de41bf6faf6c9618498bbaa48411e52c5a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DF31C\",\"who\":\"sol-080DF31C-3108\",\"claim_id\":6697835509,\"reason\":\"Zero-C inspection stop: discarded RAM shadow loads lack independently grounded storage representation.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T23:01:16Z",
+          "id": 6697930472,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T23:01:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9838ad1b1d869012d1f220b6963c6b89009f2d08fa560c03ff264d76b73da572",
+        "result": {
+          "address": "0x080DF31C",
+          "claim_id": 6697835509,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6697930472,
+          "status": "accepted",
+          "who": "sol-080DF31C-3108"
+        }
+      }
     },
     {
       "claim": {
