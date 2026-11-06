@@ -24,11 +24,15 @@ GUARDED_SWITCH_CONTROL_FLOW = 'bounded buffer calls with an exact unsigned-guard
 NESTED_OUTPUT_SELECTOR = 'bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_CONTROL_FLOW = 'bounded buffer calls with native nested formal halfword outputs and retained entry aliases'
+GUARDED_ALIAS_SELECTOR = 'bounded-buffer-guarded-callee-aliases-v1'
+GUARDED_ALIAS_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-callee-aliases-v1'
+GUARDED_ALIAS_CONTROL_FLOW = 'complete ordinary Thumb owner with guarded bounded-buffer callees and every native return alias retained'
+GUARDED_ALIAS_MAX_DEPENDENCIES = 32
 ROOT_SWITCH_SELECTOR = 'bounded-buffer-root-guarded-switch-v1'
 ROOT_SWITCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-root-guarded-switch-v1'
 ROOT_SWITCH_CONTROL_FLOW = 'complete guarded-switch owner with unchanged bounded ordinary-buffer alias checks'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA)
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -466,3 +470,137 @@ class BiosSqrtScratchProof(DiscardedReturnScratchProof):
                 Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                 for name in producers},
             observations=[self._bios_calls[key] for key in sorted(self._bios_calls)])
+
+
+class GuardedAliasBufferProof(NamedDataBufferProof):
+    """Reuse guarded native CFG inventory and preserve ordinary return aliases."""
+
+    dependency_budget = GUARDED_ALIAS_MAX_DEPENDENCIES
+
+    def __init__(self, rom, mapping, index, objects):
+        super().__init__(rom, mapping, index, objects)
+        self._guarded_switches = {}
+        self._entry_kills = {}
+
+    def prefix_kills(self, address, registers):
+        """Prove every incoming scratch value dies before any use or call.
+
+        This proves only non-observation of the supplied incoming values.
+        The subsequent ordinary call retains the existing conditional returning
+        ABI boundary; no callee-local buffer or arbitrary-memory effect is proved.
+        """
+        scratch = {match.ARM_REG_R0 + 2, match.ARM_REG_R0 + 3}
+        if not registers or set(registers) - scratch:
+            return None
+        data = self.span(address)
+        validate_owner(data, address, self.rom, self.mapping, self.index)
+        import owner_admission_profile as owner
+        refinement = owner.refine(data, address, self.mapping)
+        try:
+            ins, edges, branches, calls, words = graph.graph(data, address, refinement)
+        except ValueError:
+            return None
+        if branches or words:
+            return None
+        pending = [(address, frozenset(registers))]
+        seen, frontier = set(), set()
+        while pending:
+            current, live = pending.pop()
+            if (current, live) in seen:
+                return None  # A cycle before all kills proves no finite prefix.
+            if len(seen) >= 4096:
+                return None
+            seen.add((current, live))
+            item = ins[current]
+            read, written = item.regs_access()
+            if item.size != 2 or current in calls or not edges[current] or set(read) & live or \
+                    item.mnemonic not in ('push', 'sub', 'subs', 'add', 'adds',
+                        'mov', 'movs', 'ldr', 'ldrh', 'ldrb', 'cmp', 'b', 'beq', 'bne',
+                        'bhi', 'bls', 'bge', 'blt', 'bgt', 'ble', 'bhs', 'blo'):
+                return None
+            remaining = live - set(written)
+            if remaining:
+                pending.extend((target, remaining) for target in edges[current])
+            else:
+                frontier.add(current)
+        if not frontier:
+            return None
+        return dict(address=address, end=address+len(data), bytes=len(data),
+            body_sha256=hashlib.sha256(data).hexdigest(),
+            incoming_registers=[r-match.ARM_REG_R0 for r in sorted(registers)],
+            checked_states=[[site, [r-match.ARM_REG_R0 for r in sorted(live)]]
+                            for site, live in sorted(seen)],
+            killed_frontier=sorted(frontier),
+            partition=graph.partition(data, address, refinement, ins, words),
+            ordinary_call_boundary='conditional compatible returning ABI after '
+                'every incoming scratch pointer is overwritten without a read; '
+                'no callee-local or arbitrary-memory effect theorem',
+            **self.identities)
+
+    def check_arguments(self, address, arguments, stack, incoming, protected, *,
+                        constants=None, site=None, **context):
+        if arguments and not incoming and not context.get('words') and not context.get('watched'):
+            for offset in arguments.values():
+                self.validate_pointer_value(offset, stack)
+            killed = self.prefix_kills(address, arguments)
+            if killed is not None:
+                self.dependencies[address] = self.span(address)
+                self.records[address] = dict(killed, structure={'kind': 'incoming-scratch-prefix-overwrite-v1'})
+                self._entry_kills[(address, tuple(sorted(arguments)))] = killed
+                return self.word_result({}, {})
+        return super().check_arguments(address, arguments, stack, incoming, protected,
+            constants=constants, site=site, **context)
+
+    def entry_kill_manifest(self):
+        return dict(schema='exact-native-scratch-prefix-overwrite-v1',
+            observations=[self._entry_kills[key] for key in sorted(self._entry_kills)])
+
+    def inspect(self, address, data):
+        # Inventory only; all effects replay on this ordinary alias proof.
+        import analyze
+        refinement = analyze.refine_function(data, address, json.loads(self.mapping),
+            max_bytes=len(data), max_instructions=len(data)//2, rom_end=0x09000000,
+            same_owner_long_branches=True, one_object_word_switch=True)
+        switches = refinement['word_switches']
+        if len(switches) == 1 and switches[0].get('interposed_words') == 1:
+            ins, edges, branches, calls, words = graph.graph(data, address, refinement,
+                one_object_word_switch=True)
+            if branches:
+                raise ValueError('one-word guarded buffer excludes local BL control')
+            for destination in calls.values():
+                match.function_address_target(f'func_{destination:08X}', self.entries,
+                    address, len(data), len(self.rom))
+            offset = switches[0]['literal'] - 4
+            value = struct.unpack_from('<I', data, offset)[0]
+            objects = {offset: ('ROM-checked interposed word', value)}
+            instructions = match.verify_leaf_instructions(data, address, True, calls,
+                switch_relocations=words, switch_data_relocations=objects)
+            if set(ins) != {item.address for item in instructions}:
+                raise ValueError('one-word guarded buffer differs from complete instructions')
+            transfer = address + switches[0]['dispatch'] + 8
+            structure = dict(kind='complete-guarded-buffer-switch-one-ROM-word-v1',
+                switch=switches[0], instructions=len(instructions),
+                partition=graph.partition(data, address, refinement, ins, words),
+                transfer=transfer, successors=list(edges[transfer]),
+                interposed_ROM_word=dict(offset=offset, value=value,
+                    sha256=hashlib.sha256(data[offset:offset+4]).hexdigest()),
+                table_words_sha256=hashlib.sha256(b''.join(
+                    data[word:word+4] for word in sorted(words))).hexdigest())
+            self.records[address] = dict(address=address, end=address+len(data),
+                bytes=len(data), body_sha256=hashlib.sha256(data).hexdigest(),
+                structure=structure, **self.identities)
+            self._guarded_switches[address] = self.records[address]
+            return instructions, {transfer: edges[transfer]}
+        inspector = GuardedSwitchBufferProof(self.rom, self.mapping, self.index, self.objects)
+        instructions, transfers = inspector.inspect(address, data)
+        self.records[address] = inspector.records[address]
+        self._guarded_switches.update(inspector._guarded_switches)
+        return instructions, transfers
+
+    def guarded_manifest(self):
+        manifest = GuardedSwitchBufferProof.guarded_manifest(self)
+        manifest['contract'] += '; ordinary-alias inventory additionally accepts one '
+        manifest['contract'] += 'reached interposed ROM word under the existing exact '
+        manifest['contract'] += 'one-object switch parser and complete byte partition; '
+        manifest['contract'] += 'the word grants no extent, contents or alias premise'
+        return manifest

@@ -3351,6 +3351,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
     alignment = 2 if thumb else 4
     states = {address: (frozenset({ARM_REG_LR}), (), (), (), (), ())}
     stack_arguments = buffer_proof is not None and buffer_proof.stack_arguments
+    from named_data_buffer_profile import GuardedAliasBufferProof
+    guarded_live_aliases = type(buffer_proof) is GuardedAliasBufferProof
     caller_clobbered = CALLER_CLOBBERED
     pending = [address]
     path_states = None
@@ -3655,6 +3657,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                 if stm is not None:
                     base, offset, stored_registers = stm
                     for index, register in enumerate(stored_registers):
+                        if guarded_live_aliases:
+                            buffer_proof.access(offset + 4 * index, 4, stack)
                         stack_alias_store(stack, pointer_slots, aliases, return_registers,
                                           offset + 4 * index, 4, register)
                     allowed_aliases.add(base)
@@ -3663,6 +3667,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                 loaded_constant = None
                 if ldm is not None:
                     base, offset, destination = ldm
+                    if guarded_live_aliases:
+                        buffer_proof.access(offset, 4, stack)
                     slot = (offset + 4 * len(stack)) // 4
                     if word_mode and (offset in words or offset in pointer_slots):
                         buffer_proof.access(offset, 4, stack)
@@ -3720,6 +3726,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                             offset += constants[operand.mem.index]
                         if offset % width or not -4 * len(stack) <= offset or offset + width > 0:
                             raise ValueError("stack-alias access is unaligned or outside the tracked frame")
+                        if guarded_live_aliases:
+                            buffer_proof.access(offset, width, stack)
                         allowed_aliases.add(operand.mem.base)
                         slot = (offset + 4 * len(stack)) // 4
                         pointer_word = offset - offset % 4
@@ -4208,6 +4216,7 @@ def main():
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
                                                       "bounded-buffer-bios-fill-source-v1",
                                                       "bounded-buffer-guarded-switch-v1",
+                                                      "bounded-buffer-guarded-callee-aliases-v1",
                                                       "bounded-buffer-nested-halfword-output-v1",
                                                       "bounded-buffer-root-guarded-switch-v1",
                                                       "static-callback-buffer-v1",
