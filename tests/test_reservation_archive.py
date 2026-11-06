@@ -421,6 +421,41 @@ class ReservationArchiveTests(unittest.TestCase):
             for operation in ("claim", "release"):
                 self.assertEqual(generation[operation]["body_provenance"], "acceptance-time")
 
+    def test_body_capacity_eviction_archives_before_the_normal_batch(self):
+        initial = {"version": 1, "cursor": 0, "rows": [], "results": []}
+        comments = []
+        for claim_id in range(100, 112, 2):
+            _, generation = pair(claim_id, claim_id + 1)
+            comments.extend(generation)
+        preview = copy.deepcopy(initial)
+        for entry in comments[:3]:
+            preview = reserve.apply_comment(preview, entry, set(), TIMESTAMP,
+                                             claim_check=lambda address: (0, "FREE"))
+        limit = len(reserve.render(preview).encode()) - 1
+        fake = FakeArchiveAPI(initial, comments)
+        with patch.object(reserve, "MAX_BODY_BYTES", limit), \
+                patch.object(reserve, "api", side_effect=fake), \
+                patch.object(reserve, "comments_after", side_effect=lambda cursor: [
+                    copy.deepcopy(item) for item in fake.comments.values() if item["id"] > cursor]), \
+                patch.object(reserve, "claim_status", return_value=(0, "FREE")), \
+                patch.object(reserve, "now", return_value=TIMESTAMP), \
+                patch.object(reserve, "unmatchable", return_value=set()), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(reserve.drain(archive_closed=True), 0)
+            archive = reserve.ReceiptArchive()
+            for claim_id in range(100, 112, 2):
+                generation = archive.read(f"issues/66/closed/{claim_id}.json")
+                self.assertIsNotNone(generation)
+                for operation in ("claim", "release"):
+                    self.assertEqual(generation[operation]["body_provenance"], "acceptance-time")
+                    self.assertEqual(generation[operation]["result"]["status"], "accepted")
+            self.assertLessEqual(len(reserve.render(fake.state).encode()), limit)
+        self.assertEqual(fake.state["rows"], [])
+        self.assertEqual(fake.state["cursor"], 111)
+        self.assertLess(len(fake.state["results"]), 16)
+        self.assertNotIn(100, fake.comments)
+        self.assertNotIn(101, fake.comments)
+
     def test_only_default_branch_trusted_scheduled_or_manual_events_can_archive(self):
         event = {"repository": {"full_name": reserve.KIT_REPO, "default_branch": "main"}}
         environment = {"GITHUB_ACTIONS": "true", "GITHUB_REPOSITORY": reserve.KIT_REPO,

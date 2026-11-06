@@ -233,9 +233,12 @@ be adopted by matching a label. They remain reserved until normal expiry or
 maintainer reconciliation. Manual ledger maintenance must pause all writers;
 GitHub issue edits do not provide compare-and-swap protection.
 
-The broker retains 64 recent receipts and at most 256 rows, accepts requests up
-to 2 KiB, and limits its rendered issue body to 60,000 UTF-8 bytes. Capacity
-errors fail closed without dropping rows. An evicted receipt is unconfirmed,
+The broker retains up to 64 recent receipts and at most 256 rows, accepts requests
+up to 2 KiB, and limits its rendered issue body to 60,000 UTF-8 bytes. It evicts
+older receipts as needed to fit that body, always retaining the newest result.
+With archival enabled, it durably captures accepted receipts before eviction,
+even when body pressure shortens the normal archive interval. Capacity errors
+fail closed without dropping rows. An evicted receipt is unconfirmed,
 not success. The visible table and hidden state must agree; edit neither while
 the broker is running. This protocol does not grant contributors repository
 write access or create separate reservation issues.

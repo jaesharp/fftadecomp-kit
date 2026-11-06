@@ -10,8 +10,9 @@ workflow runs and retries cannot lose or repeat accepted operations. All writers
 including sweep, must use the same workflow concurrency group. Manual ledger
 maintenance requires pausing that writer; GitHub issue edits are not a CAS API.
 
-Operational bounds: 64 recent results, 256 rows, 2 KiB requests, and a conservative
-60,000-byte UTF-8 issue body. If even a rejection result cannot fit, neither rows
+Operational bounds: at most 64 recent results, 256 rows, 2 KiB requests, and a
+conservative 60,000-byte UTF-8 issue body. Older results may leave the window
+earlier to fit that body. If even a rejection result cannot fit, neither rows
 nor cursor change. An expired result or timeout is unconfirmed, not
 success. Legacy rows remain ownerless until expiry or maintainer reconciliation.
 Unmatchable evidence stays in the request comment unless the deployed trusted
@@ -104,6 +105,10 @@ PR_HEAD_QUERY = """query($owner:String!, $name:String!, $number:Int!) {
 
 
 class LedgerError(Exception):
+    pass
+
+
+class BodyCapacityReached(LedgerError):
     pass
 
 
@@ -397,10 +402,22 @@ def render(state):
     metadata = json.dumps(state, ensure_ascii=True, separators=(",", ":")).replace("<", "\\u003c").replace(">", "\\u003e")
     body = "\n".join(lines + [END, "", STATE_START + metadata + STATE_END, ""])
     if len(body.encode("utf-8")) > MAX_BODY_BYTES:
-        raise LedgerError("ledger body capacity exceeded; maintainer reconciliation required")
+        raise BodyCapacityReached("ledger body capacity exceeded; maintainer reconciliation required")
     if parse_ledger(body) != state:
         raise LedgerError("rendered ledger does not preserve broker state")
     return body
+
+
+def fit_recent_results(state):
+    """Keep the newest acknowledgement and all rows within the body bound."""
+    while True:
+        try:
+            render(state)
+            return
+        except BodyCapacityReached:
+            if len(state["results"]) <= 1:
+                raise
+            state["results"].pop(0)
 
 
 def ledger():
@@ -608,6 +625,7 @@ def comment_identity(comment):
 
 
 def apply_comment(state, comment, skipped, timestamp, claim_check=None):
+    validate_state(state)
     request_id, owner_id = comment_identity(comment)
     if request_id <= state["cursor"]:
         return state
@@ -666,13 +684,14 @@ def apply_comment(state, comment, skipped, timestamp, claim_check=None):
         result["message"] = str(error)[:400]
     candidate["results"] = (candidate["results"] + [result])[-MAX_RESULTS:]
     try:
-        render(candidate)
+        fit_recent_results(candidate)
     except LedgerError:
         candidate["rows"] = copy.deepcopy(state["rows"])
         result["status"] = "rejected"
         result["code"] = 1
         result["message"] = "ledger capacity or validation failed; no change accepted"
-        render(candidate)
+        candidate["results"] = (copy.deepcopy(state["results"]) + [result])[-MAX_RESULTS:]
+        fit_recent_results(candidate)
     return candidate
 
 
@@ -1097,6 +1116,14 @@ def drain(days=STALE_DAYS, archive_closed=False):
             break
         for comment in comments:
             candidate = apply_comment(state, comment, skipped, now(), claim_check=claim_status)
+            retained = {result["request_id"] for result in candidate["results"]}
+            if archive and any(result["request_id"] in acceptance_bodies and
+                               result["request_id"] not in retained for result in state["results"]):
+                # Body pressure can shrink the receipt window before the usual
+                # checkpoint. Preserve prior acceptances before persisting it.
+                archive.capture(state, acceptance_bodies)
+                archive.retire(state)
+                acceptance_bodies.clear()
             body = persist(candidate, body)
             state = candidate
             acceptance_bodies[comment["id"]] = comment["body"]
