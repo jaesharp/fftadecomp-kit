@@ -3774,7 +3774,35 @@
           "who": "sol-080F7160-2063"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "b85ee636f4e809bba836e69ad8b6189a9c79a502e75287fac5d3f7e8a065b138",
+        "acknowledged_cursor": 6674140925,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b85ee636f4e809bba836e69ad8b6189a9c79a502e75287fac5d3f7e8a065b138",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F7160\",\"who\":\"sol-080F7160-2063\",\"claim_id\":6673943110,\"reason\":\"Complete original sized FUNC diagnostic exact; stopped pending distinct parent native clearance.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T01:25:02Z",
+          "id": 6674140925,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T01:25:02Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "dc0ebc4edba0389fd2e3beee63f4431e2ff8feb544e74f922abfde1c4bf663e0",
+        "result": {
+          "address": "0x080F7160",
+          "claim_id": 6673943110,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6674140925,
+          "status": "accepted",
+          "who": "sol-080F7160-2063"
+        }
+      }
     },
     {
       "claim": {
