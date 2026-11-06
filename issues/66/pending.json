@@ -3806,7 +3806,35 @@
           "who": "sol-080DF9E4-2862"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e5ec57b720d0ec9b136319f36e65a78fdd7122204e0a86b0c69ff9d9ee51c482",
+        "acknowledged_cursor": 6692562288,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e5ec57b720d0ec9b136319f36e65a78fdd7122204e0a86b0c69ff9d9ee51c482",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DF9E4\",\"who\":\"sol-080DF9E4-2862\",\"claim_id\":6692388961,\"reason\":\"Complete original diagnostic frozen; exact remains native-pending, otherwise no independent natural correction.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T18:40:27Z",
+          "id": 6692562288,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T18:40:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a66f689a375276268b7b86e3dbe1fc356401379c8e5c5b7ccbb4a8ec6259bc48",
+        "result": {
+          "address": "0x080DF9E4",
+          "claim_id": 6692388961,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6692562288,
+          "status": "accepted",
+          "who": "sol-080DF9E4-2862"
+        }
+      }
     },
     {
       "claim": {
