@@ -3934,7 +3934,35 @@
           "who": "sol-080F378C-2140"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ec73e8194cf5c599301145eb43c47377fe5a21f4d88a10ab4c2a3234adb82a17",
+        "acknowledged_cursor": 6676055213,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ec73e8194cf5c599301145eb43c47377fe5a21f4d88a10ab4c2a3234adb82a17",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F378C\",\"who\":\"sol-080F378C-2140\",\"claim_id\":6676035371,\"reason\":\"First native MATCH310 complete bytes verified; all original and current167 pins preserved; primary publication intake follows.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T03:27:37Z",
+          "id": 6676055213,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T03:27:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "37b47865eebe85058311f520ea15933d141e72b4dfac841ade8ff0c7f373aa13",
+        "result": {
+          "address": "0x080F378C",
+          "claim_id": 6676035371,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6676055213,
+          "status": "accepted",
+          "who": "sol-080F378C-2140"
+        }
+      }
     }
   ],
   "issue": 66,
