@@ -19,6 +19,7 @@ import tempfile
 
 import private_float_pack_effects_inventory as inventory
 import private_float_extension_effects_inventory as extension
+import private_float_comparison_effects_inventory as comparison
 from inert_spin_profile import fixed_configuration, index_snapshot, marker_text
 from addressed_signed_runtime_profile import toolchain_fingerprint, runtime_fingerprint
 
@@ -26,7 +27,9 @@ SELECTOR = 'private-float-unpack-pack-v1'
 SCHEMA = 'elf-symbol-thumb-private-float-unpack-pack-v1'
 EXTENSION_SELECTOR = 'private-float-extension-v1'
 EXTENSION_SCHEMA = 'elf-symbol-thumb-private-float-extension-v1'
-SELECTORS = (SELECTOR, EXTENSION_SELECTOR)
+COMPARISON_SELECTOR = 'private-float-comparison-v1'
+COMPARISON_SCHEMA = 'elf-symbol-thumb-private-float-comparison-v1'
+SELECTORS = (SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
             'definedness equivalence, physical memory, nonalias, nonescape and '
@@ -37,6 +40,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == COMPARISON_SELECTOR:
+        return comparison, COMPARISON_SCHEMA, CONTRACT.replace('unpack/pack', 'unpack/comparison')
     if selector == EXTENSION_SELECTOR:
         return extension, EXTENSION_SCHEMA, CONTRACT.replace('unpack/pack', 'unpack/double-constructor')
     return inventory, SCHEMA, CONTRACT
@@ -61,7 +66,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
@@ -117,7 +122,7 @@ def function_size(image, address):
 
 
 def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR):
-    """Authenticate only the two genuine private entry symbols, without aliases."""
+    """Authenticate only genuine private entry symbols from the selected closure, without aliases."""
     import match
     from software_double_profile import indices, span_record
     selected_inventory, _, _ = profile(selector)
