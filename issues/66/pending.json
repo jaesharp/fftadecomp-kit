@@ -3806,66 +3806,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "54eb5b6dddf65e01111f943e422532512c2a78d11af27b576ead7b3c8f695460",
-        "acknowledged_cursor": 6673100290,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "54eb5b6dddf65e01111f943e422532512c2a78d11af27b576ead7b3c8f695460",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D1DC\",\"who\":\"sol-0812D1DC-2012\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T00:20:14Z",
-          "id": 6673100290,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:20:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "69bd41c2d162c2d8440b4804a5b741548623b23e570a324f18c8f5322a3b2571",
-        "result": {
-          "address": "0x0812D1DC",
-          "claim_id": 6673100290,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6673100290,
-          "status": "accepted",
-          "who": "sol-0812D1DC-2012"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d02d2796bcd9b9eaa4cecd726cc085035361f46ec757cf08e61a426ca05a4981",
-        "acknowledged_cursor": 6673222570,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d02d2796bcd9b9eaa4cecd726cc085035361f46ec757cf08e61a426ca05a4981",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D1DC\",\"who\":\"sol-0812D1DC-2012\",\"claim_id\":6673100290,\"reason\":\"First native MATCH complete276 bytes, plausible frozen original C, one native and compiler invocation with no replay. Source/report/original compiler and proof receipts frozen; parent intake/publication.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T00:27:42Z",
-          "id": 6673222570,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:27:42Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "bf5c5c2c9e68bccf3746d3dd0a41f03ef23577d62bb36631854eed6d07c9e3b9",
-        "result": {
-          "address": "0x0812D1DC",
-          "claim_id": 6673100290,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6673222570,
-          "status": "accepted",
-          "who": "sol-0812D1DC-2012"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c9cc9e08030bb8d9eb5fb2119b81025ecda16dc9109c7188c1b52cd3272a9217",
         "acknowledged_cursor": 6673139540,
         "body_provenance": "acceptance-time",
@@ -3895,66 +3835,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "df07fc395ec82ce89ab1114bbdecf12f97110e896979367276ff54fa8d6d48c1",
-        "acknowledged_cursor": 6673139540,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "df07fc395ec82ce89ab1114bbdecf12f97110e896979367276ff54fa8d6d48c1",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802C270\",\"who\":\"sol-0802C270-2015\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T00:22:40Z",
-          "id": 6673139540,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:22:40Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "53889730ded8616f7f3275c1c9abae510c3e4b00b880694a6b6b7b7413b87d73",
-        "result": {
-          "address": "0x0802C270",
-          "claim_id": 6673139540,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6673139540,
-          "status": "accepted",
-          "who": "sol-0802C270-2015"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "23428387d11fa7b10f04784e9dcd6fb1fdb0a54a8b457e652b9d3b1744cb1d47",
-        "acknowledged_cursor": 6673233097,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "23428387d11fa7b10f04784e9dcd6fb1fdb0a54a8b457e652b9d3b1744cb1d47",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802C270\",\"who\":\"sol-0802C270-2015\",\"claim_id\":6673139540,\"reason\":\"Frozen first natural full296-byte diagnostic;276 equal, two argument-setup scheduling blocks differ. No independently grounded refinement, native proof or MATCH credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T00:28:14Z",
-          "id": 6673230518,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:28:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "23d088acc61f7fb163069a177eb780f61770c04ea7263faf2bf54c0e98395bf8",
-        "result": {
-          "address": "0x0802C270",
-          "claim_id": 6673139540,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6673230518,
-          "status": "accepted",
-          "who": "sol-0802C270-2015"
-        }
-      }
     },
     {
       "claim": {
