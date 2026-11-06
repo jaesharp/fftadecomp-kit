@@ -3834,7 +3834,35 @@
           "who": "sol-080D9350-2045"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "26b150b7203b302c553f23ce8f888a71c6c9334a74e148e93a4bc419f3bf3b98",
+        "acknowledged_cursor": 6673703235,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "26b150b7203b302c553f23ce8f888a71c6c9334a74e148e93a4bc419f3bf3b98",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D9350\",\"who\":\"sol-080D9350-2045\",\"claim_id\":6673551239,\"reason\":\"Frozen whole original FUNC312B exact, genuine original artifacts and natural halfword loop reconstruction preserved. Native prerequisite qualification primary-owned; no MATCH credit yet.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T00:57:07Z",
+          "id": 6673703235,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:57:07Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "732f60c9cd8251cf72a9028e4fc84ff7abe8cf477f55faa2aa1cf3e5347482da",
+        "result": {
+          "address": "0x080D9350",
+          "claim_id": 6673551239,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673703235,
+          "status": "accepted",
+          "who": "sol-080D9350-2045"
+        }
+      }
     },
     {
       "claim": {
@@ -3896,6 +3924,70 @@
           "request_id": 6673655328,
           "status": "accepted",
           "who": "sol-080D4A28-2050"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "46985e029f3dc48031640db0d5109b364846071a8a8d0728be180cae49bd8f13",
+        "acknowledged_cursor": 6673703235,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "46985e029f3dc48031640db0d5109b364846071a8a8d0728be180cae49bd8f13",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080F0AC0\",\"who\":\"sol-080F0AC0-2054\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-06T00:56:49Z",
+          "id": 6673698902,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:56:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "732f60c9cd8251cf72a9028e4fc84ff7abe8cf477f55faa2aa1cf3e5347482da",
+        "result": {
+          "address": "0x080F0AC0",
+          "claim_id": 6673698902,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6673698902,
+          "status": "accepted",
+          "who": "sol-080F0AC0-2054"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "8b34888ec95dec057b36bb7c63fc2d927457298ca6f55c1c7d117d01fcfa0039",
+        "acknowledged_cursor": 6673703235,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8b34888ec95dec057b36bb7c63fc2d927457298ca6f55c1c7d117d01fcfa0039",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080EF970\",\"who\":\"sol-080EF970-2054\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-06T00:56:49Z",
+          "id": 6673698945,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:56:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "732f60c9cd8251cf72a9028e4fc84ff7abe8cf477f55faa2aa1cf3e5347482da",
+        "result": {
+          "address": "0x080EF970",
+          "claim_id": 6673698945,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6673698945,
+          "status": "accepted",
+          "who": "sol-080EF970-2054"
         }
       },
       "release": null
