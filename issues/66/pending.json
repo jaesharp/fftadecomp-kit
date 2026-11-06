@@ -3806,66 +3806,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "4af8a1e4fb477ffd590f70080532a6ebd29434240259c6b6e7b5c9e016d7eaed",
-        "acknowledged_cursor": 6680914261,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4af8a1e4fb477ffd590f70080532a6ebd29434240259c6b6e7b5c9e016d7eaed",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080B48CC\",\"who\":\"sol-080B48CC-2371\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T08:45:46Z",
-          "id": 6680914220,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T08:45:46Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "82fc74d2161dafae4dfd3615f49ce6fa7a38b70fc992e0a7e1af3bb9e1c8c3e4",
-        "result": {
-          "address": "0x080B48CC",
-          "claim_id": 6680914220,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6680914220,
-          "status": "accepted",
-          "who": "sol-080B48CC-2371"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d5015528c596f6266a6856acf01f25ed39de6007103f21f74e63df5b18f25eff",
-        "acknowledged_cursor": 6681127220,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d5015528c596f6266a6856acf01f25ed39de6007103f21f74e63df5b18f25eff",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080B48CC\",\"who\":\"sol-080B48CC-2371\",\"claim_id\":6680914220,\"reason\":\"Original qualification2372 retains nested descriptor live-alias preservation gap. Frozen source retained; no C/compiler/native replay or MATCH credit. Releasing pending prerequisite work.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T08:58:14Z",
-          "id": 6681127220,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T08:58:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "71c419ba2762d606d0cf7f2441eb94914a7d7bf2bf29d13304426e3ab9b01236",
-        "result": {
-          "address": "0x080B48CC",
-          "claim_id": 6680914220,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6681127220,
-          "status": "accepted",
-          "who": "sol-080B48CC-2371"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "cbf3b90be1940e77da60588b050c34b129ce8e51688551abc60e41dfc8723cb5",
         "acknowledged_cursor": 6681077069,
         "body_provenance": "acceptance-time",
