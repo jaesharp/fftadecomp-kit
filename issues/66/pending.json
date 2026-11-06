@@ -3838,7 +3838,35 @@
           "who": "sol-080E4A14-2022"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "686d6612a7bba35fa07d7eb275d538d61eb230c48f9d603434691d95f99fbe9d",
+        "acknowledged_cursor": 6673334844,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "686d6612a7bba35fa07d7eb275d538d61eb230c48f9d603434691d95f99fbe9d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080E4A14\",\"who\":\"sol-080E4A14-2022\",\"claim_id\":6673233097,\"reason\":\"First natural original diagnostic complete298 bytes exact, frozen source/compiler/original ELF evidence. Stopped pending independent native admission, zero MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T00:34:46Z",
+          "id": 6673334844,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:34:46Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d3286968d5c00295854e4eaae9731eb14bb0b08b4f1cc7c7858d1d6ac7c0b1a1",
+        "result": {
+          "address": "0x080E4A14",
+          "claim_id": 6673233097,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673334844,
+          "status": "accepted",
+          "who": "sol-080E4A14-2022"
+        }
+      }
     },
     {
       "claim": {
