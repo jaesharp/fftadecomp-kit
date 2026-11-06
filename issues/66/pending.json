@@ -3834,7 +3834,35 @@
           "who": "sol-0812D1DC-2012"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d02d2796bcd9b9eaa4cecd726cc085035361f46ec757cf08e61a426ca05a4981",
+        "acknowledged_cursor": 6673222570,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d02d2796bcd9b9eaa4cecd726cc085035361f46ec757cf08e61a426ca05a4981",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D1DC\",\"who\":\"sol-0812D1DC-2012\",\"claim_id\":6673100290,\"reason\":\"First native MATCH complete276 bytes, plausible frozen original C, one native and compiler invocation with no replay. Source/report/original compiler and proof receipts frozen; parent intake/publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T00:27:42Z",
+          "id": 6673222570,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:27:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "bf5c5c2c9e68bccf3746d3dd0a41f03ef23577d62bb36631854eed6d07c9e3b9",
+        "result": {
+          "address": "0x0812D1DC",
+          "claim_id": 6673100290,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673222570,
+          "status": "accepted",
+          "who": "sol-0812D1DC-2012"
+        }
+      }
     },
     {
       "claim": {
