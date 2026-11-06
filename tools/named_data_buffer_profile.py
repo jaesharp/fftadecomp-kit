@@ -9,6 +9,9 @@ from inert_spin_profile import validate_span
 
 SELECTOR = 'named-data-buffer-v1'
 SCHEMA = 'elf-symbol-thumb-named-data-buffer-calls-v1'
+DATAFREE_SELECTOR = 'bounded-buffer-datafree-caller-v1'
+DATAFREE_SCHEMA = 'elf-symbol-thumb-bounded-buffer-datafree-caller-v1'
+DATAFREE_CONTROL_FLOW = 'complete data-free Thumb caller with unchanged bounded ordinary-buffer effects'
 SCRATCH_SELECTOR = 'bounded-buffer-discarded-return-scratch-v1'
 SCRATCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-discarded-return-scratch-v1'
 SCRATCH_CONTROL_FLOW = 'bounded buffer calls with exact unobserved R2/R3 normal-return scratch'
@@ -31,8 +34,8 @@ GUARDED_ALIAS_MAX_DEPENDENCIES = 32
 ROOT_SWITCH_SELECTOR = 'bounded-buffer-root-guarded-switch-v1'
 ROOT_SWITCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-root-guarded-switch-v1'
 ROOT_SWITCH_CONTROL_FLOW = 'complete guarded-switch owner with unchanged bounded ordinary-buffer alias checks'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA)
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
