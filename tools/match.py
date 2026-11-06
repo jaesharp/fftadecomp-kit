@@ -4221,6 +4221,7 @@ def main():
                                                       "bounded-buffer-discarded-return-scratch-v1",
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
                                                       "bounded-buffer-bios-fill-source-v1",
+                                                      "bounded-buffer-bios-fast-fill-source-v1",
                                                       "bounded-buffer-guarded-switch-v1",
                                                       "bounded-buffer-guarded-callee-aliases-v1",
                                                       "bounded-buffer-guarded-bios-division-v1",
