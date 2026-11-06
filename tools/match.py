@@ -4196,7 +4196,7 @@ def main():
     ap.add_argument("--emit", help="write verified symbol bytes to a new file under the decomp build/")
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"),
                     help="decomp repo (default: current directory)")
-    ap.add_argument("--owner-runtime-profile", choices=("restoring-owner-runtime-v1",
+    ap.add_argument("--owner-runtime-profile", choices=("restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1",
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
                                                       "named-data-buffer-v1",
