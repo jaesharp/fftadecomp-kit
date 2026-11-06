@@ -3838,7 +3838,35 @@
           "who": "sol-08119068-2652"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5b54da44431a4f536c190c8867bf72165925f7bd4bca0122ae45cb1f23eda6f9",
+        "acknowledged_cursor": 6687530028,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5b54da44431a4f536c190c8867bf72165925f7bd4bca0122ae45cb1f23eda6f9",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08119068\",\"who\":\"sol-08119068-2652\",\"claim_id\":6687227808,\"reason\":\"Frozen honest residual: one natural form 1408/1424B, unsupported discarded control-byte storage plus remaining allocation/control differences; all originals preserved, no native proof or MATCH credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T14:43:49Z",
+          "id": 6687519698,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:43:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "73611645dc1aa00b078ea470a360eb1e48bf21b9cea09549ad87ada11fdab261",
+        "result": {
+          "address": "0x08119068",
+          "claim_id": 6687227808,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6687519698,
+          "status": "accepted",
+          "who": "sol-08119068-2652"
+        }
+      }
     },
     {
       "claim": {
@@ -3900,6 +3928,102 @@
           "request_id": 6687441661,
           "status": "accepted",
           "who": "sol-080AADBC-2660"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "b05ac0646813c5428774b6f1e54a4713587636285abda86b43457b7e835db779",
+        "acknowledged_cursor": 6687530028,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b05ac0646813c5428774b6f1e54a4713587636285abda86b43457b7e835db779",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D5128\",\"who\":\"sol-080D5128-2663\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-06T14:43:59Z",
+          "id": 6687523468,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:43:59Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "73611645dc1aa00b078ea470a360eb1e48bf21b9cea09549ad87ada11fdab261",
+        "result": {
+          "address": "0x080D5128",
+          "claim_id": 6687523468,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6687523468,
+          "status": "accepted",
+          "who": "sol-080D5128-2663"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "de050b61a482f8a31d2f3992b305f1ed4bec3d35f7cc35dd040c96699989e51e",
+        "acknowledged_cursor": 6687530028,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "de050b61a482f8a31d2f3992b305f1ed4bec3d35f7cc35dd040c96699989e51e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080E5978\",\"who\":\"sol-080E5978-2664\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-06T14:44:16Z",
+          "id": 6687529716,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:44:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "73611645dc1aa00b078ea470a360eb1e48bf21b9cea09549ad87ada11fdab261",
+        "result": {
+          "address": "0x080E5978",
+          "claim_id": 6687529716,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6687529716,
+          "status": "accepted",
+          "who": "sol-080E5978-2664"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "15e2ad334275fb7e70342baf5123b745f5f3c2956e5f63f717c74da431379f36",
+        "acknowledged_cursor": 6687530028,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "15e2ad334275fb7e70342baf5123b745f5f3c2956e5f63f717c74da431379f36",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08148B60\",\"who\":\"sol-08148B60-2664\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+          "created_at": "2026-11-06T14:44:17Z",
+          "id": 6687530028,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:44:17Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "73611645dc1aa00b078ea470a360eb1e48bf21b9cea09549ad87ada11fdab261",
+        "result": {
+          "address": "0x08148B60",
+          "claim_id": 6687530028,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6687530028,
+          "status": "accepted",
+          "who": "sol-08148B60-2664"
         }
       },
       "release": null
