@@ -38,6 +38,7 @@ import descriptor_disjunctive_alias_profile as disjunctive
 import descriptor_callee_constant_profile as callee_constant
 import descriptor_cursor_value_profile as cursor
 import ordinary_formal_output_spill_profile as formal_spill
+import guarded_bios_division_profile as bios_div
 from inert_spin_profile import fixed_configuration, index_snapshot, validate_span, marker_text
 
 SCHEMA = 'elf-symbol-thumb-restoring-owner-runtime-v1'
@@ -92,6 +93,7 @@ def selected(report):
                       [f'* verification: `{named_buffer.BIOS_FILL_SCHEMA}`'],
                       [f'* verification: `{named_buffer.GUARDED_SWITCH_SCHEMA}`'],
                       [f'* verification: `{named_buffer.GUARDED_ALIAS_SCHEMA}`'],
+                      [f'* verification: `{bios_div.SCHEMA}`'],
                       [f'* verification: `{named_buffer.ROOT_SWITCH_SCHEMA}`'],
                       [f'* verification: `{nested_output.SCHEMA}`'],
                       [f'* verification: `{static_buffer.SCHEMA}`'],
@@ -171,6 +173,8 @@ def selector_for_report(report):
         return nested_output.SELECTOR
     if f'* verification: `{named_buffer.ROOT_SWITCH_SCHEMA}`' in report.splitlines():
         return named_buffer.ROOT_SWITCH_SELECTOR
+    if f'* verification: `{bios_div.SCHEMA}`' in report.splitlines():
+        return bios_div.SELECTOR
     if f'* verification: `{named_buffer.GUARDED_ALIAS_SCHEMA}`' in report.splitlines():
         return named_buffer.GUARDED_ALIAS_SELECTOR
     if f'* verification: `{named_buffer.GUARDED_SWITCH_SCHEMA}`' in report.splitlines():
@@ -243,7 +247,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
         if set(ins) != {item.address for item in verified}:
             raise ValueError('aligned switch native instructions differ from complete owner CFG')
     elif buffer_selector:
-        module = nested_output if selector == nested_output.SELECTOR else r6_buffer if selector in r6_buffer.PROFILES else word_buffer if selector == word_buffer.SELECTOR else r7_buffer if selector == r7_buffer.SELECTOR else formal_spill if selector in formal_spill.SELECTORS else cursor if selector == cursor.SELECTOR else callee_constant if selector == callee_constant.SELECTOR else disjunctive if selector == disjunctive.SELECTOR else single_store if selector == single_store.SELECTOR else output_alias if selector == output_alias.SELECTOR else watched_switch if selector == watched_switch.SELECTOR else descriptor if selector == descriptor.SELECTOR else static_buffer if selector == static_buffer.SELECTOR else named_buffer
+        module = bios_div if selector == bios_div.SELECTOR else nested_output if selector == nested_output.SELECTOR else r6_buffer if selector in r6_buffer.PROFILES else word_buffer if selector == word_buffer.SELECTOR else r7_buffer if selector == r7_buffer.SELECTOR else formal_spill if selector in formal_spill.SELECTORS else cursor if selector == cursor.SELECTOR else callee_constant if selector == callee_constant.SELECTOR else disjunctive if selector == disjunctive.SELECTOR else single_store if selector == single_store.SELECTOR else output_alias if selector == output_alias.SELECTOR else watched_switch if selector == watched_switch.SELECTOR else descriptor if selector == descriptor.SELECTOR else static_buffer if selector == static_buffer.SELECTOR else named_buffer
         if branches or words and selector != named_buffer.ROOT_SWITCH_SELECTOR:
             raise ValueError('named-data buffer caller excludes local BL and word switches')
         for destination in calls.values():
@@ -264,6 +268,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
                    watched_switch.WatchedSwitchPreservationProof if selector == watched_switch.SELECTOR else
                    descriptor.ProtectedDescriptorWordProof if selector == descriptor.SELECTOR else
                    static_buffer.StaticCallbackBufferProof if selector == static_buffer.SELECTOR else
+                   bios_div.GuardedBiosDivisionProof if selector == bios_div.SELECTOR else
                    named_buffer.GuardedAliasBufferProof if selector == named_buffer.GUARDED_ALIAS_SELECTOR else
                    named_buffer.GuardedSwitchBufferProof if selector == named_buffer.GUARDED_SWITCH_SELECTOR else
                    named_buffer.BiosFillSourceProof if selector == named_buffer.BIOS_FILL_SELECTOR else
@@ -318,6 +323,10 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
                 proof['buffers']['entry_scratch_overwrites'] = buffers.entry_kill_manifest()
             if selector == named_buffer.GUARDED_SWITCH_SELECTOR:
                 proof['buffers']['normal_return_scratch'] = buffers.scratch_manifest()
+        if selector == bios_div.SELECTOR:
+            proof['buffers']['bios_division'] = buffers.bios_manifest()
+            proof['buffers']['guarded_switches'] = buffers.guarded_manifest()
+            proof['buffers']['entry_scratch_overwrites'] = buffers.entry_kill_manifest()
         if selector == named_buffer.BIOS_FILL_SELECTOR:
             import bios_cpuset_fill_profile as fill
             proof['buffers']['bios_fill'] = buffers.bios_manifest()
@@ -432,7 +441,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
             bindings['calls'] != sorted(proof['calls'] + proof['runtime_calls']):
         raise ValueError('owner bindings do not cover every exact reached external call')
     ordinary.update(data=bindings['data'],functions=bindings['functions'])
-    if selector in (nested_output.SELECTOR, named_buffer.SCRATCH_SELECTOR, named_buffer.BIOS_SQRT_SELECTOR, named_buffer.BIOS_FILL_SELECTOR, named_buffer.GUARDED_SWITCH_SELECTOR, named_buffer.GUARDED_ALIAS_SELECTOR) and (bindings['functions'] or bindings['switches']):
+    if selector in (bios_div.SELECTOR, nested_output.SELECTOR, named_buffer.SCRATCH_SELECTOR, named_buffer.BIOS_SQRT_SELECTOR, named_buffer.BIOS_FILL_SELECTOR, named_buffer.GUARDED_SWITCH_SELECTOR, named_buffer.GUARDED_ALIAS_SELECTOR) and (bindings['functions'] or bindings['switches']):
         raise ValueError('discarded return scratch excludes callback literals and switches')
     if selector in (named_buffer.SELECTOR, named_buffer.BIOS_FILL_SELECTOR) and (not bindings['data'] or bindings['functions'] or bindings['switches']):
         raise ValueError('named-data buffers require actual named object relocations and exclude function literals')
@@ -482,6 +491,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
         nested_output.SCHEMA if selector == nested_output.SELECTOR else \
         named_buffer.DATAFREE_SCHEMA if selector == named_buffer.DATAFREE_SELECTOR else \
         named_buffer.ROOT_SWITCH_SCHEMA if selector == named_buffer.ROOT_SWITCH_SELECTOR else \
+        bios_div.SCHEMA if selector == bios_div.SELECTOR else \
         named_buffer.GUARDED_ALIAS_SCHEMA if selector == named_buffer.GUARDED_ALIAS_SELECTOR else \
         named_buffer.GUARDED_SWITCH_SCHEMA if selector == named_buffer.GUARDED_SWITCH_SELECTOR else \
         named_buffer.BIOS_FILL_SCHEMA if selector == named_buffer.BIOS_FILL_SELECTOR else named_buffer.BIOS_SQRT_SCHEMA if selector == named_buffer.BIOS_SQRT_SELECTOR else \
@@ -781,8 +791,8 @@ def render(address,result):
     if buffers or recursive or mutable_selected or aligned or entry_switch or scalar_switch:
         evidence['original_elf_sha256'] = sha(original_elf)
     return '\n'.join([f'# 0x{address:08X}','',f'* verification: `{manifest["profile"]}`',
-        f'* owner runtime: {THUNK_SWITCH_SELECTOR if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_SELECTOR if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_SELECTOR if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_SELECTOR if entry_switch else CYCLIC_SELECTOR if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_SELECTOR if aligned else mutable_native.SELECTOR if mutable_selected else entry.SELECTOR if recursive else resident_word.SELECTOR if resident_selected else word_buffer.SELECTOR if word_selected else r6_profile[0] if r6_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.BIOS_SELECTOR if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else callee_constant.SELECTOR if constant else disjunctive.SELECTOR if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else nested_output.SELECTOR if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_SELECTOR if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else named_buffer.GUARDED_ALIAS_SELECTOR if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_SELECTOR if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.BIOS_SQRT_SELECTOR if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_SELECTOR if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_SELECTOR if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
-        f'* control flow: {THUNK_SWITCH_CONTROL_FLOW if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_CONTROL_FLOW if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_CONTROL_FLOW if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_CONTROL_FLOW if entry_switch else CYCLIC_CONTROL_FLOW if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_CONTROL_FLOW if manifest["profile"] == ALIGNED_SCHEMA else mutable_native.CONTROL_FLOW if mutable_selected else entry.CONTROL_FLOW if recursive else resident_word.CONTROL_FLOW if resident_selected else word_buffer.CONTROL_FLOW if word_selected else r6_profile[1] if r6_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.BIOS_CONTROL_FLOW if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.CONTROL_FLOW if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else nested_output.CONTROL_FLOW if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else named_buffer.GUARDED_ALIAS_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.BIOS_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_FILL_SCHEMA else named_buffer.BIOS_SQRT_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_CONTROL_FLOW if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_CONTROL_FLOW if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
+        f'* owner runtime: {THUNK_SWITCH_SELECTOR if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_SELECTOR if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_SELECTOR if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_SELECTOR if entry_switch else CYCLIC_SELECTOR if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_SELECTOR if aligned else mutable_native.SELECTOR if mutable_selected else entry.SELECTOR if recursive else resident_word.SELECTOR if resident_selected else word_buffer.SELECTOR if word_selected else r6_profile[0] if r6_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.BIOS_SELECTOR if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else callee_constant.SELECTOR if constant else disjunctive.SELECTOR if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else nested_output.SELECTOR if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_SELECTOR if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.SELECTOR if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_SELECTOR if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_SELECTOR if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.BIOS_SQRT_SELECTOR if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_SELECTOR if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_SELECTOR if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
+        f'* control flow: {THUNK_SWITCH_CONTROL_FLOW if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_CONTROL_FLOW if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_CONTROL_FLOW if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_CONTROL_FLOW if entry_switch else CYCLIC_CONTROL_FLOW if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_CONTROL_FLOW if manifest["profile"] == ALIGNED_SCHEMA else mutable_native.CONTROL_FLOW if mutable_selected else entry.CONTROL_FLOW if recursive else resident_word.CONTROL_FLOW if resident_selected else word_buffer.CONTROL_FLOW if word_selected else r6_profile[1] if r6_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.BIOS_CONTROL_FLOW if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.CONTROL_FLOW if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else nested_output.CONTROL_FLOW if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.CONTROL_FLOW if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.BIOS_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_FILL_SCHEMA else named_buffer.BIOS_SQRT_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_CONTROL_FLOW if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_CONTROL_FLOW if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
         '* verified extent: complete ELF function symbol, including literal pools',
         '* relocations: none','* source plausibility: plausible','* hand-asm allow list: not listed',
         f'* owner runtime evidence: `{text(evidence)}`',f'* compiled : `{data.hex()}`',

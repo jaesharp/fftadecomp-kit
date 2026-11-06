@@ -4221,6 +4221,7 @@ def main():
                                                       "bounded-buffer-bios-fill-source-v1",
                                                       "bounded-buffer-guarded-switch-v1",
                                                       "bounded-buffer-guarded-callee-aliases-v1",
+                                                      "bounded-buffer-guarded-bios-division-v1",
                                                       "bounded-buffer-nested-halfword-output-v1",
                                                       "bounded-buffer-root-guarded-switch-v1",
                                                       "static-callback-buffer-v1",
