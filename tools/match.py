@@ -4239,7 +4239,7 @@ def main():
     ap.add_argument("--emit", help="write verified symbol bytes to a new file under the decomp build/")
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"),
                     help="decomp repo (default: current directory)")
-    ap.add_argument("--owner-runtime-profile", choices=("ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
+    ap.add_argument("--owner-runtime-profile", choices=("canonical-integer-scalar-source-v1", "ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
                                                       "restoring-owner-r3-thunk-switch-v1", "restoring-owner-scalar-switch-v1", "restoring-owner-switch-entry-word-v1", "restoring-owner-switch-entry-two-words-data-v1",
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
