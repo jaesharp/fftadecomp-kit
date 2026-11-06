@@ -3309,8 +3309,12 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         division_constants = udivsi3_context[2]
     if switch_data_relocations is not None and switch_relocations is None:
         raise ValueError("switch-data requires a verified local switch")
+    root_buffer_switch = False
     if switch_relocations is not None:
-        if not thumb or buffer_proof is not None or call_resolver is not None:
+        from named_data_buffer_profile import root_switch_context
+        root_buffer_switch = root_switch_context(buffer_proof, data, address,
+            validated_calls, switch_relocations, switch_data_relocations)
+        if not thumb or buffer_proof is not None and not root_buffer_switch or call_resolver is not None:
             raise ValueError("switch evidence cannot combine frame or buffer proof profiles")
         if allow_switch_constants:
             switch = constants_layout(data, address, switch_relocations)
@@ -3914,7 +3918,7 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
         raise ValueError("stack alias literal load is bypassed by a control-flow edge")
     if switch is not None:
         pool_switch = function_thunk_context is not None and 'pool_switch' in function_thunk_context
-        if (not scalar_switch_frame and double_context is None and not pool_switch and
+        if (not scalar_switch_frame and double_context is None and not pool_switch and not root_buffer_switch and
                 uses_stack_frame(instructions.values())) or any(
                 target in RUNTIME_HELPERS.values() and not (pool_switch and target in function_thunk.ALIASES.values())
                 for target in calls.values()):

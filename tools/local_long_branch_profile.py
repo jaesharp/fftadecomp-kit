@@ -92,9 +92,11 @@ def prove_frame(instructions, edges, address, branches, calls, *,
     Ordinary calls retain the toolkit's existing external ABI-summary boundary.
     """
     from match import thumb_stack_adjustment, stack_alias_assignment, BufferCallProof
+    from named_data_buffer_profile import RootGuardedSwitchBufferProof
+    root_switch_buffer = type(buffer_proof) is RootGuardedSwitchBufferProof
     if type(stack_aliases) is not bool or buffer_proof is not None and (
-            not stack_aliases or type(buffer_proof) is not BufferCallProof or
-            buffer_proof.stack_arguments):
+            not stack_aliases or not root_switch_buffer and (
+                type(buffer_proof) is not BufferCallProof or buffer_proof.stack_arguments)):
         raise ValueError("local aliases require explicit Boolean policy and native buffer proof")
     if bounded_output_proof is not None:
         from bounded_stack_output_profile import BoundedOutputProof
@@ -427,7 +429,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 if (bounded_output_proof.check_call(calls[site],offsets,native_stack,site=site)
                         if bounded_output_proof is not None else
                         buffer_proof.check_call(calls[site], offsets, native_stack,
-                            **({'site':site} if buffer_proof.bios_fill_proof is not None else {}))):
+                            **({'site':site} if root_switch_buffer or buffer_proof.bios_fill_proof is not None else {}))):
                     raise ValueError("local alias return requires a separate provenance policy")
                 # A proved callee may write through any passed local buffer.
                 # Do not retain a saved-register token in potentially changed bytes.

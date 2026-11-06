@@ -24,8 +24,11 @@ GUARDED_SWITCH_CONTROL_FLOW = 'bounded buffer calls with an exact unsigned-guard
 NESTED_OUTPUT_SELECTOR = 'bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_CONTROL_FLOW = 'bounded buffer calls with native nested formal halfword outputs and retained entry aliases'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA)
+ROOT_SWITCH_SELECTOR = 'bounded-buffer-root-guarded-switch-v1'
+ROOT_SWITCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-root-guarded-switch-v1'
+ROOT_SWITCH_CONTROL_FLOW = 'complete guarded-switch owner with unchanged bounded ordinary-buffer alias checks'
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -123,6 +126,59 @@ class NamedDataBufferProof(match.BufferCallProof):
             'body_sha256': hashlib.sha256(data).hexdigest(), 'structure': structure,
             **self.identities}
         return instructions, transfers
+
+
+class RootGuardedSwitchBufferProof(NamedDataBufferProof):
+    """Authenticate root switch edges without changing buffer or escape rules."""
+
+    def inspect(self, address, data):
+        # Reuse only the existing complete instruction/edge inventory. Alias
+        # effects are replayed on this object, without scratch projection.
+        inspector = GuardedSwitchBufferProof(self.rom, self.mapping, self.index, self.objects)
+        instructions, transfers = inspector.inspect(address, data)
+        self.records[address] = inspector.records[address]
+        if inspector._guarded_switches:
+            self.__dict__.setdefault('_root_guarded_callees', {}).update(inspector._guarded_switches)
+        return instructions, transfers
+
+    def bind_root(self, data, address, calls, words):
+        import owner_admission_profile as owner
+        import owner_runtime_profile as operations
+        if hasattr(self, '_root_switch'):
+            raise ValueError('root switch buffer context is single use')
+        validate_owner(data, address, self.rom, self.mapping, self.index)
+        refinement = owner.refine(data, address, self.mapping)
+        ins, edges, branches, actual_calls, actual_words = graph.graph(data, address, refinement)
+        if branches or not calls or calls != actual_calls or words != actual_words or \
+                len(refinement['word_switches']) != 1:
+            raise ValueError('root buffer requires one exact guarded switch and ordinary calls')
+        layout = match.switch_layout(data, address, words)
+        operations.verify_operations(ins, edges, address, branches, calls, refinement)
+        self._root_switch = (data, address, dict(calls), dict(words))
+        self._root_switch_manifest = dict(schema=ROOT_SWITCH_SCHEMA,
+            address=address, end=address+len(data), body_sha256=hashlib.sha256(data).hexdigest(),
+            switch=layout, partition=graph.partition(data, address, refinement, ins, words),
+            calls=[[site-address, target] for site, target in sorted(calls.items())],
+            contract='Exact local guarded dispatch edges only. Ordinary buffer bounds, alias joins, '
+                'pointer slots and return escape checks remain active. Every reached return restores '
+                'R4-R11, SP and the entry return address under the conditional returning ordinary-call ABI. '
+                'No initialization, physical readability, nonalias, arithmetic equivalence or termination theorem.',
+            **self.identities)
+
+    def root_manifest(self):
+        if not hasattr(self, '_root_switch_manifest'):
+            raise ValueError('root switch has not been authenticated')
+        return dict(self._root_switch_manifest, guarded_callees=[
+            record for _, record in sorted(getattr(self, '_root_guarded_callees', {}).items())])
+
+
+def root_switch_context(proof, data, address, calls, words, data_words):
+    if type(proof) is not RootGuardedSwitchBufferProof:
+        return False
+    if data_words is not None or not hasattr(proof, '_root_switch') or \
+            proof._root_switch != (data, address, calls, words):
+        raise ValueError('root buffer switch differs from authenticated complete context')
+    return True
 
 
 class DiscardedReturnScratchProof(NamedDataBufferProof):
