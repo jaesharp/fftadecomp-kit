@@ -3742,7 +3742,35 @@
           "who": "sol-081428AC-2374"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d38f7aa52d0b0d6a5a2ffda892bd460063b7e021d0c82b01477b6f716326ca4d",
+        "acknowledged_cursor": 6681323995,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d38f7aa52d0b0d6a5a2ffda892bd460063b7e021d0c82b01477b6f716326ca4d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081428AC\",\"who\":\"sol-081428AC-2374\",\"claim_id\":6681076080,\"reason\":\"Complete56B original diagnostic exact frozen with prospective operator point bindings; compiler stopped, original artifacts retained. Native admission pending, no MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T09:09:28Z",
+          "id": 6681323995,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T09:09:28Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8fe4562ddfe72ccb1d466727d7ed3a72a411f38d0c26e001c929515222b2e1b0",
+        "result": {
+          "address": "0x081428AC",
+          "claim_id": 6681076080,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6681323995,
+          "status": "accepted",
+          "who": "sol-081428AC-2374"
+        }
+      }
     },
     {
       "claim": {
