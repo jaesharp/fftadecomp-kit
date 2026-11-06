@@ -5,6 +5,7 @@ import struct
 import sys
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import match
@@ -88,6 +89,22 @@ def fixture(*, callee=(0x6001, 0x2000, 0x4770), callee_body=None, allocation=2, 
 
 
 class RootSwitchBufferTests(unittest.TestCase):
+    def test_match_CLI_accepts_explicit_selector_before_any_execution(self):
+        import argparse
+        original = argparse.ArgumentParser.parse_args
+
+        class Parsed(Exception):
+            pass
+
+        def capture(parser, *args, **kwargs):
+            parsed = original(parser, ['0x08010000', '--owner-runtime-profile',
+                                       buffers.ROOT_SWITCH_SELECTOR])
+            self.assertEqual(parsed.owner_runtime_profile, buffers.ROOT_SWITCH_SELECTOR)
+            raise Parsed
+
+        with patch.object(argparse.ArgumentParser, 'parse_args', capture), self.assertRaises(Parsed):
+            match.main()
+
     def test_existing_guarded_callee_inventory_keeps_each_output_bound(self):
         prefix = struct.pack('<8H', 0xB500, 0x2901, 0xD80E,
                              0x008B, 0x4A01, 0x189B, 0x681B, 0x469F)
