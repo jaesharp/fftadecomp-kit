@@ -23,6 +23,7 @@ import private_float_comparison_effects_inventory as comparison
 import private_double_comparison_effects_inventory as double_comparison
 import private_float_scalar_conversion_effects_inventory as scalar_conversion
 import private_double_scalar_conversion_effects_inventory as double_scalar_conversion
+import private_double_pack_effects_inventory as double_pack
 from inert_spin_profile import fixed_configuration, index_snapshot, marker_text
 from addressed_signed_runtime_profile import toolchain_fingerprint, runtime_fingerprint
 
@@ -38,7 +39,9 @@ SCALAR_CONVERSION_SELECTOR = 'private-float-scalar-conversion-v1'
 SCALAR_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-scalar-conversion-v1'
 DOUBLE_SCALAR_CONVERSION_SELECTOR = 'private-double-scalar-conversion-v1'
 DOUBLE_SCALAR_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-double-scalar-conversion-v1'
-SELECTORS = (SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+DOUBLE_PACK_SELECTOR = 'private-double-unpack-pack-v1'
+DOUBLE_PACK_SCHEMA = 'elf-symbol-thumb-private-double-unpack-pack-v1'
+SELECTORS = (DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
              SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
@@ -50,6 +53,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == DOUBLE_PACK_SELECTOR:
+        return double_pack, DOUBLE_PACK_SCHEMA, CONTRACT.replace('unpack/pack', 'double-unpack/pack')
     if selector == DOUBLE_SCALAR_CONVERSION_SELECTOR:
         return double_scalar_conversion, DOUBLE_SCALAR_CONVERSION_SCHEMA, CONTRACT.replace('unpack/pack', 'double-unpack/scalar-conversion')
     if selector == SCALAR_CONVERSION_SELECTOR:
@@ -82,7 +87,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
