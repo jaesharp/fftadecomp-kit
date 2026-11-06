@@ -3742,7 +3742,35 @@
           "who": "sol-08057CDC-2063"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2e90619d8e5d7c0d0f107f1b7ef1456b5f19383d09e90d8aad8bc4df7ee68041",
+        "acknowledged_cursor": 6674078716,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2e90619d8e5d7c0d0f107f1b7ef1456b5f19383d09e90d8aad8bc4df7ee68041",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08057CDC\",\"who\":\"sol-08057CDC-2063\",\"claim_id\":6673918197,\"reason\":\"Frozen complete sized original linked FUNC is diagnostic exact. Fully stopped pending distinct parent native clearance; no native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T01:21:33Z",
+          "id": 6674078716,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T01:21:33Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "32b587b65e200d143600b7d999e20a10ccbc58d0c3ec02595106bf91d132e445",
+        "result": {
+          "address": "0x08057CDC",
+          "claim_id": 6673918197,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6674078716,
+          "status": "accepted",
+          "who": "sol-08057CDC-2063"
+        }
+      }
     },
     {
       "claim": {
