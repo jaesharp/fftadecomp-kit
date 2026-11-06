@@ -3838,66 +3838,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "4ea8174779c60f973f99e871a87ec66b55a909e620d21de81bd0458434f86b12",
-        "acknowledged_cursor": 6684244234,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4ea8174779c60f973f99e871a87ec66b55a909e620d21de81bd0458434f86b12",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0801CE6C\",\"who\":\"sol-0801CE6C-2537\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:55:24Z",
-          "id": 6684234138,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:55:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5e218263c117373f8b7ea1910bc708e4f09f5c01153186375859fae78fa5431e",
-        "result": {
-          "address": "0x0801CE6C",
-          "claim_id": 6684234138,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684234138,
-          "status": "accepted",
-          "who": "sol-0801CE6C-2537"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4f28cbbd6129c815e46253ddb87f139ae82ceac2be4d1c85b2da3b9e6eec6a09",
-        "acknowledged_cursor": 6684417648,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4f28cbbd6129c815e46253ddb87f139ae82ceac2be4d1c85b2da3b9e6eec6a09",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801CE6C\",\"who\":\"sol-0801CE6C-2537\",\"claim_id\":6684234138,\"reason\":\"Fully stopped. One grounded form emits164 bytes with156/164 same-offset equality. Only control-flags address materialization around first helper call differs; no independently grounded correction remains and no source-order sweep attempted. Original diagnostic link accepted; zero native/proof credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T12:05:56Z",
-          "id": 6684417213,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:05:56Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "00cbe212af750b7d792800e3b4d292c934590b31c052ec92a3d7dadddbfec6c4",
-        "result": {
-          "address": "0x0801CE6C",
-          "claim_id": 6684234138,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684417213,
-          "status": "accepted",
-          "who": "sol-0801CE6C-2537"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "e4c8064e8117fd650202821ec6c15ec85a0e4b8fca38f5d187bba1d98eb25d5f",
         "acknowledged_cursor": 6684398632,
         "body_provenance": "acceptance-time",
