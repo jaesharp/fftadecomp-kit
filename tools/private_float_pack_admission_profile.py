@@ -18,16 +18,28 @@ import sys
 import tempfile
 
 import private_float_pack_effects_inventory as inventory
+import private_float_extension_effects_inventory as extension
 from inert_spin_profile import fixed_configuration, index_snapshot, marker_text
 from addressed_signed_runtime_profile import toolchain_fingerprint, runtime_fingerprint
 
 SELECTOR = 'private-float-unpack-pack-v1'
 SCHEMA = 'elf-symbol-thumb-private-float-unpack-pack-v1'
+EXTENSION_SELECTOR = 'private-float-extension-v1'
+EXTENSION_SCHEMA = 'elf-symbol-thumb-private-float-extension-v1'
+SELECTORS = (SELECTOR, EXTENSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
             'definedness equivalence, physical memory, nonalias, nonescape and '
             'universal termination unproved')
 _replay = ContextVar('private_float_pack_replay', default=False)
+
+
+def profile(selector):
+    if type(selector) is not str or selector not in SELECTORS:
+        raise ValueError('private float admission requires its explicit selector')
+    if selector == EXTENSION_SELECTOR:
+        return extension, EXTENSION_SCHEMA, CONTRACT.replace('unpack/pack', 'unpack/double-constructor')
+    return inventory, SCHEMA, CONTRACT
 
 
 def sha(data):
@@ -47,17 +59,23 @@ def producer_fingerprint():
     return {name: sha(path.read_bytes()) for name, path in sorted(paths.items())}
 
 
-def selected(report):
+def selector_for_report(report):
     lines = report.splitlines()
-    if not any(SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
-        return False
-    if [line for line in lines if marker_text(line).startswith('* verification')] != [
-            f'* verification: `{SCHEMA}`'] or [line for line in lines
-            if marker_text(line).startswith('* private float pack:')] != [
-            f'* private float pack: `{SELECTOR}`']:
-        raise ValueError('mixed or malformed private-float admission report')
-    return True
+        return None
+    for selector in SELECTORS:
+        _, schema, _ = profile(selector)
+        if [line for line in lines if marker_text(line).startswith('* verification')] == [
+                f'* verification: `{schema}`'] and [line for line in lines
+                if marker_text(line).startswith('* private float pack:')] == [
+                f'* private float pack: `{selector}`']:
+            return selector
+    raise ValueError('mixed or malformed private-float admission report')
+
+
+def selected(report):
+    return selector_for_report(report) is not None
 
 
 def function_size(image, address):
@@ -98,10 +116,11 @@ def function_size(image, address):
     return size
 
 
-def original_bindings(image, address, rom, mapping, index):
+def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR):
     """Authenticate only the two genuine private entry symbols, without aliases."""
     import match
     from software_double_profile import indices, span_record
+    selected_inventory, _, _ = profile(selector)
     if image['type'] != 1:
         raise ValueError('private float requires original relocatable ELF')
     size = function_size(image, address)
@@ -113,10 +132,10 @@ def original_bindings(image, address, rom, mapping, index):
         raise ValueError('private float requires one complete Thumb ELF function')
     entries, rows = indices(mapping, index)
     span_record(address, address + size, entries, rows, rom)
-    if sha(rom) != inventory.runtime.ROM_SHA256:
+    if sha(rom) != selected_inventory.runtime.ROM_SHA256:
         raise ValueError('private float requires the approved ROM identity')
     targets = {}
-    for _, (start, end, count, digest), _ in inventory.HELPERS:
+    for _, (start, end, count, digest), _ in selected_inventory.HELPERS:
         record = span_record(start, end, entries, rows, rom)
         if record['instrs'] != count or sha(rom[start-match.ROM_BASE:end-match.ROM_BASE]) != digest or \
                 start < address + size and end > address:
@@ -147,7 +166,10 @@ def original_bindings(image, address, rom, mapping, index):
                 raise ValueError('private float requires canonical zero-addend Thumb BL')
             calls.append([site, name])
     calls.sort()
-    expected = [f'func_{record[0]:08X}' for _, record, _ in inventory.HELPERS]
+    roles = getattr(selected_inventory, 'ROOT_HELPERS',
+                    tuple(role for role, _, _ in selected_inventory.HELPERS))
+    expected = [f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}'
+                for name in roles]
     if [name for _, name in calls] != expected or any(item['name'] and not item['section'] and
             item['name'] not in targets for item in image['symbols']):
         raise ValueError('private float requires exactly one unpack then one pack and no extra symbols')
@@ -178,10 +200,10 @@ def linked_bytes(original, linked, address, calls, targets):
     return linked['text'][:size]
 
 
-def object_bytes(runner, workspace, args, original, address, rom, mapping, index):
+def object_bytes(runner, workspace, args, original, address, rom, mapping, index, *, selector=SELECTOR):
     import match
     fixed_configuration(args)
-    calls, targets = original_bindings(original, address, rom, mapping, index)
+    calls, targets = original_bindings(original, address, rom, mapping, index, selector=selector)
     definitions = ['.syntax unified', '.thumb']
     for name, target in sorted(targets.items()):
         definitions += [f'.global {name}', f'.type {name}, %function',
@@ -204,14 +226,14 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, index
 
 
 def verify(data, address, rom, mapping, index, calls, *, selector=SELECTOR, manifest=None):
-    if type(selector) is not str or selector != SELECTOR:
-        raise ValueError('private float admission requires its explicit selector')
-    proof, instructions = inventory.verify(data, address, rom, mapping, index, selector=inventory.SELECTOR)
-    expected = [[site-address, f'func_{next(record[0] for role, record, _ in inventory.HELPERS if role == name):08X}']
+    selected_inventory, schema, contract = profile(selector)
+    proof, instructions = selected_inventory.verify(data, address, rom, mapping, index,
+        selector=selected_inventory.SELECTOR)
+    expected = [[site-address, f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}']
                 for site, name in proof['private_bindings']]
     if type(calls) is not list or calls != expected:
         raise ValueError('private float ELF bindings differ from the fresh reached closure')
-    observed = dict(schema=SCHEMA, selector=SELECTOR, contract=CONTRACT, bindings=calls,
+    observed = dict(schema=schema, selector=selector, contract=contract, bindings=calls,
                     inventory=proof, producer_source_sha256=producer_fingerprint())
     if manifest is not None and text(manifest) != text(observed):
         raise ValueError('private float admission manifest differs from fresh proof')
@@ -229,6 +251,8 @@ def build(root, address, args=None, expected=None):
     args = args or argparse.Namespace(cc=match.DEFAULT_CC, cpp=match.DEFAULT_CPP, assembler=match.DEFAULT_AS,
         objcopy=match.DEFAULT_OBJCOPY, linker=match.DEFAULT_LD, flags=match.DEFAULT_FLAGS)
     fixed_configuration(args)
+    selector = expected['selector'] if expected is not None else getattr(args, 'owner_runtime_profile', SELECTOR)
+    profile(selector)
     source, mapping, index = source_fingerprint(root, address), mapping_snapshot(root), index_snapshot(root)
     objects, rom_path = data_snapshot(root), report_rom_path(root)
     rom = Path(rom_path).read_bytes()
@@ -249,8 +273,10 @@ def build(root, address, args=None, expected=None):
         with runner.workspace() as workspace:
             raw, _, original = match.compile_object(runner, workspace, args, capture, address,
                 candidates[0].relative_to(root).as_posix())
-            data, calls = object_bytes(runner, workspace, args, original, address, rom, mapping, index)
-            manifest, instructions = verify(data, address, rom, mapping, index, calls, manifest=expected)
+            data, calls = object_bytes(runner, workspace, args, original, address, rom, mapping, index,
+                selector=selector)
+            manifest, instructions = verify(data, address, rom, mapping, index, calls,
+                selector=selector, manifest=expected)
             linked = runner.read_binary(workspace+'/f.elf')
         checker = Path(importlib.import_module('plausible').__file__)
         process = match._run_replay_process([sys.executable, str(checker), '--quiet', '--addr',
@@ -272,11 +298,13 @@ def build(root, address, args=None, expected=None):
 
 
 def render(result):
+    selector = result['manifest']['selector']
+    _, schema, contract = profile(selector)
     evidence = {key: value for key, value in result.items() if key not in ('body', 'original_elf', 'linked_elf')}
     for key in ('body', 'original_elf', 'linked_elf'):
         evidence[key+'_sha256'] = sha(result[key])
-    return '\n'.join([f'# 0x{result["address"]:08X}', '', f'* verification: `{SCHEMA}`',
-        f'* private float pack: `{SELECTOR}`', f'* control flow: {CONTRACT}',
+    return '\n'.join([f'# 0x{result["address"]:08X}', '', f'* verification: `{schema}`',
+        f'* private float pack: `{selector}`', f'* control flow: {contract}',
         '* verified extent: complete original ELF function symbol, including literal pools',
         '* relocations: none', '* source plausibility: plausible', '* hand-asm allow list: not listed',
         f'* private float pack evidence: `{text(evidence)}`',
@@ -326,7 +354,7 @@ def report_matches(report, root, address):
 
 def issue(root, address, args):
     import match
-    if args.owner_runtime_profile != SELECTOR or args.mode != 'thumb' or \
+    if args.owner_runtime_profile not in SELECTORS or args.mode != 'thumb' or \
             args.control_flow_profile != 'ordinary' or args.label or args.wsl != 'Ubuntu' or \
             args.wsl_path != match.DEFAULT_WSL_PATH or any(getattr(args, name, None) is not None for name in (
             'signed_runtime_profile', 'signed_quotient_profile', 'addressed_signed_runtime_profile',

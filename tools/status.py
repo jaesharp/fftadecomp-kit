@@ -259,7 +259,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 import unsigned_divmod_profile
                 unsigned_runtime_profile = unsigned_divmod_profile.selector_for_report(saved_report)
                 import private_float_pack_admission_profile
-                private_float_profile = private_float_pack_admission_profile.selected(saved_report)
+                private_float_profile = private_float_pack_admission_profile.selector_for_report(saved_report)
                 import addressed_signed_runtime_profile
                 addressed_runtime_profile = addressed_signed_runtime_profile.selector_for_report(saved_report)
                 import signed_divmod_profile
@@ -327,7 +327,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
             if owner_profile:
                 command += ["--owner-runtime-profile", owner_admission_profile.selector_for_report(saved_report)]
             if private_float_profile:
-                command += ["--owner-runtime-profile", private_float_pack_admission_profile.SELECTOR]
+                command += ["--owner-runtime-profile", private_float_profile]
             if constants_profile:
                 command += ["--switch-profile", constants_profile.selector]
             if typed_outgoing_profile:
