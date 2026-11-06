@@ -3742,7 +3742,35 @@
           "who": "sol-0811AE00-2095"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "eaf17ad9550bd2ea14bc97a8b3607d9ed7c378c0c87b1843ffde21da4517b99c",
+        "acknowledged_cursor": 6675314747,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "eaf17ad9550bd2ea14bc97a8b3607d9ed7c378c0c87b1843ffde21da4517b99c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811AE00\",\"who\":\"sol-0811AE00-2095\",\"claim_id\":6675183588,\"reason\":\"Complete406B first-form original diagnostic exact and all final checks frozen; primary owns native qualification/publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T02:35:06Z",
+          "id": 6675314747,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T02:35:06Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c611e5445d7a14cf2c77658a54f8db5c2135f847be4e71076b56077147ffbb63",
+        "result": {
+          "address": "0x0811AE00",
+          "claim_id": 6675183588,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6675314747,
+          "status": "accepted",
+          "who": "sol-0811AE00-2095"
+        }
+      }
     },
     {
       "claim": {
