@@ -18,6 +18,8 @@ SELECTOR = 'scalar-frame-ordinary-switch-inventory-v1'
 SCHEMA = 'thumb-scalar-frame-ordinary-switch-inventory-v1'
 CYCLIC_SELECTOR = 'scalar-frame-ordinary-cyclic-switch-inventory-v1'
 CYCLIC_SCHEMA = 'thumb-scalar-frame-ordinary-cyclic-switch-inventory-v1'
+ENTRY_SELECTOR = 'scalar-entry-word-ordinary-switch-inventory-v1'
+ENTRY_SCHEMA = 'thumb-scalar-entry-word-ordinary-switch-v1'
 
 
 def text(value):
@@ -54,7 +56,7 @@ def bind_calls(calls, mapping, address, size, rom_size):
 
 
 def verify(data, address, rom, mapping, index, calls, bindings, *, selector, manifest=None):
-    if type(selector) is not str or selector not in (SELECTOR,CYCLIC_SELECTOR):
+    if type(selector) is not str or selector not in (SELECTOR,CYCLIC_SELECTOR,ENTRY_SELECTOR):
         raise ValueError('scalar switch requires its explicit inventory-only selector')
     if any(type(value) is not bytes for value in (data, rom, mapping, index)) or type(address) is not int:
         raise ValueError('scalar switch requires immutable exact ROM and index inputs')
@@ -104,15 +106,24 @@ def verify(data, address, rom, mapping, index, calls, bindings, *, selector, man
             raise ValueError('scalar switch excludes stack-address materialization')
         if adjustment is not None:
             adjustments.append([site - address, adjustment * 4])
-    if not any(value < 0 for _, value in adjustments):
+    if selector != ENTRY_SELECTOR and not any(value < 0 for _, value in adjustments):
         raise ValueError('scalar switch requires an actual nonzero fixed local allocation')
     # No buffer contracts, entry-word permissions, alias policies or call
     # preservation overrides. Every return restores the original frame tokens.
-    restored = frame.prove_frame(instructions, edges, address, branches, calls)
+    entry_policy = None
+    if selector == ENTRY_SELECTOR:
+        import readonly_entry_stack_profile as entry_stack
+        entry_policy = dict(schema=entry_stack.SCHEMA, words=[0])
+    restored = frame.prove_frame(instructions, edges, address, branches, calls,
+        entry_stack_policy=entry_policy)
+    if entry_policy is not None and not restored['entry_stack']['reads']:
+        raise ValueError('entry-word switch requires an actual incoming word0 read')
     modules = (analyze, thunks, frame, match, owner, graph, operations)
+    if entry_policy is not None:
+        modules += (entry_stack,)
     pins = {Path(module.__file__).name: sha(Path(module.__file__).read_bytes()) for module in modules}
     pins[Path(__file__).name] = sha(Path(__file__).read_bytes())
-    observed = {'schema': CYCLIC_SCHEMA if selector == CYCLIC_SELECTOR else SCHEMA, 'selector': selector, 'inventory_only': True,
+    observed = {'schema': ENTRY_SCHEMA if selector == ENTRY_SELECTOR else CYCLIC_SCHEMA if selector == CYCLIC_SELECTOR else SCHEMA, 'selector': selector, 'inventory_only': True,
         'source_or_ELF_admission': False, 'address': address, 'end': address + len(data),
         'instructions': len(instructions), 'word_switches': refinement['word_switches'],
         'interposed_constant_words': 0, 'stack_adjustments': adjustments,
@@ -124,11 +135,11 @@ def verify(data, address, rom, mapping, index, calls, bindings, *, selector, man
         'claim': 'complete local structural CFG/frame/return inventory under conditional ordinary returning-call ABI',
         'numeric_input_preconditions': [], 'arithmetic_C_equivalence': False,
         'termination_claim': False,
-        'control_flow_guarantee': ('every reached return restores the frame; local cycles receive no termination or iteration-bound claim' if selector == CYCLIC_SELECTOR else 'every reached CFG region has a path to a checked return; universal termination is not proved'),
+        'control_flow_guarantee': ('every reached return restores the frame; local cycles receive no termination or iteration-bound claim' if selector in (CYCLIC_SELECTOR, ENTRY_SELECTOR) else 'every reached CFG region has a path to a checked return; universal termination is not proved'),
         'body_sha256': sha(data), 'mapping_sha256': sha(mapping),
         'index_sha256': sha(index), 'ROM_sha256': sha(rom),
         'producer_source_sha256': pins, 'complete_native_structural_proof': True}
-    if selector == CYCLIC_SELECTOR:
+    if selector in (CYCLIC_SELECTOR, ENTRY_SELECTOR):
         observed['local_CFG_cycles'] = reached != len(instructions)
     if manifest is not None and text(manifest) != text(observed):
         raise ValueError('scalar switch manifest differs from fresh native proof')
