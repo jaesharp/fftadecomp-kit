@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "6caa13b2dee8a61dc2b18a09983d925af99627d3620375a22e5cd7d72d912d9d",
-        "acknowledged_cursor": 6679576038,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6caa13b2dee8a61dc2b18a09983d925af99627d3620375a22e5cd7d72d912d9d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08109B64\",\"who\":\"sol-08109B64-2318\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T07:23:52Z",
-          "id": 6679575618,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T07:23:52Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "704b234ad0bc6b53c0991dbb2adf7fce84e09c3dd9e7cf6a5db2a64b5d9fe519",
-        "result": {
-          "address": "0x08109B64",
-          "claim_id": 6679575618,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6679575618,
-          "status": "accepted",
-          "who": "sol-08109B64-2318"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d53b099958e9d0f170e7e707d2ce3287330f8c4c50a1a4c0b1d6393a5b83f3ac",
-        "acknowledged_cursor": 6679838900,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d53b099958e9d0f170e7e707d2ce3287330f8c4c50a1a4c0b1d6393a5b83f3ac",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08109B64\",\"who\":\"sol-08109B64-2318\",\"claim_id\":6679575618,\"reason\":\"Seven distinct natural compiler bodies exhausted; best valid868/860-byte nonmatch and all source/original/error evidence preserved.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T07:40:24Z",
-          "id": 6679838887,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T07:40:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "744ee4a5bc25028dff2bc39766255fdaf8db78037efbe0a88c2afb44eefdb0de",
-        "result": {
-          "address": "0x08109B64",
-          "claim_id": 6679575618,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6679838887,
-          "status": "accepted",
-          "who": "sol-08109B64-2318"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "630621dbcedac56a9747528508ec534845abc7bac03c3d5d74072fe30624278e",
         "acknowledged_cursor": 6679609734,
         "body_provenance": "acceptance-time",
@@ -3959,66 +3899,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "1eeb36153dc9d1d7800d019526ddde82808fd587aaf847453bdaa55594aa90be",
-        "acknowledged_cursor": 6679771302,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1eeb36153dc9d1d7800d019526ddde82808fd587aaf847453bdaa55594aa90be",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08011B30\",\"who\":\"sol-08011B30-2328\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T07:36:15Z",
-          "id": 6679771302,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T07:36:15Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f85c37707fb85f4d4c977adc37d950fe303c32cd6c148073019bbfe5d4dd195a",
-        "result": {
-          "address": "0x08011B30",
-          "claim_id": 6679771302,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6679771302,
-          "status": "accepted",
-          "who": "sol-08011B30-2328"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "aed909354b8d9a88fa51ed89c1f55e888c03c7da630b47ff38b54ecd4d9eb305",
-        "acknowledged_cursor": 6679799698,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "aed909354b8d9a88fa51ed89c1f55e888c03c7da630b47ff38b54ecd4d9eb305",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08011B30\",\"who\":\"sol-08011B30-2328\",\"claim_id\":6679771302,\"reason\":\"First native MATCH304B admitted once with published guarded ordinary alias proof; plausible source and all original/native167/runtime/ROM checks pass.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T07:37:47Z",
-          "id": 6679799698,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T07:37:47Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8b82e318188f16521a12e0a08f2b1c03fe7a7afc33f9a9b5f6794b12bfc7358a",
-        "result": {
-          "address": "0x08011B30",
-          "claim_id": 6679771302,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6679799698,
-          "status": "accepted",
-          "who": "sol-08011B30-2328"
-        }
-      }
     }
   ],
   "issue": 66,
