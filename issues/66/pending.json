@@ -3834,7 +3834,35 @@
           "who": "sol-0814402C-2809"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a12dbdf9e0691af5bf1589498d01e121057fac3681d880d9314677f2a54e5825",
+        "acknowledged_cursor": 6691737690,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a12dbdf9e0691af5bf1589498d01e121057fac3681d880d9314677f2a54e5825",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814402C\",\"who\":\"sol-0814402C-2809\",\"claim_id\":6691429911,\"reason\":\"Fully stopped original packet frozen with exact sized FUNC or explicit residual/historical stop; source retained, zero native credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T17:59:10Z",
+          "id": 6691737690,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T17:59:10Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3e2e88e5c2dfaa12ae887789a8e4788cd51d2cf3aa2c60f57850e5639bc728c2",
+        "result": {
+          "address": "0x0814402C",
+          "claim_id": 6691429911,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6691737690,
+          "status": "accepted",
+          "who": "sol-0814402C-2809"
+        }
+      }
     },
     {
       "claim": {
