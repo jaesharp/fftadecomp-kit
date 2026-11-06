@@ -3742,7 +3742,35 @@
           "who": "sol-080F0AC0-2054"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d718cf20a1ee0cd1fc7258c6bda4a2b095bdbe1074a98b9ea6f695ef64ce58f4",
+        "acknowledged_cursor": 6673878458,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d718cf20a1ee0cd1fc7258c6bda4a2b095bdbe1074a98b9ea6f695ef64ce58f4",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F0AC0\",\"who\":\"sol-080F0AC0-2054\",\"claim_id\":6673698902,\"reason\":\"Frozen whole original sized linked FUNC diagnostic exact; stopped pending separate primary native clearance. Zero native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T01:08:25Z",
+          "id": 6673878458,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T01:08:25Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5d5a59352e06b0f8f0816860c52c77012203e10639de413c06119549a2c058e2",
+        "result": {
+          "address": "0x080F0AC0",
+          "claim_id": 6673698902,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673878458,
+          "status": "accepted",
+          "who": "sol-080F0AC0-2054"
+        }
+      }
     },
     {
       "claim": {
