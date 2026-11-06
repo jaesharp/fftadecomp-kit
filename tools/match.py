@@ -4203,6 +4203,7 @@ def main():
                                                       "bounded-buffer-discarded-return-scratch-v1",
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
                                                       "bounded-buffer-guarded-switch-v1",
+                                                      "bounded-buffer-nested-halfword-output-v1",
                                                       "static-callback-buffer-v1",
                                                       "static-callback-unwritten-r7-v1",
                                                       "static-callback-restoring-r6-v1",
