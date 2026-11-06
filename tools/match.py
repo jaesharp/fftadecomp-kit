@@ -4216,6 +4216,7 @@ def main():
                                                       "watched-switch-preservation-v1",
                                                       "descriptor-output-alias-v1",
                                                       "ordinary-formal-output-spill-v1",
+                                                      "ordinary-formal-output-spill-bios-remainder-v1",
                                                       "descriptor-single-store-v1",
                                                       "descriptor-disjunctive-alias-v1",
                                                       "descriptor-callee-constant-v1",

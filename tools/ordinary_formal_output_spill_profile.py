@@ -14,6 +14,11 @@ SCHEMA = 'elf-symbol-thumb-ordinary-formal-output-spill-v1'
 CONTROL_FLOW = ('complete Thumb owner; fixed-SP0 R2 formal output spill; '
                 'conditional returning ordinary ARM ABI, no numeric or global-effect theorem')
 MAX_DEPENDENCIES = 8
+BIOS_SELECTOR = 'ordinary-formal-output-spill-bios-remainder-v1'
+BIOS_SCHEMA = 'elf-symbol-thumb-ordinary-formal-output-spill-bios-remainder-v1'
+BIOS_CONTROL_FLOW = 'fixed-SP0 formal output with an exact conditional scalar BIOS remainder wrapper'
+SELECTORS = (SELECTOR, BIOS_SELECTOR)
+SCHEMAS = (SCHEMA, BIOS_SCHEMA)
 
 
 class FormalOutputSpillProof(frames.DescriptorOutputAliasProof):
@@ -150,3 +155,63 @@ class FormalOutputSpillProof(frames.DescriptorOutputAliasProof):
             native_frames=self.native_frame_observations(),
             source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             premise='conditional returning ordinary ARM ABI; no numeric, nonalias, global-effect, readability or allocation theorem')
+
+
+class BiosRemainderSpillProof(FormalOutputSpillProof):
+    """One exact scalar service wrapper, without extending ordinary frame rules."""
+
+    wrapper_address = 0x08141874
+    wrapper_bytes = b'\x06\xdf\x08\x1c\x70\x47'
+    contract = ('conditional compatible BIOS service6 normal-return ABI: scalar register '
+        'inputs/results, no memory access or pointer result, R4-R11/SP and the wrapper '
+        'return link preserved; R0-R3/R12 unknown after return. No division/remainder '
+        'numerical equivalence, BIOS implementation, physical effects, initialization, '
+        'nonalias or termination theorem')
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.bios_calls = {}
+
+    def check_arguments(self, address, arguments, stack, incoming, protected, *,
+                        constants=None, site=None, **context):
+        if address != self.wrapper_address:
+            return super().check_arguments(address, arguments, stack, incoming, protected,
+                constants=constants, site=site, **context)
+        if arguments or incoming or context.get('watched') or not self.scopes or \
+                type(site) is not int:
+            raise ValueError('BIOS remainder requires an actual nested scalar call without live register aliases')
+        parent = self.scopes[-1]['address']
+        if site not in self.graphs[parent]:
+            raise ValueError('BIOS remainder requires its actual reached consumer instruction')
+        decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
+        decoder.detail = True
+        item = next(decoder.disasm(self.rom[site-match.ROM_BASE:site-match.ROM_BASE+4], site), None)
+        if item is None or item.id != match.ARM_INS_BL or item.size != 4 or \
+                item.operands[0].imm != address:
+            raise ValueError('BIOS remainder differs from the actual direct consumer call')
+        data = self.span(address)
+        if data != self.wrapper_bytes:
+            raise ValueError('BIOS remainder requires its exact complete svc6; adds r0,r1,0; bx lr body')
+        words = dict(context.get('words') or {})
+        for kind, value in words.values():
+            if kind == 'pointer':
+                self.validate_pointer_value(value, stack)
+        self.dependencies[address] = data
+        self.records[address] = dict(address=address, end=address+len(data), bytes=len(data),
+            body_sha256=hashlib.sha256(data).hexdigest(), **self.identities,
+            structure=dict(kind=BIOS_SCHEMA, instructions=3, wrapper_hex=data.hex(),
+                conditional_ABI=self.contract))
+        row = dict(site=site, target=address, consumer=parent,
+            consumer_body_sha256=self.records[parent]['body_sha256'],
+            untouched_pointer_word_slots=sorted(slot for slot, value in words.items() if value[0]=='pointer'),
+            protected_slots=sorted(protected), unknown_results=[0,1,2,3,12])
+        self.bios_calls[site] = row
+        return self.word_result({}, words)
+
+    def bios_manifest(self):
+        if not self.bios_calls:
+            raise ValueError('BIOS remainder profile requires an actual nested wrapper call')
+        return dict(schema=BIOS_SCHEMA, conditional_ABI=self.contract,
+            wrapper_address=self.wrapper_address, wrapper_hex=self.wrapper_bytes.hex(),
+            source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            observations=[self.bios_calls[key] for key in sorted(self.bios_calls)])
