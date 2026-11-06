@@ -3838,66 +3838,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "966692f07a5ccddc955d0f8ed2774f68cfd195808d6d784b48f69a2505d62178",
-        "acknowledged_cursor": 6684034928,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "966692f07a5ccddc955d0f8ed2774f68cfd195808d6d784b48f69a2505d62178",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081418C0\",\"who\":\"sol-081418C0-2525\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:43:55Z",
-          "id": 6684034890,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:43:55Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "975bc8c28127a06546abd7c8104a645803eef691b95fefe2ec3925b5158080ae",
-        "result": {
-          "address": "0x081418C0",
-          "claim_id": 6684034890,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684034890,
-          "status": "accepted",
-          "who": "sol-081418C0-2525"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "00574532d7a5d4ac913c2ce224b1484a4e40851a8aaddfb1ec654971d1d70d30",
-        "acknowledged_cursor": 6684146500,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "00574532d7a5d4ac913c2ce224b1484a4e40851a8aaddfb1ec654971d1d70d30",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081418C0\",\"who\":\"sol-081418C0-2525\",\"claim_id\":6684034890,\"reason\":\"Finite static source boundary: local halfword countdown volatility excluded; copied-code helper extent incomplete. No source, compiler, native or proof execution. Fully stopped.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T11:50:31Z",
-          "id": 6684146481,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:50:31Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "daf903bf31ca86c07a47c8cc7d5fb22ce93429c80e0cb62235feb1e5e55e4ece",
-        "result": {
-          "address": "0x081418C0",
-          "claim_id": 6684034890,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684146481,
-          "status": "accepted",
-          "who": "sol-081418C0-2525"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "69da14cf2118f3d1f717170634cef9c0c58ff093928bfd4b6f35a782154479a4",
         "acknowledged_cursor": 6684034928,
         "body_provenance": "acceptance-time",
@@ -3927,66 +3867,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "0dee30bd12424dee8bdae314e2ae6d8d372f72a2030fad375ffdf7f78f8a11f4",
-        "acknowledged_cursor": 6684072927,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0dee30bd12424dee8bdae314e2ae6d8d372f72a2030fad375ffdf7f78f8a11f4",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080EEE50\",\"who\":\"sol-080EEE50-2527\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:46:09Z",
-          "id": 6684072927,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:46:09Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2270d4440710deb1198aeb6bcdb15d6da04d2b33e61489602903b45a5dd553c9",
-        "result": {
-          "address": "0x080EEE50",
-          "claim_id": 6684072927,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684072927,
-          "status": "accepted",
-          "who": "sol-080EEE50-2527"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "884e61f2aaf558b72d24588bd2329172aaca5127f77f9dd4a92c3d501730b68c",
-        "acknowledged_cursor": 6684146500,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "884e61f2aaf558b72d24588bd2329172aaca5127f77f9dd4a92c3d501730b68c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080EEE50\",\"who\":\"sol-080EEE50-2527\",\"claim_id\":6684072927,\"reason\":\"Complete diagnostic160/160 bytes exact and frozen. Fully stopped, native admission pending; zero native/proof credit.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T11:50:31Z",
-          "id": 6684146487,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:50:31Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "daf903bf31ca86c07a47c8cc7d5fb22ce93429c80e0cb62235feb1e5e55e4ece",
-        "result": {
-          "address": "0x080EEE50",
-          "claim_id": 6684072927,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684146487,
-          "status": "accepted",
-          "who": "sol-080EEE50-2527"
-        }
-      }
     }
   ],
   "issue": 66,
