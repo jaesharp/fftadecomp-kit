@@ -3561,6 +3561,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                 aliases = structural_return_aliases(buffer_proof, data, address, current, aliases)
                 from descriptor_disjunctive_alias_profile import root_return_aliases
                 aliases = root_return_aliases(buffer_proof, data, address, current, aliases)
+                from direct_halfword_output_buffer_profile import root_return_aliases as direct_output_return_aliases
+                aliases = direct_output_return_aliases(buffer_proof, data, address, current, aliases)
                 if aliases.keys() - {ARM_REG_R12}:
                     raise ValueError("local stack pointer escapes through a return register")
             returns.add(current)
@@ -4226,6 +4228,7 @@ def main():
                                                       "bounded-buffer-guarded-callee-aliases-v1",
                                                       "bounded-buffer-guarded-bios-division-v1",
                                                       "bounded-buffer-nested-halfword-output-v1",
+                                                      "bounded-buffer-direct-halfword-output-v1",
                                                       "bounded-buffer-three-halfword-output-v1",
                                                       "bounded-buffer-three-output-dynamic-division-v1",
                                                       "bounded-buffer-root-guarded-switch-v1",
