@@ -3870,7 +3870,35 @@
           "who": "sol-0810A850-2360"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "6df6ba67d7e07a1ca43a4b72b400c92b3c46e2d53b6eb45a797869c949f3f41f",
+        "acknowledged_cursor": 6680998144,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6df6ba67d7e07a1ca43a4b72b400c92b3c46e2d53b6eb45a797869c949f3f41f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810A850\",\"who\":\"sol-0810A850-2360\",\"claim_id\":6680712430,\"reason\":\"Complete984B owner natural diagnostic964B; discarded ordinary-RAM reads lack established read-preserving member representation. Original artifacts retained, native/proof0.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T08:50:45Z",
+          "id": 6680998144,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T08:50:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5671bfd527bb40e0e3c7cbebb55473d6db44d9257bf061b7ba12b25a51bb0388",
+        "result": {
+          "address": "0x0810A850",
+          "claim_id": 6680712430,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6680998144,
+          "status": "accepted",
+          "who": "sol-0810A850-2360"
+        }
+      }
     },
     {
       "claim": {
