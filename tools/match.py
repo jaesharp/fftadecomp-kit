@@ -4232,6 +4232,8 @@ def main():
                                                       "static-callback-restoring-r6-target-leaf-alias-local-scratch-aligned-v1",
                                                       "static-callback-restoring-r6-target-leaf-alias-scratch-leaf-kill-aligned-v1",
                                                       "static-callback-restoring-r6-target-movs-frame-aligned-v1",
+                                                      "static-callback-restoring-r6-target-optional-local-frame-aligned-v1",
+                                                      "static-callback-restoring-r6-target-compact-closure-aligned-v1",
                                                       "static-callback-local-output-word-return-r7-v1",
                                                       "standalone-local-output-word-return-v1",
             "entry-recursive-ordinary-call-v1",
