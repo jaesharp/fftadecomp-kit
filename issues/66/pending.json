@@ -3774,66 +3774,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "3eca9505d6be15ec8a925e0d2c35146b326cdd483b3f135ba68a6e24ada0103e",
-        "acknowledged_cursor": 6673368867,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3eca9505d6be15ec8a925e0d2c35146b326cdd483b3f135ba68a6e24ada0103e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08133E18\",\"who\":\"sol-08133E18-2032\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T00:36:15Z",
-          "id": 6673368678,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:36:15Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "d4a57d14214823e3b703c1de266e859f7b247fd82a79d7ebd235babaa339f67f",
-        "result": {
-          "address": "0x08133E18",
-          "claim_id": 6673368678,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6673368678,
-          "status": "accepted",
-          "who": "sol-08133E18-2032"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4b11ce92a9c8a01aff00c0728e7d4b34d53243e9fd9ddbdd5f598ae23e135f7b",
-        "acknowledged_cursor": 6673520411,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4b11ce92a9c8a01aff00c0728e7d4b34d53243e9fd9ddbdd5f598ae23e135f7b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08133E18\",\"who\":\"sol-08133E18-2032\",\"claim_id\":6673368678,\"reason\":\"Frozen complete original sized FUNC304B exact from3 grounded natural C forms; original ETREL and linked ELF retained. Diagnostic proof prerequisite awaiting primary qualification, no native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T00:45:20Z",
-          "id": 6673515179,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T00:45:20Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "b96ce1bad5b9a8888cecd9fcc3bd3d674424a3d3b9e9f84a971229bcb0f4be5e",
-        "result": {
-          "address": "0x08133E18",
-          "claim_id": 6673368678,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6673515179,
-          "status": "accepted",
-          "who": "sol-08133E18-2032"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "3fa1a2ce838033de3bec350f9ac26bb63538b0174f0ecc68849e7e44f3de7f01",
         "acknowledged_cursor": 6673368867,
         "body_provenance": "acceptance-time",
