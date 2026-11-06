@@ -3774,7 +3774,35 @@
           "who": "sol-0800F308-2082"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "09d893b4620d28e310e64f75e89102d7ef7af66238a7237d71ddc58b10930af7",
+        "acknowledged_cursor": 6674935867,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "09d893b4620d28e310e64f75e89102d7ef7af66238a7237d71ddc58b10930af7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800F308\",\"who\":\"sol-0800F308-2082\",\"claim_id\":6674760750,\"reason\":\"Frozen original diagnostic and final fixed-input checks; native admission remains primary-owned.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T02:07:57Z",
+          "id": 6674935867,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T02:07:57Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f079ed010fea1da57a8a6eced77965104795ef26b84a2aada19e814af85508b3",
+        "result": {
+          "address": "0x0800F308",
+          "claim_id": 6674760750,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6674935867,
+          "status": "accepted",
+          "who": "sol-0800F308-2082"
+        }
+      }
     },
     {
       "claim": {
