@@ -3806,7 +3806,35 @@
           "who": "sol-0811F5E0-3108"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f418a8e61cb51b9a35b556f6112199476e32024ddb2ae9feef812df4b81caf30",
+        "acknowledged_cursor": 6698105724,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f418a8e61cb51b9a35b556f6112199476e32024ddb2ae9feef812df4b81caf30",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811F5E0\",\"who\":\"sol-0811F5E0-3108\",\"claim_id\":6697850954,\"reason\":\"Frozen fullFUNC876B versus892B; no grounded correction remains.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T23:11:30Z",
+          "id": 6698105246,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T23:11:30Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ae9583f020bd6f8adfc6ee48a6368fc28b051987e0f709a4643821330eeeb301",
+        "result": {
+          "address": "0x0811F5E0",
+          "claim_id": 6697850954,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6698105246,
+          "status": "accepted",
+          "who": "sol-0811F5E0-3108"
+        }
+      }
     },
     {
       "claim": {
@@ -4058,7 +4086,35 @@
           "who": "sol-08045DF4-3116"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7b0037f09b375038b0ca118c552684a0e9dc98bf1426982674b74da29f5e4a4e",
+        "acknowledged_cursor": 6698105724,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7b0037f09b375038b0ca118c552684a0e9dc98bf1426982674b74da29f5e4a4e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08045DF4\",\"who\":\"sol-08045DF4-3116\",\"claim_id\":6697950494,\"reason\":\"Frozen fullFUNC976B versus992B; no grounded correction remains.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T23:11:31Z",
+          "id": 6698105724,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T23:11:31Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ae9583f020bd6f8adfc6ee48a6368fc28b051987e0f709a4643821330eeeb301",
+        "result": {
+          "address": "0x08045DF4",
+          "claim_id": 6697950494,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6698105724,
+          "status": "accepted",
+          "who": "sol-08045DF4-3116"
+        }
+      }
     },
     {
       "claim": {
