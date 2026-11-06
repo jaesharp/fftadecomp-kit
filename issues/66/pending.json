@@ -3742,7 +3742,35 @@
           "who": "sol-0813AE30-2076"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4a4a82cfb1ce026b3b8220026fd1c6c0dbf9bdca657dfc804d8a475de742f821",
+        "acknowledged_cursor": 6674793686,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4a4a82cfb1ce026b3b8220026fd1c6c0dbf9bdca657dfc804d8a475de742f821",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0813AE30\",\"who\":\"sol-0813AE30-2076\",\"claim_id\":6674644184,\"reason\":\"Frozen complete original diagnostic and final input checks. Native prerequisite remains separately retained under primary ownership.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T01:58:21Z",
+          "id": 6674793686,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T01:58:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f67960539a629f59703f6158b15bef90cac9f3dc8f85ab5af43d563b2b4fc3c0",
+        "result": {
+          "address": "0x0813AE30",
+          "claim_id": 6674644184,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6674793686,
+          "status": "accepted",
+          "who": "sol-0813AE30-2076"
+        }
+      }
     },
     {
       "claim": {
