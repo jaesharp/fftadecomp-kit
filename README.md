@@ -2071,3 +2071,20 @@ Previous profiles retain their merge behavior and the acyclic profile retains it
 DAG requirement. `tests/test_descriptor_disjunctive_alias.py` covers natural fixed-O2
 ET_REL match/report/status replay, per-arm bounds and escapes, clobbered words,
 saved slots, watched registers, final return proof, budgets and altered evidence.
+
+### Complete ordinary owners with multiple guarded switches
+
+The explicit owner selector `ordinary-multiple-switch-source-v1` compiles plausible
+source with the fixed toolchain and binds the actual original relocatable ELF,
+its typed linked ELF, both indexes, the full ROM and current runtime. It derives
+two through eight guarded tables from every original local section relocation.
+Unique table partitioning, guard predecessors, complete acyclic CFG, byte
+partition and restoring frame checks are mandatory. Source admission and status
+replay use the same original-ELF verifier and exact manifest.
+
+Only genuine ordinary zero-addend direct calls and local switch relocations are
+admitted. Arithmetic runtimes, indirect thunks, extra named data or function
+words, local pointer materialization, local cycles and mixed runtime policies
+are rejected. Ordinary callee effects remain conditional on the returning ABI;
+this does not prove memory safety, physical separation, numeric equivalence or
+termination. A data-only owner API cannot select this source profile.

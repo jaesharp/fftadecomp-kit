@@ -407,8 +407,16 @@ def call_bindings(image, name, address, mapping, rom_size,
                    double_bindings=None, double_index=None, function_thunks=False, *,
                    allow_switch_constants=False, umodsi3_bindings=None,
                    ashldi3_bindings=None, ashldi3_index=None, float_bindings=None, float_index=None,
-                   allow_double_data=False, signed_runtime_profile=None, unsigned_runtime_profile=None, thunk_pool_words=5, umod_r1_profile=None):
+                   allow_double_data=False, signed_runtime_profile=None, unsigned_runtime_profile=None, thunk_pool_words=5, umod_r1_profile=None, multiple_switch_profile=None):
     """Bind external Thumb calls and explicitly mapped absolute data words."""
+    if multiple_switch_profile is not None:
+        from multiple_switch_owner_prerequisite import check_context
+        check_context(multiple_switch_profile, switch_relocations,
+            (data_mapping, function_relocations, udivsi3_bindings, modsi3_bindings, divsi3_bindings,
+             double_bindings, umodsi3_bindings, ashldi3_bindings, float_bindings,
+             signed_runtime_profile, unsigned_runtime_profile, umod_r1_profile, double_index, ashldi3_index, float_index),
+            (allow_switch_data, allow_preloaded_switch, allow_switch_constants,
+             function_thunks, allow_double_data), thunk_pool_words)
     function_thunk.check_pool_opt_in(thunk_pool_words, function_thunks)
     if umod_r1_profile is not None:
         from umod_r1_thunk_profile import check_link_context
@@ -828,7 +836,8 @@ def call_bindings(image, name, address, mapping, rom_size,
                       if double_bindings is not None else selected_switch_layout(
                           bytes(relocated), address, switch_relocations,
                           data_relocations if data_relocations else None, allow_preloaded_switch,
-                          allow_switch_constants=allow_switch_constants))
+                          allow_switch_constants=allow_switch_constants,
+                          multiple_switch_profile=multiple_switch_profile))
         if "preload" in layout and calls:
             raise ValueError("preloaded switches do not support calls")
     if not (calls or data_relocations or function_relocations or switch_relocations) or \
@@ -852,8 +861,16 @@ def linked_function_bytes(original, linked, name, address, calls, targets, data_
                           allow_preloaded_switch=False, modsi3_bindings=None, divsi3_bindings=None,
                           double_bindings=None, function_thunks=False, *,
                           allow_switch_constants=False, umodsi3_bindings=None, ashldi3_bindings=None, float_bindings=None,
-                          allow_double_data=False, signed_runtime_profile=None, unsigned_runtime_profile=None, thunk_pool_words=5, umod_r1_profile=None):
+                          allow_double_data=False, signed_runtime_profile=None, unsigned_runtime_profile=None, thunk_pool_words=5, umod_r1_profile=None, multiple_switch_profile=None):
     """Validate exact placement and the linker's complete modification surface."""
+    if multiple_switch_profile is not None:
+        from multiple_switch_owner_prerequisite import check_context
+        check_context(multiple_switch_profile, switch_relocations,
+            (data_relocations, function_relocations, udivsi3_bindings, modsi3_bindings, divsi3_bindings,
+             double_bindings, umodsi3_bindings, ashldi3_bindings, float_bindings,
+             signed_runtime_profile, unsigned_runtime_profile, umod_r1_profile),
+            (allow_switch_data, allow_preloaded_switch, allow_switch_constants,
+             function_thunks, allow_double_data), thunk_pool_words)
     function_thunk.check_pool_opt_in(thunk_pool_words, function_thunks)
     unsigned_divmod.check_link_selector(unsigned_runtime_profile, udivsi3_bindings, umodsi3_bindings,
         (data_relocations or None, function_relocations or None, switch_relocations or None,
@@ -1093,7 +1110,8 @@ def linked_function_bytes(original, linked, name, address, calls, targets, data_
                       if double_bindings is not None else selected_switch_layout(
                           linked["text"][:after["size"]], address, switch_relocations,
                           data_relocations if data_relocations else None, allow_preloaded_switch,
-                          allow_switch_constants=allow_switch_constants))
+                          allow_switch_constants=allow_switch_constants,
+                          multiple_switch_profile=multiple_switch_profile))
         if "preload" in layout and calls:
             raise ValueError("preloaded switches do not support calls")
     if any(before_byte != after_byte and position not in patched
@@ -1704,7 +1722,13 @@ def preloaded_switch_encoding(data, address, literal):
 
 
 def selected_switch_layout(data, address, relocations, data_relocations=None,
-                           allow_preloaded_switch=False, *, allow_switch_constants=False):
+                           allow_preloaded_switch=False, *, allow_switch_constants=False,
+                           multiple_switch_profile=None):
+    if multiple_switch_profile is not None:
+        from multiple_switch_owner_prerequisite import check_context, layout
+        check_context(multiple_switch_profile, relocations, (data_relocations,),
+            (allow_preloaded_switch, allow_switch_constants), 5)
+        return layout(data, address, relocations)
     from switch_constants_profile import check_opt_in, layout
     check_opt_in(allow_switch_constants, relocations, data_relocations, allow_preloaded_switch)
     if allow_switch_constants:
@@ -4215,7 +4239,7 @@ def main():
     ap.add_argument("--emit", help="write verified symbol bytes to a new file under the decomp build/")
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"),
                     help="decomp repo (default: current directory)")
-    ap.add_argument("--owner-runtime-profile", choices=("restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
+    ap.add_argument("--owner-runtime-profile", choices=("ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
                                                       "restoring-owner-r3-thunk-switch-v1", "restoring-owner-scalar-switch-v1", "restoring-owner-switch-entry-word-v1", "restoring-owner-switch-entry-two-words-data-v1",
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
