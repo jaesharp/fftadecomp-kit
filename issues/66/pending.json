@@ -3934,7 +3934,35 @@
           "who": "sol-0807D240-2674"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "23854eae745392a51a578bf0b3453e6ec64a1a407ada992a6807fd18206c6f78",
+        "acknowledged_cursor": 6688199079,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "23854eae745392a51a578bf0b3453e6ec64a1a407ada992a6807fd18206c6f78",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0807D240\",\"who\":\"sol-0807D240-2674\",\"claim_id\":6687856163,\"reason\":\"Frozen honest residual1674/1706B after two grounded forms. Original artifacts and all167 preserved, no independent load-width/hoisting/shared-tail correction remains; native/proof0.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T15:14:56Z",
+          "id": 6688199079,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T15:14:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "361eae1a745210ebc481a173d85ca7982e459a97b23ea276837ed39075c0f45c",
+        "result": {
+          "address": "0x0807D240",
+          "claim_id": 6687856163,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6688199079,
+          "status": "accepted",
+          "who": "sol-0807D240-2674"
+        }
+      }
     },
     {
       "claim": {
