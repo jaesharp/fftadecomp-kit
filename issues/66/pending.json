@@ -3866,7 +3866,35 @@
           "who": "sol-080035A8-2779"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "3e7c73712cdc4369252a25468479599907eb6fb3180e552576b369b1cb6f0000",
+        "acknowledged_cursor": 6691342652,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "3e7c73712cdc4369252a25468479599907eb6fb3180e552576b369b1cb6f0000",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080035A8\",\"who\":\"sol-080035A8-2779\",\"claim_id\":6690920750,\"reason\":\"Original natural-C sized FUNC exact against current ROM; original artifacts frozen, diagnostic only, no native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T17:39:28Z",
+          "id": 6691342652,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T17:39:28Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9055e4af3ffa67aae63104e8534cdf816436789df683a44f66c4488dfd9ee247",
+        "result": {
+          "address": "0x080035A8",
+          "claim_id": 6690920750,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6691342652,
+          "status": "accepted",
+          "who": "sol-080035A8-2779"
+        }
+      }
     },
     {
       "claim": {
