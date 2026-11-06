@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "26ad81ec4fcff5e6320b1f2d5456e81f491100bc6a46ea078f0aae5940f4003a",
+    "acknowledged_cursor": 6691232923,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "26ad81ec4fcff5e6320b1f2d5456e81f491100bc6a46ea078f0aae5940f4003a",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08020780\",\"who\":\"sol-08020780-2798\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-06T17:33:43Z",
+      "id": 6691227478,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T17:33:43Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "625c620558f3cfe82b9b26fa1f814f776263310bd0b45a4a8e3f5e5d7ecc79cb",
+    "result": {
+      "address": "0x08020780",
+      "claim_id": 6691227478,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6691227478,
+      "status": "accepted",
+      "who": "sol-08020780-2798"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "f3c36100546df2d213d749b19798b34187965e14b964ab796e51d701e33e0ef9",
+    "acknowledged_cursor": 6691454725,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "f3c36100546df2d213d749b19798b34187965e14b964ab796e51d701e33e0ef9",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08020780\",\"who\":\"sol-08020780-2798\",\"claim_id\":6691227478,\"reason\":\"Frozen original diagnostic result or explicitly zero-new-form historical stop; all sources preserved, no native credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+      "created_at": "2026-11-06T17:45:05Z",
+      "id": 6691454725,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T17:45:05Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "6860c179353fec4acc438e0c4d39e867755638f5a89c460bba1c39cecf87748e",
+    "result": {
+      "address": "0x08020780",
+      "claim_id": 6691227478,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6691454725,
+      "status": "accepted",
+      "who": "sol-08020780-2798"
+    }
+  }
+}
