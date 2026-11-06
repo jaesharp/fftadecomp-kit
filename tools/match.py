@@ -3557,7 +3557,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             # through calls and later uses, but an unobserved value at return
             # does not return a pointer. All other escape checks still apply.
             if stack_arguments and aliases.keys() - {ARM_REG_R12}:
-                raise ValueError("local stack pointer escapes through a return register")
+                from static_callback_r6_frame_profile import structural_return_aliases
+                aliases = structural_return_aliases(buffer_proof, data, address, current, aliases)
+                if aliases.keys() - {ARM_REG_R12}:
+                    raise ValueError("local stack pointer escapes through a return register")
             returns.add(current)
             successors = ()
         elif local_branch:
@@ -4224,6 +4227,11 @@ def main():
                                                       "static-callback-unwritten-r7-v1",
                                                       "static-callback-restoring-r6-v1",
                                                       "static-callback-restoring-r6-target-v1",
+                                                      "static-callback-restoring-r6-target-aligned-v1",
+                                                      "static-callback-restoring-r6-target-leaf-alias-aligned-v1",
+                                                      "static-callback-restoring-r6-target-leaf-alias-local-scratch-aligned-v1",
+                                                      "static-callback-restoring-r6-target-leaf-alias-scratch-leaf-kill-aligned-v1",
+                                                      "static-callback-restoring-r6-target-movs-frame-aligned-v1",
                                                       "static-callback-local-output-word-return-r7-v1",
                                                       "standalone-local-output-word-return-v1",
             "entry-recursive-ordinary-call-v1",

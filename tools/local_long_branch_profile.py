@@ -94,8 +94,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
     from match import thumb_stack_adjustment, stack_alias_assignment, BufferCallProof
     from named_data_buffer_profile import RootGuardedSwitchBufferProof
     root_switch_buffer = type(buffer_proof) is RootGuardedSwitchBufferProof
+    from static_callback_r6_frame_profile import RestoringLocalBufferProof
+    restoring_local_buffer = type(buffer_proof) is RestoringLocalBufferProof
     if type(stack_aliases) is not bool or buffer_proof is not None and (
-            not stack_aliases or not root_switch_buffer and (
+            not stack_aliases or not root_switch_buffer and not restoring_local_buffer and (
                 type(buffer_proof) is not BufferCallProof or buffer_proof.stack_arguments)):
         raise ValueError("local aliases require explicit Boolean policy and native buffer proof")
     if bounded_output_proof is not None:
@@ -140,10 +142,13 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             raise ValueError('formal stack callees require their exclusive fresh native proof and local slots')
         formal_stack_callee_proof.validate_calls(calls)
     discarded_aliases = set()
+    if restoring_local_buffer:
+        buffer_proof.validate_frame(instructions, edges, address, branches, calls,
+                                    call_preservation, discarded_exit_scratch)
     if discarded_exit_scratch is not None:
         validate_discarded_exit_scratch(discarded_exit_scratch)
-        if not stack_aliases or any(value is not None for value in (buffer_proof,
-                bounded_output_proof, runtime_calls, call_preservation, entry_stack_policy,
+        if not stack_aliases or any(value is not None for value in ((None if restoring_local_buffer else buffer_proof),
+                bounded_output_proof, runtime_calls, (None if restoring_local_buffer else call_preservation), entry_stack_policy,
                 local_alias_slot_policy, finite_stack_index_policy)):
             raise ValueError('discarded exit scratch requires exclusive local-only alias policy')
     if runtime_calls is not None:
@@ -385,7 +390,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             registers.pop(ARM_REG_LR, None)
             aliases.pop(ARM_REG_LR, None)
         elif site in calls:
-            if discarded_exit_scratch is not None and aliases:
+            if discarded_exit_scratch is not None and aliases and not restoring_local_buffer:
                 raise ValueError('discarded scratch local aliases cannot cross calls')
             if runtime_calls is not None and site in runtime_calls:
                 if set(clobbered) & aliases.keys():
@@ -429,7 +434,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 if (bounded_output_proof.check_call(calls[site],offsets,native_stack,site=site)
                         if bounded_output_proof is not None else
                         buffer_proof.check_call(calls[site], offsets, native_stack,
-                            **({'site':site} if root_switch_buffer or buffer_proof.bios_fill_proof is not None else {}))):
+                            **({'site':site} if root_switch_buffer or restoring_local_buffer or buffer_proof.bios_fill_proof is not None else {}))):
                     raise ValueError("local alias return requires a separate provenance policy")
                 # A proved callee may write through any passed local buffer.
                 # Do not retain a saved-register token in potentially changed bytes.
@@ -454,7 +459,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 else:
                     exact = {register: alias_offset(register, aliases)
                              for register in aliases if register in read}
-                    constants = {} if slot_states is None else {register:value[0] for register,value in slot_states[site].items()}
+                    constant_states = (buffer_proof.constant_states
+                        if restoring_local_buffer and buffer_proof.constant_states is not None else slot_states)
+                    constants = {} if constant_states is None else {
+                        register: value[0] for register, value in constant_states[site].items()}
                     assignment = stack_alias_assignment(instruction, exact, len(stack), constants)
                 if assignment is not None:
                     if assignment[0] in (ARM_REG_SP, ARM_REG_PC, ARM_REG_LR):
@@ -716,7 +724,19 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                     raise ValueError("local alias escapes through an exit register")
                 for register, alternatives in aliases.items():
                     if len(alternatives) != 1 or any(offset >= 0 for offset, _ in alternatives):
-                        raise ValueError('discarded exit scratch requires exact local-offset provenance')
+                        # Every real local alias is checked by access(offset, 1)
+                        # when formed, so offset zero cannot name a local byte.
+                        # The existing join inserts (0, False) solely for an
+                        # incoming path with no tracked local alias. Permit that
+                        # alternative only at an unobserved scratch exit, under
+                        # the explicit completed-replay policy. Actual alias uses
+                        # still require one live exact offset in alias_offset.
+                        optional_local = (restoring_local_buffer and
+                            buffer_proof.proof._optional_local_frame_policy and
+                            len(alternatives) == 2 and (0, False) in alternatives and
+                            sum(offset < 0 for offset, _ in alternatives) == 1)
+                        if not optional_local:
+                            raise ValueError('discarded exit scratch requires exact local-offset provenance')
                     for offset, live in alternatives:
                         discarded_aliases.add((site, register-ARM_REG_R0, offset, live))
             returns.add(site)

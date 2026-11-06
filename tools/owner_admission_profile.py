@@ -98,6 +98,11 @@ def selected(report):
                       [f'* verification: `{r7_buffer.SCHEMA}`'],
                       [f'* verification: `{r6_buffer.SCHEMA}`'],
                       [f'* verification: `{r6_buffer.TARGET_SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.ALIGNED_TARGET_SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.LEAF_ALIAS_SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.LOCAL_SCRATCH_SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.QUARANTINE_SCHEMA}`'],
+                      [f'* verification: `{r6_buffer.MOVS_FRAME_SCHEMA}`'],
                       [f'* verification: `{word_buffer.SCHEMA}`'],
                       [f'* verification: `{resident_word.SCHEMA}`'],
                       [f'* verification: `{descriptor.SCHEMA}`'],
@@ -293,7 +298,7 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
         proof = {'schema': named_buffer.DATAFREE_SCHEMA if selector == named_buffer.DATAFREE_SELECTOR else named_buffer.GUARDED_ALIAS_SCHEMA if selector == named_buffer.GUARDED_ALIAS_SELECTOR else formal_spill.BIOS_SCHEMA if selector == formal_spill.BIOS_SELECTOR else r6_buffer.PROFILES[selector][0] if selector in r6_buffer.PROFILES else named_buffer.GUARDED_SWITCH_SCHEMA if selector == named_buffer.GUARDED_SWITCH_SELECTOR else named_buffer.BIOS_FILL_SCHEMA if selector == named_buffer.BIOS_FILL_SELECTOR else named_buffer.BIOS_SQRT_SCHEMA if selector == named_buffer.BIOS_SQRT_SELECTOR else named_buffer.SCRATCH_SCHEMA if selector == named_buffer.SCRATCH_SELECTOR else module.SCHEMA, 'instructions': len(verified),
                  'calls': [[site-address, f'func_{target:08X}'] for site,target in sorted(calls.items())],
                  'runtime_calls': [], 'partition': graph.partition(data,address,refinement,ins,words),
-                 'buffers': {'dependency_budget': buffers.dependency_budget if selector == named_buffer.GUARDED_ALIAS_SELECTOR else module.MAX_DEPENDENCIES,
+                 'buffers': {'dependency_budget': buffers.dependency_budget if selector in (named_buffer.GUARDED_ALIAS_SELECTOR, *r6_buffer.PROFILES) else module.MAX_DEPENDENCIES,
                     'owner_byte_budget': named_buffer.MAX_BYTES,
                     'dependencies': [buffers.records[target] for target in sorted(buffers.records)]}}
         if selector == nested_output.SELECTOR:
@@ -341,9 +346,11 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
             if not restorations or not callbacks or not any(row['value'] is not None for row in restorations):
                 raise ValueError('R6 selector requires actual frame restoration and callback effect replay')
             proof['buffers']['r6_restoration'] = dict(policy=r6_buffer.policy_manifest(selector),
-                observations=restorations, **{'callback_observations' if selector == r6_buffer.TARGET_SELECTOR else 'r7_observations': callbacks})
-            if selector == r6_buffer.TARGET_SELECTOR:
+                observations=restorations, **{'callback_observations' if selector in r6_buffer.TARGET_POLICIES else 'r7_observations': callbacks})
+            if selector in r6_buffer.TARGET_POLICIES:
                 proof['buffers']['r6_restoration']['normal_return_scratch'] = buffers.scratch_return_observations()
+            if selector == r6_buffer.COMPACT_CLOSURE_SELECTOR:
+                proof['buffers']['r6_restoration']['compact_dependency_closure'] = buffers.compact_dependency_closure()
         if selector == word_buffer.SELECTOR:
             proof['buffers']['word_result_callback'] = buffers.effect_manifest()
         if selector in formal_spill.SELECTORS:
@@ -559,12 +566,12 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
     match.allocated_text_only(image)
     symbol,offset=match.function_record(image,f'func_{address:08X}',address,True)
     size=symbol['size']
-    if selector in (ALIGNED_SELECTOR,CYCLIC_SELECTOR):
+    if selector in (ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES):
         import addressed_signed_runtime_profile as alignment
         alignment.terminal_alignment(image,symbol)
         if len(image['text']) != size+2:
             raise ValueError('aligned owner requires actual external two-byte Thumb alignment')
-    external_alignment=(selector in (*named_buffer.SELECTORS,ALIGNED_SELECTOR,CYCLIC_SELECTOR) and size%4==2 and
+    external_alignment=(selector in (*named_buffer.SELECTORS,ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES) and size%4==2 and
                         len(image['text'])==size+2 and image['text'][size:]==b'\xc0\x46')
     if offset or (size!=len(image['text']) and not external_alignment) or any(
             item['type']==2 and item is not symbol and item['section'] or
@@ -669,7 +676,7 @@ def object_bytes(runner,workspace,args,original,address,rom,mapping,objects, *, 
     match.allocated_text_only(linked)
     record,offset=match.function_record(linked,f'func_{address:08X}',address,True)
     original_record,_=match.function_record(original,f'func_{address:08X}',address,True)
-    if selector in (ALIGNED_SELECTOR,CYCLIC_SELECTOR):
+    if selector in (ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES):
         import addressed_signed_runtime_profile as alignment
         alignment.terminal_alignment(linked,record)
     if linked['type']!=2 or offset or linked['relocations'] or \
