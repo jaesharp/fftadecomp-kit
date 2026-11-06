@@ -3742,7 +3742,35 @@
           "who": "sol-08098A88-2015"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1a2085fbc97f67e473e680ead91d2b8b2d31bf2fb1d25c0807754357820bd994",
+        "acknowledged_cursor": 6673454712,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1a2085fbc97f67e473e680ead91d2b8b2d31bf2fb1d25c0807754357820bd994",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08098A88\",\"who\":\"sol-08098A88-2015\",\"claim_id\":6673139315,\"reason\":\"Frozen grounded natural C diagnostics: best complete linked FUNC292B versus294B; coordinate-copy/row spill and return/pool allocation differ. No further independently grounded representation. No native proof or MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T00:41:20Z",
+          "id": 6673454712,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:41:20Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "29082c233d4b72c5a9e8761b5659d951e6e35b85b077213110369f8e4d4057ff",
+        "result": {
+          "address": "0x08098A88",
+          "claim_id": 6673139315,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673454712,
+          "status": "accepted",
+          "who": "sol-08098A88-2015"
+        }
+      }
     },
     {
       "claim": {
