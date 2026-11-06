@@ -3742,7 +3742,35 @@
           "who": "sol-08126118-2566"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "bf260ffe87a0836fa7a1ffd36d9aed0567fcf3dd4b5183ae26703ca4f19c5675",
+        "acknowledged_cursor": 6685494087,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bf260ffe87a0836fa7a1ffd36d9aed0567fcf3dd4b5183ae26703ca4f19c5675",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08126118\",\"who\":\"sol-08126118-2566\",\"claim_id\":6685317144,\"reason\":\"Zero-C storage-contract stop: seven discarded RAM loads have no independently grounded same-member storage representation. No forced reads/bitfield invention. No compiler/link/native/proof.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T13:05:50Z",
+          "id": 6685494087,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T13:05:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e6b81eb170ecfa32e0109d96d52333ba49d637bbe9a9ade2898b84a331647128",
+        "result": {
+          "address": "0x08126118",
+          "claim_id": 6685317144,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6685494087,
+          "status": "accepted",
+          "who": "sol-08126118-2566"
+        }
+      }
     },
     {
       "claim": {
