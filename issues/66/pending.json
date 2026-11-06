@@ -3742,7 +3742,35 @@
           "who": "sol-080D989C-2350"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "90fdfc427ef62c2e0d2f4de049025412cf78e3384c524657a6dbd0ee0be5dd3a",
+        "acknowledged_cursor": 6680535258,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "90fdfc427ef62c2e0d2f4de049025412cf78e3384c524657a6dbd0ee0be5dd3a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D989C\",\"who\":\"sol-080D989C-2350\",\"claim_id\":6680350537,\"reason\":\"Complete56-byte first-form exact diagnostic frozen with actual callback capture and all input checks. Native prerequisite remains separate; fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T08:23:11Z",
+          "id": 6680535258,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T08:23:11Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f4f2eecdae63928630cecb16ce35cad32c3530ba49630f7cec7ef9494ba8f102",
+        "result": {
+          "address": "0x080D989C",
+          "claim_id": 6680350537,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6680535258,
+          "status": "accepted",
+          "who": "sol-080D989C-2350"
+        }
+      }
     },
     {
       "claim": {
