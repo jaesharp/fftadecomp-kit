@@ -3778,66 +3778,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "35a183c55d86a3600adf9047d6e714dd8d6bd692e8f81b13e42ebf6ffe3a6c00",
-        "acknowledged_cursor": 6684244234,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "35a183c55d86a3600adf9047d6e714dd8d6bd692e8f81b13e42ebf6ffe3a6c00",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08024758\",\"who\":\"sol-08024758-2537\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:55:24Z",
-          "id": 6684234048,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:55:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5e218263c117373f8b7ea1910bc708e4f09f5c01153186375859fae78fa5431e",
-        "result": {
-          "address": "0x08024758",
-          "claim_id": 6684234048,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684234048,
-          "status": "accepted",
-          "who": "sol-08024758-2537"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "09030297fe3afb1aca2cd0335f385b6e6ce181d749ee40b7b8a82e3c0781d481",
-        "acknowledged_cursor": 6684390199,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "09030297fe3afb1aca2cd0335f385b6e6ce181d749ee40b7b8a82e3c0781d481",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08024758\",\"who\":\"sol-08024758-2537\",\"claim_id\":6684234048,\"reason\":\"Fully stopped after first natural compiler form,complete diagnostic ELF FUNC exact164/164 bytes. Frozen original artifacts retained, zero native/proof/MATCH credit; primary owns separate fresh native qualification.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T12:04:24Z",
-          "id": 6684390199,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:04:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "dae3ad65f183f60880d4aaa12201cdfbe510dfd0fd801b45c3578986022b8bcc",
-        "result": {
-          "address": "0x08024758",
-          "claim_id": 6684234048,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684390199,
-          "status": "accepted",
-          "who": "sol-08024758-2537"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "d05805af1e64c881dd1ef9d94e9dbae980ef7bd1c61a5f9e704c5f8f02c40616",
         "acknowledged_cursor": 6684244234,
         "body_provenance": "acceptance-time",
