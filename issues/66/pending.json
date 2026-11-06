@@ -3838,66 +3838,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "51edb5c1e80685ed90afc5e994e8b880bd7d03f0ffe1fe97c38a733a7a36dfc1",
-        "acknowledged_cursor": 6697364544,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "51edb5c1e80685ed90afc5e994e8b880bd7d03f0ffe1fe97c38a733a7a36dfc1",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08112AEC\",\"who\":\"sol-08112AEC-3086\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T22:24:40Z",
-          "id": 6697350623,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T22:24:40Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1ea7d216d55417ee5a883d855a1cdb39b9ef683dffb20bdeee8fcf16e2997a7c",
-        "result": {
-          "address": "0x08112AEC",
-          "claim_id": 6697350623,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6697350623,
-          "status": "accepted",
-          "who": "sol-08112AEC-3086"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "cfa21df254da43efc3d8d4ce8560792d3421eeac45824f2be4c486e7c723fed8",
-        "acknowledged_cursor": 6697545738,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "cfa21df254da43efc3d8d4ce8560792d3421eeac45824f2be4c486e7c723fed8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08112AEC\",\"who\":\"sol-08112AEC-3086\",\"claim_id\":6697350623,\"reason\":\"Frozen original natural C diagnostic nonmatch. Genuine complete ELF FUNC and source retained; remaining allocation, ordering or switch-lowering residual has no independent semantic correction. Native and MATCH credit zero.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T22:36:33Z",
-          "id": 6697545738,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T22:36:33Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "86a93ef709bc8d84322e7e79061629d50a2466002cc361e68735c9916627ba46",
-        "result": {
-          "address": "0x08112AEC",
-          "claim_id": 6697350623,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6697545738,
-          "status": "accepted",
-          "who": "sol-08112AEC-3086"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "009f62196b2e8c1ee9e873e6f2693bc82b47d4c44eff9761267a89d9a7f0ab10",
         "acknowledged_cursor": 6697364544,
         "body_provenance": "acceptance-time",
