@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "2cfc1609f5359c90cf945620a42e3630efccbd0c6fc5561488091ab9311503b8",
+    "acknowledged_cursor": 6681381115,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2cfc1609f5359c90cf945620a42e3630efccbd0c6fc5561488091ab9311503b8",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DFD8C\",\"who\":\"sol-080DFD8C-2387\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-06T09:12:31Z",
+      "id": 6681380891,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T09:12:31Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "be39bfd91cb418b7f2770459bd3f80a5a80ba7ea9e725a5c7ff8158f8a204956",
+    "result": {
+      "address": "0x080DFD8C",
+      "claim_id": 6681380891,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6681380891,
+      "status": "accepted",
+      "who": "sol-080DFD8C-2387"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "f7494b50fcef640399cfa07aea797d235a78aae1acb7fe19f36dbdd2a3ca98c5",
+    "acknowledged_cursor": 6681664481,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "f7494b50fcef640399cfa07aea797d235a78aae1acb7fe19f36dbdd2a3ca98c5",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DFD8C\",\"who\":\"sol-080DFD8C-2387\",\"claim_id\":6681380891,\"reason\":\"Original complete diagnostic frozen; native/proof0, admission separately pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-06T09:28:33Z",
+      "id": 6681664481,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T09:28:33Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "62cb0c2a915e70cea7e50800dde1f0e0608a4cc04b2ff4ba89fb3b0a0775da86",
+    "result": {
+      "address": "0x080DFD8C",
+      "claim_id": 6681380891,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6681664481,
+      "status": "accepted",
+      "who": "sol-080DFD8C-2387"
+    }
+  }
+}
