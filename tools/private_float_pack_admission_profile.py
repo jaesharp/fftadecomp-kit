@@ -21,6 +21,7 @@ import private_float_pack_effects_inventory as inventory
 import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_double_comparison_effects_inventory as double_comparison
+import private_float_scalar_conversion_effects_inventory as scalar_conversion
 from inert_spin_profile import fixed_configuration, index_snapshot, marker_text
 from addressed_signed_runtime_profile import toolchain_fingerprint, runtime_fingerprint
 
@@ -32,7 +33,10 @@ COMPARISON_SELECTOR = 'private-float-comparison-v1'
 COMPARISON_SCHEMA = 'elf-symbol-thumb-private-float-comparison-v1'
 DOUBLE_COMPARISON_SELECTOR = 'private-double-comparison-v1'
 DOUBLE_COMPARISON_SCHEMA = 'elf-symbol-thumb-private-double-comparison-v1'
-SELECTORS = (SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR)
+SCALAR_CONVERSION_SELECTOR = 'private-float-scalar-conversion-v1'
+SCALAR_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-scalar-conversion-v1'
+SELECTORS = (SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+             SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
             'definedness equivalence, physical memory, nonalias, nonescape and '
@@ -43,6 +47,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == SCALAR_CONVERSION_SELECTOR:
+        return scalar_conversion, SCALAR_CONVERSION_SCHEMA, CONTRACT.replace('unpack/pack', 'scalar-conversion local-record')
     if selector == DOUBLE_COMPARISON_SELECTOR:
         return double_comparison, DOUBLE_COMPARISON_SCHEMA, CONTRACT.replace('unpack/pack', 'double-unpack/comparison')
     if selector == COMPARISON_SELECTOR:
@@ -71,7 +77,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
@@ -88,7 +94,7 @@ def selected(report):
     return selector_for_report(report) is not None
 
 
-def function_size(image, address):
+def function_size(image, address, *, partitioned_tail=False):
     """Keep only the complete symbol, with one unreferenced compiler NOP tail."""
     import match
     match.allocated_text_only(image)
@@ -109,6 +115,11 @@ def function_size(image, address):
         position = (item['value'] & ~1) - base
         if item['type'] in (1, 2) or position < 0 or position >= size or position + item['size'] > size:
             raise ValueError('private float alignment has foreign symbol ownership')
+    if partitioned_tail:
+        # The scalar selector subsequently requires its full native CFG and byte
+        # partition over this sized symbol. Reached code/literals cannot use the
+        # excluded NOP, including in symbols containing in-function literal pools.
+        return size
     decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
     decoder.detail = True
     instructions = list(decoder.disasm(data[:size], address))
@@ -133,7 +144,7 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
     selected_inventory, _, _ = profile(selector)
     if image['type'] != 1:
         raise ValueError('private float requires original relocatable ELF')
-    size = function_size(image, address)
+    size = function_size(image, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
     symbol, offset = match.function_record(image, f'func_{address:08X}', address, True)
     if offset or any(
             item['type'] == 2 and item is not symbol and item['section'] or
@@ -176,20 +187,22 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
                 raise ValueError('private float requires canonical zero-addend Thumb BL')
             calls.append([site, name])
     calls.sort()
-    roles = getattr(selected_inventory, 'ROOT_HELPERS',
-                    tuple(role for role, _, _ in selected_inventory.HELPERS))
-    expected = [f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}'
-                for name in roles]
-    if [name for _, name in calls] != expected or any(item['name'] and not item['section'] and
+    sequences = getattr(selected_inventory, 'ROOT_HELPER_SEQUENCES',
+        (getattr(selected_inventory, 'ROOT_HELPERS',
+                 tuple(role for role, _, _ in selected_inventory.HELPERS)),))
+    expected = [[f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}'
+                 for name in roles] for roles in sequences]
+    if [name for _, name in calls] not in expected or any(item['name'] and not item['section'] and
             item['name'] not in targets for item in image['symbols']):
         raise ValueError('private float requires exactly one unpack then one pack and no extra symbols')
     return calls, targets
 
 
-def linked_bytes(original, linked, address, calls, targets):
+def linked_bytes(original, linked, address, calls, targets, *, selector=SELECTOR):
     import match
-    size = function_size(original, address)
-    linked_size = function_size(linked, address)
+    profile(selector)
+    size = function_size(original, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
+    linked_size = function_size(linked, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
     record, offset = match.function_record(linked, f'func_{address:08X}', address, True)
     if linked['type'] != 2 or offset or linked['relocations'] or \
             linked_size != size or len(linked['text']) != len(original['text']) or any(
@@ -232,7 +245,7 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, index
               f'--orphan-handling=error -T {quoted}/f.ld -e func_{address:08X} '
               f'{quoted}/f.o {quoted}/f.known.o -o {quoted}/f.elf')
     linked = match.elf_image(runner.read_binary(workspace+'/f.elf'))
-    return linked_bytes(original, linked, address, calls, targets), calls
+    return linked_bytes(original, linked, address, calls, targets, selector=selector), calls
 
 
 def verify(data, address, rom, mapping, index, calls, *, selector=SELECTOR, manifest=None):
