@@ -4158,7 +4158,35 @@
           "who": "sol-08099644-2786"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f331dd23ad07ab5812788fe233eb5126a6e5eedc6220437d1f43590e227b495d",
+        "acknowledged_cursor": 6691143370,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f331dd23ad07ab5812788fe233eb5126a6e5eedc6220437d1f43590e227b495d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08099644\",\"who\":\"sol-08099644-2786\",\"claim_id\":6691100872,\"reason\":\"First native MATCH40B exact original whole FUNC and plausible source passed; all167 context/runtime/ROM preserved. Primary publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T17:29:43Z",
+          "id": 6691143370,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T17:29:43Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "aab02ece63a50b1cc75e90bc629fc5616309d6738ee5e688b78247ab6f9b3cc9",
+        "result": {
+          "address": "0x08099644",
+          "claim_id": 6691100872,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6691143370,
+          "status": "accepted",
+          "who": "sol-08099644-2786"
+        }
+      }
     }
   ],
   "issue": 66,
