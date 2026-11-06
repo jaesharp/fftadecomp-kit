@@ -4226,6 +4226,8 @@ def main():
                                                       "bounded-buffer-guarded-callee-aliases-v1",
                                                       "bounded-buffer-guarded-bios-division-v1",
                                                       "bounded-buffer-nested-halfword-output-v1",
+                                                      "bounded-buffer-three-halfword-output-v1",
+                                                      "bounded-buffer-three-output-dynamic-division-v1",
                                                       "bounded-buffer-root-guarded-switch-v1",
                                                       "static-callback-buffer-v1",
                                                       "static-callback-unwritten-r7-v1",
@@ -4254,7 +4256,7 @@ def main():
                                                       "bounded-disjunctive-restoring-callee-scratch-v1",
                                                       "descriptor-callee-constant-v1",
                                                       "descriptor-cursor-value-v1",
-                                                      "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1"))
+                                                      "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1"))
     args = ap.parse_args()
     global ROOT
     ROOT = repo_root(args.root)
@@ -4285,7 +4287,7 @@ def main():
             args.function_address_profile or args.switch_profile or args.owner_runtime_profile):
         sys.exit("framed signed quotient excludes other selectors and requires Thumb mode")
     if args.owner_runtime_profile:
-        if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1"):
+        if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1"):
             from private_float_pack_admission_profile import issue
             return issue(Path(ROOT), addr, args)
         import owner_admission_profile
