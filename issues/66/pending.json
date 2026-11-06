@@ -3934,7 +3934,35 @@
           "who": "sol-0810E738-2701"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "6618f118941ac92698e863c33567a5955e0d045c535396abc063ce1a16975372",
+        "acknowledged_cursor": 6689107473,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6618f118941ac92698e863c33567a5955e0d045c535396abc063ce1a16975372",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810E738\",\"who\":\"sol-0810E738-2701\",\"claim_id\":6688878057,\"reason\":\"Frozen438B versus450B nonmatch, genuine originals and ungrounded discarded-read residual retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T15:54:40Z",
+          "id": 6689107473,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T15:54:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ee7fca2bfd330395ea864187dbbb8bccf9e6d892d8a11bc456e59016e8d782f5",
+        "result": {
+          "address": "0x0810E738",
+          "claim_id": 6688878057,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6689107473,
+          "status": "accepted",
+          "who": "sol-0810E738-2701"
+        }
+      }
     },
     {
       "claim": {
@@ -4090,7 +4118,35 @@
           "who": "sol-080ED4E8-2701"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "d8e8eff5166e093794fe80107a9d3bba1f6c7fea8d24382e8eb13fb258464a7b",
+        "acknowledged_cursor": 6689107473,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d8e8eff5166e093794fe80107a9d3bba1f6c7fea8d24382e8eb13fb258464a7b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080ED4E8\",\"who\":\"sol-080ED4E8-2701\",\"claim_id\":6688878170,\"reason\":\"Frozen720B versus710B nonmatch, eight discarded ordinary RAM reads and scheduling residual retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T15:54:40Z",
+          "id": 6689107466,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T15:54:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ee7fca2bfd330395ea864187dbbb8bccf9e6d892d8a11bc456e59016e8d782f5",
+        "result": {
+          "address": "0x080ED4E8",
+          "claim_id": 6688878170,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6689107466,
+          "status": "accepted",
+          "who": "sol-080ED4E8-2701"
+        }
+      }
     },
     {
       "claim": {
@@ -4122,7 +4178,35 @@
           "who": "sol-080D6A34-2701"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "b2d8cb9bd4ba686b2ef85cc5265fab1edd4810a2deaf696eda01b5a3eb19d776",
+        "acknowledged_cursor": 6689107473,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b2d8cb9bd4ba686b2ef85cc5265fab1edd4810a2deaf696eda01b5a3eb19d776",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D6A34\",\"who\":\"sol-080D6A34-2701\",\"claim_id\":6688878231,\"reason\":\"Frozen complete728B nonmatch:723 bytes equal, only five register-allocation differences, no grounded correction.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T15:54:40Z",
+          "id": 6689107457,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T15:54:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ee7fca2bfd330395ea864187dbbb8bccf9e6d892d8a11bc456e59016e8d782f5",
+        "result": {
+          "address": "0x080D6A34",
+          "claim_id": 6688878231,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6689107457,
+          "status": "accepted",
+          "who": "sol-080D6A34-2701"
+        }
+      }
     }
   ],
   "issue": 66,
