@@ -3742,7 +3742,35 @@
           "who": "sol-080C13C8-2423"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f6ab5cbb3ff5dd237bb42c9b33ca87a5bffa8176c1c4f03fb8e48860730bc81c",
+        "acknowledged_cursor": 6682317210,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f6ab5cbb3ff5dd237bb42c9b33ca87a5bffa8176c1c4f03fb8e48860730bc81c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C13C8\",\"who\":\"sol-080C13C8-2423\",\"claim_id\":6682140413,\"reason\":\"One grounded form110B/101equal; nine operand bytes exchangeR4/R5, all calls branches pools and extent identical. Stopped before ungrounded scheduling. Canonical modulo diagnostic original link retained, caller4B versus callee10B capacity gap unresolved; native/proof0, inputs unchanged.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T10:05:45Z",
+          "id": 6682317210,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T10:05:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e7529b3688f3200c3293249e64aae8d41edb1f5bd79b95993c666028558b3b06",
+        "result": {
+          "address": "0x080C13C8",
+          "claim_id": 6682140413,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6682317210,
+          "status": "accepted",
+          "who": "sol-080C13C8-2423"
+        }
+      }
     },
     {
       "claim": {
