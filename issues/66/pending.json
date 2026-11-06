@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "010a2f8347747bae46f533e2db926c89a762936a98bcadd7629ecce28653b482",
-        "acknowledged_cursor": 6680914261,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "010a2f8347747bae46f533e2db926c89a762936a98bcadd7629ecce28653b482",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080BDECC\",\"who\":\"sol-080BDECC-2371\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T08:45:46Z",
-          "id": 6680914188,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T08:45:46Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "82fc74d2161dafae4dfd3615f49ce6fa7a38b70fc992e0a7e1af3bb9e1c8c3e4",
-        "result": {
-          "address": "0x080BDECC",
-          "claim_id": 6680914188,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6680914188,
-          "status": "accepted",
-          "who": "sol-080BDECC-2371"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "3a51b9ec4effd884ed807d580922ef6937dffa537436eebe505a59e81feff1fd",
-        "acknowledged_cursor": 6681170482,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3a51b9ec4effd884ed807d580922ef6937dffa537436eebe505a59e81feff1fd",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080BDECC\",\"who\":\"sol-080BDECC-2371\",\"claim_id\":6680914188,\"reason\":\"Original2376 private cursor canonical padding passes; nested12E4F4 live alias preservation remains unproved. Zero C/compiler/native replay or MATCH credit. Frozen source retained; pending prerequisite work.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T09:00:46Z",
-          "id": 6681170482,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T09:00:46Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "094a4e38502b852d2d146cf1a774ad7ee6b13fd172e03e00815aa6ee42cb98f7",
-        "result": {
-          "address": "0x080BDECC",
-          "claim_id": 6680914188,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6681170482,
-          "status": "accepted",
-          "who": "sol-080BDECC-2371"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "cbf3b90be1940e77da60588b050c34b129ce8e51688551abc60e41dfc8723cb5",
         "acknowledged_cursor": 6681077069,
         "body_provenance": "acceptance-time",
