@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "fc95c33b3da2ec1b284bb7778c8b61996cb428ad389dd0a634a396391b609373",
-        "acknowledged_cursor": 6684244234,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "fc95c33b3da2ec1b284bb7778c8b61996cb428ad389dd0a634a396391b609373",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0811EC30\",\"who\":\"sol-0811EC30-2537\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:55:23Z",
-          "id": 6684233814,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:55:23Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5e218263c117373f8b7ea1910bc708e4f09f5c01153186375859fae78fa5431e",
-        "result": {
-          "address": "0x0811EC30",
-          "claim_id": 6684233814,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684233814,
-          "status": "accepted",
-          "who": "sol-0811EC30-2537"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d5f66ff12d03e8d8de1ad073541eae65c190ceb7a2b1c64866182463e4ae0b96",
-        "acknowledged_cursor": 6684425690,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d5f66ff12d03e8d8de1ad073541eae65c190ceb7a2b1c64866182463e4ae0b96",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0811EC30\",\"who\":\"sol-0811EC30-2537\",\"claim_id\":6684233814,\"reason\":\"Fully stopped. Two grounded forms emit172/160 bytes against160-byte target; retained160B nonexact with20same-offset bytes. Six discarded RAM reads and control-base lifetime differ, without an independently grounded permitted correction. No forced-read/order/register steering; zero native/proof credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T12:06:25Z",
-          "id": 6684425690,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:06:25Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "89d307aed1daf30701b4db4e2139a7fcfb14c8cb9a8559459ba33e713eb026aa",
-        "result": {
-          "address": "0x0811EC30",
-          "claim_id": 6684233814,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684425690,
-          "status": "accepted",
-          "who": "sol-0811EC30-2537"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "066e9cbe7a7689a42676eef58a9811c8f2f5bac2837ce8611b3010c2f57e2594",
         "acknowledged_cursor": 6684244234,
         "body_provenance": "acceptance-time",
