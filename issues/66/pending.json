@@ -3898,7 +3898,35 @@
           "who": "sol-080F0AC0-2371"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "67027fe95592ee3de53d12adcb116a7b535fd3e2661115f420d3a1e44c2eb9b7",
+        "acknowledged_cursor": 6681114027,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "67027fe95592ee3de53d12adcb116a7b535fd3e2661115f420d3a1e44c2eb9b7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080F0AC0\",\"who\":\"sol-080F0AC0-2371\",\"claim_id\":6680914261,\"reason\":\"Original qualification2372 retains unsupported stack alias use or escape. Frozen source retained; no C/compiler/native replay or MATCH credit. Releasing pending prerequisite work.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T08:57:32Z",
+          "id": 6681114027,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T08:57:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a557980a8539c4def4f11892c9e5ca1e5afa01a6b318530f61042946329aaae7",
+        "result": {
+          "address": "0x080F0AC0",
+          "claim_id": 6680914261,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6681114027,
+          "status": "accepted",
+          "who": "sol-080F0AC0-2371"
+        }
+      }
     },
     {
       "claim": {
