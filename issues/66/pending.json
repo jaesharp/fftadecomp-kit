@@ -3866,7 +3866,35 @@
           "who": "sol-080E1A38-3108"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "0cc1dc13e9c68f7729dc96c8360f5ca2c52959a031f5e7768ccfae70c9d1b1b1",
+        "acknowledged_cursor": 6698095433,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "0cc1dc13e9c68f7729dc96c8360f5ca2c52959a031f5e7768ccfae70c9d1b1b1",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080E1A38\",\"who\":\"sol-080E1A38-3108\",\"claim_id\":6697850088,\"reason\":\"Frozen fullFUNC896B versus900B; no grounded correction remains.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T23:11:01Z",
+          "id": 6698095053,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T23:11:01Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "789409d17ca89730954058db31d522adebbdf5ddf0347d5f16333cf6c6bb2722",
+        "result": {
+          "address": "0x080E1A38",
+          "claim_id": 6697850088,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6698095053,
+          "status": "accepted",
+          "who": "sol-080E1A38-3108"
+        }
+      }
     },
     {
       "claim": {
@@ -4058,7 +4086,35 @@
           "who": "sol-08119D74-3116"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "28cebf9841c5b80c8458282accfd97275e86456b1849e5779b99f086993a196d",
+        "acknowledged_cursor": 6698095433,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "28cebf9841c5b80c8458282accfd97275e86456b1849e5779b99f086993a196d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08119D74\",\"who\":\"sol-08119D74-3116\",\"claim_id\":6697950442,\"reason\":\"Zero-C inspection stop: discarded RAM loads lack independently grounded storage representation.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T23:11:02Z",
+          "id": 6698095433,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T23:11:02Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "789409d17ca89730954058db31d522adebbdf5ddf0347d5f16333cf6c6bb2722",
+        "result": {
+          "address": "0x08119D74",
+          "claim_id": 6697950442,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6698095433,
+          "status": "accepted",
+          "who": "sol-08119D74-3116"
+        }
+      }
     },
     {
       "claim": {
