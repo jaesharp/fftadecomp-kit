@@ -3559,6 +3559,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             if stack_arguments and aliases.keys() - {ARM_REG_R12}:
                 from static_callback_r6_frame_profile import structural_return_aliases
                 aliases = structural_return_aliases(buffer_proof, data, address, current, aliases)
+                from descriptor_disjunctive_alias_profile import root_return_aliases
+                aliases = root_return_aliases(buffer_proof, data, address, current, aliases)
                 if aliases.keys() - {ARM_REG_R12}:
                     raise ValueError("local stack pointer escapes through a return register")
             returns.add(current)
@@ -4246,6 +4248,9 @@ def main():
                                                       "ordinary-formal-output-spill-bios-remainder-v1",
                                                       "descriptor-single-store-v1",
                                                       "descriptor-disjunctive-alias-v1",
+                                                      "descriptor-disjunctive-restoring-leaf-alias-v1",
+                                                      "descriptor-disjunctive-restoring-callee-alias-v1",
+                                                      "bounded-disjunctive-restoring-callee-scratch-v1",
                                                       "descriptor-callee-constant-v1",
                                                       "descriptor-cursor-value-v1",
                                                       "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1"))
