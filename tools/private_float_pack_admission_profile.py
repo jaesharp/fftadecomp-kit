@@ -22,6 +22,7 @@ import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_double_comparison_effects_inventory as double_comparison
 import private_float_scalar_conversion_effects_inventory as scalar_conversion
+import private_double_scalar_conversion_effects_inventory as double_scalar_conversion
 from inert_spin_profile import fixed_configuration, index_snapshot, marker_text
 from addressed_signed_runtime_profile import toolchain_fingerprint, runtime_fingerprint
 
@@ -35,8 +36,10 @@ DOUBLE_COMPARISON_SELECTOR = 'private-double-comparison-v1'
 DOUBLE_COMPARISON_SCHEMA = 'elf-symbol-thumb-private-double-comparison-v1'
 SCALAR_CONVERSION_SELECTOR = 'private-float-scalar-conversion-v1'
 SCALAR_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-scalar-conversion-v1'
+DOUBLE_SCALAR_CONVERSION_SELECTOR = 'private-double-scalar-conversion-v1'
+DOUBLE_SCALAR_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-double-scalar-conversion-v1'
 SELECTORS = (SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
-             SCALAR_CONVERSION_SELECTOR)
+             SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
             'definedness equivalence, physical memory, nonalias, nonescape and '
@@ -47,6 +50,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == DOUBLE_SCALAR_CONVERSION_SELECTOR:
+        return double_scalar_conversion, DOUBLE_SCALAR_CONVERSION_SCHEMA, CONTRACT.replace('unpack/pack', 'double-unpack/scalar-conversion')
     if selector == SCALAR_CONVERSION_SELECTOR:
         return scalar_conversion, SCALAR_CONVERSION_SCHEMA, CONTRACT.replace('unpack/pack', 'scalar-conversion local-record')
     if selector == DOUBLE_COMPARISON_SELECTOR:
@@ -77,7 +82,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
@@ -138,7 +143,7 @@ def function_size(image, address, *, partitioned_tail=False):
 
 
 def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR):
-    """Authenticate only genuine private entry symbols from the selected closure, without aliases."""
+    """Authenticate indexed helpers and only the selected closure's pinned compiler names."""
     import match
     from software_double_profile import indices, span_record
     selected_inventory, _, _ = profile(selector)
@@ -162,6 +167,8 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
                 start < address + size and end > address:
             raise ValueError('private float helper identity/count/ownership differs')
         targets[f'func_{start:08X}'] = start
+    for alias, role in getattr(selected_inventory, 'COMPILER_ALIASES', {}).items():
+        targets[alias] = next(record[0] for name, record, _ in selected_inventory.HELPERS if name == role)
     calls, occupied = [], set()
     decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
     decoder.detail = True
@@ -180,7 +187,7 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
             name = target['name']
             if name not in targets or target['section'] or target['value'] or target['bind'] != 1 or \
                     target['type'] not in (0, 2) or sum(item['name'] == name for item in image['symbols']) != 1:
-                raise ValueError('private float requires unique undefined genuine helper functions')
+                raise ValueError('private float requires unique undefined pinned helper symbols')
             item = next(decoder.disasm(image['text'][site:site+4], address+site), None)
             if item is None or item.id != match.ARM_INS_BL or item.size != 4 or \
                     item.operands[0].imm != address+site:
@@ -190,9 +197,9 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
     sequences = getattr(selected_inventory, 'ROOT_HELPER_SEQUENCES',
         (getattr(selected_inventory, 'ROOT_HELPERS',
                  tuple(role for role, _, _ in selected_inventory.HELPERS)),))
-    expected = [[f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}'
+    expected = [[next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name)
                  for name in roles] for roles in sequences]
-    if [name for _, name in calls] not in expected or any(item['name'] and not item['section'] and
+    if [targets[name] for _, name in calls] not in expected or any(item['name'] and not item['section'] and
             item['name'] not in targets for item in image['symbols']):
         raise ValueError('private float requires exactly one unpack then one pack and no extra symbols')
     return calls, targets
@@ -252,9 +259,14 @@ def verify(data, address, rom, mapping, index, calls, *, selector=SELECTOR, mani
     selected_inventory, schema, contract = profile(selector)
     proof, instructions = selected_inventory.verify(data, address, rom, mapping, index,
         selector=selected_inventory.SELECTOR)
-    expected = [[site-address, f'func_{next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name):08X}']
+    expected = [[site-address, next(record[0] for role, record, _ in selected_inventory.HELPERS if role == name)]
                 for site, name in proof['private_bindings']]
-    if type(calls) is not list or calls != expected:
+    genuine = {f'func_{record[0]:08X}': record[0] for _, record, _ in selected_inventory.HELPERS}
+    for alias, role in getattr(selected_inventory, 'COMPILER_ALIASES', {}).items():
+        genuine[alias] = next(record[0] for name, record, _ in selected_inventory.HELPERS if name == role)
+    if type(calls) is not list or any(type(call) is not list or len(call) != 2 or
+            type(call[0]) is not int or type(call[1]) is not str or call[1] not in genuine for call in calls) or \
+            [[site, genuine[name]] for site, name in calls] != expected:
         raise ValueError('private float ELF bindings differ from the fresh reached closure')
     observed = dict(schema=schema, selector=selector, contract=contract, bindings=calls,
                     inventory=proof, producer_source_sha256=producer_fingerprint())

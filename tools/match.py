@@ -4236,7 +4236,7 @@ def main():
                                                       "descriptor-disjunctive-alias-v1",
                                                       "descriptor-callee-constant-v1",
                                                       "descriptor-cursor-value-v1",
-                                                      "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1"))
+                                                      "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1"))
     args = ap.parse_args()
     global ROOT
     ROOT = repo_root(args.root)
@@ -4267,7 +4267,7 @@ def main():
             args.function_address_profile or args.switch_profile or args.owner_runtime_profile):
         sys.exit("framed signed quotient excludes other selectors and requires Thumb mode")
     if args.owner_runtime_profile:
-        if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1"):
+        if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1"):
             from private_float_pack_admission_profile import issue
             return issue(Path(ROOT), addr, args)
         import owner_admission_profile
