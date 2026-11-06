@@ -3774,7 +3774,35 @@
           "who": "sol-0812D1DC-1990"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "b75542c357f68369c2838aed61f574de1957b5f515119389636537d6f93f885c",
+        "acknowledged_cursor": 6672843303,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b75542c357f68369c2838aed61f574de1957b5f515119389636537d6f93f885c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D1DC\",\"who\":\"sol-0812D1DC-1990\",\"claim_id\":6672706417,\"reason\":\"Complete276B natural C is diagnostic byte-exact; originals frozen. Native stack/callee admission prerequisite pending, zero MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T00:04:37Z",
+          "id": 6672843303,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:04:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "42121be925dcf6d166485b669a80f83cc094a8a7eb9fcc548f0805af84244f81",
+        "result": {
+          "address": "0x0812D1DC",
+          "claim_id": 6672706417,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6672843303,
+          "status": "accepted",
+          "who": "sol-0812D1DC-1990"
+        }
+      }
     },
     {
       "claim": {
