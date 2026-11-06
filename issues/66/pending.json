@@ -3934,7 +3934,35 @@
           "who": "sol-080D4038-2171"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5b9b4df943855ce21e89619ed76c2bcac0614a98cb8af2bda529d671b98be63a",
+        "acknowledged_cursor": 6676563530,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5b9b4df943855ce21e89619ed76c2bcac0614a98cb8af2bda529d671b98be63a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D4038\",\"who\":\"sol-080D4038-2171\",\"claim_id\":6676531464,\"reason\":\"First native complete original490 byte FUNC MATCH, source plausible; immutable original artifacts and all167/reference/runtime/ROM checks retained for native publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T04:04:36Z",
+          "id": 6676563530,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T04:04:36Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b844f32e0fd251ebe1fc3875899bfb91b0c07cd0e9c598d3babb90af291ca2de",
+        "result": {
+          "address": "0x080D4038",
+          "claim_id": 6676531464,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6676563530,
+          "status": "accepted",
+          "who": "sol-080D4038-2171"
+        }
+      }
     }
   ],
   "issue": 66,
