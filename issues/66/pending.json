@@ -3906,66 +3906,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "9187262d50f28553b600ebfe562e0d44733e21e7fef6cbb3c0cf8e98c0d04f72",
-        "acknowledged_cursor": 6688878231,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "9187262d50f28553b600ebfe562e0d44733e21e7fef6cbb3c0cf8e98c0d04f72",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0810E738\",\"who\":\"sol-0810E738-2701\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T15:45:01Z",
-          "id": 6688878057,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T15:45:01Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ce33d6a74ac990ef961f1f4be8296aa63b031f79600327b5460ac9eb5ae9f8e9",
-        "result": {
-          "address": "0x0810E738",
-          "claim_id": 6688878057,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6688878057,
-          "status": "accepted",
-          "who": "sol-0810E738-2701"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "6618f118941ac92698e863c33567a5955e0d045c535396abc063ce1a16975372",
-        "acknowledged_cursor": 6689107473,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6618f118941ac92698e863c33567a5955e0d045c535396abc063ce1a16975372",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810E738\",\"who\":\"sol-0810E738-2701\",\"claim_id\":6688878057,\"reason\":\"Frozen438B versus450B nonmatch, genuine originals and ungrounded discarded-read residual retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T15:54:40Z",
-          "id": 6689107473,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T15:54:40Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ee7fca2bfd330395ea864187dbbb8bccf9e6d892d8a11bc456e59016e8d782f5",
-        "result": {
-          "address": "0x0810E738",
-          "claim_id": 6688878057,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6689107473,
-          "status": "accepted",
-          "who": "sol-0810E738-2701"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "ac41d08cfa65edbc53c1b53f1a514781b490697726b81baf68933a1c9c381b68",
         "acknowledged_cursor": 6688878231,
         "body_provenance": "acceptance-time",
@@ -4021,66 +3961,6 @@
           "request_id": 6689145283,
           "status": "accepted",
           "who": "sol-08120BF4-2701"
-        }
-      }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "c44c868fbc60d47de30612588d5976ed4696c6cebf3e6527de20e277c44bf0de",
-        "acknowledged_cursor": 6688878231,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c44c868fbc60d47de30612588d5976ed4696c6cebf3e6527de20e277c44bf0de",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080FB0B4\",\"who\":\"sol-080FB0B4-2701\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T15:45:01Z",
-          "id": 6688878167,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T15:45:01Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ce33d6a74ac990ef961f1f4be8296aa63b031f79600327b5460ac9eb5ae9f8e9",
-        "result": {
-          "address": "0x080FB0B4",
-          "claim_id": 6688878167,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6688878167,
-          "status": "accepted",
-          "who": "sol-080FB0B4-2701"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "2521cc37b6f8925bdd137ea3b08b1c267c61bad7162d2b638bc84a32e693a125",
-        "acknowledged_cursor": 6689145283,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "2521cc37b6f8925bdd137ea3b08b1c267c61bad7162d2b638bc84a32e693a125",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080FB0B4\",\"who\":\"sol-080FB0B4-2701\",\"claim_id\":6688878167,\"reason\":\"Frozen680B nonmatch,12-byte rotation of pure default initialization; no grounded next correction.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T15:56:14Z",
-          "id": 6689145255,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T15:56:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "76a9635f03cf27fda4075ea5ee21cde9c59dc4e8fec62ae493615eac0a4ac109",
-        "result": {
-          "address": "0x080FB0B4",
-          "claim_id": 6688878167,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6689145255,
-          "status": "accepted",
-          "who": "sol-080FB0B4-2701"
         }
       }
     },
