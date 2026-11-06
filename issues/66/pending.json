@@ -3806,66 +3806,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "d05805af1e64c881dd1ef9d94e9dbae980ef7bd1c61a5f9e704c5f8f02c40616",
-        "acknowledged_cursor": 6684244234,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d05805af1e64c881dd1ef9d94e9dbae980ef7bd1c61a5f9e704c5f8f02c40616",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08026838\",\"who\":\"sol-08026838-2537\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T11:55:24Z",
-          "id": 6684234095,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T11:55:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5e218263c117373f8b7ea1910bc708e4f09f5c01153186375859fae78fa5431e",
-        "result": {
-          "address": "0x08026838",
-          "claim_id": 6684234095,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684234095,
-          "status": "accepted",
-          "who": "sol-08026838-2537"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "8e7d3be2471856f1c7cd009320d0eb125065c45cb6d831344b2676f5111b10c4",
-        "acknowledged_cursor": 6684417648,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "8e7d3be2471856f1c7cd009320d0eb125065c45cb6d831344b2676f5111b10c4",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08026838\",\"who\":\"sol-08026838-2537\",\"claim_id\":6684234095,\"reason\":\"Fully stopped. First grounded source compiles and original typed-linked complete FUNC matches162/162 bytes. Original artifacts frozen; native/proof/MATCH credit remains zero pending primary qualification. Logical buffer capacity remains conditional.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T12:05:58Z",
-          "id": 6684417648,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:05:58Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "00cbe212af750b7d792800e3b4d292c934590b31c052ec92a3d7dadddbfec6c4",
-        "result": {
-          "address": "0x08026838",
-          "claim_id": 6684234095,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684417648,
-          "status": "accepted",
-          "who": "sol-08026838-2537"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "e4c8064e8117fd650202821ec6c15ec85a0e4b8fca38f5d187bba1d98eb25d5f",
         "acknowledged_cursor": 6684398632,
         "body_provenance": "acceptance-time",
