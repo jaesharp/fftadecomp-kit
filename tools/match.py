@@ -4202,6 +4202,7 @@ def main():
                                                       "named-data-buffer-v1",
                                                       "bounded-buffer-discarded-return-scratch-v1",
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
+                                                      "bounded-buffer-bios-fill-source-v1",
                                                       "bounded-buffer-guarded-switch-v1",
                                                       "bounded-buffer-nested-halfword-output-v1",
                                                       "static-callback-buffer-v1",

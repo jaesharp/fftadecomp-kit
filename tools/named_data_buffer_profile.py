@@ -15,14 +15,17 @@ SCRATCH_CONTROL_FLOW = 'bounded buffer calls with exact unobserved R2/R3 normal-
 BIOS_SQRT_SELECTOR = 'bounded-buffer-bios-sqrt-scratch-v1'
 BIOS_SQRT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-bios-sqrt-scratch-v1'
 BIOS_SQRT_CONTROL_FLOW = 'bounded buffer calls with an exact scalar BIOS Sqrt wrapper and killed return scratch'
+BIOS_FILL_SELECTOR = 'bounded-buffer-bios-fill-source-v1'
+BIOS_FILL_SCHEMA = 'elf-symbol-thumb-bounded-buffer-bios-fill-source-v1'
+BIOS_FILL_CONTROL_FLOW = 'complete named-data owner with exact conditional BIOS CpuSet local-source bounds'
 GUARDED_SWITCH_SELECTOR = 'bounded-buffer-guarded-switch-v1'
 GUARDED_SWITCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-switch-v1'
 GUARDED_SWITCH_CONTROL_FLOW = 'bounded buffer calls with an exact unsigned-guarded local word switch'
 NESTED_OUTPUT_SELECTOR = 'bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_CONTROL_FLOW = 'bounded buffer calls with native nested formal halfword outputs and retained entry aliases'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA)
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -268,6 +271,47 @@ class GuardedSwitchBufferProof(DiscardedReturnScratchProof):
                 Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                 for name in producers},
             observations=[self._guarded_switches[key] for key in sorted(self._guarded_switches)])
+
+
+class BiosFillSourceProof(NamedDataBufferProof):
+    """Compose the existing root-local source proof without widening callees."""
+
+    def bind_root(self, data, address, calls):
+        import bios_cpuset_fill_profile as bios
+        if hasattr(self, '_root_fill'):
+            raise ValueError('BIOS fill root context is single use')
+        self._root_fill = bios.BiosFillProof(data, address, self.rom,
+            self.mapping, self.index, calls)
+
+    def check_call(self, address, aliases, stack, slots=None, *, constants=None,
+                   site=None, words=None):
+        import bios_cpuset_fill_profile as bios
+        if address != bios.ADDRESS:
+            return super().check_call(address, aliases, stack, slots,
+                constants=constants, site=site, words=words)
+        if not hasattr(self, '_root_fill') or slots or words or match.ARM_REG_LR in aliases:
+            raise ValueError('BIOS fill requires its actual root call without pointer slots or words')
+        arguments = {reg:offset for reg,offset in aliases.items()
+                     if reg in match.CALLER_CLOBBERED}
+        result = self._root_fill.check_call(site, arguments, stack)
+        data = self.span(address)
+        if data != bios.WRAPPER:
+            raise ValueError('BIOS fill requires the exact complete indexed wrapper')
+        self.dependencies[address] = data
+        self.records[address] = dict(address=address, end=address+len(data), bytes=len(data),
+            body_sha256=hashlib.sha256(data).hexdigest(), **self.identities,
+            structure=dict(kind=BIOS_FILL_SCHEMA, instructions=2,
+                wrapper_hex=data.hex(), conditional_ABI=bios.CONTRACT))
+        return result
+
+    def bios_manifest(self):
+        import bios_cpuset_fill_profile as bios
+        from pathlib import Path
+        if not hasattr(self, '_root_fill') or not self._root_fill.observations:
+            raise ValueError('BIOS fill source profile requires an actual checked local source')
+        return dict(self._root_fill.manifest(), producer_sha256={
+            Path(module.__file__).name:hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
+            for module in (bios, __import__(__name__))})
 
 
 class BiosSqrtScratchProof(DiscardedReturnScratchProof):
