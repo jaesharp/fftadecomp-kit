@@ -3742,7 +3742,35 @@
           "who": "sol-0810BB70-2309"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4c2e7795f6e5d9f63fe4fe3a9c6b3944aa4ba61e7908170f2d226afdc8f631f5",
+        "acknowledged_cursor": 6679462880,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4c2e7795f6e5d9f63fe4fe3a9c6b3944aa4ba61e7908170f2d226afdc8f631f5",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810BB70\",\"who\":\"sol-0810BB70-2309\",\"claim_id\":6679286220,\"reason\":\"Original diagnostic exact816B; native prerequisite pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T07:16:54Z",
+          "id": 6679462880,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T07:16:54Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cbec17f8cbf2365a105a6907a6cf810a6d51dc9fdc8d395728ee1efa8bd60559",
+        "result": {
+          "address": "0x0810BB70",
+          "claim_id": 6679286220,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6679462880,
+          "status": "accepted",
+          "who": "sol-0810BB70-2309"
+        }
+      }
     },
     {
       "claim": {
@@ -3838,7 +3866,35 @@
           "who": "sol-0810D728-2309"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8cdc25fe8e12c9101b99841c3dd55bf8f1c10d4cf5b5ba8b631be5d681adfd0e",
+        "acknowledged_cursor": 6679462880,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8cdc25fe8e12c9101b99841c3dd55bf8f1c10d4cf5b5ba8b631be5d681adfd0e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0810D728\",\"who\":\"sol-0810D728-2309\",\"claim_id\":6679286408,\"reason\":\"Original diagnostic exact816B; native prerequisite pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T07:16:54Z",
+          "id": 6679462843,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T07:16:54Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cbec17f8cbf2365a105a6907a6cf810a6d51dc9fdc8d395728ee1efa8bd60559",
+        "result": {
+          "address": "0x0810D728",
+          "claim_id": 6679286408,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6679462843,
+          "status": "accepted",
+          "who": "sol-0810D728-2309"
+        }
+      }
     },
     {
       "claim": {
