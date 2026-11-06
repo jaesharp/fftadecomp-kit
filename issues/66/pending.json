@@ -3742,7 +3742,35 @@
           "who": "sol-0808F638-2000"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "cb02f45c3ea3c7859db6fe6107dc7ab612c05ce64bfa1199bed116dd4713efd8",
+        "acknowledged_cursor": 6673128424,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "cb02f45c3ea3c7859db6fe6107dc7ab612c05ce64bfa1199bed116dd4713efd8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808F638\",\"who\":\"sol-0808F638-2000\",\"claim_id\":6672828065,\"reason\":\"Frozen eight natural forms; closest complete FUNC272 versus276 bytes. Tree address lifetime and pool/back-edge placement differ with no grounded next representation. No native proof or MATCH.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T00:21:58Z",
+          "id": 6673128424,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T00:21:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "671875893071a2695aee50963660db68763d401dcdffec8856be21543f5a9f72",
+        "result": {
+          "address": "0x0808F638",
+          "claim_id": 6672828065,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6673128424,
+          "status": "accepted",
+          "who": "sol-0808F638-2000"
+        }
+      }
     },
     {
       "claim": {
