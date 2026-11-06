@@ -3714,66 +3714,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "110e259d6eaf25735f93c866808de1b7dd4279464605d14d6960a013dcac29a2",
-        "acknowledged_cursor": 6684689527,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "110e259d6eaf25735f93c866808de1b7dd4279464605d14d6960a013dcac29a2",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DAAC4\",\"who\":\"sol-080DAAC4-2549\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T12:20:47Z",
-          "id": 6684689527,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:20:47Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "865525ca276287fe047b3df4c67b6cedf3f8888db7bc1e7fa186938453a7b669",
-        "result": {
-          "address": "0x080DAAC4",
-          "claim_id": 6684689527,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684689527,
-          "status": "accepted",
-          "who": "sol-080DAAC4-2549"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "511d74dc4dc0cc7620dac7ba99ebff726cc9b841a4645df5af35615256969f43",
-        "acknowledged_cursor": 6684866925,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "511d74dc4dc0cc7620dac7ba99ebff726cc9b841a4645df5af35615256969f43",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DAAC4\",\"who\":\"sol-080DAAC4-2549\",\"claim_id\":6684689527,\"reason\":\"Four natural forms frozen, best174B versus192B; target center conversions/transport eliminated by observed halfword destination arithmetic, no grounded further correction. No native/proof.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
-          "created_at": "2026-11-06T12:30:48Z",
-          "id": 6684866925,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:30:48Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f03a54efacb9fc8997161748872d204949f8907253fb3235f71c0d225d873cad",
-        "result": {
-          "address": "0x080DAAC4",
-          "claim_id": 6684689527,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684866925,
-          "status": "accepted",
-          "who": "sol-080DAAC4-2549"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "cd4454e2e5739c7f65074c32571748c9696d33d7a9644787a4ba4726266f60c4",
         "acknowledged_cursor": 6684866925,
         "body_provenance": "acceptance-time",
@@ -3895,66 +3835,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "cbe63eba5822966e12a81d125979af8cff5e666af95285db4c9dfe0b5c4f0d61",
-        "acknowledged_cursor": 6684866925,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "cbe63eba5822966e12a81d125979af8cff5e666af95285db4c9dfe0b5c4f0d61",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080DBDEC\",\"who\":\"sol-080DBDEC-2555\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T12:29:39Z",
-          "id": 6684846756,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:29:39Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f03a54efacb9fc8997161748872d204949f8907253fb3235f71c0d225d873cad",
-        "result": {
-          "address": "0x080DBDEC",
-          "claim_id": 6684846756,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6684846756,
-          "status": "accepted",
-          "who": "sol-080DBDEC-2555"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4e056aba31419cf16cd4f593fab3cd6468f52fb6e649bc08435f338fc0a65608",
-        "acknowledged_cursor": 6684971640,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4e056aba31419cf16cd4f593fab3cd6468f52fb6e649bc08435f338fc0a65608",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DBDEC\",\"who\":\"sol-080DBDEC-2555\",\"claim_id\":6684846756,\"reason\":\"First natural original FUNC diagnostic exact200B;1compiler, all167 unchanged. Frozen original artifacts; native/proof admission pending, zero MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-06T12:36:42Z",
-          "id": 6684971495,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T12:36:42Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a74d395363c648b70c2baa9bcad5c54a8a21d27e082cb0aec6c5a6637d7415ad",
-        "result": {
-          "address": "0x080DBDEC",
-          "claim_id": 6684846756,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6684971495,
-          "status": "accepted",
-          "who": "sol-080DBDEC-2555"
-        }
-      }
     },
     {
       "claim": {
