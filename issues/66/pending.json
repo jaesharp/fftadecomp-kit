@@ -3802,7 +3802,35 @@
           "who": "sol-08104AEC-2645"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1cd5d10ff8957a479189be8399d3ac428166ae61950e5f33c32be6d99b358058",
+        "acknowledged_cursor": 6687420281,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1cd5d10ff8957a479189be8399d3ac428166ae61950e5f33c32be6d99b358058",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08104AEC\",\"who\":\"sol-08104AEC-2645\",\"claim_id\":6687095642,\"reason\":\"Two grounded source forms and exact-size1366B diagnostic frozen; packed-halfword allocation/spill/constant-placement residual remains without independently grounded next correction. Original evidence and end checks retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T14:39:12Z",
+          "id": 6687420281,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:39:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "bd52020c90d0792596c7fd562d88239738c538e329e1f60b62fc44cb03724e07",
+        "result": {
+          "address": "0x08104AEC",
+          "claim_id": 6687095642,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6687420281,
+          "status": "accepted",
+          "who": "sol-08104AEC-2645"
+        }
+      }
     },
     {
       "claim": {
