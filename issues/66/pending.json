@@ -3934,7 +3934,35 @@
           "who": "sol-08011B30-2328"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "aed909354b8d9a88fa51ed89c1f55e888c03c7da630b47ff38b54ecd4d9eb305",
+        "acknowledged_cursor": 6679799698,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "aed909354b8d9a88fa51ed89c1f55e888c03c7da630b47ff38b54ecd4d9eb305",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08011B30\",\"who\":\"sol-08011B30-2328\",\"claim_id\":6679771302,\"reason\":\"First native MATCH304B admitted once with published guarded ordinary alias proof; plausible source and all original/native167/runtime/ROM checks pass.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T07:37:47Z",
+          "id": 6679799698,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T07:37:47Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8b82e318188f16521a12e0a08f2b1c03fe7a7afc33f9a9b5f6794b12bfc7358a",
+        "result": {
+          "address": "0x08011B30",
+          "claim_id": 6679771302,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6679799698,
+          "status": "accepted",
+          "who": "sol-08011B30-2328"
+        }
+      }
     }
   ],
   "issue": 66,
