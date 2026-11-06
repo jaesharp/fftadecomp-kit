@@ -132,7 +132,7 @@ def verify(data, address, rom, mapping, index, calls, bindings, *, selector, man
         import readonly_entry_stack_words_profile as entry_stack
         entry_policy = dict(schema=entry_stack.SCHEMA, words=[0, 1])
     restored = frame.prove_frame(instructions, edges, address, branches, calls,
-        entry_stack_policy=entry_policy, runtime_calls=runtime_calls)
+        entry_stack_policy=entry_policy, runtime_calls=runtime_calls or None)
     if entry_policy is not None and not restored['entry_stack']['reads']:
         raise ValueError('entry-word switch requires an actual incoming word0 read')
     modules = (analyze, thunks, frame, match, owner, graph, operations)
