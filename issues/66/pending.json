@@ -3958,7 +3958,35 @@
           "who": "sol-0814379C-2399"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c68771d6faa0306bf57011ce359cec99885ef45f62636aef0c4eea042714479c",
+        "acknowledged_cursor": 6681882448,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c68771d6faa0306bf57011ce359cec99885ef45f62636aef0c4eea042714479c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814379C\",\"who\":\"sol-0814379C-2399\",\"claim_id\":6681705157,\"reason\":\"Complete original diagnostic exact frozen; all original artifacts and native admission gap retained; no native/proof or source replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T09:40:34Z",
+          "id": 6681870746,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T09:40:34Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "57aa3ee69332a9132760fd4372c0d8278a7750b8bf21c5deb23dfa702fef0662",
+        "result": {
+          "address": "0x0814379C",
+          "claim_id": 6681705157,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6681870746,
+          "status": "accepted",
+          "who": "sol-0814379C-2399"
+        }
+      }
     },
     {
       "claim": {
@@ -4086,7 +4114,35 @@
           "who": "sol-081440F0-2403"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "77ffc021eefddf87406b2f8c406681f21dd4e930a7954cc40afd6efbabac238f",
+        "acknowledged_cursor": 6681882448,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "77ffc021eefddf87406b2f8c406681f21dd4e930a7954cc40afd6efbabac238f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081440F0\",\"who\":\"sol-081440F0-2403\",\"claim_id\":6681820852,\"reason\":\"First actual native MATCH76B with published private-float-comparison-v1; frozen source/all167/native167/references/runtime/ROM unchanged. Publication pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T09:41:13Z",
+          "id": 6681882448,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T09:41:13Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "57aa3ee69332a9132760fd4372c0d8278a7750b8bf21c5deb23dfa702fef0662",
+        "result": {
+          "address": "0x081440F0",
+          "claim_id": 6681820852,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6681882448,
+          "status": "accepted",
+          "who": "sol-081440F0-2403"
+        }
+      }
     },
     {
       "claim": {
