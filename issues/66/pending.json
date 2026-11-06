@@ -3838,7 +3838,35 @@
           "who": "sol-080D5128-2663"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ab32282838a3dee4322044290aebcf1395392c9dc30a5f3074a6e601e9f1aa63",
+        "acknowledged_cursor": 6687640876,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ab32282838a3dee4322044290aebcf1395392c9dc30a5f3074a6e601e9f1aa63",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D5128\",\"who\":\"sol-080D5128-2663\",\"claim_id\":6687523468,\"reason\":\"First complete native MATCH1132B, plausible unchanged frozen C, one compiler, all actual bounded alias effects/frame/root scratch checks accepted; original167/current167/runtime/ROM unchanged. Publication integration follows.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T14:49:16Z",
+          "id": 6687640876,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T14:49:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "559cc7ea3094b6edfa8668d25adb3be9b53565e56f9bc8ccb5119ddfdca453d1",
+        "result": {
+          "address": "0x080D5128",
+          "claim_id": 6687523468,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6687640876,
+          "status": "accepted",
+          "who": "sol-080D5128-2663"
+        }
+      }
     },
     {
       "claim": {
