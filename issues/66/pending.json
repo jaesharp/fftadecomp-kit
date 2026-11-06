@@ -4062,7 +4062,35 @@
           "who": "sol-08043ECC-3032"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e90a426cdd8f666ed3beae499b101404bbedd4e49f7319e449462865907800b7",
+        "acknowledged_cursor": 6695781424,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e90a426cdd8f666ed3beae499b101404bbedd4e49f7319e449462865907800b7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08043ECC\",\"who\":\"sol-08043ECC-3032\",\"claim_id\":6695592090,\"reason\":\"First natural original148B versus152B target69 equal bytes, cursor and count scheduling residual. No independent semantic correction. Frozen stopped native/proof0.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T21:15:10Z",
+          "id": 6695781402,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T21:15:10Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "314e307b6048f758df6f799575de8c8dec65c1382bc8df97babe5ed18e358ec8",
+        "result": {
+          "address": "0x08043ECC",
+          "claim_id": 6695592090,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6695781402,
+          "status": "accepted",
+          "who": "sol-08043ECC-3032"
+        }
+      }
     },
     {
       "claim": {
@@ -4094,7 +4122,35 @@
           "who": "sol-0805459C-3032"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a5a481877f714a569f6812b57f42d6fded2fd37be3d90f9527042b0864dc7077",
+        "acknowledged_cursor": 6695781424,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a5a481877f714a569f6812b57f42d6fded2fd37be3d90f9527042b0864dc7077",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805459C\",\"who\":\"sol-0805459C-3032\",\"claim_id\":6695593135,\"reason\":\"First natural original164B versus160B target29 equal bytes. Allocation and increment scheduling residual, no independent semantic correction; stopped frozen native/proof0.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T21:15:10Z",
+          "id": 6695781424,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T21:15:10Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "314e307b6048f758df6f799575de8c8dec65c1382bc8df97babe5ed18e358ec8",
+        "result": {
+          "address": "0x0805459C",
+          "claim_id": 6695593135,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6695781424,
+          "status": "accepted",
+          "who": "sol-0805459C-3032"
+        }
+      }
     },
     {
       "claim": {
