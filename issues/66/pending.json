@@ -3994,7 +3994,35 @@
           "who": "sol-0804BBC0-3072"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "204fac716259baaea4b62eba81fab9e4e646decd4c8630a47b4eb7ed40e9d8f0",
+        "acknowledged_cursor": 6697274906,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "204fac716259baaea4b62eba81fab9e4e646decd4c8630a47b4eb7ed40e9d8f0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0804BBC0\",\"who\":\"sol-0804BBC0-3072\",\"claim_id\":6696999051,\"reason\":\"Original392B FUNC versus396B; natural field layout and update semantics agree; remaining frame/register scheduling has no grounded correction; evidence frozen.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T22:20:13Z",
+          "id": 6697274906,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T22:20:13Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9f5c026f3a6e28afec5be015cf8f8f1b22b5cc866c19452f3c59037218acc845",
+        "result": {
+          "address": "0x0804BBC0",
+          "claim_id": 6696999051,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6697274906,
+          "status": "accepted",
+          "who": "sol-0804BBC0-3072"
+        }
+      }
     },
     {
       "claim": {
