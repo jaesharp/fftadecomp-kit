@@ -18,6 +18,7 @@ import sys
 import tempfile
 
 import private_float_pack_effects_inventory as inventory
+import private_scalar_division_locals_inventory as scalar_division_locals
 import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_double_comparison_effects_inventory as double_comparison
@@ -47,7 +48,9 @@ DOUBLE_TRUNCATION_SELECTOR = 'private-double-truncation-v1'
 DOUBLE_TRUNCATION_SCHEMA = 'elf-symbol-thumb-private-double-truncation-v1'
 DOUBLE_SCALAR_PACK_SELECTOR = 'private-double-scalar-pack-v1'
 DOUBLE_SCALAR_PACK_SCHEMA = 'elf-symbol-thumb-private-double-scalar-pack-v1'
-SELECTORS = (DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+SCALAR_DIVISION_LOCALS_SELECTOR = 'private-scalar-division-byte-locals-v1'
+SCALAR_DIVISION_LOCALS_SCHEMA = 'elf-symbol-thumb-private-scalar-division-byte-locals-v1'
+SELECTORS = (SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
              SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
@@ -59,6 +62,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == SCALAR_DIVISION_LOCALS_SELECTOR:
+        return scalar_division_locals, SCALAR_DIVISION_LOCALS_SCHEMA, scalar_division_locals.CONTRACT
     if selector == DOUBLE_SCALAR_PACK_SELECTOR:
         return double_scalar_pack, DOUBLE_SCALAR_PACK_SCHEMA, CONTRACT.replace('unpack/pack', 'double scalar pack local-record')
     if selector == DOUBLE_TRUNCATION_SELECTOR:
@@ -97,7 +102,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
