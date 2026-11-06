@@ -6,10 +6,16 @@ import match
 import function_thunk_profile as thunk
 import local_long_branch_profile as frame
 import descriptor_disjunctive_alias_profile as alternatives
+import named_data_buffer_profile as named
 
 SELECTOR = 'descriptor-callee-constant-v1'
 SCHEMA = 'elf-symbol-thumb-descriptor-callee-constant-v1'
 CONTROL_FLOW = 'complete Thumb owner with exact alternatives and native-proved callee-saved constants'
+RESTORING_SELECTOR = 'descriptor-restoring-callee-constant-v1'
+RESTORING_SCHEMA = 'elf-symbol-thumb-descriptor-restoring-callee-constant-v1'
+PROFILES = {SELECTOR: SCHEMA, RESTORING_SELECTOR: RESTORING_SCHEMA}
+RESTORING_CONTROL_FLOW = CONTROL_FLOW + (' and unobserved saved entry aliases; '
+    'discarded R2/R3 only after complete actual consumer continuation proof')
 MAX_DEPENDENCIES = alternatives.MAX_DEPENDENCIES
 MAX_STACK_BYTES = alternatives.MAX_STACK_BYTES
 MAX_PATH_STATES = alternatives.MAX_PATH_STATES
@@ -137,3 +143,63 @@ class DescriptorCalleeConstantProof(alternatives.DescriptorDisjunctiveAliasProof
                 'refused_frames':[{'address':address,'reason':reason}
                                   for address,reason in sorted(self.preservation_failures.items())],
                 'transfers':[row for _,row in sorted(self.constant_transfers.items())]}
+
+
+class DescriptorRestoringCalleeConstantProof(DescriptorCalleeConstantProof,
+                                           named.DiscardedReturnScratchProof):
+    """Compose opaque-entry restoration with the existing actual native replay.
+
+    Canonical indirect thunks keep their independent exact target check. The
+    restoration certificate covers that actual target, and cannot export effects
+    or constant facts until the original thunk and native frame replay complete.
+    """
+
+    restoration_schema = alternatives.CALLEE_SCHEMA
+    _graph = alternatives.RestoringLeafDisjunctiveProof._graph
+    _restore_aliases = alternatives.RestoringCalleeDisjunctiveProof._restore_aliases
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.leaf_restorations = {}
+
+    def check_arguments(self, address, arguments, stack, incoming, protected, *,
+                        constants=None, site=None, **context):
+        watched = tuple(context.get('watched', ()))
+        reduced, record, resolved = watched, None, address
+        if watched:
+            if address in thunk.ALIASES.values():
+                register = match.ARM_REG_R0 + (address-thunk.START)//4
+                value = (constants or {}).get(register)
+                if register in arguments or type(value) is not int or value % 2 != 1:
+                    raise ValueError('restoration requires an exact Thumb callback target')
+                resolved = match.function_address_target(f'func_{value & ~1:08X}',
+                    self.entries, address, 2, len(self.rom))
+                if resolved in thunk.ALIASES.values():
+                    raise ValueError('restoration callback cannot target an indirect thunk')
+            reduced, record = self._restore_aliases(resolved, watched, arguments)
+        result = super().check_arguments(address, arguments, stack, incoming, protected,
+            constants=constants, site=site, **dict(context, watched=reduced))
+        if record is not None:
+            observation = dict(site=site, address=address, resolved_address=resolved,
+                watched=sorted(watched), retained_watched=sorted(reduced), restoration=record)
+            self.leaf_restorations[alternatives._text(observation)] = observation
+        return result
+
+    def restoring_leaf_manifest(self):
+        from pathlib import Path
+        result = alternatives.RestoringLeafDisjunctiveProof.restoring_leaf_manifest(self)
+        result['source_sha256'][Path(__file__).name] = hashlib.sha256(
+            Path(__file__).read_bytes()).hexdigest()
+        return result
+
+
+def proof_type(selector):
+    if selector not in PROFILES:
+        raise ValueError('callee constant proof requires its explicit selector')
+    return (DescriptorRestoringCalleeConstantProof if selector == RESTORING_SELECTOR
+            else DescriptorCalleeConstantProof)
+
+
+def control_flow(selector):
+    proof_type(selector)
+    return RESTORING_CONTROL_FLOW if selector == RESTORING_SELECTOR else CONTROL_FLOW

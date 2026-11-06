@@ -4255,6 +4255,7 @@ def main():
                                                       "descriptor-disjunctive-restoring-callee-alias-v1",
                                                       "bounded-disjunctive-restoring-callee-scratch-v1",
                                                       "descriptor-callee-constant-v1",
+                                                      "descriptor-restoring-callee-constant-v1",
                                                       "descriptor-cursor-value-v1",
                                                       "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1", "private-scalar-division-byte-locals-v1"))
     args = ap.parse_args()
