@@ -3898,7 +3898,35 @@
           "who": "sol-0801E2A4-2118"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "bec9d3296f19223b9829545fb75e643077771f92452e02242ccc6d01eb213967",
+        "acknowledged_cursor": 6675645219,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bec9d3296f19223b9829545fb75e643077771f92452e02242ccc6d01eb213967",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801E2A4\",\"who\":\"sol-0801E2A4-2118\",\"claim_id\":6675566936,\"reason\":\"First compile exact436-byte diagnostic frozen; native qualification remains pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T02:58:40Z",
+          "id": 6675645219,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T02:58:40Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "65e37a3b67b2cd9aa9e3a613047aa64b33d757e38fdc7bc5c0b75aecc312b621",
+        "result": {
+          "address": "0x0801E2A4",
+          "claim_id": 6675566936,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6675645219,
+          "status": "accepted",
+          "who": "sol-0801E2A4-2118"
+        }
+      }
     },
     {
       "claim": {
