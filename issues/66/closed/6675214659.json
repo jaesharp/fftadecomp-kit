@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "afb60a0c8fd7b4e8fd96597d168d6b8d8abb10178d5d7d16429909211c4a7dc9",
+    "acknowledged_cursor": 6675214730,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "afb60a0c8fd7b4e8fd96597d168d6b8d8abb10178d5d7d16429909211c4a7dc9",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080E921C\",\"who\":\"sol-080E921C-2099\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-06T02:27:47Z",
+      "id": 6675214659,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T02:27:47Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "8d796075176f9dfa79eb4376d8630fb52171b59b273f2eec32fe03283d6b0066",
+    "result": {
+      "address": "0x080E921C",
+      "claim_id": 6675214659,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6675214659,
+      "status": "accepted",
+      "who": "sol-080E921C-2099"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "bf18542f30b79116765d442c6b962f5e6b5545b49a3e7ca06e6fc5c67f83ac9f",
+    "acknowledged_cursor": 6675458569,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "bf18542f30b79116765d442c6b962f5e6b5545b49a3e7ca06e6fc5c67f83ac9f",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080E921C\",\"who\":\"sol-080E921C-2099\",\"claim_id\":6675214659,\"reason\":\"Exact whole diagnostic frozen; parent native stack/callee qualification pending.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-06T02:44:38Z",
+      "id": 6675451603,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-06T02:44:38Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "3a42e50b9bad7b6793c88eba7399c2040223e1223b5876303791d807769d49b9",
+    "result": {
+      "address": "0x080E921C",
+      "claim_id": 6675214659,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6675451603,
+      "status": "accepted",
+      "who": "sol-080E921C-2099"
+    }
+  }
+}
