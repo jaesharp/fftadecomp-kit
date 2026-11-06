@@ -3802,7 +3802,35 @@
           "who": "sol-080213DC-2537"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "0dbe1e5d93b26b0b6a1775f65546667a5421de2e51c874c16c710092f3cb4323",
+        "acknowledged_cursor": 6684390199,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "0dbe1e5d93b26b0b6a1775f65546667a5421de2e51c874c16c710092f3cb4323",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080213DC\",\"who\":\"sol-080213DC-2537\",\"claim_id\":6684233802,\"reason\":\"Fully stopped. One grounded natural form emits 166 bytes,155/166 same-offset bytes. Remaining comparison load and operand order has no independently grounded correction; no source-order steering attempted. Diagnostic artifacts frozen; zero native/proof credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T12:03:58Z",
+          "id": 6684382036,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T12:03:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "dae3ad65f183f60880d4aaa12201cdfbe510dfd0fd801b45c3578986022b8bcc",
+        "result": {
+          "address": "0x080213DC",
+          "claim_id": 6684233802,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6684382036,
+          "status": "accepted",
+          "who": "sol-080213DC-2537"
+        }
+      }
     },
     {
       "claim": {
@@ -3898,7 +3926,35 @@
           "who": "sol-08024758-2537"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "09030297fe3afb1aca2cd0335f385b6e6ce181d749ee40b7b8a82e3c0781d481",
+        "acknowledged_cursor": 6684390199,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "09030297fe3afb1aca2cd0335f385b6e6ce181d749ee40b7b8a82e3c0781d481",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08024758\",\"who\":\"sol-08024758-2537\",\"claim_id\":6684234048,\"reason\":\"Fully stopped after first natural compiler form,complete diagnostic ELF FUNC exact164/164 bytes. Frozen original artifacts retained, zero native/proof/MATCH credit; primary owns separate fresh native qualification.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T12:04:24Z",
+          "id": 6684390199,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T12:04:24Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "dae3ad65f183f60880d4aaa12201cdfbe510dfd0fd801b45c3578986022b8bcc",
+        "result": {
+          "address": "0x08024758",
+          "claim_id": 6684234048,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6684390199,
+          "status": "accepted",
+          "who": "sol-08024758-2537"
+        }
+      }
     },
     {
       "claim": {
