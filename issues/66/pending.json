@@ -3962,7 +3962,35 @@
           "who": "sol-0800CC8C-3072"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7f4814281599d540284809b0d2c2702cbd11fea3fe9bae20b3d752afd7080187",
+        "acknowledged_cursor": 6697381525,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7f4814281599d540284809b0d2c2702cbd11fea3fe9bae20b3d752afd7080187",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800CC8C\",\"who\":\"sol-0800CC8C-3072\",\"claim_id\":6696999195,\"reason\":\"Two grounded storage representations end at408B versus380B; remaining carrier lowering/frame differences have no grounded correction; originals retained.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T22:26:29Z",
+          "id": 6697381525,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T22:26:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b88520ca6ad80c981ef7af65238ba13fb7a53b4585874b4db7cfd90410af0ffa",
+        "result": {
+          "address": "0x0800CC8C",
+          "claim_id": 6696999195,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6697381525,
+          "status": "accepted",
+          "who": "sol-0800CC8C-3072"
+        }
+      }
     },
     {
       "claim": {
