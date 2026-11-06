@@ -3994,7 +3994,35 @@
           "who": "sol-08099544-3022"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "09e3c9fbd696ebbdbe192fa0addb92986228ee2ed95347b54bf30e30d9fc5f06",
+        "acknowledged_cursor": 6695403238,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "09e3c9fbd696ebbdbe192fa0addb92986228ee2ed95347b54bf30e30d9fc5f06",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08099544\",\"who\":\"sol-08099544-3022\",\"claim_id\":6695342592,\"reason\":\"First native MATCH plausible, complete28 bytes under published explicit restoring-callee-constant policy3021. Genuine original ELF/typed link/native frames and actual consumer scratch proofs passed; one native compilation, frozen167/runtime/ROM receipts.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-06T20:59:31Z",
+          "id": 6695403238,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T20:59:31Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d2dbfb4053eedc94654d68b2c4a736c672b195a599cc6080171395c18e14d08d",
+        "result": {
+          "address": "0x08099544",
+          "claim_id": 6695342592,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6695403238,
+          "status": "accepted",
+          "who": "sol-08099544-3022"
+        }
+      }
     }
   ],
   "issue": 66,
