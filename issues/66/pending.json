@@ -3930,7 +3930,35 @@
           "who": "sol-0802BEB0-3072"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e28a27aa20df74dfa0156185badbf07a6dae0a1612ed518edf8c5b6963128e11",
+        "acknowledged_cursor": 6697430251,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e28a27aa20df74dfa0156185badbf07a6dae0a1612ed518edf8c5b6963128e11",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802BEB0\",\"who\":\"sol-0802BEB0-3072\",\"claim_id\":6696999335,\"reason\":\"One natural form348B versus344B; same-object typed runtime/thunk link retained; remaining callback save/restore scheduling has no grounded correction.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-06T22:29:25Z",
+          "id": 6697430251,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-06T22:29:25Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "900eae9f1b2e385ca5195ec43bf3070b0f6648b6dbb91699dd050de97486a40a",
+        "result": {
+          "address": "0x0802BEB0",
+          "claim_id": 6696999335,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6697430251,
+          "status": "accepted",
+          "who": "sol-0802BEB0-3072"
+        }
+      }
     },
     {
       "claim": {
