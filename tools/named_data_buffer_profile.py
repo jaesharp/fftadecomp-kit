@@ -15,8 +15,11 @@ SCRATCH_CONTROL_FLOW = 'bounded buffer calls with exact unobserved R2/R3 normal-
 BIOS_SQRT_SELECTOR = 'bounded-buffer-bios-sqrt-scratch-v1'
 BIOS_SQRT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-bios-sqrt-scratch-v1'
 BIOS_SQRT_CONTROL_FLOW = 'bounded buffer calls with an exact scalar BIOS Sqrt wrapper and killed return scratch'
-SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR)
-SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA)
+GUARDED_SWITCH_SELECTOR = 'bounded-buffer-guarded-switch-v1'
+GUARDED_SWITCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-switch-v1'
+GUARDED_SWITCH_CONTROL_FLOW = 'bounded buffer calls with an exact unsigned-guarded local word switch'
+SELECTORS = (SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, GUARDED_SWITCH_SELECTOR)
+SCHEMAS = (SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, GUARDED_SWITCH_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -199,6 +202,69 @@ class DiscardedReturnScratchProof(NamedDataBufferProof):
                 Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                 for name in producers},
             observations=[self._scratch_returns[key] for key in sorted(self._scratch_returns)])
+
+
+class GuardedSwitchBufferProof(DiscardedReturnScratchProof):
+    """Compose the existing scalar switch CFG and bounded alias replay."""
+
+    def __init__(self, rom, mapping, index, objects):
+        super().__init__(rom, mapping, index, objects)
+        self._guarded_switches = {}
+
+    def inspect(self, address, data):
+        import analyze
+        refinement = analyze.refine_function(data, address, json.loads(self.mapping),
+            max_bytes=len(data), max_instructions=len(data)//2, rom_end=0x09000000,
+            same_owner_long_branches=True, two_constant_word_switch=True)
+        switches = refinement['word_switches']
+        if not switches:
+            return super().inspect(address, data)
+        if len(switches) != 1 or switches[0].get('interposed_words', 0) not in (0, 2):
+            raise ValueError('buffer switch requires one guarded table with zero or two scalar words')
+        two_constants = switches[0].get('interposed_words', 0) == 2
+        ins, edges, branches, calls, words = graph.graph(
+            data, address, refinement, two_constant_word_switch=two_constants)
+        if branches:
+            raise ValueError('buffer switch excludes local BL control')
+        for destination in calls.values():
+            match.function_address_target(f'func_{destination:08X}', self.entries,
+                                          address, len(data), len(self.rom))
+        # This first pass proves saved-register/SP/return provenance and the
+        # exact guarded dispatch. The caller's existing alias replay below
+        # independently checks every actual buffer access and nested call.
+        instructions = match.verify_leaf_instructions(data, address, True, calls,
+            switch_relocations=words, allow_switch_constants=two_constants)
+        if set(ins) != {item.address for item in instructions}:
+            raise ValueError('buffer switch differs from complete verified instructions')
+        partition = graph.partition(data, address, refinement, ins, words)
+        transfer = address + switches[0]['dispatch'] + 8
+        structure = dict(kind='complete-guarded-buffer-switch-v1',
+            switch=switches[0], instructions=len(instructions), partition=partition,
+            transfer=transfer, successors=list(edges[transfer]),
+            table_words_sha256=hashlib.sha256(b''.join(
+                data[offset:offset+4] for offset in sorted(words))).hexdigest())
+        self.records[address] = dict(address=address, end=address+len(data), bytes=len(data),
+            body_sha256=hashlib.sha256(data).hexdigest(), structure=structure, **self.identities)
+        self._guarded_switches[address] = self.records[address]
+        return instructions, {transfer: edges[transfer]}
+
+    def guarded_manifest(self):
+        from pathlib import Path
+        import importlib
+        producers = ('named_data_buffer_profile', 'owner_admission_profile',
+                     'owner_graph_profile', 'switch_constants_profile', 'analyze',
+                     'inert_spin_profile', 'local_long_branch_profile', 'match')
+        return dict(schema=GUARDED_SWITCH_SCHEMA,
+            contract='one exact unsigned-guarded complete local Thumb word table per '
+                'inspected buffer callee, zero or two reached scalar constants; '
+                'existing bounded alias accesses, escapes and return provenance '
+                'are checked on all actual finite successors; ordinary direct calls '
+                'use only conditional compatible returning ABI summaries; no physical '
+                'readability, initialization, nonalias, numerical or termination theorem',
+            source_sha256={name+'.py': hashlib.sha256(
+                Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
+                for name in producers},
+            observations=[self._guarded_switches[key] for key in sorted(self._guarded_switches)])
 
 
 class BiosSqrtScratchProof(DiscardedReturnScratchProof):
