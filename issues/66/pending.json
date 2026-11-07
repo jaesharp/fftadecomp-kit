@@ -59,6 +59,38 @@
           "who": "codex-08065608"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "813fd788de99affa31f0b45a1581653bb650fad9b40275ae42ca565cd3b44f0a",
+        "acknowledged_cursor": 6708753550,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "813fd788de99affa31f0b45a1581653bb650fad9b40275ae42ca565cd3b44f0a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080670B4\",\"who\":\"codex-080670B4\",\"note\":\"Recover1020-byte selected-item details panel; canonical-thunks-v1 full ROMmanifest passed, external buffers and current mappings only\"}",
+          "created_at": "2026-11-07T15:10:13Z",
+          "id": 6708753550,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:10:13Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7dc383abf468308c7a18ec3e4cbb8fffbc0e882aeaf46115cec85909eb0370d8",
+        "result": {
+          "address": "0x080670B4",
+          "claim_id": 6708753550,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708753550,
+          "status": "accepted",
+          "who": "codex-080670B4"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
