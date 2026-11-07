@@ -90,7 +90,35 @@
           "who": "sol-080198D4-3737"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "b184a9a2b5384d8a6979ae9b5ede97ebc4c7eefda58652b0957fdbb2b029a34e",
+        "acknowledged_cursor": 6711538311,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b184a9a2b5384d8a6979ae9b5ede97ebc4c7eefda58652b0957fdbb2b029a34e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080198D4\",\"who\":\"sol-080198D4-3737\",\"claim_id\":6711439410,\"reason\":\"Natural C stopped at complete FUNC mismatch; original evidence frozen. Zero native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T18:46:49Z",
+          "id": 6711538310,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T18:46:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6c2d5042e2b1dd0963f9ebe7ac9fecd432744f40217e860d61172d41060b94b9",
+        "result": {
+          "address": "0x080198D4",
+          "claim_id": 6711439410,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711538310,
+          "status": "accepted",
+          "who": "sol-080198D4-3737"
+        }
+      }
     },
     {
       "claim": {
@@ -122,7 +150,35 @@
           "who": "sol-080A0FF0-3737"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f7cd1d1859268c680992c4bc6da0f675a71e0346ef76236529447e6354b12814",
+        "acknowledged_cursor": 6711538311,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f7cd1d1859268c680992c4bc6da0f675a71e0346ef76236529447e6354b12814",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080A0FF0\",\"who\":\"sol-080A0FF0-3737\",\"claim_id\":6711439459,\"reason\":\"Natural C stopped at complete FUNC mismatch; original evidence frozen. Zero native MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T18:46:49Z",
+          "id": 6711538311,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T18:46:49Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6c2d5042e2b1dd0963f9ebe7ac9fecd432744f40217e860d61172d41060b94b9",
+        "result": {
+          "address": "0x080A0FF0",
+          "claim_id": 6711439459,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711538311,
+          "status": "accepted",
+          "who": "sol-080A0FF0-3737"
+        }
+      }
     },
     {
       "claim": {
