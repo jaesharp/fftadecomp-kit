@@ -62,7 +62,35 @@
           "who": "sol-08149384-3771"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "2e38523ac13f19c412affa5f36ca4d4f1e2017e4eb2f45557d86705df941578c",
+        "acknowledged_cursor": 6713938396,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2e38523ac13f19c412affa5f36ca4d4f1e2017e4eb2f45557d86705df941578c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08149384\",\"who\":\"sol-08149384-3771\",\"claim_id\":6713900727,\"reason\":\"Grounded packed seven-byte record and field correction remains plausible native NONMATCH: complete38B, coordinate zero-extension schedule differs; no independent further correction.\",\"unmatchable\":true,\"tried\":\"ROM-grounded packed record/bitfield layout; fixed -mthumb-interwork -O2; one native/compiler, no steering or replay.\"}",
+          "created_at": "2026-11-07T22:35:38Z",
+          "id": 6713938396,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:35:38Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8de40695b3ce3c4fc35d90efd218833b771f6ac6d86ecef500ae873752bf4f06",
+        "result": {
+          "address": "0x08149384",
+          "claim_id": 6713900727,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6713938396,
+          "status": "accepted",
+          "who": "sol-08149384-3771"
+        }
+      }
     },
     {
       "claim": {
@@ -92,6 +120,38 @@
           "request_id": 6713907426,
           "status": "accepted",
           "who": "sol-08149194-3771"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "cff22c198668763f7ece257074e4559e7fc61d3131a5ee62090f6216e67d18bb",
+        "acknowledged_cursor": 6713938396,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "cff22c198668763f7ece257074e4559e7fc61d3131a5ee62090f6216e67d18bb",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08035CAC\",\"who\":\"FFTA-Team2-native141\",\"note\":\"First natural complete84B two-digit glyph formatter from exact indexed body; SOLO; originals retained; native gate publication if exact.\"}",
+          "created_at": "2026-11-07T22:35:14Z",
+          "id": 6713934306,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:35:14Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8de40695b3ce3c4fc35d90efd218833b771f6ac6d86ecef500ae873752bf4f06",
+        "result": {
+          "address": "0x08035CAC",
+          "claim_id": 6713934306,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713934306,
+          "status": "accepted",
+          "who": "FFTA-Team2-native141"
         }
       },
       "release": null

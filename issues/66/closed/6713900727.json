@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "2d10d47216324c4c831841d947a450d981661bb1651301ac0dc40dd1858a2e9f",
+    "acknowledged_cursor": 6713900727,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2d10d47216324c4c831841d947a450d981661bb1651301ac0dc40dd1858a2e9f",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08149384\",\"who\":\"sol-08149384-3771\",\"note\":\"Match plausible C using independently established seven-byte packed grid layout; no tooling changes.\"}",
+      "created_at": "2026-11-07T22:31:55Z",
+      "id": 6713900727,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:31:55Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "78a22d551a5cea8abf8d433c3abeb6dfb8b3f76b27314430f311e539217340d4",
+    "result": {
+      "address": "0x08149384",
+      "claim_id": 6713900727,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6713900727,
+      "status": "accepted",
+      "who": "sol-08149384-3771"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "2e38523ac13f19c412affa5f36ca4d4f1e2017e4eb2f45557d86705df941578c",
+    "acknowledged_cursor": 6713938396,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2e38523ac13f19c412affa5f36ca4d4f1e2017e4eb2f45557d86705df941578c",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08149384\",\"who\":\"sol-08149384-3771\",\"claim_id\":6713900727,\"reason\":\"Grounded packed seven-byte record and field correction remains plausible native NONMATCH: complete38B, coordinate zero-extension schedule differs; no independent further correction.\",\"unmatchable\":true,\"tried\":\"ROM-grounded packed record/bitfield layout; fixed -mthumb-interwork -O2; one native/compiler, no steering or replay.\"}",
+      "created_at": "2026-11-07T22:35:38Z",
+      "id": 6713938396,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:35:38Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "8de40695b3ce3c4fc35d90efd218833b771f6ac6d86ecef500ae873752bf4f06",
+    "result": {
+      "address": "0x08149384",
+      "claim_id": 6713900727,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6713938396,
+      "status": "accepted",
+      "who": "sol-08149384-3771"
+    }
+  }
+}
