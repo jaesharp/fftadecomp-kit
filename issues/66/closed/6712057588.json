@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "3411b1c0d8a8d893cd9849776aef8d5bd60e02df3a79125d125dbbba80f85ccc",
+    "acknowledged_cursor": 6712057791,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "3411b1c0d8a8d893cd9849776aef8d5bd60e02df3a79125d125dbbba80f85ccc",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0809D7E4\",\"who\":\"sol-0809D7E4-3747\",\"note\":\"Match one complete function using existing native tooling; natural C only.\"}",
+      "created_at": "2026-11-07T19:35:22Z",
+      "id": 6712057588,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T19:35:22Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d95f7918d2fc22727a3d927a327fafb0ea3b2a56ebe265e595a0ce962f88c5a0",
+    "result": {
+      "address": "0x0809D7E4",
+      "claim_id": 6712057588,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6712057588,
+      "status": "accepted",
+      "who": "sol-0809D7E4-3747"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "388e61099ba815a2fb77fa7a2a96be91b637dae495489f327ed090fc81f660c9",
+    "acknowledged_cursor": 6712163646,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "388e61099ba815a2fb77fa7a2a96be91b637dae495489f327ed090fc81f660c9",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809D7E4\",\"who\":\"sol-0809D7E4-3747\",\"claim_id\":6712057588,\"reason\":\"Natural96B differs25bytes; native helper closure returns local stack pointer.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
+      "created_at": "2026-11-07T19:45:18Z",
+      "id": 6712163608,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T19:45:18Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "4a0a6074575be0a134ebd24d9eba0288382b062bd4c612bfcb4cd41c556e2b88",
+    "result": {
+      "address": "0x0809D7E4",
+      "claim_id": 6712057588,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6712163608,
+      "status": "accepted",
+      "who": "sol-0809D7E4-3747"
+    }
+  }
+}
