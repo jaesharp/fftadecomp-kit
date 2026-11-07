@@ -187,6 +187,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "d0fafd1f3f5d20aaf08c341df61f37ce58036b1af0f46fdd3d4eeaab36bcbca3",
+        "acknowledged_cursor": 6705434627,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d0fafd1f3f5d20aaf08c341df61f37ce58036b1af0f46fdd3d4eeaab36bcbca3",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002950\",\"who\":\"codex-08002950\",\"note\":\"Natural C recovery of two-byte-character signed decimal parser; complete 124-byte owner, existing verifier only.\"}",
+          "created_at": "2026-11-07T10:08:26Z",
+          "id": 6705434627,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:08:26Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b0ed83edc81fe0fbe40e3d988682c280232c0cc1f4936ac2ea25229e32d9117f",
+        "result": {
+          "address": "0x08002950",
+          "claim_id": 6705434627,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6705434627,
+          "status": "accepted",
+          "who": "codex-08002950"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
