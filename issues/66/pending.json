@@ -30,7 +30,35 @@
           "who": "FFTA-Team2-native135"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "1be0da4f2b1eed07818eaa87cb0a3e23cc20ecbea19f2e2ef994176151590863",
+        "acknowledged_cursor": 6713450252,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1be0da4f2b1eed07818eaa87cb0a3e23cc20ecbea19f2e2ef994176151590863",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802C7E0\",\"who\":\"FFTA-Team2-native135\",\"claim_id\":6713425330,\"reason\":\"First natural80B tile-indicator native MATCH/compiler1, full34 instructions; frozen135 and queued310B publication, all167 unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T21:48:24Z",
+          "id": 6713450252,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:48:24Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "677eeba34a261c3fef843a8e0683abc78549d288352e4af45f143db7c7a6ff28",
+        "result": {
+          "address": "0x0802C7E0",
+          "claim_id": 6713425330,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6713450252,
+          "status": "accepted",
+          "who": "FFTA-Team2-native135"
+        }
+      }
     }
   ],
   "issue": 66,
