@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "ee4a2dfadbe9dc1da43b6a25295051017efedcad9df2c968d091cdd7ee065d93",
+    "acknowledged_cursor": 6714623413,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "ee4a2dfadbe9dc1da43b6a25295051017efedcad9df2c968d091cdd7ee065d93",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D72C8\",\"who\":\"codex-recovery-080D72C8\",\"note\":\"Validate unchanged recovered C from older local checkout with current canonical toolkit; no new hand matching.\"}",
+      "created_at": "2026-11-07T23:45:09Z",
+      "id": 6714623413,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T23:45:09Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d0ef8ea8121958b440c024c0e7d77b2e524e0553285bdebcbdd13fe559897f77",
+    "result": {
+      "address": "0x080D72C8",
+      "claim_id": 6714623413,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6714623413,
+      "status": "accepted",
+      "who": "codex-recovery-080D72C8"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "97a10b8ab08939be34fe42e4af8f3842d869d96dd41e3d2a157272b676cdd3d0",
+    "acknowledged_cursor": 6714639040,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "97a10b8ab08939be34fe42e4af8f3842d869d96dd41e3d2a157272b676cdd3d0",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D72C8\",\"who\":\"codex-recovery-080D72C8\",\"claim_id\":6714623413,\"reason\":\"Recovered unchanged source; fresh current-toolkit validation completed; full evidence retained locally.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T23:46:30Z",
+      "id": 6714636213,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T23:46:30Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "6310b4f0a19d6cfe1fa1ce6a3655f19d21f2c9e19a8c5feb6c6847d5905975c1",
+    "result": {
+      "address": "0x080D72C8",
+      "claim_id": 6714623413,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6714636213,
+      "status": "accepted",
+      "who": "codex-recovery-080D72C8"
+    }
+  }
+}
