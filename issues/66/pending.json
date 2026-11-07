@@ -123,66 +123,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "cb439adbbaa322436136cc3d23185d9b664355f4f664f9e0eac86cfffc2d40b2",
-        "acknowledged_cursor": 6705519185,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "cb439adbbaa322436136cc3d23185d9b664355f4f664f9e0eac86cfffc2d40b2",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812C700\",\"who\":\"codex-0812C700\",\"note\":\"Natural C recovery of184-byte directional-region classifier; existing mappings and matched callee, no verifier changes.\"}",
-          "created_at": "2026-11-07T10:16:59Z",
-          "id": 6705515625,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:16:59Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f1516c913463a90a5cd17aaf2798ec18b829487c393b7d0e5719fe10f7f4a048",
-        "result": {
-          "address": "0x0812C700",
-          "claim_id": 6705515625,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705515625,
-          "status": "accepted",
-          "who": "codex-0812C700"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "3b8e3d6650ca55ebed2f13855acdd4283c5d01ccc156e3fe83a76c30a6fdf6d8",
-        "acknowledged_cursor": 6705535798,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3b8e3d6650ca55ebed2f13855acdd4283c5d01ccc156e3fe83a76c30a6fdf6d8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812C700\",\"who\":\"codex-0812C700\",\"claim_id\":6705515625,\"reason\":\"Natural directional-region classifier matched184/184 bytes and84/84 instructions; plausible default framed typed-data direct-call verification, source and report retained.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T10:18:51Z",
-          "id": 6705535798,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:18:51Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "18533bd9292db062f12dde0db4584adfda502a7c9234128e49425a8026cca19c",
-        "result": {
-          "address": "0x0812C700",
-          "claim_id": 6705515625,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6705535798,
-          "status": "accepted",
-          "who": "codex-0812C700"
-        }
-      }
     }
   ],
   "issue": 66,
