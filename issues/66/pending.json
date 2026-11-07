@@ -222,7 +222,35 @@
           "who": "codex-08035CAC"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e170bf8df96da82c6e457aab8789d8e391d766dd312fa9e80b0d29e4a293000c",
+        "acknowledged_cursor": 6705988799,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e170bf8df96da82c6e457aab8789d8e391d766dd312fa9e80b0d29e4a293000c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08035CAC\",\"who\":\"codex-08035CAC\",\"claim_id\":6705965971,\"reason\":\"Integrated natural two-code formatter;84/84 bytes exact, plausible addressed-unsigned-runtime-v1. Numeric runtime equivalence unclaimed; source and source-bound report retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T11:05:11Z",
+          "id": 6705988799,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T11:05:11Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c949064631b503c10ae0d1f75013b1e6fd57a77461eeb58019a4af0c6066db3d",
+        "result": {
+          "address": "0x08035CAC",
+          "claim_id": 6705965971,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6705988799,
+          "status": "accepted",
+          "who": "codex-08035CAC"
+        }
+      }
     },
     {
       "claim": {
