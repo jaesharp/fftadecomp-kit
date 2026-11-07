@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "55f9254eca45afc883bd247c399b6338f7e51836dbeb746e3f80557e33520959",
+    "acknowledged_cursor": 6714591104,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "55f9254eca45afc883bd247c399b6338f7e51836dbeb746e3f80557e33520959",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08141D9C\",\"who\":\"sol-08141D9C-3773\",\"note\":\"Finish ordinary plausible C matching with existing native profiles; natural expressions/scopes/types allowed, no artificial operations or tooling.\"}",
+      "created_at": "2026-11-07T23:41:44Z",
+      "id": 6714591104,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T23:41:44Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "f2faec385593f291d7cc210e2d008fc5158e5d86ee07964ccbaa03fbdb4f6ce9",
+    "result": {
+      "address": "0x08141D9C",
+      "claim_id": 6714591104,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6714591104,
+      "status": "accepted",
+      "who": "sol-08141D9C-3773"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "29f11e6f96619ffc59abc364dbe3602e1722f700d56191595f2766c444b5b438",
+    "acknowledged_cursor": 6714663291,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "29f11e6f96619ffc59abc364dbe3602e1722f700d56191595f2766c444b5b438",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08141D9C\",\"who\":\"sol-08141D9C-3773\",\"claim_id\":6714591104,\"reason\":\"Stopped with complete148B NONMATCH:146/148 bytes,51/53 instructions. Two instruction register residual retained in exact result; no match credit. Bounded source-form failure, not proof no natural source can match.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; three plausible C forms\"}",
+      "created_at": "2026-11-07T23:49:24Z",
+      "id": 6714663291,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T23:49:24Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "7706775618fef4e0634175f3f1333aa721caa538658afc509a0e2af06bcdfbfb",
+    "result": {
+      "address": "0x08141D9C",
+      "claim_id": 6714591104,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6714663291,
+      "status": "accepted",
+      "who": "sol-08141D9C-3773"
+    }
+  }
+}
