@@ -91,66 +91,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "497ec8bf713bdc7b50e374bf4c151bbf9d5bd15b7248c34a14f944ca2a4a1158",
-        "acknowledged_cursor": 6714209285,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "497ec8bf713bdc7b50e374bf4c151bbf9d5bd15b7248c34a14f944ca2a4a1158",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081493AC\",\"who\":\"sol-081493AC-3773\",\"note\":\"Finish ordinary plausible C matching from preserved near-exact source; idiomatic source expressions allowed, no artificial code or tooling.\"}",
-          "created_at": "2026-11-07T23:02:48Z",
-          "id": 6714209285,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:02:48Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f09eb674b5feb0068db93be9f44fa1dcf33e92c055416c5fe74f4d7c44766ddc",
-        "result": {
-          "address": "0x081493AC",
-          "claim_id": 6714209285,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714209285,
-          "status": "accepted",
-          "who": "sol-081493AC-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "1d893bce879452a024b4b8308eb33859b97079cfccae1cd62c47a9c8ff89cbbc",
-        "acknowledged_cursor": 6714249995,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1d893bce879452a024b4b8308eb33859b97079cfccae1cd62c47a9c8ff89cbbc",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081493AC\",\"who\":\"sol-081493AC-3773\",\"claim_id\":6714209285,\"reason\":\"Plausible genuine row-of16record layout native1 complete26B versus20B target. One native/compiler, proof retained; matching owner fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T23:06:49Z",
-          "id": 6714249995,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:06:49Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5a6aafad62d2be177e72cf1135b1ee8d614018744f7c97591dd884bcc24d6431",
-        "result": {
-          "address": "0x081493AC",
-          "claim_id": 6714209285,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714249995,
-          "status": "accepted",
-          "who": "sol-081493AC-3773"
-        }
-      }
     }
   ],
   "issue": 66,
