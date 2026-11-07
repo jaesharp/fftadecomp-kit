@@ -6,6 +6,7 @@ import zero_index_stack_profile as zero_index
 
 SELECTOR = 'local-alias-word-slots-small-index-v1'
 SCHEMA = 'thumb-local-alias-word-slots-small-index-v1'
+ENTRY_WORDS_POLICY = 'readonly-entry-words-local-alias-slots-v1'
 UNKNOWN = frozenset(((0, False),))
 MAX_UPDATES = 4096
 FORMAL_MOVS10_POLICY = 'formal-stack-leaf-movs10-local-alias-v1'

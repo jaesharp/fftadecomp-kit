@@ -79,6 +79,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 stack_aliases=False, buffer_proof=None, runtime_calls=None,
                 call_preservation=None, bounded_output_proof=None, zero_index_profile=None,
                 entry_stack_policy=None, local_alias_slot_policy=None, finite_stack_index_policy=None,
+                entry_stack_alias_slot_policy=None,
                 discarded_exit_scratch=None, formal_stack_callee_proof=None,
                 formal_stack_alias_constant_policy=None, formal_stack_entry_word_policy=None,
                 formal_stack_entry_words_policy=None, mutable_stack_index_policy=None,
@@ -106,6 +107,22 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         from bounded_stack_output_profile import BoundedOutputProof
         if type(bounded_output_proof) is not BoundedOutputProof or not stack_aliases or buffer_proof is not None:
             raise ValueError("bounded output requires its explicit native alias proof")
+    entry_alias_words = entry_stack_alias_slot_policy is not None
+    if entry_alias_words:
+        import local_alias_slot_profile as alias_slots
+        import readonly_entry_stack_words_profile as entry_words
+        if type(entry_stack_alias_slot_policy) is not str or \
+                entry_stack_alias_slot_policy != alias_slots.ENTRY_WORDS_POLICY or not stack_aliases or \
+                local_alias_slot_policy != alias_slots.SELECTOR or any(value is not None for value in (
+                    buffer_proof, bounded_output_proof, runtime_calls, call_preservation,
+                    zero_index_profile, finite_stack_index_policy, discarded_exit_scratch,
+                    formal_stack_callee_proof, formal_stack_alias_constant_policy,
+                    formal_stack_entry_word_policy, formal_stack_entry_words_policy,
+                    mutable_stack_index_policy, consumer_scratch_proof, entry_recursive_calls,
+                    native_three_call_policy)):
+            raise ValueError('entry words and local alias slots require their exclusive explicit composition')
+        alias_slots.validate(local_alias_slot_policy)
+        entry_words.validate(entry_stack_policy)
     named_entry_word = formal_stack_entry_word_policy is not None
     if named_entry_word:
         from ordinary_named_output_entry_word_inventory import SELECTOR as NAMED_ENTRY_WORD
@@ -196,7 +213,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         import local_alias_slot_profile as alias_slots
         alias_slots.validate(local_alias_slot_policy)
         if not stack_aliases or buffer_proof is not None or bounded_output_proof is not None or \
-                entry_stack_policy is not None and not (named_entry_word or named_pair_entry_words):
+                entry_stack_policy is not None and not (named_entry_word or named_pair_entry_words or entry_alias_words):
             raise ValueError("local alias slots require exclusive local-only stack alias policy")
         slot_states = alias_slots.prove_constants(instructions, edges, address,
             constant_domain=None if formal_stack_alias_constant_policy is None else alias_slots.FORMAL_MOVS10_DOMAIN)
@@ -824,6 +841,8 @@ def prove_frame(instructions, edges, address, branches, calls, *,
         proof['formal_stack_entry_word_policy'] = formal_stack_entry_word_policy
     if named_pair_entry_words:
         proof['formal_stack_entry_words_policy'] = formal_stack_entry_words_policy
+    if entry_alias_words:
+        proof['entry_stack_alias_slot_policy'] = entry_stack_alias_slot_policy
     if zero_states is not None:
         proof["zero_index_profile"] = zero_index_profile
         proof["zero_index_signed_loads"] = [[site,base,index,width,list(origins)]
