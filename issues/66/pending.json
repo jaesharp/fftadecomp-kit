@@ -126,7 +126,35 @@
           "who": "FFTA-Team2-native116"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "17c4d761a58d70b67e4b29897205b091c8d07f6e5970a52d26c8bd5ae5968c73",
+        "acknowledged_cursor": 6712709358,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "17c4d761a58d70b67e4b29897205b091c8d07f6e5970a52d26c8bd5ae5968c73",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800C224\",\"who\":\"FFTA-Team2-native116\",\"claim_id\":6712692746,\"reason\":\"Complete68B first natural list-unlink C retains59/68 bytes, saved-register allocation residual only. Original artifacts frozen at Team2/native-game-116; no register/order steering. Fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T20:36:53Z",
+          "id": 6712709358,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:36:53Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "0a897c72574154074df7c65ab200c28453bbf6e8edffb59925fbe57567ce7ef5",
+        "result": {
+          "address": "0x0800C224",
+          "claim_id": 6712692746,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6712709358,
+          "status": "accepted",
+          "who": "FFTA-Team2-native116"
+        }
+      }
     }
   ],
   "issue": 66,
