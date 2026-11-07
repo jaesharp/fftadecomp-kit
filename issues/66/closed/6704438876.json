@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "bbbae6e6aa6b0b5e3d12fa7dc5dc4d2b7c840f83b564f3cc6d64e38b5797666c",
+    "acknowledged_cursor": 6704438876,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "bbbae6e6aa6b0b5e3d12fa7dc5dc4d2b7c840f83b564f3cc6d64e38b5797666c",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08138284\",\"who\":\"primary-native-08138284-3527\",\"note\":\"Reuse frozen exact208B natural C under fresh native-only context; named BIOS fill preflightPASS3526. No new C authorship or diagnostic replay. Primary owns native admission and publication.\"}",
+      "created_at": "2026-11-07T08:22:27Z",
+      "id": 6704438876,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T08:22:27Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "cae367dbc7cbd96f305cb6fc3f4fe86d692ea41570bde3f07015f4252e0a9eaf",
+    "result": {
+      "address": "0x08138284",
+      "claim_id": 6704438876,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6704438876,
+      "status": "accepted",
+      "who": "primary-native-08138284-3527"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "2044a6ca1d6cea375767e85c32964dc8418ff84d0875459149d16f28ff85de50",
+    "acknowledged_cursor": 6704489969,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "2044a6ca1d6cea375767e85c32964dc8418ff84d0875459149d16f28ff85de50",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08138284\",\"who\":\"primary-native-08138284-3527\",\"claim_id\":6704438876,\"reason\":\"Native BIOS fill-source admissionPASS; frozen exact208B source copied under this fresh accepted lease into publication3531. C work stopped. Required native gate/CI still pending; publication credit0.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T08:27:57Z",
+      "id": 6704489969,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T08:27:57Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "fcc0e1d862fa23d81f61ff1ecccc7368e7e997da2e1c4410775804719f0fcdb4",
+    "result": {
+      "address": "0x08138284",
+      "claim_id": 6704438876,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6704489969,
+      "status": "accepted",
+      "who": "primary-native-08138284-3527"
+    }
+  }
+}
