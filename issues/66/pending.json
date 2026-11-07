@@ -66,66 +66,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "167d1eb32686a916c23019d85c63bca11517713a795a388bbe546e7ef9ab434c",
-        "acknowledged_cursor": 6701973006,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "167d1eb32686a916c23019d85c63bca11517713a795a388bbe546e7ef9ab434c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0814339C\",\"who\":\"sol-0814339C-3375\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-07T04:00:04Z",
-          "id": 6701973006,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T04:00:04Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "9cd10aee9e18182121a0544ac57ff16df120e31c9267156531f5c8521024b2a3",
-        "result": {
-          "address": "0x0814339C",
-          "claim_id": 6701973006,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6701973006,
-          "status": "accepted",
-          "who": "sol-0814339C-3375"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d1a481b18a8c902c5000eb46c655f576e2e47b9b80e6bd766dddf25733e1c06a",
-        "acknowledged_cursor": 6701995603,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d1a481b18a8c902c5000eb46c655f576e2e47b9b80e6bd766dddf25733e1c06a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0814339C\",\"who\":\"sol-0814339C-3375\",\"claim_id\":6701973006,\"reason\":\"First native plausible whole396B MATCH under published private double inline division policy; original and native167 inputs preserved. Matching executor fully stopped; primary intake and native publication follow.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T04:02:22Z",
-          "id": 6701995603,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T04:02:22Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7cb9e2c1b2df9ffeaa11424c7979a99c578c25467cc4bbd7ea29300e87771102",
-        "result": {
-          "address": "0x0814339C",
-          "claim_id": 6701973006,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6701995603,
-          "status": "accepted",
-          "who": "sol-0814339C-3375"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "10630290a010242a6450c14d48582d40bdf377f47c3ce33bd76359af2a314e53",
         "acknowledged_cursor": 6702568580,
         "body_provenance": "acceptance-time",
