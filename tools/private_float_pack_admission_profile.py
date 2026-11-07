@@ -23,6 +23,7 @@ import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_float_selected_record_inventory as selected_record
 import private_double_selected_record_inventory as double_selected_record
+import private_double_inline_division_inventory as double_inline_division
 import private_float_unsigned_conversion_inventory as unsigned_conversion
 import private_float_inline_division_inventory as inline_division
 import private_double_comparison_effects_inventory as double_comparison
@@ -62,7 +63,9 @@ UNSIGNED_CONVERSION_SELECTOR = 'private-float-unsigned-conversion-v1'
 UNSIGNED_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-unsigned-conversion-v1'
 INLINE_DIVISION_SELECTOR = 'private-float-inline-division-v1'
 INLINE_DIVISION_SCHEMA = 'elf-symbol-thumb-private-float-inline-division-v1'
-SELECTORS = (DOUBLE_SELECTED_RECORD_SELECTOR, INLINE_DIVISION_SELECTOR, UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+DOUBLE_INLINE_DIVISION_SELECTOR = 'private-double-inline-division-v1'
+DOUBLE_INLINE_DIVISION_SCHEMA = 'elf-symbol-thumb-private-double-inline-division-v1'
+SELECTORS = (DOUBLE_INLINE_DIVISION_SELECTOR, DOUBLE_SELECTED_RECORD_SELECTOR, INLINE_DIVISION_SELECTOR, UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
              SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
@@ -74,6 +77,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == DOUBLE_INLINE_DIVISION_SELECTOR:
+        return double_inline_division, DOUBLE_INLINE_DIVISION_SCHEMA, double_inline_division.CONTRACT
     if selector == DOUBLE_SELECTED_RECORD_SELECTOR:
         return double_selected_record, DOUBLE_SELECTED_RECORD_SCHEMA, double_selected_record.CONTRACT
     if selector == INLINE_DIVISION_SELECTOR:
@@ -122,7 +127,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(DOUBLE_SELECTED_RECORD_SCHEMA in line or INLINE_DIVISION_SCHEMA in line or UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(DOUBLE_INLINE_DIVISION_SCHEMA in line or DOUBLE_SELECTED_RECORD_SCHEMA in line or INLINE_DIVISION_SCHEMA in line or UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
@@ -189,7 +194,7 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
     selected_inventory, _, _ = profile(selector)
     if image['type'] != 1:
         raise ValueError('private float requires original relocatable ELF')
-    size = function_size(image, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
+    size = function_size(image, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR))
     symbol, offset = match.function_record(image, f'func_{address:08X}', address, True)
     if offset or any(
             item['type'] == 2 and item is not symbol and item['section'] or
@@ -209,7 +214,7 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
         targets[f'func_{start:08X}'] = start
     for alias, role in getattr(selected_inventory, 'COMPILER_ALIASES', {}).items():
         targets[alias] = next(record[0] for name, record, _ in selected_inventory.HELPERS if name == role)
-    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
+    data_targets = selected_inventory.DATA_BINDINGS if selector in (INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR) else {}
     targets.update(data_targets)
     calls, occupied = [], set()
     decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
@@ -264,8 +269,8 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
 def linked_bytes(original, linked, address, calls, targets, *, selector=SELECTOR):
     import match
     profile(selector)
-    size = function_size(original, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
-    linked_size = function_size(linked, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
+    size = function_size(original, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR))
+    linked_size = function_size(linked, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR))
     record, offset = match.function_record(linked, f'func_{address:08X}', address, True)
     if linked['type'] != 2 or offset or linked['relocations'] or \
             linked_size != size or len(linked['text']) != len(original['text']) or any(
@@ -282,7 +287,7 @@ def linked_bytes(original, linked, address, calls, targets, *, selector=SELECTOR
             raise ValueError('linked private-float call target differs from original binding')
         expected[site:site+4] = linked['text'][site:site+4]
     selected_inventory, _, _ = profile(selector)
-    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
+    data_targets = selected_inventory.DATA_BINDINGS if selector in (INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR) else {}
     for section_index in original['relocations']:
         section = original['sections'][section_index]
         for position in range(0, section[5], 8):
@@ -309,7 +314,7 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, index
     calls, targets = original_bindings(original, address, rom, mapping, index, selector=selector)
     definitions = ['.syntax unified', '.thumb']
     selected_inventory, _, _ = profile(selector)
-    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
+    data_targets = selected_inventory.DATA_BINDINGS if selector in (INLINE_DIVISION_SELECTOR, DOUBLE_INLINE_DIVISION_SELECTOR) else {}
     for name, target in sorted(targets.items()):
         if name in data_targets:
             definitions += [f'.global {name}', f'.type {name}, %object', f'.set {name}, 0x{target:08X}']
