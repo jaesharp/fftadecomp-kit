@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "9a08fe1e08b180147986829dfe6dccde7aba5828eafd5c071e8d46fafeeb6339",
-        "acknowledged_cursor": 6706962083,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "9a08fe1e08b180147986829dfe6dccde7aba5828eafd5c071e8d46fafeeb6339",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08003014\",\"who\":\"codex-08003014\",\"note\":\"Natural116byte attributed halfword decimal formatter; existing addressed signed runtime profile; no new mappings.\"}",
-          "created_at": "2026-11-07T12:30:21Z",
-          "id": 6706962083,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:30:21Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3d25e2d42f6e5c0c7f79b034220247b44d400f17156a237bb305d2d2a96f69fe",
-        "result": {
-          "address": "0x08003014",
-          "claim_id": 6706962083,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706962083,
-          "status": "accepted",
-          "who": "codex-08003014"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "853fe5a13fd6a7db5a6eadcd405ba4e1a20a795899cf59a13a4b7c3880f8fdc5",
-        "acknowledged_cursor": 6707009125,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "853fe5a13fd6a7db5a6eadcd405ba4e1a20a795899cf59a13a4b7c3880f8fdc5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08003014\",\"who\":\"codex-08003014\",\"claim_id\":6706962083,\"reason\":\"Parked plausible116byte attributed formatter; three loop instructions use r1 temporary instead targetr5; parent native rejection.\",\"unmatchable\":true,\"tried\":\"-O2; natural decimal arithmetic, signed half divmod, signed digit lifetime and narrowing\"}",
-          "created_at": "2026-11-07T12:34:40Z",
-          "id": 6707009125,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:34:40Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5254ae48de45e3059e22921eab8e7eacd73da3e34521e34ee4822ba998a12232",
-        "result": {
-          "address": "0x08003014",
-          "claim_id": 6706962083,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6707009125,
-          "status": "accepted",
-          "who": "codex-08003014"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "2aecf4720fbfdb06f756a3f53ab45e3490f9991921e9c2a87d9985ac6cd4b222",
         "acknowledged_cursor": 6707037009,
         "body_provenance": "acceptance-time",
