@@ -154,7 +154,35 @@
           "who": "codex-0800D61C-1107"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "adc3b513c227b28dd86500e2d013c5522d5003f81257ca8ea7cc2c244f79798f",
+        "acknowledged_cursor": 6704420333,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "adc3b513c227b28dd86500e2d013c5522d5003f81257ca8ea7cc2c244f79798f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800D61C\",\"who\":\"codex-0800D61C-1107\",\"claim_id\":6704388883,\"reason\":\"Parked 60-byte natural candidate versus72; missing two pre-store reads and pointer loop differs; callback/index gaps documented, no shared map edits.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O1/-O2/-O3/-Os; packed/unpacked bitfields, separate pointers\"}",
+          "created_at": "2026-11-07T08:20:26Z",
+          "id": 6704420333,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:20:26Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "eb1e07a43e69f6520b49c5677abb90ce98f1a0b3627cd05990b3cba7de0622f1",
+        "result": {
+          "address": "0x0800D61C",
+          "claim_id": 6704388883,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6704420333,
+          "status": "accepted",
+          "who": "codex-0800D61C-1107"
+        }
+      }
     }
   ],
   "issue": 66,
