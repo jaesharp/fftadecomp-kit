@@ -91,66 +91,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "c0ea41550c132c68a1b575b7ba795511118e5ddd1b125573d50b2ef127f54946",
-        "acknowledged_cursor": 6704642200,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c0ea41550c132c68a1b575b7ba795511118e5ddd1b125573d50b2ef127f54946",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08A38A9C\",\"who\":\"sol-08A38A9C-3540\",\"note\":\"Natural C matching of separate installer-backed lateROM memory routine; original ordinary leaf preflightPASS3539. Primary owns native admission and publication; RAM alias not extra function.\"}",
-          "created_at": "2026-11-07T08:44:24Z",
-          "id": 6704642200,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T08:44:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "17fb2b83343b83a4710eafa4319f553fd7140d00a38cc7d406ed3d6f7adf25d1",
-        "result": {
-          "address": "0x08A38A9C",
-          "claim_id": 6704642200,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6704642200,
-          "status": "accepted",
-          "who": "sol-08A38A9C-3540"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "07610c5cb347bc8939255bb8feb18e3397580dbcdf3f89bb50293d1dbcc1d2a0",
-        "acknowledged_cursor": 6704725873,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "07610c5cb347bc8939255bb8feb18e3397580dbcdf3f89bb50293d1dbcc1d2a0",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08A38A9C\",\"who\":\"sol-08A38A9C-3540\",\"claim_id\":6704642200,\"reason\":\"Firstnatural complete original lateROMmemoryroutine frozen; emitted size/controlflow differ. No independently grounded semantic/interface/storage correction remains; no controlspelling orregister steering. Candidate/intermediates/failures retained,0MATCHcredit.\",\"unmatchable\":true,\"tried\":\"Fixed agbcc -mthumb-interwork -O2; one genuine natural form, one native/compiler invocation; no replay.\"}",
-          "created_at": "2026-11-07T08:53:15Z",
-          "id": 6704725873,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T08:53:15Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7ee10d4e721679ff3f7ed04aaf191b2ef74a418487257342631ae33afdec8bfb",
-        "result": {
-          "address": "0x08A38A9C",
-          "claim_id": 6704642200,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6704725873,
-          "status": "accepted",
-          "who": "sol-08A38A9C-3540"
-        }
-      }
     }
   ],
   "issue": 66,
