@@ -90,7 +90,35 @@
           "who": "sol-080DEC84-2938"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ac45ee7abdedac58d65921fee5747537395aca005e96ee94113b967c4596361a",
+        "acknowledged_cursor": 6704798665,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ac45ee7abdedac58d65921fee5747537395aca005e96ee94113b967c4596361a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DEC84\",\"who\":\"sol-080DEC84-2938\",\"claim_id\":6693575557,\"reason\":\"Reconciled own original claim accepted by broker after client timed out unconfirmed. No authoring was authorized by that client receipt and no current matching attempt is active; stop holding unused lease. Prior frozen source/proof/failure artifacts remain preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T09:01:08Z",
+          "id": 6704798665,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T09:01:08Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7bfc93d4dc7ce685815f66cbadc83e0af2ecb8a63fff92615d064bfb6680fb16",
+        "result": {
+          "address": "0x080DEC84",
+          "claim_id": 6693575557,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6704798665,
+          "status": "accepted",
+          "who": "sol-080DEC84-2938"
+        }
+      }
     }
   ],
   "issue": 66,
