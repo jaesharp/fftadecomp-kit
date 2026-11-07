@@ -30,7 +30,35 @@
           "who": "sol-08148A0C-3769"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ef15ceee536132359b6fc9779ce9c4b8eb8bd041b6f00f43a4b5aef0cc29ee06",
+        "acknowledged_cursor": 6713610274,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ef15ceee536132359b6fc9779ce9c4b8eb8bd041b6f00f43a4b5aef0cc29ee06",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08148A0C\",\"who\":\"sol-08148A0C-3769\",\"claim_id\":6713516509,\"reason\":\"Grounded packed bitfield layout is plausible but complete native FUNC remains148B versus140B ROM; only table-base hoisting and R8 save/restore remain, with no further independent correction. Stopped; zero MATCH credit.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; one new independently ROM-grounded bitfield source form; native exit1\"}",
+          "created_at": "2026-11-07T22:03:55Z",
+          "id": 6713610274,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:03:55Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1731b7e9005a7d32854874113782ac73251bd27945c6db1de89777ec480c6e33",
+        "result": {
+          "address": "0x08148A0C",
+          "claim_id": 6713516509,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6713610274,
+          "status": "accepted",
+          "who": "sol-08148A0C-3769"
+        }
+      }
     },
     {
       "claim": {
