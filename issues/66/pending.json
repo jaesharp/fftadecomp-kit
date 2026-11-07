@@ -91,6 +91,38 @@
           "who": "codex-08025FDC"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "ec7a0ab17e6fc9143a39b81ebb9dbed6e7fcf51d5190dfc9636985f312c2873d",
+        "acknowledged_cursor": 6707133517,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ec7a0ab17e6fc9143a39b81ebb9dbed6e7fcf51d5190dfc9636985f312c2873d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080A901C\",\"who\":\"codex-080A901C\",\"note\":\"Natural576byte animated display updater; scratch-only ROM-evidenced graphics mappings, existing addressed signed runtime data profile.\"}",
+          "created_at": "2026-11-07T12:47:26Z",
+          "id": 6707133517,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T12:47:26Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5f7a6ad0e463aa1ad07f3f9c95239291d5a29693d152528050770452cc0f357b",
+        "result": {
+          "address": "0x080A901C",
+          "claim_id": 6707133517,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6707133517,
+          "status": "accepted",
+          "who": "codex-080A901C"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
