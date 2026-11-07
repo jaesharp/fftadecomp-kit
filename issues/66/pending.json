@@ -95,6 +95,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "7b83e85a92367fef819e5ea270c819262c765d93e5193e33e559055677a6d366",
+        "acknowledged_cursor": 6704388883,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7b83e85a92367fef819e5ea270c819262c765d93e5193e33e559055677a6d366",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800D61C\",\"who\":\"codex-0800D61C-1107\",\"note\":\"Recover natural C for complete indexed owner in isolated native subagent; orchestrator manages verification and release.\"}",
+          "created_at": "2026-11-07T08:17:10Z",
+          "id": 6704388883,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:17:10Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "26cf866c0446bb09b42353ff92318f2aeb40f746f36f273dc045e27650210994",
+        "result": {
+          "address": "0x0800D61C",
+          "claim_id": 6704388883,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704388883,
+          "status": "accepted",
+          "who": "codex-0800D61C-1107"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
