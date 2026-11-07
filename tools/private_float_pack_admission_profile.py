@@ -23,6 +23,7 @@ import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_float_selected_record_inventory as selected_record
 import private_float_unsigned_conversion_inventory as unsigned_conversion
+import private_float_inline_division_inventory as inline_division
 import private_double_comparison_effects_inventory as double_comparison
 import private_float_scalar_conversion_effects_inventory as scalar_conversion
 import private_double_scalar_conversion_effects_inventory as double_scalar_conversion
@@ -56,7 +57,9 @@ SELECTED_RECORD_SELECTOR = 'private-float-selected-record-v1'
 SELECTED_RECORD_SCHEMA = 'elf-symbol-thumb-private-float-selected-record-v1'
 UNSIGNED_CONVERSION_SELECTOR = 'private-float-unsigned-conversion-v1'
 UNSIGNED_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-unsigned-conversion-v1'
-SELECTORS = (UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+INLINE_DIVISION_SELECTOR = 'private-float-inline-division-v1'
+INLINE_DIVISION_SCHEMA = 'elf-symbol-thumb-private-float-inline-division-v1'
+SELECTORS = (INLINE_DIVISION_SELECTOR, UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
              SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
@@ -68,6 +71,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == INLINE_DIVISION_SELECTOR:
+        return inline_division, INLINE_DIVISION_SCHEMA, inline_division.CONTRACT
     if selector == UNSIGNED_CONVERSION_SELECTOR:
         return unsigned_conversion, UNSIGNED_CONVERSION_SCHEMA, unsigned_conversion.CONTRACT
     if selector == SELECTED_RECORD_SELECTOR:
@@ -112,7 +117,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(INLINE_DIVISION_SCHEMA in line or UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
@@ -151,7 +156,7 @@ def function_size(image, address, *, partitioned_tail=False):
         if item['type'] in (1, 2) or position < 0 or position >= size or position + item['size'] > size:
             raise ValueError('private float alignment has foreign symbol ownership')
     if partitioned_tail:
-        # The scalar selector subsequently requires its full native CFG and byte
+        # The selected scalar/inline selector subsequently requires its full native CFG and byte
         # partition over this sized symbol. Reached code/literals cannot use the
         # excluded NOP, including in symbols containing in-function literal pools.
         return size
@@ -179,7 +184,7 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
     selected_inventory, _, _ = profile(selector)
     if image['type'] != 1:
         raise ValueError('private float requires original relocatable ELF')
-    size = function_size(image, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
+    size = function_size(image, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
     symbol, offset = match.function_record(image, f'func_{address:08X}', address, True)
     if offset or any(
             item['type'] == 2 and item is not symbol and item['section'] or
@@ -199,6 +204,8 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
         targets[f'func_{start:08X}'] = start
     for alias, role in getattr(selected_inventory, 'COMPILER_ALIASES', {}).items():
         targets[alias] = next(record[0] for name, record, _ in selected_inventory.HELPERS if name == role)
+    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
+    targets.update(data_targets)
     calls, occupied = [], set()
     decoder = match.Cs(match.CS_ARCH_ARM, match.CS_MODE_THUMB)
     decoder.detail = True
@@ -209,13 +216,27 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
         symbols = image['symbol_tables'].get(section[6])
         for position in range(0, section[5], 8):
             site, info = struct.unpack_from('<II', image['section_data'][section_index], position)
-            if symbols is None or info >> 8 >= len(symbols) or info & 255 != 10 or \
+            if symbols is None or info >> 8 >= len(symbols) or info & 255 not in (2, 10) or \
                     site % 2 or site + 4 > size or occupied.intersection(range(site, site+4)):
                 raise ValueError('invalid or overlapping private-float call relocation')
             occupied.update(range(site, site+4))
             target = symbols[info >> 8]
             name = target['name']
-            if name not in targets or target['section'] or target['value'] or target['bind'] != 1 or \
+            if info & 255 == 2:
+                import owner_admission_profile as owner
+                body = rom[address-match.ROM_BASE:address-match.ROM_BASE+size]
+                refinement = owner.refine(body, address, mapping)
+                literal = any(int(word['address'], 16) == address+site and word['size'] == 4
+                              for word in refinement['literal_reads'])
+                if name not in data_targets or (address+site) % 4 or not literal or \
+                        target['section'] or target['value'] or target['bind'] != 1 or target['size'] or \
+                        target['type'] not in (0, 1) or \
+                        sum(item['name'] == name for item in image['symbols']) != 1 or \
+                        struct.unpack_from('<I', image['text'], site)[0] != 0 or \
+                        struct.unpack_from('<I', body, site)[0] != data_targets[name]:
+                    raise ValueError('private float requires an authentic zero-addend pinned data literal')
+                continue
+            if name not in targets or name in data_targets or target['section'] or target['value'] or target['bind'] != 1 or \
                     target['type'] not in (0, 2) or sum(item['name'] == name for item in image['symbols']) != 1:
                 raise ValueError('private float requires unique undefined pinned helper symbols')
             item = next(decoder.disasm(image['text'][site:site+4], address+site), None)
@@ -238,8 +259,8 @@ def original_bindings(image, address, rom, mapping, index, *, selector=SELECTOR)
 def linked_bytes(original, linked, address, calls, targets, *, selector=SELECTOR):
     import match
     profile(selector)
-    size = function_size(original, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
-    linked_size = function_size(linked, address, partitioned_tail=selector == SCALAR_CONVERSION_SELECTOR)
+    size = function_size(original, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
+    linked_size = function_size(linked, address, partitioned_tail=selector in (SCALAR_CONVERSION_SELECTOR, INLINE_DIVISION_SELECTOR))
     record, offset = match.function_record(linked, f'func_{address:08X}', address, True)
     if linked['type'] != 2 or offset or linked['relocations'] or \
             linked_size != size or len(linked['text']) != len(original['text']) or any(
@@ -255,6 +276,23 @@ def linked_bytes(original, linked, address, calls, targets, *, selector=SELECTOR
                 item.operands[0].imm != targets[name]:
             raise ValueError('linked private-float call target differs from original binding')
         expected[site:site+4] = linked['text'][site:site+4]
+    selected_inventory, _, _ = profile(selector)
+    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
+    for section_index in original['relocations']:
+        section = original['sections'][section_index]
+        for position in range(0, section[5], 8):
+            site, info = struct.unpack_from('<II', original['section_data'][section_index], position)
+            if info & 255 != 2:
+                continue
+            symbol = original['symbol_tables'][section[6]][info >> 8]
+            name = symbol['name']
+            definitions = [item for item in linked['symbols'] if item['name'] == name]
+            if name not in data_targets or len(definitions) != 1 or \
+                    definitions[0]['section'] != 0xFFF1 or definitions[0]['type'] != 1 or \
+                    definitions[0]['value'] != data_targets[name] or definitions[0]['size'] or \
+                    struct.unpack_from('<I', original['text'], site)[0] != 0:
+                raise ValueError('linked private-float data definition differs from original pinned literal')
+            expected[site:site+4] = struct.pack('<I', data_targets[name])
     if bytes(expected) != linked['text']:
         raise ValueError('private float linker changed bytes outside original BL relocations')
     return linked['text'][:size]
@@ -265,9 +303,14 @@ def object_bytes(runner, workspace, args, original, address, rom, mapping, index
     fixed_configuration(args)
     calls, targets = original_bindings(original, address, rom, mapping, index, selector=selector)
     definitions = ['.syntax unified', '.thumb']
+    selected_inventory, _, _ = profile(selector)
+    data_targets = selected_inventory.DATA_BINDINGS if selector == INLINE_DIVISION_SELECTOR else {}
     for name, target in sorted(targets.items()):
-        definitions += [f'.global {name}', f'.type {name}, %function',
-                        f'.thumb_set {name}, 0x{target|1:08X}']
+        if name in data_targets:
+            definitions += [f'.global {name}', f'.type {name}, %object', f'.set {name}, 0x{target:08X}']
+        else:
+            definitions += [f'.global {name}', f'.type {name}, %function',
+                            f'.thumb_set {name}, 0x{target|1:08X}']
     runner.write_text(workspace+'/f.known.s', '\n'.join(definitions)+'\n')
     runner.write_text(workspace+'/f.ld',
         f'SECTIONS {{ .text 0x{address:08X} : {{ *(.text) *(.glue_7) *(.glue_7t) }} '
