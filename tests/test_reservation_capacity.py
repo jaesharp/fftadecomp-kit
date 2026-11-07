@@ -574,5 +574,107 @@ class ReservationPRHeadTests(unittest.TestCase):
                         self.check(fake)
 
 
+class FakeDefaultSourceAPI(FakePRHeadAPI):
+    DEFAULT_SOURCE = "5" * 40
+
+    def __init__(self):
+        super().__init__(present=False)
+        self.default_entries = [
+            {"name": "20101", "type": "tree", "oid": self.DEFAULT_SOURCE}]
+        self.default_source = {"sha": self.DEFAULT_SOURCE, "truncated": False, "tree": [
+            {"path": "08136538.c", "type": "blob", "mode": "100644", "sha": self.BLOB}]}
+
+    def __call__(self, method, endpoint, payload=None):
+        if (method, endpoint) == (
+                "GET", f"repos/{reserve.DECOMP_REPO}/git/trees/{self.DEFAULT_SOURCE}?recursive=1"):
+            self.calls.append((method, endpoint, payload))
+            return self.default_source
+        return super().__call__(method, endpoint, payload)
+
+
+class ReservationDefaultSubtreeTests(unittest.TestCase):
+    def check(self, fake):
+        with patch.object(reserve, "api", side_effect=fake):
+            return reserve.claim_status("0x08136538")
+
+    def test_nested_published_source_blocks_claim_before_pr_inspection(self):
+        fake = FakeDefaultSourceAPI()
+        code, message = self.check(fake)
+        self.assertEqual(code, 4)
+        self.assertIn("src/20101/08136538.c", message)
+        self.assertEqual(len(fake.calls), 2)
+        self.assertEqual(fake.calls[1][1],
+                         f"repos/{reserve.DECOMP_REPO}/git/trees/{fake.DEFAULT_SOURCE}?recursive=1")
+        self.assertIn("name type oid", reserve.CLAIM_QUERY)
+
+    def test_deep_nested_filename_is_case_insensitive(self):
+        fake = FakeDefaultSourceAPI()
+        fake.default_source["tree"][0]["path"] = "group/another/08136538.C"
+        code, message = self.check(fake)
+        self.assertEqual(code, 4)
+        self.assertIn("src/20101/group/another/08136538.C", message)
+
+    def test_direct_filename_is_case_insensitive(self):
+        fake = FakeDefaultSourceAPI()
+        fake.default_entries = [{"name": "08136538.C", "type": "blob"}]
+        self.assertEqual(self.check(fake)[0], 4)
+        self.assertEqual(len(fake.calls), 1)
+
+    def test_absent_nested_source_keeps_full_pr_head_check(self):
+        fake = FakeDefaultSourceAPI()
+        fake.default_source["tree"] = []
+        self.assertEqual(self.check(fake), (0, ""))
+        self.assertEqual(fake.calls[-1][2]["query"], reserve.PR_HEAD_QUERY)
+
+    def test_directory_named_like_target_is_not_a_definition(self):
+        fake = FakeDefaultSourceAPI()
+        fake.default_entries[0]["name"] = "08136538.c"
+        fake.default_source["tree"] = []
+        self.assertEqual(self.check(fake), (0, ""))
+
+    def test_nested_gitlink_named_like_target_is_not_a_definition(self):
+        fake = FakeDefaultSourceAPI()
+        fake.default_source["tree"][0].update(type="commit", mode="160000")
+        self.assertEqual(self.check(fake), (0, ""))
+
+    def test_malformed_subtree_identity_fails_closed(self):
+        for oid in (None, "main", "5" * 39, "G" * 40, [], {}):
+            with self.subTest(oid=oid):
+                fake = FakeDefaultSourceAPI()
+                fake.default_entries[0]["oid"] = oid
+                with self.assertRaises(reserve.GuardUnavailable):
+                    self.check(fake)
+                self.assertEqual(len(fake.calls), 1)
+
+    def test_truncated_or_malformed_recursive_response_fails_closed(self):
+        for mutation in ("truncated", "missing_flag", "wrong_sha", "bad_path", "bad_mode", "duplicate"):
+            with self.subTest(mutation=mutation):
+                fake = FakeDefaultSourceAPI()
+                tree = fake.default_source
+                if mutation == "truncated":
+                    tree["truncated"] = True
+                elif mutation == "missing_flag":
+                    tree.pop("truncated")
+                elif mutation == "wrong_sha":
+                    tree["sha"] = "6" * 40
+                elif mutation == "bad_path":
+                    tree["tree"][0]["path"] = "../08136538.c"
+                elif mutation == "bad_mode":
+                    tree["tree"][0]["mode"] = "040000"
+                else:
+                    tree["tree"] *= 2
+                with self.assertRaises(reserve.GuardUnavailable):
+                    self.check(fake)
+
+    def test_invalid_default_entry_fails_closed(self):
+        for entry in (None, {"name": "../20101", "type": "tree"},
+                      {"name": "", "type": "blob"}, {"name": "x", "type": []}):
+            with self.subTest(entry=entry):
+                fake = FakeDefaultSourceAPI()
+                fake.default_entries = [entry]
+                with self.assertRaises(reserve.GuardUnavailable):
+                    self.check(fake)
+
+
 if __name__ == "__main__":
     unittest.main()

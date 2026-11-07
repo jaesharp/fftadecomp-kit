@@ -84,7 +84,7 @@ COMMENTS_QUERY = """query($owner:String!, $name:String!, $issue:Int!, $after:Str
 CLAIM_QUERY = """query($owner:String!, $name:String!, $after:String) {
   repository(owner:$owner, name:$name) {
     defaultBranchRef { name }
-    object(expression:"HEAD:src") { __typename ... on Tree { entries { name type } } }
+    object(expression:"HEAD:src") { __typename ... on Tree { entries { name type oid } } }
     pullRequests(first:20, states:OPEN, after:$after) {
       nodes {
         number title body state headRefOid
@@ -555,10 +555,22 @@ def claim_status(address):
             if not isinstance(tree, dict) or tree.get("__typename") != "Tree" or not isinstance(tree.get("entries"), list):
                 raise LedgerError("default-branch src tree is unavailable")
             for entry in tree["entries"]:
-                if not isinstance(entry, dict) or not isinstance(entry.get("name"), str) or not isinstance(entry.get("type"), str):
+                if not isinstance(entry, dict) or not isinstance(entry.get("name"), str) or \
+                        not entry["name"] or entry["name"] in (".", "..") or \
+                        "/" in entry["name"] or "\0" in entry["name"] or \
+                        entry.get("type") not in ("blob", "tree", "commit"):
                     raise LedgerError("invalid default-branch src entry")
-                if entry["name"] == filename:
-                    return 4, f"MATCHED: src/{filename} is on the default branch"
+                if entry["type"] == "blob" and entry["name"].casefold() == filename.casefold():
+                    return 4, f"MATCHED: src/{entry['name']} is on the default branch"
+                if entry["type"] == "tree":
+                    oid = entry.get("oid")
+                    if not isinstance(oid, str) or re.fullmatch(r"[0-9a-f]{40}", oid) is None:
+                        raise LedgerError("default-branch source subtree has no valid object ID")
+                    for nested in git_tree_entries(DECOMP_REPO, oid, recursive=True):
+                        if nested["type"] == "blob" and \
+                                nested["path"].rsplit("/", 1)[-1].casefold() == filename.casefold():
+                            path = entry["name"] + "/" + nested["path"]
+                            return 4, f"MATCHED: src/{path} is on the default branch"
             pulls, after = connection_page(repository.get("pullRequests"))
             for pull in pulls:
                 if not isinstance(pull, dict) or not positive_id(pull.get("number")):
