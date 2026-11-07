@@ -4239,7 +4239,8 @@ def main():
     ap.add_argument("--emit", help="write verified symbol bytes to a new file under the decomp build/")
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"),
                     help="decomp repo (default: current directory)")
-    ap.add_argument("--owner-runtime-profile", choices=("canonical-integer-private-locals-data-source-v1", "canonical-integer-six-words-data-source-v1", "canonical-integer-scalar-source-v1", "ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
+    ap.add_argument("--palette-closure-bundle", help="canonical independently authenticated palette artifact bundle for first compilation")
+    ap.add_argument("--owner-runtime-profile", choices=("conditional-palette-source-compilation-v1", "canonical-integer-private-locals-data-source-v1", "canonical-integer-six-words-data-source-v1", "canonical-integer-scalar-source-v1", "ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
                                                       "restoring-owner-r3-thunk-switch-v1", "restoring-owner-scalar-switch-v1", "restoring-owner-switch-entry-word-v1", "restoring-owner-switch-entry-two-words-data-v1",
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
@@ -4289,6 +4290,11 @@ def main():
                                                       "descriptor-cursor-value-v1",
                                                       "private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1", "private-scalar-division-byte-locals-v1", "private-float-selected-record-v1", "private-double-inline-division-v1", "private-double-selected-record-v1", "private-float-inline-division-v1", "private-float-unsigned-conversion-v1"))
     args = ap.parse_args()
+    if args.owner_runtime_profile == "conditional-palette-source-compilation-v1":
+        from palette_source_admission_profile import configuration
+        configuration(args)
+    elif args.palette_closure_bundle is not None:
+        sys.exit("--palette-closure-bundle requires the isolated palette source selector")
     global ROOT
     ROOT = repo_root(args.root)
 
@@ -4317,6 +4323,9 @@ def main():
             args.software_double_profile or args.software_double_remainder_profile or
             args.function_address_profile or args.switch_profile or args.owner_runtime_profile):
         sys.exit("framed signed quotient excludes other selectors and requires Thumb mode")
+    if args.owner_runtime_profile == "conditional-palette-source-compilation-v1":
+        from palette_source_admission_profile import issue
+        return issue(Path(ROOT), addr, args)
     if args.owner_runtime_profile:
         if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1", "private-scalar-division-byte-locals-v1", "private-float-selected-record-v1", "private-double-inline-division-v1", "private-double-selected-record-v1", "private-float-inline-division-v1", "private-float-unsigned-conversion-v1"):
             from private_float_pack_admission_profile import issue

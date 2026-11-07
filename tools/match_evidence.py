@@ -917,6 +917,9 @@ def report_matches(report, root, address):
         import unsigned_divmod_profile
         if unsigned_divmod_profile.selected(report):
             return unsigned_divmod_profile.report_matches(report, root, address)
+        import palette_source_admission_profile
+        if palette_source_admission_profile.selected(report):
+            return palette_source_admission_profile.report_matches(report, root, address)
         import private_float_pack_admission_profile
         if private_float_pack_admission_profile.selected(report):
             return private_float_pack_admission_profile.report_matches(report, root, address)

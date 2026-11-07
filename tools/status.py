@@ -252,12 +252,15 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
         unsigned_runtime_profile = False
         addressed_runtime_profile = False
         private_float_profile = False
+        palette_source_profile = False
         if os.path.exists(rep):
             with open(rep, encoding="utf-8") as report_file:
                 saved_report = report_file.read()
             try:
                 import unsigned_divmod_profile
                 unsigned_runtime_profile = unsigned_divmod_profile.selector_for_report(saved_report)
+                import palette_source_admission_profile
+                palette_source_profile = palette_source_admission_profile.selector_for_report(saved_report)
                 import private_float_pack_admission_profile
                 private_float_profile = private_float_pack_admission_profile.selector_for_report(saved_report)
                 import addressed_signed_runtime_profile
@@ -326,6 +329,8 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command += ["--function-address-profile", thunk_profile]
             if owner_profile:
                 command += ["--owner-runtime-profile", owner_admission_profile.selector_for_report(saved_report)]
+            if palette_source_profile:
+                command += ["--owner-runtime-profile", palette_source_profile]
             if private_float_profile:
                 command += ["--owner-runtime-profile", private_float_profile]
             if constants_profile:
@@ -351,7 +356,7 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
                 command.append("--no-write")
             result = subprocess.run(command, capture_output=True, text=True)
             ok = result.returncode == 0 and "verdict MATCH - byte identical" in result.stdout.splitlines()
-        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or typed_outgoing_profile or u16_switch_profile or owner_profile or quotient_frame or unsigned_quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile) and ok:
+        if not verify or (write_reports or spin_profile or double_profile or thunk_profile or constants_profile or typed_outgoing_profile or u16_switch_profile or owner_profile or quotient_frame or unsigned_quotient_frame or signed_runtime_profile or unsigned_runtime_profile or addressed_runtime_profile or private_float_profile or palette_source_profile) and ok:
             if os.path.exists(rep):
                 with open(rep, encoding="utf-8") as report_file:
                     report = report_file.read()
