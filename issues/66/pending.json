@@ -90,7 +90,35 @@
           "who": "codex-08002838"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ec6fdbe45ef7a81eb00c180bc0c7e5b9a641a789febcd433b93d1fc7aac24688",
+        "acknowledged_cursor": 6706474158,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ec6fdbe45ef7a81eb00c180bc0c7e5b9a641a789febcd433b93d1fc7aac24688",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002838\",\"who\":\"codex-08002838\",\"claim_id\":6706368094,\"reason\":\"Parked four-sample RNG recovery:148 vs144 bytes, r10 state pointer and retained increment differ. Natural variants/native remainder did not match; no steering or verifier edits.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; direct/local state, scoped stages, accumulation forms, native remainder\"}",
+          "created_at": "2026-11-07T11:42:46Z",
+          "id": 6706474158,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T11:42:46Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3e26295a4faed82cea21d17a9b65f196bb456991702702fee8e2620ad6b12c12",
+        "result": {
+          "address": "0x08002838",
+          "claim_id": 6706368094,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6706474158,
+          "status": "accepted",
+          "who": "codex-08002838"
+        }
+      }
     },
     {
       "claim": {
