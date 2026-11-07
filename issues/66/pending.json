@@ -154,7 +154,35 @@
           "who": "sol-080D3F84-3290"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c032fdbd832d932d5611508e46f0e24115fd1d707c90c0feea29cc342aea2e7e",
+        "acknowledged_cursor": 6701192979,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c032fdbd832d932d5611508e46f0e24115fd1d707c90c0feea29cc342aea2e7e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D3F84\",\"who\":\"sol-080D3F84-3290\",\"claim_id\":6701015661,\"reason\":\"Stopped inspection: discarded RAM reads remain without independent storage authority, no new compilation/native/proof.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T02:44:12Z",
+          "id": 6701192979,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T02:44:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cfa269d49c7f6cec78234eaee4a01941a6ae97ad8f1ecc0368ffe4a22d6b9702",
+        "result": {
+          "address": "0x080D3F84",
+          "claim_id": 6701015661,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701192979,
+          "status": "accepted",
+          "who": "sol-080D3F84-3290"
+        }
+      }
     },
     {
       "claim": {
