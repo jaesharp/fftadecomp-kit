@@ -222,7 +222,35 @@
           "who": "FFTA-Team2-native-104-numeric"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "ae432be32b72f1695eee583382b122a0cfb371f056bf9f6367095b733a5714d4",
+        "acknowledged_cursor": 6710885927,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ae432be32b72f1695eee583382b122a0cfb371f056bf9f6367095b733a5714d4",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002950\",\"who\":\"FFTA-Team2-native-104-numeric\",\"claim_id\":6710869486,\"reason\":\"Frozen honest NONMATCH: complete compiled FUNC110B versus actual124B. No independently grounded second form; no register/prototype/order steering. All original compiler/source/error artifacts retained privately.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2, one first natural C form\"}",
+          "created_at": "2026-11-07T17:48:08Z",
+          "id": 6710885927,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T17:48:08Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "db9c0aa99fa86f54a7dd66ca7fb469cb7085d2af9d846aef6352fabd5afe4f67",
+        "result": {
+          "address": "0x08002950",
+          "claim_id": 6710869486,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6710885927,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-104-numeric"
+        }
+      }
     }
   ],
   "issue": 66,
