@@ -91,6 +91,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "ea4bb499389dfa6e51e50a27aa57975b55b81dedf3b720a2019db434580c1db3",
+        "acknowledged_cursor": 6712505118,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ea4bb499389dfa6e51e50a27aa57975b55b81dedf3b720a2019db434580c1db3",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0809A09C\",\"who\":\"FFTA-Team2-native112\",\"note\":\"Solo natural two-slot cleanup loop; reconcile actual restored-return boundary and preserve following bytes/entries. Full original compiler/native/all167/current ROM runtime evidence; no steering.\"}",
+          "created_at": "2026-11-07T20:17:38Z",
+          "id": 6712505118,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:17:38Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "df22a45ffdc9a35b6c71a581b021ee48ba43a474df34ab1388b84caf725cc2e3",
+        "result": {
+          "address": "0x0809A09C",
+          "claim_id": 6712505118,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712505118,
+          "status": "accepted",
+          "who": "FFTA-Team2-native112"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
