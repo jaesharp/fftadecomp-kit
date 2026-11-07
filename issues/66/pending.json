@@ -123,6 +123,102 @@
           "who": "codex-0800D61C-1107"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "572a9bd5d1bced82cb682550e5f1cd0836bcc567330055c12afa53d4fe9f4cf4",
+        "acknowledged_cursor": 6704438876,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "572a9bd5d1bced82cb682550e5f1cd0836bcc567330055c12afa53d4fe9f4cf4",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805F44C\",\"who\":\"codex-0805F44C-1107\",\"note\":\"Natural C recovery of scheduler owner; isolated native subagent, parent verifies and releases.\"}",
+          "created_at": "2026-11-07T08:22:03Z",
+          "id": 6704435259,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:22:03Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cae367dbc7cbd96f305cb6fc3f4fe86d692ea41570bde3f07015f4252e0a9eaf",
+        "result": {
+          "address": "0x0805F44C",
+          "claim_id": 6704435259,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704435259,
+          "status": "accepted",
+          "who": "codex-0805F44C-1107"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "6e74719a90b5e08f16bd8aed3dfb66ff3517f0da5e83797940cbe31df6da3d1c",
+        "acknowledged_cursor": 6704438876,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6e74719a90b5e08f16bd8aed3dfb66ff3517f0da5e83797940cbe31df6da3d1c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08066C28\",\"who\":\"codex-08066C28-1107\",\"note\":\"Natural C recovery of indexed framed owner; isolated native subagent, parent verifies and releases.\"}",
+          "created_at": "2026-11-07T08:22:04Z",
+          "id": 6704435411,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:22:04Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cae367dbc7cbd96f305cb6fc3f4fe86d692ea41570bde3f07015f4252e0a9eaf",
+        "result": {
+          "address": "0x08066C28",
+          "claim_id": 6704435411,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704435411,
+          "status": "accepted",
+          "who": "codex-08066C28-1107"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "bbbae6e6aa6b0b5e3d12fa7dc5dc4d2b7c840f83b564f3cc6d64e38b5797666c",
+        "acknowledged_cursor": 6704438876,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "bbbae6e6aa6b0b5e3d12fa7dc5dc4d2b7c840f83b564f3cc6d64e38b5797666c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08138284\",\"who\":\"primary-native-08138284-3527\",\"note\":\"Reuse frozen exact208B natural C under fresh native-only context; named BIOS fill preflightPASS3526. No new C authorship or diagnostic replay. Primary owns native admission and publication.\"}",
+          "created_at": "2026-11-07T08:22:27Z",
+          "id": 6704438876,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:22:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cae367dbc7cbd96f305cb6fc3f4fe86d692ea41570bde3f07015f4252e0a9eaf",
+        "result": {
+          "address": "0x08138284",
+          "claim_id": 6704438876,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6704438876,
+          "status": "accepted",
+          "who": "primary-native-08138284-3527"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
