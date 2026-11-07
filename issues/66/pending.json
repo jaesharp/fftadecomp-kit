@@ -66,66 +66,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "57ea967fc3a1c6c4b14d0b461647511fc1de3c82dc1f3a4eeebf1c3cce41ef10",
-        "acknowledged_cursor": 6705924784,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "57ea967fc3a1c6c4b14d0b461647511fc1de3c82dc1f3a4eeebf1c3cce41ef10",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08003014\",\"who\":\"sol-08003014-3623\",\"note\":\"First natural C attempt; only old inventory or rejected broker checks exist. Fresh syntactic complete-owner/literal-span preparation3612. Primary owns native admission, fullbody evidence and publication; no fabricated native closure.\"}",
-          "created_at": "2026-11-07T10:58:43Z",
-          "id": 6705924784,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:58:43Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "75c4e35504be4476ab0a56059a27abb4df29f1c8fb50f8a8f5dae5f1e63a5879",
-        "result": {
-          "address": "0x08003014",
-          "claim_id": 6705924784,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6705924784,
-          "status": "accepted",
-          "who": "sol-08003014-3623"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "34dfba9291cda1c51b3287a4f6ffdf997ec03fe5582fedb79c84874e454a0296",
-        "acknowledged_cursor": 6706037081,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "34dfba9291cda1c51b3287a4f6ffdf997ec03fe5582fedb79c84874e454a0296",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08003014\",\"who\":\"sol-08003014-3623\",\"claim_id\":6705924784,\"reason\":\"Matching stopped; natural complete-FUNC nonmatch or zero-C storage boundary frozen. No independently grounded correction remains. Actual discarded destination loads, genuine stride correction and real errors preserved. No invented reads/bitfields/volatile, source steering, replay, native/proof or MATCH credit.\",\"unmatchable\":true,\"tried\":\"Fixed agbcc -mthumb-interwork -O2; original first form and genuine typed linking. Exact command/adapter/runtime/compiler counts and original limitations retained in frozen result.\"}",
-          "created_at": "2026-11-07T11:09:14Z",
-          "id": 6706029923,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T11:09:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7da50ddff966558cb3db3ce7093269596f127a34b7f1729c4c2f6a93f1ea9c03",
-        "result": {
-          "address": "0x08003014",
-          "claim_id": 6705924784,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6706029923,
-          "status": "accepted",
-          "who": "sol-08003014-3623"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "0a2520db7a5c74f0c04a6295eb001a80f0339ff662274bbaf98e1c1a3ed7ff4d",
         "acknowledged_cursor": 6705931145,
         "body_provenance": "acceptance-time",
@@ -215,66 +155,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "0e966b7df38cb6eb3707a961c02a3ab98372a91646099c3384d789aa18d535cb",
-        "acknowledged_cursor": 6705966333,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0e966b7df38cb6eb3707a961c02a3ab98372a91646099c3384d789aa18d535cb",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08137194\",\"who\":\"codex-08137194\",\"note\":\"Natural C recovery with complete indexed owner and existing runtime profiles; isolated scratch source, no shared-header/index/verifier edits.\"}",
-          "created_at": "2026-11-07T11:02:51Z",
-          "id": 6705966333,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T11:02:51Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4e61e804f6f6dc002363b4d52fbb7447caca89cbdff40c29f6fc6669d3c147cf",
-        "result": {
-          "address": "0x08137194",
-          "claim_id": 6705966333,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705966333,
-          "status": "accepted",
-          "who": "codex-08137194"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "7512ee6a932c3bfc18434f43d164d31e977a90009bd57c660fb62e0a619d147e",
-        "acknowledged_cursor": 6706026369,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7512ee6a932c3bfc18434f43d164d31e977a90009bd57c660fb62e0a619d147e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08137194\",\"who\":\"codex-08137194\",\"claim_id\":6705966333,\"reason\":\"Parked natural table interpolation: 70 vs 72 bytes; weight/from register allocation differs. Existing owner verifier rejects non-exact complete owner; no match credit.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; direct/merged return, halfword/word types, arithmetic operand order\"}",
-          "created_at": "2026-11-07T11:08:54Z",
-          "id": 6706026369,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T11:08:54Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "25ea353878466d6761161391924b3e435b55fb68282252caa0725cd0b7bfb949",
-        "result": {
-          "address": "0x08137194",
-          "claim_id": 6705966333,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706026369,
-          "status": "accepted",
-          "who": "codex-08137194"
-        }
-      }
     },
     {
       "claim": {
