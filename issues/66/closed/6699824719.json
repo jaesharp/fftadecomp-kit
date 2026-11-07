@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "073f9a5f829eae0c54742c5247cc1cc31b46a74926f6c7ebf97c4425ffce0905",
+    "acknowledged_cursor": 6699828147,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "073f9a5f829eae0c54742c5247cc1cc31b46a74926f6c7ebf97c4425ffce0905",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08137194\",\"who\":\"sol-08137194-3189\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
+      "created_at": "2026-11-07T00:46:55Z",
+      "id": 6699824719,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T00:46:55Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "8114d267fb74c7747571f15d7f7821891d668b27b1a2eadb308ff8da7f1e67ab",
+    "result": {
+      "address": "0x08137194",
+      "claim_id": 6699824719,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6699824719,
+      "status": "accepted",
+      "who": "sol-08137194-3189"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "310aab2e14c6722c58ab7a712a12319e05c3cc4a0e2df62df9b280088b780299",
+    "acknowledged_cursor": 6700008961,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "310aab2e14c6722c58ab7a712a12319e05c3cc4a0e2df62df9b280088b780299",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08137194\",\"who\":\"sol-08137194-3189\",\"claim_id\":6699824719,\"reason\":\"Fully stopped finite natural-source residual or unsupported zero-C storage/interface; original167/artifacts/refs/runtime/fullROM preserved, no independently grounded correction; native/proof zero.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+      "created_at": "2026-11-07T01:00:12Z",
+      "id": 6699998975,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T01:00:12Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d13427c43ede2143b4e3ce3cf165299cd126cf69df27223cbddae915a4270109",
+    "result": {
+      "address": "0x08137194",
+      "claim_id": 6699824719,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6699998975,
+      "status": "accepted",
+      "who": "sol-08137194-3189"
+    }
+  }
+}
