@@ -286,7 +286,35 @@
           "who": "sol-08143CB4-3332"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7226d479c025b4559ce9a9d515e0f04d441418e38700a97cda1f494ba6ccdb52",
+        "acknowledged_cursor": 6701446120,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7226d479c025b4559ce9a9d515e0f04d441418e38700a97cda1f494ba6ccdb52",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08143CB4\",\"who\":\"sol-08143CB4-3332\",\"claim_id\":6701422003,\"reason\":\"Native MATCH: complete56-byte subtraction owner, plausible source and entire original qualification manifest agree. Four actual unpack/selection/pack helper calls and unknown fixed RAM reads retained; one compiler/native, all167/ref/runtime/ROM unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T03:08:25Z",
+          "id": 6701446120,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T03:08:25Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "acdbf348e56202a9b963bc375f6b0e50894c90f0d629aa6f535e4040840022a0",
+        "result": {
+          "address": "0x08143CB4",
+          "claim_id": 6701422003,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701446120,
+          "status": "accepted",
+          "who": "sol-08143CB4-3332"
+        }
+      }
     }
   ],
   "issue": 66,
