@@ -59,66 +59,6 @@
           "who": "codex-08141318"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "d98956db4e8e6461c6da37a37425e35d34ecb5867e566532eeebd0569b379983",
-        "acknowledged_cursor": 6707472919,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d98956db4e8e6461c6da37a37425e35d34ecb5867e566532eeebd0569b379983",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0803920C\",\"who\":\"codex-0803920C\",\"note\":\"Natural384byte seven-row circular-list display builder; existingg_state_03002810 and addressed-integer-runtime-data-v1; no new mappings.\"}",
-          "created_at": "2026-11-07T13:20:39Z",
-          "id": 6707472919,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T13:20:39Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3149c7e58524894852d0ac0ec273daed46c9ba768477f0472e5f33cd30b80df4",
-        "result": {
-          "address": "0x0803920C",
-          "claim_id": 6707472919,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6707472919,
-          "status": "accepted",
-          "who": "codex-0803920C"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "781e06a4dba32777b093a73eb14ce3c286922fac2c435b002d7acee014fbe851",
-        "acknowledged_cursor": 6707568132,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "781e06a4dba32777b093a73eb14ce3c286922fac2c435b002d7acee014fbe851",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0803920C\",\"who\":\"codex-0803920C\",\"claim_id\":6707472919,\"reason\":\"Parked: 384-byte candidate differs at three initial bound/register scheduling instructions; both loops and pools match.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; natural category conditions, counter types, global-state slot handle, snapshots and initialization order\"}",
-          "created_at": "2026-11-07T13:29:55Z",
-          "id": 6707568132,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T13:29:55Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e94e598b86773f621a273d06098d811802eddb0c098a3e4ad6324138c6e2512e",
-        "result": {
-          "address": "0x0803920C",
-          "claim_id": 6707472919,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6707568132,
-          "status": "accepted",
-          "who": "codex-0803920C"
-        }
-      }
     }
   ],
   "issue": 66,
