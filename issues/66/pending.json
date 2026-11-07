@@ -123,66 +123,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "53fcd524ac2e10aebd19d01e0256d790ec0430360979da794024883dcdad36db",
-        "acknowledged_cursor": 6706373840,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "53fcd524ac2e10aebd19d01e0256d790ec0430360979da794024883dcdad36db",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D38B4\",\"who\":\"codex-080D38B4\",\"note\":\"Natural display state reset recovery,80byte complete owner; evidence-based bitfield investigation, no verifier changes.\"}",
-          "created_at": "2026-11-07T11:37:04Z",
-          "id": 6706373840,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T11:37:04Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "53a24b127277e92f549fe4a5918f50ba2f4d437a199ea7f1695458715c00a985",
-        "result": {
-          "address": "0x080D38B4",
-          "claim_id": 6706373840,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706373840,
-          "status": "accepted",
-          "who": "codex-080D38B4"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5ab5575ce493f88e42b7c966c748f4f869616f16f40f109e4cf3c76aaea73629",
-        "acknowledged_cursor": 6706445171,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5ab5575ce493f88e42b7c966c748f4f869616f16f40f109e4cf3c76aaea73629",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D38B4\",\"who\":\"codex-080D38B4\",\"claim_id\":6706373840,\"reason\":\"Parked natural display reset:76 vs80 bytes; redundant ROM read-before-clear not reproduced. Plain/full-byte/nested bitfields insufficient; no evidence for artificial smaller fields.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2/-O3/-Os; -O1 rejected allocated section\"}",
-          "created_at": "2026-11-07T11:41:03Z",
-          "id": 6706445171,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T11:41:03Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "eb37d9faca9b5607c02a392f848d1557cce248b8a62d35aea530677416882e24",
-        "result": {
-          "address": "0x080D38B4",
-          "claim_id": 6706373840,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706445171,
-          "status": "accepted",
-          "who": "codex-080D38B4"
-        }
-      }
     }
   ],
   "issue": 66,
