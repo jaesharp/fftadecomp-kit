@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "9774e4ca294d8071cf6e831bffd34fea79fc70b2d13ddf538614af8af6743e79",
-        "acknowledged_cursor": 6712142493,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "9774e4ca294d8071cf6e831bffd34fea79fc70b2d13ddf538614af8af6743e79",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812B7D0\",\"who\":\"sol-0812B7D0-3749\",\"note\":\"Native matching existing exact natural C with existing tooling only; primary owns publication.\"}",
-          "created_at": "2026-11-07T19:43:16Z",
-          "id": 6712142493,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T19:43:16Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8a9705a4fb2a5abe4b90e60029927db04bfbea53a14e5b122b8ec312efbc72a2",
-        "result": {
-          "address": "0x0812B7D0",
-          "claim_id": 6712142493,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712142493,
-          "status": "accepted",
-          "who": "sol-0812B7D0-3749"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "0b1725d56442b45e746d296e9fcb3eab6b3e74d6ae9c275180f377c2a1312f62",
-        "acknowledged_cursor": 6712318724,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0b1725d56442b45e746d296e9fcb3eab6b3e74d6ae9c275180f377c2a1312f62",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812B7D0\",\"who\":\"sol-0812B7D0-3749\",\"claim_id\":6712142493,\"reason\":\"Exact32B C, overlap corrected in isolated maps; same actual08121B8C\\u219205954 alias guard as sibling independently settles unsupported admission. Two natives retained, no third replay.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2\"}",
-          "created_at": "2026-11-07T20:00:13Z",
-          "id": 6712318724,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:00:13Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8726c6f1513f809ec69b8f1416513525fa3aabfa33226ee4f6f1457c0810dc15",
-        "result": {
-          "address": "0x0812B7D0",
-          "claim_id": 6712142493,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712318724,
-          "status": "accepted",
-          "who": "sol-0812B7D0-3749"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "54283240cd73d379361f20a770c54c49277c10c482f5cc6c0c5c5db086382f8e",
         "acknowledged_cursor": 6712298199,
         "body_provenance": "acceptance-time",
