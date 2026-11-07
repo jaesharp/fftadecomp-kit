@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "5fc10ac57e4957e907e9398789ce9b3a93819226ea0ff655a81bce0c2df41df5",
-        "acknowledged_cursor": 6712343970,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5fc10ac57e4957e907e9398789ce9b3a93819226ea0ff655a81bce0c2df41df5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08080DB4\",\"who\":\"FFTA-Team2-native110\",\"note\":\"First natural C; actual complete76B includes referenced16B trailing pool; private span/count reconciliation preserving all entries. No shared167 edits.\"}",
-          "created_at": "2026-11-07T20:02:32Z",
-          "id": 6712343970,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:02:32Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c3c21cbe7c48ea5db22d760129e2c6266463d81b70d1d991484d7bbc7a24379f",
-        "result": {
-          "address": "0x08080DB4",
-          "claim_id": 6712343970,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712343970,
-          "status": "accepted",
-          "who": "FFTA-Team2-native110"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "0c549bca3b259b5f943d337906b8f33b0c4238726e5a9166606d865c17c41367",
-        "acknowledged_cursor": 6712412622,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0c549bca3b259b5f943d337906b8f33b0c4238726e5a9166606d865c17c41367",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08080DB4\",\"who\":\"FFTA-Team2-native110\",\"claim_id\":6712343970,\"reason\":\"First natural C native MATCH76B all25 instructions; original ET_REL fullFUNC runtime ROM all167 frozen native-game-110. Publication queued; source work stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T20:08:59Z",
-          "id": 6712412622,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:08:59Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "338e6e9e5454b693daca5c8f7973b4eff803a81f172755cda6091dd4ed4d2880",
-        "result": {
-          "address": "0x08080DB4",
-          "claim_id": 6712343970,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712412622,
-          "status": "accepted",
-          "who": "FFTA-Team2-native110"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "3ee3a984c74b6ef6bac4e23fe230ae98e8e9cc537440b1f7cdeb7990ea158cc9",
         "acknowledged_cursor": 6712412622,
         "body_provenance": "acceptance-time",
