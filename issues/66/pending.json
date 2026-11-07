@@ -30,6 +30,66 @@
           "who": "FFTA-Team2-native131"
         }
       },
+      "release": {
+        "acceptance_body_sha256": "9cdbcb38ff180781c36b754c224da7a276b701d4d2a26c4d009c31f473c7e679",
+        "acknowledged_cursor": 6713349260,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9cdbcb38ff180781c36b754c224da7a276b701d4d2a26c4d009c31f473c7e679",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002E4C\",\"who\":\"FFTA-Team2-native131\",\"claim_id\":6713330827,\"reason\":\"First natural126B signed halfword formatter native MATCH/compiler1; frozen131, queued publication, all167 unchanged.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T21:38:24Z",
+          "id": 6713346927,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:38:24Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "aef3f7b5435cea24b145e5e58446b41b59258d43db238ec472ac7fda6331a62a",
+        "result": {
+          "address": "0x08002E4C",
+          "claim_id": 6713330827,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6713346927,
+          "status": "accepted",
+          "who": "FFTA-Team2-native131"
+        }
+      }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "4e215c75537b7a6c84a15d606e639959adecc4da6f2b0f93837ad8bec5151961",
+        "acknowledged_cursor": 6713349260,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4e215c75537b7a6c84a15d606e639959adecc4da6f2b0f93837ad8bec5151961",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002FB8\",\"who\":\"FFTA-Team2-native132\",\"note\":\"First natural complete92B unsigned16 decimal formatter; actual indexed bytes and adjacent published formatting interface; solo native matching.\"}",
+          "created_at": "2026-11-07T21:38:37Z",
+          "id": 6713349260,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:38:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "aef3f7b5435cea24b145e5e58446b41b59258d43db238ec472ac7fda6331a62a",
+        "result": {
+          "address": "0x08002FB8",
+          "claim_id": 6713349260,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713349260,
+          "status": "accepted",
+          "who": "FFTA-Team2-native132"
+        }
+      },
       "release": null
     }
   ],
