@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "4794d116c7c20ec6b2d1ba9e3c509b4c2d6b034614d2caeb34f8b5aa2d70bb05",
+    "acknowledged_cursor": 6706541776,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "4794d116c7c20ec6b2d1ba9e3c509b4c2d6b034614d2caeb34f8b5aa2d70bb05",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08022A04\",\"who\":\"codex-08022A04\",\"note\":\"Natural flag-driven graphics/palette loader,152byte complete span; existing canonical thunk profile, isolated source.\"}",
+      "created_at": "2026-11-07T11:48:03Z",
+      "id": 6706541686,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:48:03Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "c49abe88949c294dfcbc8ce8a61ae388bacabce08b280c3a387620cf6f8d692e",
+    "result": {
+      "address": "0x08022A04",
+      "claim_id": 6706541686,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6706541686,
+      "status": "accepted",
+      "who": "codex-08022A04"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "29252572dbf3fd90c9fdced61d19baaf6206988ef6ed93ff17115d1c69fbdade",
+    "acknowledged_cursor": 6706578699,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "29252572dbf3fd90c9fdced61d19baaf6206988ef6ed93ff17115d1c69fbdade",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08022A04\",\"who\":\"codex-08022A04\",\"claim_id\":6706541686,\"reason\":\"Integrated natural flag-driven graphics/palette loader;152/152 bytes and51/51 instructions exact, plausible canonical-thunks-v1 MATCH in primary.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T11:51:43Z",
+      "id": 6706578699,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:51:43Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "c9fbc5655379a3feb9051fa031df73feffc5530ad39b0aa13aec7e7647364bda",
+    "result": {
+      "address": "0x08022A04",
+      "claim_id": 6706541686,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6706578699,
+      "status": "accepted",
+      "who": "codex-08022A04"
+    }
+  }
+}
