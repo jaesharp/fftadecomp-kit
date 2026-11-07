@@ -31,6 +31,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "a3c32f1352ebc4dca8d9bbeb38006b6325118994f9d5cc790751898835371640",
+        "acknowledged_cursor": 6708481757,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a3c32f1352ebc4dca8d9bbeb38006b6325118994f9d5cc790751898835371640",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08097A04\",\"who\":\"codex-08097A04\",\"note\":\"Recover1280-byte actor movement/render update with evidence-backed signed16bit packed terrain positions; default native admission\"}",
+          "created_at": "2026-11-07T14:52:05Z",
+          "id": 6708481757,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T14:52:05Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1fcb35ade06f45250ba9c9277968d873500c31c8d1a0519ca37ff03ef9010008",
+        "result": {
+          "address": "0x08097A04",
+          "claim_id": 6708481757,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708481757,
+          "status": "accepted",
+          "who": "codex-08097A04"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
