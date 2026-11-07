@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "c40044e846781c43221a501143c25ccfb65b1ba132211c84d44f9002077f8fff",
-        "acknowledged_cursor": 6705068898,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c40044e846781c43221a501143c25ccfb65b1ba132211c84d44f9002077f8fff",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CC0DC\",\"who\":\"codex-080CC0DC-1107\",\"note\":\"Recover constrained random-value routine; dedicated native agent; exact literal extent and signed remainder proof required.\"}",
-          "created_at": "2026-11-07T09:29:38Z",
-          "id": 6705068898,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:29:38Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "45f357c84913fe44fe8189b669badcfa04e002b76d1a04a9652f1ed11ac75a15",
-        "result": {
-          "address": "0x080CC0DC",
-          "claim_id": 6705068898,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705068898,
-          "status": "accepted",
-          "who": "codex-080CC0DC-1107"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "0d2793679e5872cd8ccc1bf1ed1bf10292e0fb4dd22437996c5b9775d925954b",
-        "acknowledged_cursor": 6705094714,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0d2793679e5872cd8ccc1bf1ed1bf10292e0fb4dd22437996c5b9775d925954b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CC0DC\",\"who\":\"codex-080CC0DC-1107\",\"claim_id\":6705068898,\"reason\":\"Verified complete188byte match via compiler-signed-runtime-data-v1, exact188byte index and report; natural four loops preserve observed old-byte check.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T09:32:13Z",
-          "id": 6705094714,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:32:13Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f7a60febbbd9e6914a055e6eaa82ce8910c8a40100d57c63674d11ad2533b793",
-        "result": {
-          "address": "0x080CC0DC",
-          "claim_id": 6705068898,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6705094714,
-          "status": "accepted",
-          "who": "codex-080CC0DC-1107"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "cf55e1eceed99a68c05c1951ae39cb89d9226277c281ce1bf3c3c03195a29cb4",
         "acknowledged_cursor": 6705189534,
         "body_provenance": "acceptance-time",
