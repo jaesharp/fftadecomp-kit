@@ -30,7 +30,35 @@
           "who": "sol-08132D84-3587"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "854ef1894b539c2db112f1278a41f04cde66e031a8d3c9a553317d6cf6b24b58",
+        "acknowledged_cursor": 6705702948,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "854ef1894b539c2db112f1278a41f04cde66e031a8d3c9a553317d6cf6b24b58",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08132D84\",\"who\":\"sol-08132D84-3587\",\"claim_id\":6705477923,\"reason\":\"Complete whole-function native MATCH and plausible source frozen; matching stopped. Primary integrating source and native report for mandatory full game status, native publication and exact CI. All original diagnostics and actual native evidence preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T10:36:50Z",
+          "id": 6705702948,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:36:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "52c6fd52ea886000bbd8372be0318156dae780893f0735fa045999c2ab87c561",
+        "result": {
+          "address": "0x08132D84",
+          "claim_id": 6705477923,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6705702948,
+          "status": "accepted",
+          "who": "sol-08132D84-3587"
+        }
+      }
     },
     {
       "claim": {
@@ -122,7 +150,35 @@
           "who": "sol-080DA968-3596"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8043c43fcd597538770c22dbd61c038c1f7c136dfbafde9518f96e182ee0ec2d",
+        "acknowledged_cursor": 6705702948,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8043c43fcd597538770c22dbd61c038c1f7c136dfbafde9518f96e182ee0ec2d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DA968\",\"who\":\"sol-080DA968-3596\",\"claim_id\":6705622461,\"reason\":\"Matching stopped; natural complete-FUNC nonmatch or zero-C storage boundary frozen. No independently grounded correction remains. Actual discarded destination loads, genuine stride correction and real errors preserved. No invented reads/bitfields/volatile, source steering, replay, native/proof or MATCH credit.\",\"unmatchable\":true,\"tried\":\"Fixed agbcc -mthumb-interwork -O2; original first form and genuine typed linking. Exact command/adapter/runtime/compiler counts and original limitations retained in frozen result.\"}",
+          "created_at": "2026-11-07T10:36:39Z",
+          "id": 6705701325,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:36:39Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "52c6fd52ea886000bbd8372be0318156dae780893f0735fa045999c2ab87c561",
+        "result": {
+          "address": "0x080DA968",
+          "claim_id": 6705622461,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6705701325,
+          "status": "accepted",
+          "who": "sol-080DA968-3596"
+        }
+      }
     },
     {
       "claim": {
