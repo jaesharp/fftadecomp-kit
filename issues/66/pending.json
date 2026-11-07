@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "f9a081650fed661d5a58e6065e48c0e49e157c6f2840aee418072f5de6e68408",
-        "acknowledged_cursor": 6706832178,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f9a081650fed661d5a58e6065e48c0e49e157c6f2840aee418072f5de6e68408",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808C53C\",\"who\":\"codex-0808C53C\",\"note\":\"Natural244byte tile/palette state machine; isolated source plus scratch-only0600EFA0 mapping evidenced byROMliteral0808C62C. Existing BIOS ordinary data profile.\"}",
-          "created_at": "2026-11-07T12:17:33Z",
-          "id": 6706832178,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:17:33Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8a2e8e01ed15ffd2ea5a60d7f3eee4b4122004b7c1344d989f1c6afe79b48ec1",
-        "result": {
-          "address": "0x0808C53C",
-          "claim_id": 6706832178,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706832178,
-          "status": "accepted",
-          "who": "codex-0808C53C"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "7a21322d99f899905f77dba742742fb3bf15866619dc67f79071a81e43671012",
-        "acknowledged_cursor": 6706902152,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7a21322d99f899905f77dba742742fb3bf15866619dc67f79071a81e43671012",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808C53C\",\"who\":\"codex-0808C53C\",\"claim_id\":6706832178,\"reason\":\"Parked natural244byte source: two byte positions differ from reversed source-move/destination-load at0808C610. Native profile rejects.\",\"unmatchable\":true,\"tried\":\"-O2,-O3,-Os; named/numeric destination, destination local, explicit source, branch-local calls; -O1 section rejection\"}",
-          "created_at": "2026-11-07T12:24:30Z",
-          "id": 6706902152,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:24:30Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8a803a67b48401d14e352239e6e08ad5b29bc7b2b821699f5db783f693209fd8",
-        "result": {
-          "address": "0x0808C53C",
-          "claim_id": 6706832178,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706902152,
-          "status": "accepted",
-          "who": "codex-0808C53C"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "d17874e211b16b41a783451057e708ca27f708c6380664e2358366853cf088b7",
         "acknowledged_cursor": 6706884679,
         "body_provenance": "acceptance-time",
