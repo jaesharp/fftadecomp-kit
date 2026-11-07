@@ -63,6 +63,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "1df94bab48d250f2e8de3efb4b9b3685ef35db3714695848288ed830da68d66d",
+        "acknowledged_cursor": 6713997099,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1df94bab48d250f2e8de3efb4b9b3685ef35db3714695848288ed830da68d66d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08035CAC\",\"who\":\"FFTA-Team2-native142\",\"note\":\"Independent published08018ABC glyph-base u16 operation now read: reuse semantic digit_base=0x8118 in existing exact-body formatter; preserve original92B form141. One grounded correction only, no sweeps.\"}",
+          "created_at": "2026-11-07T22:41:33Z",
+          "id": 6713997099,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:41:33Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "64708813899f55334b31ade73aeb607fe16e96fb5fac2842b58b7b9e93148eeb",
+        "result": {
+          "address": "0x08035CAC",
+          "claim_id": 6713997099,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713997099,
+          "status": "accepted",
+          "who": "FFTA-Team2-native142"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
