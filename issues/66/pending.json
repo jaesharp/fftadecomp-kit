@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "d2386ae63c75f8f43d79395a6afe5b739b5e98ad1f3e092c41cc9cdab89b28cb",
-        "acknowledged_cursor": 6714478039,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d2386ae63c75f8f43d79395a6afe5b739b5e98ad1f3e092c41cc9cdab89b28cb",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D8708\",\"who\":\"sol-080D8708-3773\",\"note\":\"C matching continuation for complete plausible near-match with commuted address additions. Natural C expressions/scopes/types allowed, no artificial operations or tooling development.\"}",
-          "created_at": "2026-11-07T23:30:02Z",
-          "id": 6714478039,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:30:02Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ba90bd71befd94761a3f832c3f606cc1c76406f36c05518b32b91ba716bf93c4",
-        "result": {
-          "address": "0x080D8708",
-          "claim_id": 6714478039,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714478039,
-          "status": "accepted",
-          "who": "sol-080D8708-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "66ad7cf212cd05ac9730eca66641a9973a0918742b9e7c1cb2753723ba9dd968",
-        "acknowledged_cursor": 6714521275,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "66ad7cf212cd05ac9730eca66641a9973a0918742b9e7c1cb2753723ba9dd968",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D8708\",\"who\":\"sol-080D8708-3773\",\"claim_id\":6714478039,\"reason\":\"Plausible native MATCH exit0 complete336bytes on first invocation. Compiler work explicitly stopped; exact source/report/proof frozen for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T23:34:30Z",
-          "id": 6714521275,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:34:30Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5b13d7a264e29e166f4372259b55eec9bafe907db1ead2dc38cf04fddaab1a7a",
-        "result": {
-          "address": "0x080D8708",
-          "claim_id": 6714478039,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714521275,
-          "status": "accepted",
-          "who": "sol-080D8708-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "247f7771856405590de084ff9f65b4de28b73fdf90f325ca70a74b68ce884501",
         "acknowledged_cursor": 6714488611,
         "body_provenance": "acceptance-time",
