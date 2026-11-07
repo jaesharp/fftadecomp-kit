@@ -59,6 +59,70 @@
           "who": "codex-0805064C"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "d8b06a8b1ffcab3097b752becc8d41dce6d84f75da240a220ddd6842d4fa3e8e",
+        "acknowledged_cursor": 6709065094,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d8b06a8b1ffcab3097b752becc8d41dce6d84f75da240a220ddd6842d4fa3e8e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800FAA8\",\"who\":\"codex-0800FAA8\",\"note\":\"Recover192byte scanline object constructor; full default function-address ROM admission passes, existing maps; isolated scratch attempt.\"}",
+          "created_at": "2026-11-07T15:32:55Z",
+          "id": 6709063454,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:32:55Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "487f08a7308a7e6b5677ad83e88f16b45615c661b0a1b4d072ce67faa0f205b2",
+        "result": {
+          "address": "0x0800FAA8",
+          "claim_id": 6709063454,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6709063454,
+          "status": "accepted",
+          "who": "codex-0800FAA8"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "7042a6719bdcc399534a4ed9d8775ab3e0bc976a0a810975bba56dab262c3808",
+        "acknowledged_cursor": 6709065094,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7042a6719bdcc399534a4ed9d8775ab3e0bc976a0a810975bba56dab262c3808",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800FC8C\",\"who\":\"codex-0800FC8C\",\"note\":\"Recover192byte companion scanline constructor; full default function-address ROM admission passes, existing maps; isolated scratch attempt.\"}",
+          "created_at": "2026-11-07T15:33:02Z",
+          "id": 6709065094,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:33:02Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "487f08a7308a7e6b5677ad83e88f16b45615c661b0a1b4d072ce67faa0f205b2",
+        "result": {
+          "address": "0x0800FC8C",
+          "claim_id": 6709065094,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6709065094,
+          "status": "accepted",
+          "who": "codex-0800FC8C"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
