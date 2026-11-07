@@ -59,6 +59,38 @@
           "who": "codex-0806F8DC-1107"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "d4107067b4e2752f0ac8028554244c3578ff227ffaba88fc6887db3be4d95831",
+        "acknowledged_cursor": 6704950220,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d4107067b4e2752f0ac8028554244c3578ff227ffaba88fc6887db3be4d95831",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080812E8\",\"who\":\"codex-080812E8-1107\",\"note\":\"Natural animation-table recovery with unsigned remainder and callback thunk; dedicated native agent, parent verifies/releases.\"}",
+          "created_at": "2026-11-07T09:16:24Z",
+          "id": 6704950220,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T09:16:24Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d539f1f5df28420f078ade0b8169fc47562203df6d22ab1b74573bcca795e35b",
+        "result": {
+          "address": "0x080812E8",
+          "claim_id": 6704950220,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704950220,
+          "status": "accepted",
+          "who": "codex-080812E8-1107"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
