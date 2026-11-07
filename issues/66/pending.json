@@ -59,6 +59,38 @@
           "who": "codex-0800FC8C"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "75aa67f8689a3c67366cb232bcdbe31a9765f5009c47c0b912a4218d1b43c69b",
+        "acknowledged_cursor": 6709861933,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "75aa67f8689a3c67366cb232bcdbe31a9765f5009c47c0b912a4218d1b43c69b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D2E60\",\"who\":\"sol-080D2E60-3721\",\"note\":\"First natural C for complete12B scheduler-mode wrapper; matching only, no compiler steering.\"}",
+          "created_at": "2026-11-07T16:29:48Z",
+          "id": 6709861933,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T16:29:48Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "02232da0540284b05efc285371d62d78854463a41b2160287d3b48b1c741aa7e",
+        "result": {
+          "address": "0x080D2E60",
+          "claim_id": 6709861933,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6709861933,
+          "status": "accepted",
+          "who": "sol-080D2E60-3721"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
