@@ -59,6 +59,38 @@
           "who": "codex-080200C8"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "dd4ed3da67cf156ef89142663848b34e2892867df1eeaadcc2d2517245bc2562",
+        "acknowledged_cursor": 6708439020,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "dd4ed3da67cf156ef89142663848b34e2892867df1eeaadcc2d2517245bc2562",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08071888\",\"who\":\"codex-08071888\",\"note\":\"Recover complete1344-byte unit-list animation updater; existing ordinary native frame-data eligibility and mapped callees\"}",
+          "created_at": "2026-11-07T14:49:05Z",
+          "id": 6708439020,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T14:49:05Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a037ceb4c1f7f8d23f7e2f5622700a3ddb92b319ef8b4afd40370d7d314f9c38",
+        "result": {
+          "address": "0x08071888",
+          "claim_id": 6708439020,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708439020,
+          "status": "accepted",
+          "who": "codex-08071888"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
