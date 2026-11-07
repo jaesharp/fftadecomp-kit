@@ -159,6 +159,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "5a1a34b695c627a9a1b197f67707915e1de80b0bda506075f5e123b166ca079a",
+        "acknowledged_cursor": 6710441783,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5a1a34b695c627a9a1b197f67707915e1de80b0bda506075f5e123b166ca079a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08058348\",\"who\":\"sol-08058348-3725\",\"note\":\"Natural C tilemap palette-row update. Existing tooling only; literal extent restored from original load and next owner.\"}",
+          "created_at": "2026-11-07T17:08:55Z",
+          "id": 6710441783,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T17:08:55Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "0e4bd2a2e006a3ea1549feaee37bc94b33ec112627f71bbc4a1d55df0eb8e032",
+        "result": {
+          "address": "0x08058348",
+          "claim_id": 6710441783,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6710441783,
+          "status": "accepted",
+          "who": "sol-08058348-3725"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
