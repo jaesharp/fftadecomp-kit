@@ -90,7 +90,35 @@
           "who": "sol-08003454-3773"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e8f03694d687087e9ce5274ae1f9abd2b2ec54a783a51e95450be270add45af4",
+        "acknowledged_cursor": 6714327842,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e8f03694d687087e9ce5274ae1f9abd2b2ec54a783a51e95450be270add45af4",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08003454\",\"who\":\"sol-08003454-3773\",\"claim_id\":6714280505,\"reason\":\"Two plausible C recoveries tested; closest complete98B remains instruction/register-order NONMATCH, second70B refused extent. Both sources/errors retained. Owner fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T23:14:37Z",
+          "id": 6714327842,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:14:37Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d01e607757ba86ec20ad415655b6a8450152eabf340c0c9b09bab8a4958b8bbf",
+        "result": {
+          "address": "0x08003454",
+          "claim_id": 6714280505,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714327842,
+          "status": "accepted",
+          "who": "sol-08003454-3773"
+        }
+      }
     },
     {
       "claim": {
