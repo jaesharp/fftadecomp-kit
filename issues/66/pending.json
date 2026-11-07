@@ -90,7 +90,35 @@
           "who": "sol-0804ED6C-3740"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "902143e8bc24daed9863be50c0a638013fe713999bdb99337198273ef68b4826",
+        "acknowledged_cursor": 6711748264,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "902143e8bc24daed9863be50c0a638013fe713999bdb99337198273ef68b4826",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0804ED6C\",\"who\":\"sol-0804ED6C-3740\",\"claim_id\":6711600436,\"reason\":\"First natural linked FUNC512B vs target508B; u16 return narrowing difference, actual helper supports u16; no grounded correction, no MATCH.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; original natural C; no steering or toolkit changes\"}",
+          "created_at": "2026-11-07T19:06:21Z",
+          "id": 6711748210,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T19:06:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9cb5fbbfe7eb46226ff538cd9eb4d4d0ccf293d6078f1b1dd85855c4cfe14a3d",
+        "result": {
+          "address": "0x0804ED6C",
+          "claim_id": 6711600436,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711748210,
+          "status": "accepted",
+          "who": "sol-0804ED6C-3740"
+        }
+      }
     },
     {
       "claim": {
@@ -122,7 +150,35 @@
           "who": "sol-08091930-3740"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "dbf536d60be53d4685e5b3218c64c9ac8fbe56f22df99caf9873637f6198c58b",
+        "acknowledged_cursor": 6711748264,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "dbf536d60be53d4685e5b3218c64c9ac8fbe56f22df99caf9873637f6198c58b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08091930\",\"who\":\"sol-08091930-3740\",\"claim_id\":6711600564,\"reason\":\"Native refused complete 406B Thumb function with external two-byte alignment under existing R3 switch selector before linking; one natural C/compiler/native, no MATCH.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; original natural C; no steering or toolkit changes\"}",
+          "created_at": "2026-11-07T19:06:21Z",
+          "id": 6711748264,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T19:06:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9cb5fbbfe7eb46226ff538cd9eb4d4d0ccf293d6078f1b1dd85855c4cfe14a3d",
+        "result": {
+          "address": "0x08091930",
+          "claim_id": 6711600564,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711748264,
+          "status": "accepted",
+          "who": "sol-08091930-3740"
+        }
+      }
     },
     {
       "claim": {
@@ -154,7 +210,35 @@
           "who": "sol-08029544-3740"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "356802597a30070f0d7e8321ef1991b6bbf3cce9e1d2c8012402a57fdbf61d7c",
+        "acknowledged_cursor": 6711748264,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "356802597a30070f0d7e8321ef1991b6bbf3cce9e1d2c8012402a57fdbf61d7c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08029544\",\"who\":\"sol-08029544-3740\",\"claim_id\":6711600575,\"reason\":\"Native refused switch object/callback/runtime-thunk bindings; one natural C/compiler/native; 296B relocatable function, register-allocation mismatch. Stopped without match.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; original natural C; no steering or toolkit changes\"}",
+          "created_at": "2026-11-07T19:06:21Z",
+          "id": 6711748208,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T19:06:21Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9cb5fbbfe7eb46226ff538cd9eb4d4d0ccf293d6078f1b1dd85855c4cfe14a3d",
+        "result": {
+          "address": "0x08029544",
+          "claim_id": 6711600575,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711748208,
+          "status": "accepted",
+          "who": "sol-08029544-3740"
+        }
+      }
     }
   ],
   "issue": 66,
