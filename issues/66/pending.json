@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "dfecc4526af1e6e25a7b2f06afa1e05b4183864bf98e81ad0cd0df2789e892f5",
-        "acknowledged_cursor": 6707727962,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "dfecc4526af1e6e25a7b2f06afa1e05b4183864bf98e81ad0cd0df2789e892f5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D660\",\"who\":\"codex-0812D660\",\"note\":\"Natural four-action evaluation/weighted-choice reconstruction; new ROM-evidenced table only in scratch.\"}",
-          "created_at": "2026-11-07T13:45:42Z",
-          "id": 6707727962,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T13:45:42Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "0708e566c971d49ad168a67e63c572ef21577a168ba993163176e18af872745c",
-        "result": {
-          "address": "0x0812D660",
-          "claim_id": 6707727962,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6707727962,
-          "status": "accepted",
-          "who": "codex-0812D660"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "eeb135d4337f92ef2f88c55cdf23d8b14eed0786e33d613c8bc204d741bded82",
-        "acknowledged_cursor": 6707782645,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "eeb135d4337f92ef2f88c55cdf23d8b14eed0786e33d613c8bc204d741bded82",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D660\",\"who\":\"codex-0812D660\",\"claim_id\":6707727962,\"reason\":\"Parked natural action evaluator:396 vs412 bytes; selector scheduling/output-pointer spill/table induction differ. Scratch-only table mapping documented.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; sequential/combined sums, subtract/test loops, record/array tables, argument types; compiler-signed-runtime-data-v1\"}",
-          "created_at": "2026-11-07T13:51:11Z",
-          "id": 6707782645,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T13:51:11Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1f13ea8836f5db89679c61d075a03859b7e645baae1fb099e6122294d47509fb",
-        "result": {
-          "address": "0x0812D660",
-          "claim_id": 6707727962,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6707782645,
-          "status": "accepted",
-          "who": "codex-0812D660"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c00ebfcdae430d8ec9b957ff8ede1c636244e3afc7eae00fb92c2ed90e850a5d",
         "acknowledged_cursor": 6707815075,
         "body_provenance": "acceptance-time",
