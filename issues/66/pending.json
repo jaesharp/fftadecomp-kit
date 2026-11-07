@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "16eea57869ee8d357ea898da552320feb18f8e84c7998f281c17f85994e13076",
-        "acknowledged_cursor": 6714647360,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "16eea57869ee8d357ea898da552320feb18f8e84c7998f281c17f85994e13076",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800E878\",\"who\":\"sol-0800E878-3773\",\"note\":\"Plausible C matching continuation with existing native compiler only; address-specific executor. No tooling changes.\"}",
-          "created_at": "2026-11-07T23:47:21Z",
-          "id": 6714644227,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:47:21Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "71534b0bf7074c5267935f0e4ac64e7bcb9c5b39867e56a249122b5a5465ea16",
-        "result": {
-          "address": "0x0800E878",
-          "claim_id": 6714644227,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714644227,
-          "status": "accepted",
-          "who": "sol-0800E878-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a1f3688841dd7b27cc2eeffd005976664c6d2b15821d40afca5bbf967a520f8a",
-        "acknowledged_cursor": 6714719468,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a1f3688841dd7b27cc2eeffd005976664c6d2b15821d40afca5bbf967a520f8a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800E878\",\"who\":\"sol-0800E878-3773\",\"claim_id\":6714644227,\"reason\":\"Bounded native NONMATCH404B,400/404 exact positions; two commuted ADDs remain. Source/report/full FUNC preserved and owner fully stopped. No match credit.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; three ordinary C forms\"}",
-          "created_at": "2026-11-07T23:55:24Z",
-          "id": 6714719468,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:55:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "83e5ae1460d9331647f0b3ebd85b501a4e4fd63f495a0f101c3a533cfb41ecde",
-        "result": {
-          "address": "0x0800E878",
-          "claim_id": 6714644227,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714719468,
-          "status": "accepted",
-          "who": "sol-0800E878-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "85d001a33bf3ed2daf637559f8bbd511ff14976e682bda8a7b212cc1a0464f06",
         "acknowledged_cursor": 6714650117,
         "body_provenance": "acceptance-time",
