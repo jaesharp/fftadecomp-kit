@@ -186,7 +186,35 @@
           "who": "sol-0802F4F4-3311"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "54497ecffada7091ff0b773fbe13cf295c44c7111ef51e802bcafeb09feb2e66",
+        "acknowledged_cursor": 6701409751,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "54497ecffada7091ff0b773fbe13cf295c44c7111ef51e802bcafeb09feb2e66",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802F4F4\",\"who\":\"sol-0802F4F4-3311\",\"claim_id\":6701295134,\"reason\":\"Historical80B versus108B originals retained; six discarded ordinary RAM preloads remain without storage authority. Zero new execution.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T03:04:56Z",
+          "id": 6701409751,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T03:04:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "0a64927f6c95005c6e40380d59daaa3df75b217072575523bd45553363565f7b",
+        "result": {
+          "address": "0x0802F4F4",
+          "claim_id": 6701295134,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701409751,
+          "status": "accepted",
+          "who": "sol-0802F4F4-3311"
+        }
+      }
     },
     {
       "claim": {
