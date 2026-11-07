@@ -11,6 +11,7 @@ import scheduler_small_entry_state as small
 
 state, words = small.state, small.words
 SELECTOR = 'conditional-scheduler-zero40-common-byte-state-v1'
+PHASE0_TRANSPORT = 'scheduler-phase0-opaque-payload-transport-v1'
 IMAGE_SHA256 = 'ce26dd719323641c1c4cbfa501368306ce6e31e193dabce7e84c7067f7590130'
 IMAGE_BASE = 0x03005e78
 
@@ -43,7 +44,40 @@ def bind(prior_layout, image, image_base, *, selector):
     return result
 
 
-def continue_from_078(layout, arena_base, report, *, selector, protected_spans=(), max_steps=1024):
+def _transport_selector(selector):
+    if type(selector) is not str or selector != PHASE0_TRANSPORT:
+        raise ValueError('opaque phase0 payloads require their explicit transport selector')
+
+
+def _transport_record(layout, owners):
+    cb = layout.prior.callback
+    return dict(schema=PHASE0_TRANSPORT,
+        complete_owner_pins=[dict(address=p,bytes=len(b),sha256=hashlib.sha256(b).hexdigest())
+                             for p,b in sorted(owners.items())],
+        callback_phase_condition=0, actual_phase_reaching_proved=False,
+        conditional_callback_path=[cb+off for off in (
+            *range(0,22,2), *range(40,56,2), *range(128,136,2))],
+        ordered_payload_transfers=[dict(read_site=cb+42,write_site=cb+44,offset=2,width=1),
+                                   dict(read_site=cb+46,write_site=cb+48,offset=4,width=4),
+                                   dict(read_site=cb+50,write_site=cb+52,offset=0,width=2)],
+        payload_values='unchanged byte origins; no scalar interpretation or initialization',
+        branch_address_and_return_checks_unchanged=True,
+        nested_pointer_nonescape_proved=False,
+        actual_physical_access_proved=False, native_admission=False)
+
+
+def phase0_transport_contract(layout, *, selector):
+    """Bind the complete owners and their conditional phase0 transport sites.
+
+    The phase must still be reached by actual execution. Payload bytes never
+    become scalar or address facts, and this record supplies no call authority.
+    """
+    _transport_selector(selector)
+    return _transport_record(layout, _validate(layout))
+
+
+def continue_from_078(layout, arena_base, report, *, selector, protected_spans=(), max_steps=1024,
+                      phase0_transport_policy=None):
     """Consume a supplied078 cutpoint; do not invoke its frozen producer.
 
     Report shape and identity checks are not authentication of actual reaching.
@@ -65,7 +99,8 @@ def continue_from_078(layout, arena_base, report, *, selector, protected_spans=(
         raise ValueError('078 original complete-owner/count40 interface differs')
     result = derive(layout,arena_base,{int(k):v for k,v in report['post_cells'].items()},r,e,
         selector=selector,protected_spans=protected_spans,
-        retired_spans=tuple(tuple(v) for v in report['retired_spans']),max_steps=max_steps)
+        retired_spans=tuple(tuple(v) for v in report['retired_spans']),max_steps=max_steps,
+        phase0_transport_policy=phase0_transport_policy)
     result['inherited_078_obligations'] = report.get('obligations',[])
     result['inherited_zero12_compositions'] = report.get('retained_zero12_compositions',[])
     result['actual_078_reaching_authentication_proved'] = False
@@ -73,11 +108,15 @@ def continue_from_078(layout, arena_base, report, *, selector, protected_spans=(
 
 
 def derive(layout, arena_base, cells, registers, scheduler_entry_sp, *, selector,
-           protected_spans=(), retired_spans=(), max_steps=1024):
+           protected_spans=(), retired_spans=(), max_steps=1024, phase0_transport_policy=None):
     """Execute a new conditional count40 reaching state, stopping at exact gaps."""
     if type(selector) is not str or selector != SELECTOR:
         raise ValueError('explicit zero40 common-byte selector required')
     owners = _validate(layout)
+    transport = None
+    if phase0_transport_policy is not None:
+        _transport_selector(phase0_transport_policy)
+        transport = _transport_record(layout, owners)
     if type(arena_base) is not int or arena_base % 4 or not 0 <= arena_base < 2**32 or \
             type(scheduler_entry_sp) is not int or not -(2**31) <= scheduler_entry_sp < 2**31 or \
             type(registers) is not dict or set(registers) != set(range(15)) or any(
@@ -97,6 +136,7 @@ def derive(layout, arena_base, cells, registers, scheduler_entry_sp, *, selector
     e,pc,flags = scheduler_entry_sp,thunk,None
     boundary = cut = None
     trace,events,returns = [],[],[]
+    payload_events = []
     zero_returned = callback_entered = callback_returned = scheduler_returned = False
     callback_phase = None
     cb_entry_sp = None
@@ -150,14 +190,18 @@ def derive(layout, arena_base, cells, registers, scheduler_entry_sp, *, selector
         value = tuple(memory.get(at+i) for i in range(width))
         if any(v is None for v in value):stop('read lacks reaching byte origins',at)
         if width < 4 and any(type(v) is not int for v in value):
-            stop('scalar field observes opaque or pointer bytes',at)
+            if transport is None or (pc,width) not in ((cb+42,1),(cb+50,2)):
+                stop('scalar field observes opaque or pointer bytes',at)
+            payload_events.append(dict(site=pc,operation='read',coordinate=at,width=width,bytes=value))
         events.append(dict(site=pc,operation='read'+str(width*8),coordinate=at,bytes=value))
         return value+(0,)*(4-width)
 
     def store(at,value):
         physical(at,len(value),True)
         if len(value)<4 and any(type(v) is not int for v in value):
-            stop('narrow write contains unknown scalar bits',at)
+            if transport is None or (pc,len(value)) not in ((cb+44,1),(cb+52,2)):
+                stop('narrow write contains unknown scalar bits',at)
+            payload_events.append(dict(site=pc,operation='write',coordinate=at,width=len(value),bytes=value))
         if len(set(memory)|set(range(at,at+len(value)))) > 4096:
             stop('byte state exceeds4096 cells',at)
         memory.update({at+i:v for i,v in enumerate(value)})
@@ -309,7 +353,7 @@ def derive(layout, arena_base, cells, registers, scheduler_entry_sp, *, selector
         value=words.observe(value)
         if value['kind']=='base-plus' and any(lo<=value['coordinate']<hi for lo,hi in retired):
             stale[str(reg)]=value['coordinate']
-    return dict(schema=SELECTOR,starts_at=thunk,scheduler_entry_SP=e,final_PC=pc,boundary=boundary,nested_call_cutpoint=cut,
+    result = dict(schema=SELECTOR,starts_at=thunk,scheduler_entry_SP=e,final_PC=pc,boundary=boundary,nested_call_cutpoint=cut,
         conditional_returns=dict(zero40=zero_returned,callback=callback_returned,scheduler=scheduler_returned),
         callback_entered=callback_entered,callback_observed_phase=callback_phase,callback_entry_SP=cb_entry_sp,
         registers=r,post_cells={str(k):v for k,v in sorted(memory.items())},
@@ -331,3 +375,7 @@ def derive(layout, arena_base, cells, registers, scheduler_entry_sp, *, selector
             ('lifetime','Stack activation/retirement represents the conditional actual PUSH/POP/local-release order; physical lifetime and absence of untracked external stale aliases remain premises.'),
             ('continuation','Only recorded bounded paths/returns are closed. Unknown callbacks, nested D8B4C/D7ABC effects, Sqrt, subsequent E03F8/root execution, fullCFG and actual termination remain outside079.'),
         )])
+    if transport is not None:
+        result['phase0_payload_transport'] = transport
+        result['opaque_payload_events'] = payload_events
+    return result
