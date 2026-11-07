@@ -158,6 +158,66 @@
           "who": "codex-recovery-08022A04"
         }
       },
+      "release": {
+        "acceptance_body_sha256": "dd95d934fd7202e85517fac96bffc5dcf6356e6895b0568bdf6f0d71f3ab01b3",
+        "acknowledged_cursor": 6714679049,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "dd95d934fd7202e85517fac96bffc5dcf6356e6895b0568bdf6f0d71f3ab01b3",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08022A04\",\"who\":\"codex-recovery-08022A04\",\"claim_id\":6714668453,\"reason\":\"Recovery paused at user request to rebuild and validate local toolchain; candidate not modified or validated under this lease.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T23:51:06Z",
+          "id": 6714679049,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:51:06Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "820b7c8cf1ab034f303fbe4a591837188b402e1a894485296904b2e58d9e1513",
+        "result": {
+          "address": "0x08022A04",
+          "claim_id": 6714668453,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6714679049,
+          "status": "accepted",
+          "who": "codex-recovery-08022A04"
+        }
+      }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "6252e518fce12a2590dea8eb744adc41995bd05d7af13bc41217254e7d032bd3",
+        "acknowledged_cursor": 6714679049,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6252e518fce12a2590dea8eb744adc41995bd05d7af13bc41217254e7d032bd3",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080A8430\",\"who\":\"sol-080A8430-3773\",\"note\":\"Plausible C matching continuation with existing native compiler only; address-specific executor. No tooling changes.\"}",
+          "created_at": "2026-11-07T23:50:39Z",
+          "id": 6714674793,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:50:39Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "820b7c8cf1ab034f303fbe4a591837188b402e1a894485296904b2e58d9e1513",
+        "result": {
+          "address": "0x080A8430",
+          "claim_id": 6714674793,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714674793,
+          "status": "accepted",
+          "who": "sol-080A8430-3773"
+        }
+      },
       "release": null
     }
   ],
