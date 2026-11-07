@@ -30,7 +30,35 @@
           "who": "codex-0805E354"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "cb7eab8c22bfc32d0ca2dc529c30e224171d53b89b4cdccccebce6414a486499",
+        "acknowledged_cursor": 6709014094,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "cb7eab8c22bfc32d0ca2dc529c30e224171d53b89b4cdccccebce6414a486499",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805E354\",\"who\":\"codex-0805E354\",\"claim_id\":6708951910,\"reason\":\"Natural menu command handler produces632bytes versus620byte complete target; register allocation, literal reuse and tail merging differ. Preserving recovery in Parked/0805E354; existing u16-scalars profile rejects exact span.\",\"unmatchable\":true,\"tried\":\"fixed agbcc -mthumb-interwork -O2; typed state layout, selection signedness, natural branch structure and tail sharing; u16-scalars-v1\"}",
+          "created_at": "2026-11-07T15:29:18Z",
+          "id": 6709014094,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:29:18Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "2437709a7ddfdbd88a1a40400ff92fe75df9b926302c53a51c22db3ae4f8a1d8",
+        "result": {
+          "address": "0x0805E354",
+          "claim_id": 6708951910,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6709014094,
+          "status": "accepted",
+          "who": "codex-0805E354"
+        }
+      }
     },
     {
       "claim": {
