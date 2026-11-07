@@ -30,7 +30,35 @@
           "who": "sol-08061028-3736"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "fa086029f24b51d241fbf09d9647499751771cdb5a8c8dd8b6d73057a67ffa61",
+        "acknowledged_cursor": 6711516726,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "fa086029f24b51d241fbf09d9647499751771cdb5a8c8dd8b6d73057a67ffa61",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08061028\",\"who\":\"sol-08061028-3736\",\"claim_id\":6711393076,\"reason\":\"Natural206B C is native MATCH with existing typed-outgoing-six-words-v1; exact source and all original evidence frozen.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T18:44:50Z",
+          "id": 6711516726,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T18:44:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "d63530c7e48859e05cdf7b779bb5c0156c58f47e64c71c9f5a66384318ee548e",
+        "result": {
+          "address": "0x08061028",
+          "claim_id": 6711393076,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6711516726,
+          "status": "accepted",
+          "who": "sol-08061028-3736"
+        }
+      }
     },
     {
       "claim": {
