@@ -95,6 +95,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "38833b9d2e64bd0b3f05a36e1bacd0a9c221243c8d6142e2beb3a5d738d2d164",
+        "acknowledged_cursor": 6714061220,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "38833b9d2e64bd0b3f05a36e1bacd0a9c221243c8d6142e2beb3a5d738d2d164",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CD1FC\",\"who\":\"sol-080CD1FC-3771\",\"note\":\"Match effect subsystem with defining object/pair layout. ROM20B record has actual2B marker/value rows; old unpacked structs rounded4B. No tooling.\"}",
+          "created_at": "2026-11-07T22:47:56Z",
+          "id": 6714061220,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:47:56Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7ab5ecb1842291375a4b80cbedaec92d88a7452607e53e5c34e0fe57de582cfb",
+        "result": {
+          "address": "0x080CD1FC",
+          "claim_id": 6714061220,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714061220,
+          "status": "accepted",
+          "who": "sol-080CD1FC-3771"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
