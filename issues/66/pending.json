@@ -127,6 +127,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "b0bbdcf9fb7242ec213b2ffc5dd0e581278b4caeab7b8631c098adbe146e66f7",
+        "acknowledged_cursor": 6714361505,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b0bbdcf9fb7242ec213b2ffc5dd0e581278b4caeab7b8631c098adbe146e66f7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08020274\",\"who\":\"sol-08020274-3773\",\"note\":\"C matching continuation from complete plausible near-match. Normal natural C expression/control/interface recovery allowed. Existing native tools only, no artificial code or tooling development.\"}",
+          "created_at": "2026-11-07T23:18:04Z",
+          "id": 6714361505,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:18:04Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "85562b15d3dfe997a8068aa92a60899e090a260f0d3781dd4d07c3ff73da6b94",
+        "result": {
+          "address": "0x08020274",
+          "claim_id": 6714361505,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714361505,
+          "status": "accepted",
+          "who": "sol-08020274-3773"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
