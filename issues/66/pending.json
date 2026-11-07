@@ -59,6 +59,38 @@
           "who": "FFTA-Team2-native-103"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "59ca51ec4774bdb5c55392fb45a30ec00b0426a779c4a5df2b8155c56c1bfdf8",
+        "acknowledged_cursor": 6710106054,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "59ca51ec4774bdb5c55392fb45a30ec00b0426a779c4a5df2b8155c56c1bfdf8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080A7EC4\",\"who\":\"FFTA-Team2-native-103\",\"note\":\"First native qualification of unchanged frozen 256-byte exact original using published explicit multiple-switch admission; no C edits\"}",
+          "created_at": "2026-11-07T16:46:36Z",
+          "id": 6710106054,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T16:46:36Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "fae7568f339427da50963b8c2fc0a72b7ba9cefbe5a0f8bbc2cd536477d34aa0",
+        "result": {
+          "address": "0x080A7EC4",
+          "claim_id": 6710106054,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6710106054,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-103"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
