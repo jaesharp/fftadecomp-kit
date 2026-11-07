@@ -1589,6 +1589,21 @@ allowlist, source rewrite or progress exception is introduced.
 
 ### Explicit acyclic owner frames
 
+`--owner-runtime-profile local-rom-halfword-table-v1` admits the closed
+40-byte owner that copies eight ROM bytes into a local four-halfword array
+and returns one indexed halfword. It binds the complete original ELF,
+genuine zero-addend call/data relocations, exact current indices and the
+complete 98-byte copy helper. The root, helper and data addresses are derived
+from those bindings, not an accepted-root address list.
+
+The relation is conditional on `(entry_R0 & 255) < 4`, valid aligned live
+stack access over entry-SP offsets `[-28,0)`, readable immutable source bytes,
+source/code/frame separation, noninterference and compatible C/ABI use.
+An unsigned-byte parameter does not establish the index bound. A canonical
+data point does not grant extent or readability. Reports retain these
+conditions; the checker proves the ordered copy, protected saves and local
+read under them. Existing selectors retain their guards.
+
 `--owner-runtime-profile restoring-owner-acyclic-v1` selects
 `elf-symbol-thumb-acyclic-stack-alias-v1`. It preserves distinct stack, alias,
 constant and return-provenance states at joins, with a fixed limit of 4096
