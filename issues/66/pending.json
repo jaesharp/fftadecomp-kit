@@ -154,7 +154,35 @@
           "who": "sol-08099878-3407"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "96c39b474ecbde032e87c66ac101f695fe80b3071a6545c86dafec41cc59446e",
+        "acknowledged_cursor": 6702649696,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "96c39b474ecbde032e87c66ac101f695fe80b3071a6545c86dafec41cc59446e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08099878\",\"who\":\"sol-08099878-3407\",\"claim_id\":6702599175,\"reason\":\"First canonical native MATCH: exact complete28B callback wrapper, one compiler/native invocation, no source edits or replays, original ELF and all fixed inputs retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T05:10:27Z",
+          "id": 6702649696,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T05:10:27Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cafa4216115f0dca64ca52575648c01a1ad7ed0969f5536f2f220d249efca9f5",
+        "result": {
+          "address": "0x08099878",
+          "claim_id": 6702599175,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6702649696,
+          "status": "accepted",
+          "who": "sol-08099878-3407"
+        }
+      }
     }
   ],
   "issue": 66,
