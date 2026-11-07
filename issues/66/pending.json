@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "6c80f44ec20918fbf52599b73bf625baf205a4cdf995665c89e69d9cbe233ed6",
-        "acknowledged_cursor": 6705700159,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6c80f44ec20918fbf52599b73bf625baf205a4cdf995665c89e69d9cbe233ed6",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805ABB0\",\"who\":\"codex-0805ABB0\",\"note\":\"Natural C menu up/down navigation helper,384-byte complete owner; isolated scratch source while main audit runs, existing mappings and callees, no verifier changes.\"}",
-          "created_at": "2026-11-07T10:36:08Z",
-          "id": 6705696713,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:36:08Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "9b695b822c328f99436a15378235a08298fa869767686888e121245ccf08efed",
-        "result": {
-          "address": "0x0805ABB0",
-          "claim_id": 6705696713,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705696713,
-          "status": "accepted",
-          "who": "codex-0805ABB0"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "6193653a9b4d85d96a526d4e0e54caddea56cafb5c3f39ced2179d3b4ef226f8",
-        "acknowledged_cursor": 6705747934,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6193653a9b4d85d96a526d4e0e54caddea56cafb5c3f39ced2179d3b4ef226f8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805ABB0\",\"who\":\"codex-0805ABB0\",\"claim_id\":6705696713,\"reason\":\"Parked plausible natural menu-navigation recovery:384-byte complete symbol,358/384 bytes and126/145 instructions identical; address-add ordering and scratch allocation differ. No verifier blocker or shared-input edits.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; O3/Os unchanged; O1 rejected allocated section; typed table/address variants\"}",
-          "created_at": "2026-11-07T10:41:25Z",
-          "id": 6705747934,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:41:25Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "697d32194ad6885d810bab4e2370dd8d3eb41e5583ce22bdc5b68561bfac2c35",
-        "result": {
-          "address": "0x0805ABB0",
-          "claim_id": 6705696713,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6705747934,
-          "status": "accepted",
-          "who": "codex-0805ABB0"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "a2342b72b4a3ecfdfd510827e8c55dce09ef6ba0f726e767d95eb0f2462d34b9",
         "acknowledged_cursor": 6705732373,
         "body_provenance": "acceptance-time",
