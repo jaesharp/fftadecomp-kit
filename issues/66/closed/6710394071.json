@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "26b7dac9862ed9b924b1b76b399d2b33b8dc8a7a995db85b338180a6337c2bcc",
+    "acknowledged_cursor": 6710394189,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "26b7dac9862ed9b924b1b76b399d2b33b8dc8a7a995db85b338180a6337c2bcc",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D4D58\",\"who\":\"sol-080D4D58-3724\",\"note\":\"Natural C matching only. Existing tooling, no tooling development.\"}",
+      "created_at": "2026-11-07T17:05:33Z",
+      "id": 6710394071,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T17:05:33Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "e6b01c23b231b184ccd6a4b5740a33d6766c24563d703e09570c264dea087055",
+    "result": {
+      "address": "0x080D4D58",
+      "claim_id": 6710394071,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6710394071,
+      "status": "accepted",
+      "who": "sol-080D4D58-3724"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "c5931297ddb1db6c20bcaa41dade31676ca6b53bf0571bbd94517438bc5d2351",
+    "acknowledged_cursor": 6710593111,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "c5931297ddb1db6c20bcaa41dade31676ca6b53bf0571bbd94517438bc5d2351",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D4D58\",\"who\":\"sol-080D4D58-3724\",\"claim_id\":6710394071,\"reason\":\"Diagnostic full72B equality, native gate rejects dynamic stack address at080D4D74; existing supported selectors checked, no MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T17:21:21Z",
+      "id": 6710590486,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T17:21:21Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "a88cabf60eaf266798dd338ee44a948a13866e30bc2ba458ae9f8d7841ff293b",
+    "result": {
+      "address": "0x080D4D58",
+      "claim_id": 6710394071,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6710590486,
+      "status": "accepted",
+      "who": "sol-080D4D58-3724"
+    }
+  }
+}
