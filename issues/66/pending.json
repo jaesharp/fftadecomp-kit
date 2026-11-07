@@ -90,6 +90,66 @@
           "who": "codex-08016C90"
         }
       },
+      "release": {
+        "acceptance_body_sha256": "99f3cd051b0c3faf9889cbbcc0ede0f06915ee1e7f06708daf2f0aed5c342655",
+        "acknowledged_cursor": 6706497785,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "99f3cd051b0c3faf9889cbbcc0ede0f06915ee1e7f06708daf2f0aed5c342655",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08016C90\",\"who\":\"codex-08016C90\",\"claim_id\":6706371263,\"reason\":\"Parked natural UI initializer: diagnostic210/210 exact after three call relocations, but canonical integer profile rejects external c046 alignment; aligned owner rejects arithmetic runtime. No admitted MATCH or tool changes.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; addressed/native unsigned division, existing canonical and aligned owner profiles\"}",
+          "created_at": "2026-11-07T11:44:16Z",
+          "id": 6706497785,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T11:44:16Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4a8d2a40e5fe004f6222adc771eae6fd4cc798dd7217312ad56180851865519b",
+        "result": {
+          "address": "0x08016C90",
+          "claim_id": 6706371263,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6706497785,
+          "status": "accepted",
+          "who": "codex-08016C90"
+        }
+      }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "e68fb3a13a34377cff5ad39904ac01c246f6818a261b49393fffe5b7852b9b36",
+        "acknowledged_cursor": 6706497785,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e68fb3a13a34377cff5ad39904ac01c246f6818a261b49393fffe5b7852b9b36",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0813F080\",\"who\":\"sol-0813F080-3656\",\"note\":\"First native admission of already-frozen natural164B complete exact source; new closed three-read-only-incoming-ABI-words profile and first originalELF proof3654PASS. No C edit or diagnostic replay. Primary owns publication.\"}",
+          "created_at": "2026-11-07T11:44:08Z",
+          "id": 6706495640,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T11:44:08Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4a8d2a40e5fe004f6222adc771eae6fd4cc798dd7217312ad56180851865519b",
+        "result": {
+          "address": "0x0813F080",
+          "claim_id": 6706495640,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6706495640,
+          "status": "accepted",
+          "who": "sol-0813F080-3656"
+        }
+      },
       "release": null
     }
   ],
