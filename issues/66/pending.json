@@ -159,6 +159,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "4ebc0a34b4c8e3b5de4d21e298743165c3ad297d9e7c82e8a3a7a9d8ee6a4dca",
+        "acknowledged_cursor": 6714607250,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4ebc0a34b4c8e3b5de4d21e298743165c3ad297d9e7c82e8a3a7a9d8ee6a4dca",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002950\",\"who\":\"codex-recovery-08002950\",\"note\":\"Validate unchanged recovered C from older local checkout with current canonical toolkit; no new hand matching.\"}",
+          "created_at": "2026-11-07T23:43:25Z",
+          "id": 6714607250,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:43:25Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6d5694c0fec7486422c677e526b231fe3d6addfa24ae1c10c8654de7bee20ff9",
+        "result": {
+          "address": "0x08002950",
+          "claim_id": 6714607250,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6714607250,
+          "status": "accepted",
+          "who": "codex-recovery-08002950"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
