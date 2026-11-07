@@ -34,66 +34,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "57140e0d19d57dead96ddbd44027793ea735f62c4a265ab9758e2b017869b716",
-        "acknowledged_cursor": 6705873380,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "57140e0d19d57dead96ddbd44027793ea735f62c4a265ab9758e2b017869b716",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080975DC\",\"who\":\"codex-080975DC\",\"note\":\"Natural C renderer-state helper296bytes; isolated scratch source with exact current indexes and existing callees, no verifier changes.\"}",
-          "created_at": "2026-11-07T10:53:36Z",
-          "id": 6705872930,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:53:36Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8c21ba67d0266ccdfbf2e94b716749be0e80a42fa8815407f0d02b117d5e3a29",
-        "result": {
-          "address": "0x080975DC",
-          "claim_id": 6705872930,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705872930,
-          "status": "accepted",
-          "who": "codex-080975DC"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5244e77e1cb2fad5a61578e47918d7538ee3d475b9bbd840eea2714ff1022615",
-        "acknowledged_cursor": 6705911928,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5244e77e1cb2fad5a61578e47918d7538ee3d475b9bbd840eea2714ff1022615",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080975DC\",\"who\":\"codex-080975DC\",\"claim_id\":6705872930,\"reason\":\"Parked natural renderer-state recovery:288 vs296 bytes, remaining materialized-boolean sequence. Adjacent matched helper explains pattern but this attempt kept one C definition. No maps/index/verifier edits; no MATCH claim.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; direct boolean comparison and local switch assignment, explicit position if/else\"}",
-          "created_at": "2026-11-07T10:57:17Z",
-          "id": 6705911928,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T10:57:17Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "11b0bd01134325af9c5f78d18e853f038c5bcf42ccdd70d11f91cafd84095868",
-        "result": {
-          "address": "0x080975DC",
-          "claim_id": 6705872930,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6705911928,
-          "status": "accepted",
-          "who": "codex-080975DC"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "a19dedefad6b6a06e08e37a0b79b776d9da1f9f04235900bfe8e32c52082cc8a",
         "acknowledged_cursor": 6705905545,
         "body_provenance": "acceptance-time",
