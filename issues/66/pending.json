@@ -59,6 +59,38 @@
           "who": "sol-08148A0C-3761"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "6698b96484ef137aa13a64b34475fba63e3c923369681b4cb78ebeda8e541ee5",
+        "acknowledged_cursor": 6712901244,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "6698b96484ef137aa13a64b34475fba63e3c923369681b4cb78ebeda8e541ee5",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0806E59C\",\"who\":\"FFTA-Team2-native120\",\"note\":\"First natural112B owner after complete actual branch/epilogue and pool partition; fixed-frame calls; no source steering\"}",
+          "created_at": "2026-11-07T20:55:22Z",
+          "id": 6712901244,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:55:22Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "46e597d7005d8805435d528b2b9f3db04755637ac47ea235a1dc94fca8e367dc",
+        "result": {
+          "address": "0x0806E59C",
+          "claim_id": 6712901244,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712901244,
+          "status": "accepted",
+          "who": "FFTA-Team2-native120"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
