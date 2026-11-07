@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "fd84e26e5cd4558db9f248cc0202ac9f6976faa27b9bca68c09c81b9c27813e3",
-        "acknowledged_cursor": 6708124587,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "fd84e26e5cd4558db9f248cc0202ac9f6976faa27b9bca68c09c81b9c27813e3",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08084C98\",\"who\":\"codex-08084C98\",\"note\":\"Natural menu-record refresh264B; existing data/function-address admission, isolated workspace.\"}",
-          "created_at": "2026-11-07T14:22:27Z",
-          "id": 6708123270,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:22:27Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e602a9d1f57b082b9b98bbca219a65ada1f2687ce942393f44d96d3f62dcc7ad",
-        "result": {
-          "address": "0x08084C98",
-          "claim_id": 6708123270,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6708123270,
-          "status": "accepted",
-          "who": "codex-08084C98"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "757ba43d7bb6c20537b267a83fe0823702bab722bfc993173af8c8c96c9011e7",
-        "acknowledged_cursor": 6708183958,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "757ba43d7bb6c20537b267a83fe0823702bab722bfc993173af8c8c96c9011e7",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08084C98\",\"who\":\"codex-08084C98\",\"claim_id\":6708123270,\"reason\":\"Parked natural menu refresh260vs264 bytes; index register, widget base offsets and second callback preload differ; maps correct.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; struct access, nested widgets, byte offsets, struct/array callback records; default function-address path\"}",
-          "created_at": "2026-11-07T14:28:10Z",
-          "id": 6708183958,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:28:10Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "4bbd7886e475645d168b9f01ffdf0646afb5569229279f88a6697337e9762675",
-        "result": {
-          "address": "0x08084C98",
-          "claim_id": 6708123270,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6708183958,
-          "status": "accepted",
-          "who": "codex-08084C98"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "900dec7996558a186e143e3750a766c0dffd9835ea511d09ba574379b10dd85d",
         "acknowledged_cursor": 6708124587,
         "body_provenance": "acceptance-time",
