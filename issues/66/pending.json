@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "1b33e266861d34532e2f1adf3ea22d01461b0a4699738b020982c2ebdbb22678",
-        "acknowledged_cursor": 6712529558,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "1b33e266861d34532e2f1adf3ea22d01461b0a4699738b020982c2ebdbb22678",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CBB40\",\"who\":\"FFTA-Team2-native113\",\"note\":\"Solo natural branch-selected ROM data pointer return; actual complete60B throughBB7C; independently reconcile missing tail/literals and exact canonical DATA points only. Original artifacts/all167 preserved; no invented memory extent/effects or source steering.\"}",
-          "created_at": "2026-11-07T20:19:57Z",
-          "id": 6712529558,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:19:57Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2d8dfd25d45e7cdb76e8ed3d255af41500e43168f2fa820426c4c78b14893ea5",
-        "result": {
-          "address": "0x080CBB40",
-          "claim_id": 6712529558,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712529558,
-          "status": "accepted",
-          "who": "FFTA-Team2-native113"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "f14d504d4e13ba7776c6997b9f93080ff10f7fb9ccf38bb129d695b1f8056031",
-        "acknowledged_cursor": 6712561528,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f14d504d4e13ba7776c6997b9f93080ff10f7fb9ccf38bb129d695b1f8056031",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CBB40\",\"who\":\"FFTA-Team2-native113\",\"claim_id\":6712529558,\"reason\":\"Two grounded forms frozen native-game-113; correct2bit field yields57/60B and17/18instructions. Residual equivalent switch branch/literal ordering; no control-flow/case steering. Current original ELF/runtime/ROM/all167 retained, zero nativeMATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T20:22:56Z",
-          "id": 6712561528,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:22:56Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "38f84ea4fb4dc3b13ab0fc67a28411fb8d0d601bd81f6171120c716cad34086f",
-        "result": {
-          "address": "0x080CBB40",
-          "claim_id": 6712529558,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712561528,
-          "status": "accepted",
-          "who": "FFTA-Team2-native113"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "06ae8ed75396bd475a5a85ad327fe2a2c71a94e78df4113af5d7b13fb47b2743",
         "acknowledged_cursor": 6712575479,
         "body_provenance": "acceptance-time",
