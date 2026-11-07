@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "5e1c4ff4ddf93debbf2cda19f2e168ec8bcd39287682e365d7a4c1aa61c6468a",
-        "acknowledged_cursor": 6690492368,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5e1c4ff4ddf93debbf2cda19f2e168ec8bcd39287682e365d7a4c1aa61c6468a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08067FFC\",\"who\":\"sol-08067FFC-2748\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-06T16:59:02Z",
-          "id": 6690492259,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-06T16:59:02Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8667b2f8474663a93d389c6d8c6d769d173aef010ea17fe4bc16907ca202dd28",
-        "result": {
-          "address": "0x08067FFC",
-          "claim_id": 6690492259,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6690492259,
-          "status": "accepted",
-          "who": "sol-08067FFC-2748"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "e8cca8e332762d6d78bef03fa9918cf06cd65d6296807556111d83ed85b6fa31",
-        "acknowledged_cursor": 6704794186,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e8cca8e332762d6d78bef03fa9918cf06cd65d6296807556111d83ed85b6fa31",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08067FFC\",\"who\":\"sol-08067FFC-2748\",\"claim_id\":6690492259,\"reason\":\"Reconciled own original claim accepted by broker after client timed out unconfirmed. No authoring was authorized by that client receipt and no current matching attempt is active; stop holding unused lease. Prior frozen source/proof/failure artifacts remain preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T09:00:39Z",
-          "id": 6704794186,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:00:39Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "78e034bbfd3b9ab414b525f83cbb80761bcff137fdfcb6a6440d46b9999d2e5a",
-        "result": {
-          "address": "0x08067FFC",
-          "claim_id": 6690492259,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6704794186,
-          "status": "accepted",
-          "who": "sol-08067FFC-2748"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "2ad9aa67ffa834b91d5d42fd40c912cb530a826a53ceed116b103f5f22eae6cc",
         "acknowledged_cursor": 6693601222,
         "body_provenance": "acceptance-time",
