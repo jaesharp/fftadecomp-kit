@@ -59,6 +59,70 @@
           "who": "codex-080670B4"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "abf0fbd5d8d14aabde52a702c12ea05cc3a36efa92874756fb2e397c61826e9f",
+        "acknowledged_cursor": 6708952218,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "abf0fbd5d8d14aabde52a702c12ea05cc3a36efa92874756fb2e397c61826e9f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805E354\",\"who\":\"codex-0805E354\",\"note\":\"Recover complete620-byte menu command state handler; existing u16-scalars switch ROM verification passes; isolated single-function source attempt.\"}",
+          "created_at": "2026-11-07T15:24:33Z",
+          "id": 6708951910,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:24:33Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e52532325991a4f366e8133c937f15ffc0298b7fb4e7fe0c2db60067a82c3cca",
+        "result": {
+          "address": "0x0805E354",
+          "claim_id": 6708951910,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708951910,
+          "status": "accepted",
+          "who": "codex-0805E354"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "a1b070ab5d908371c083d6b85c60eee826e3d7f1157e063b327b919f26726760",
+        "acknowledged_cursor": 6708952218,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a1b070ab5d908371c083d6b85c60eee826e3d7f1157e063b327b919f26726760",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805064C\",\"who\":\"codex-0805064C\",\"note\":\"Recover complete232-byte switch owner; existing u16-scalars switch ROM verification passes; isolated single-function source attempt.\"}",
+          "created_at": "2026-11-07T15:24:34Z",
+          "id": 6708952218,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T15:24:34Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e52532325991a4f366e8133c937f15ffc0298b7fb4e7fe0c2db60067a82c3cca",
+        "result": {
+          "address": "0x0805064C",
+          "claim_id": 6708952218,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708952218,
+          "status": "accepted",
+          "who": "codex-0805064C"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
