@@ -59,66 +59,6 @@
           "who": "sol-08148A0C-3761"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "ba2227a871463284e3b327436becbb12ebcbce0d587f23f80706fb057be37ae8",
-        "acknowledged_cursor": 6712850151,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "ba2227a871463284e3b327436becbb12ebcbce0d587f23f80706fb057be37ae8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08142124\",\"who\":\"sol-08142124-3762\",\"note\":\"First natural C matching for full budgeted FF-byte scan owner36B after truncated-prefix correction; unchanged published tools, no tooling development.\"}",
-          "created_at": "2026-11-07T20:50:24Z",
-          "id": 6712850037,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:50:24Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "48986b04b756ba2c850372c043ee2201c068e26919020180613486208e2525a6",
-        "result": {
-          "address": "0x08142124",
-          "claim_id": 6712850037,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712850037,
-          "status": "accepted",
-          "who": "sol-08142124-3762"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a6fe645189194f1debcb3ff8040788c2ea7aa97bfaea10fa9aa2b05c0291baa3",
-        "acknowledged_cursor": 6712886044,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a6fe645189194f1debcb3ff8040788c2ea7aa97bfaea10fa9aa2b05c0291baa3",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08142124\",\"who\":\"sol-08142124-3762\",\"claim_id\":6712850037,\"reason\":\"Native MATCH0 plausible complete36/36 bytes first natural form, original artifacts frozen for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T20:53:53Z",
-          "id": 6712886044,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:53:53Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "98cfb2929b13f077289159aef43df631ad94b3f02cc65aca0833a482279d5a89",
-        "result": {
-          "address": "0x08142124",
-          "claim_id": 6712850037,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712886044,
-          "status": "accepted",
-          "who": "sol-08142124-3762"
-        }
-      }
     }
   ],
   "issue": 66,
