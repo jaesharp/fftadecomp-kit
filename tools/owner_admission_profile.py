@@ -22,6 +22,7 @@ import mutable_three_call_native_profile as mutable_native
 import multiple_switch_native_profile as multiple_native
 import canonical_integer_native_profile as integer_native
 import canonical_integer_six_words_native_profile as integer_words
+import canonical_integer_private_locals_native_profile as integer_locals
 import owner_graph_profile as graph
 import owner_runtime_profile as runtime
 import function_thunk_profile as thunk
@@ -87,12 +88,12 @@ def sha(raw):
 def selected(report):
     verification = '\n'.join(line for line in report.splitlines()
                              if marker_text(line).startswith('* verification'))
-    relevant = integer_words.SCHEMA in verification or integer_native.SCHEMA in verification or multiple_native.SCHEMA in verification or mutable_native.SCHEMA in verification or resident_word.SCHEMA in verification or any(schema in verification for schema in r6_buffer.SCHEMAS) or entry.NATIVE_SCHEMA in verification or SCHEMA in verification or ALIGNED_SCHEMA in verification or CYCLIC_SCHEMA in verification or THUNK_SWITCH_SCHEMA in verification or DIRECT_SWITCH_SCHEMA in verification or ENTRY_DATA_SWITCH_SCHEMA in verification or ENTRY_SWITCH_SCHEMA in verification or ACYCLIC_SCHEMA in verification or ignored_leaf.SCHEMA in verification or any(schema in verification for schema in named_buffer.SCHEMAS) or static_buffer.SCHEMA in verification or word_buffer.SCHEMA in verification or r7_buffer.SCHEMA in verification or descriptor.SCHEMA in verification or watched_switch.SCHEMA in verification or output_alias.SCHEMA in verification or single_store.SCHEMA in verification or any(schema in verification for schema in disjunctive.PROFILES.values()) or any(schema in verification for schema in callee_constant.PROFILES.values()) or cursor.SCHEMA in verification or any(schema in verification for schema in formal_spill.SCHEMAS) or any(marker_text(line).startswith('* owner runtime')
+    relevant = integer_locals.SCHEMA in verification or integer_words.SCHEMA in verification or integer_native.SCHEMA in verification or multiple_native.SCHEMA in verification or mutable_native.SCHEMA in verification or resident_word.SCHEMA in verification or any(schema in verification for schema in r6_buffer.SCHEMAS) or entry.NATIVE_SCHEMA in verification or SCHEMA in verification or ALIGNED_SCHEMA in verification or CYCLIC_SCHEMA in verification or THUNK_SWITCH_SCHEMA in verification or DIRECT_SWITCH_SCHEMA in verification or ENTRY_DATA_SWITCH_SCHEMA in verification or ENTRY_SWITCH_SCHEMA in verification or ACYCLIC_SCHEMA in verification or ignored_leaf.SCHEMA in verification or any(schema in verification for schema in named_buffer.SCHEMAS) or static_buffer.SCHEMA in verification or word_buffer.SCHEMA in verification or r7_buffer.SCHEMA in verification or descriptor.SCHEMA in verification or watched_switch.SCHEMA in verification or output_alias.SCHEMA in verification or single_store.SCHEMA in verification or any(schema in verification for schema in disjunctive.PROFILES.values()) or any(schema in verification for schema in callee_constant.PROFILES.values()) or cursor.SCHEMA in verification or any(schema in verification for schema in formal_spill.SCHEMAS) or any(marker_text(line).startswith('* owner runtime')
                                       for line in report.splitlines())
     if not relevant:
         return False
     fields = [line for line in report.splitlines() if marker_text(line).startswith('* verification')]
-    if fields not in ([f'* verification: `{integer_words.SCHEMA}`'], [f'* verification: `{integer_native.SCHEMA}`'], [f'* verification: `{multiple_native.SCHEMA}`'], [f'* verification: `{SCHEMA}`'], [f'* verification: `{ALIGNED_SCHEMA}`'], [f'* verification: `{CYCLIC_SCHEMA}`'],
+    if fields not in ([f'* verification: `{integer_locals.SCHEMA}`'], [f'* verification: `{integer_words.SCHEMA}`'], [f'* verification: `{integer_native.SCHEMA}`'], [f'* verification: `{multiple_native.SCHEMA}`'], [f'* verification: `{SCHEMA}`'], [f'* verification: `{ALIGNED_SCHEMA}`'], [f'* verification: `{CYCLIC_SCHEMA}`'],
                       [f'* verification: `{THUNK_SWITCH_SCHEMA}`'], [f'* verification: `{DIRECT_SWITCH_SCHEMA}`'], [f'* verification: `{ENTRY_DATA_SWITCH_SCHEMA}`'], [f'* verification: `{ENTRY_SWITCH_SCHEMA}`'], [f'* verification: `{ACYCLIC_SCHEMA}`'],
                       [f'* verification: `{ignored_leaf.SCHEMA}`'],
                       [f'* verification: `{named_buffer.SCHEMA}`'],
@@ -135,6 +136,8 @@ def selected(report):
 def selector_for_report(report):
     if not selected(report):
         raise ValueError('not a complete-owner report')
+    if f'* verification: `{integer_locals.SCHEMA}`' in report.splitlines():
+        return integer_locals.SELECTOR
     if f'* verification: `{integer_words.SCHEMA}`' in report.splitlines():
         return integer_words.SELECTOR
     if f'* verification: `{integer_native.SCHEMA}`' in report.splitlines():
@@ -671,7 +674,7 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
                         instruction.id!=match.ARM_INS_BL or instruction.size!=4 or \
                         instruction.operands[0].imm!=address+site:
                     raise ValueError('owner call requires canonical Thumb BL zero addend')
-                destination=(integer_native.scalar.OPERATIONS[name] if selector in (integer_native.SELECTOR, integer_words.SELECTOR) and name in integer_native.scalar.OPERATIONS else
+                destination=(integer_native.scalar.OPERATIONS[name] if selector in (integer_native.SELECTOR, integer_words.SELECTOR, integer_locals.SELECTOR) and name in integer_native.scalar.OPERATIONS else
                     thunk.ALIASES[name] if name in thunk.ALIASES else
                     match.UDIVSI3_ADDRESS if name=='__udivsi3' else
                     match.function_address_target(name,entries,address,size,len(rom)))
@@ -693,7 +696,7 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
            for item in image['symbols']):
         raise ValueError('unresolved owner symbol outside exact binding roles')
     for records in result.values():records.sort()
-    if selector == integer_words.SELECTOR:
+    if selector in (integer_words.SELECTOR, integer_locals.SELECTOR):
         if any(result[role] for role in ('functions','switches')) or not result['data'] or \
                 any(addend for _, _, addend in result['data']) or \
                 not set(targets).intersection(integer_native.scalar.OPERATIONS) or set(targets).intersection(thunk.ALIASES):
@@ -725,7 +728,7 @@ def object_bytes(runner,workspace,args,original,address,rom,mapping,objects, *, 
     thunk.namespace(preprocessed)
     from plausible import strip_comments_and_strings
     reserved = (r'\b(?:__divsi3|__modsi3|__udivsi3|__umodsi3)\b'
-                if selector in (integer_native.SELECTOR, integer_words.SELECTOR) else r'\b__udivsi3\b')
+                if selector in (integer_native.SELECTOR, integer_words.SELECTOR, integer_locals.SELECTOR) else r'\b__udivsi3\b')
     if re.search(reserved,strip_comments_and_strings(preprocessed)):
         raise ValueError('division identifiers are reserved for compiler emission')
     bindings,targets=original_bindings(original,address,rom,mapping,objects,selector=selector,index=index)
@@ -779,7 +782,7 @@ def fingerprint(address,data,manifest,source,mapping,index,objects,rom,original_
            mapping,index,b'absent' if objects is None else objects,hashlib.sha256(rom).digest(),
            text([match.DEFAULT_CC,match.DEFAULT_CPP,match.DEFAULT_AS,match.DEFAULT_OBJCOPY,
                  match.DEFAULT_LD,match.DEFAULT_FLAGS]).encode()]
-    if manifest['profile'] in (integer_words.SCHEMA, integer_native.SCHEMA, multiple_native.SCHEMA, THUNK_SWITCH_SCHEMA, DIRECT_SWITCH_SCHEMA, ENTRY_DATA_SWITCH_SCHEMA, ENTRY_SWITCH_SCHEMA, ALIGNED_SCHEMA, CYCLIC_SCHEMA, mutable_native.SCHEMA, resident_word.SCHEMA, entry.NATIVE_SCHEMA, *named_buffer.SCHEMAS, static_buffer.SCHEMA, *r6_buffer.SCHEMAS, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, *disjunctive.PROFILES.values(), *callee_constant.PROFILES.values(), cursor.SCHEMA, *formal_spill.SCHEMAS):
+    if manifest['profile'] in (integer_locals.SCHEMA, integer_words.SCHEMA, integer_native.SCHEMA, multiple_native.SCHEMA, THUNK_SWITCH_SCHEMA, DIRECT_SWITCH_SCHEMA, ENTRY_DATA_SWITCH_SCHEMA, ENTRY_SWITCH_SCHEMA, ALIGNED_SCHEMA, CYCLIC_SCHEMA, mutable_native.SCHEMA, resident_word.SCHEMA, entry.NATIVE_SCHEMA, *named_buffer.SCHEMAS, static_buffer.SCHEMA, *r6_buffer.SCHEMAS, r7_buffer.SCHEMA, word_buffer.SCHEMA, descriptor.SCHEMA, watched_switch.SCHEMA, output_alias.SCHEMA, single_store.SCHEMA, *disjunctive.PROFILES.values(), *callee_constant.PROFILES.values(), cursor.SCHEMA, *formal_spill.SCHEMAS):
         if not isinstance(original_elf, bytes):
             raise ValueError('named-data buffer evidence requires original ELF identity')
         parts.append(hashlib.sha256(original_elf).digest())
@@ -794,7 +797,8 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
     args=args or argparse.Namespace(cc=match.DEFAULT_CC,cpp=match.DEFAULT_CPP,assembler=match.DEFAULT_AS,
         objcopy=match.DEFAULT_OBJCOPY,linker=match.DEFAULT_LD,flags=match.DEFAULT_FLAGS)
     fixed_configuration(args)
-    environment_reader = (integer_words.environment_fingerprint if selector == integer_words.SELECTOR
+    environment_reader = (integer_locals.environment_fingerprint if selector == integer_locals.SELECTOR
+        else integer_words.environment_fingerprint if selector == integer_words.SELECTOR
         else integer_native.environment_fingerprint if selector == integer_native.SELECTOR
         else multiple_native.environment_fingerprint if selector == multiple_native.SELECTOR
         else mutable_native.environment_fingerprint if selector == mutable_native.SELECTOR
@@ -816,8 +820,9 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
                                                candidates[0].relative_to(root).as_posix())
             data,bindings=object_bytes(runner,workspace,args,original,address,rom,mapping,objects,
                                       selector=selector,index=index)
-            if selector == integer_words.SELECTOR:
-                manifest,count=integer_words.verify_original(raw,runner.read_binary(workspace+'/f.elf'),
+            if selector in (integer_words.SELECTOR, integer_locals.SELECTOR):
+                native = integer_words if selector == integer_words.SELECTOR else integer_locals
+                manifest,count=native.verify_original(raw,runner.read_binary(workspace+'/f.elf'),
                     address,rom,mapping,index,bindings,expected,objects=objects)
             elif selector in (integer_native.SELECTOR, multiple_native.SELECTOR):
                 native = integer_native if selector == integer_native.SELECTOR else multiple_native
@@ -844,6 +849,7 @@ def build(root,address,args=None,expected=None, *, selector=SELECTOR):
 def render(address,result):
     import match
     data,manifest,source,mapping,index,objects,rom,count,original_elf=result
+    integer_locals_selected = manifest['profile'] == integer_locals.SCHEMA
     integer_words_selected = manifest['profile'] == integer_words.SCHEMA
     integer_selected = manifest['profile'] == integer_native.SCHEMA
     multiple_selected = manifest['profile'] == multiple_native.SCHEMA
@@ -874,12 +880,12 @@ def render(address,result):
         'mapping_sha256':sha(mapping),'index_sha256':sha(index),'objects_sha256':None if objects is None else sha(objects),
         'rom_sha256':sha(rom),'compiler':[match.DEFAULT_CC,match.DEFAULT_FLAGS],
         'manifest':manifest,'fingerprint':fingerprint(address,data,manifest,source,mapping,index,objects,rom,
-                                                     original_elf if integer_words_selected or integer_selected or multiple_selected or buffers or recursive or mutable_selected or aligned or entry_switch or scalar_switch else None)}
-    if integer_words_selected or integer_selected or multiple_selected or buffers or recursive or mutable_selected or aligned or entry_switch or scalar_switch:
+                                                     original_elf if integer_locals_selected or integer_words_selected or integer_selected or multiple_selected or buffers or recursive or mutable_selected or aligned or entry_switch or scalar_switch else None)}
+    if integer_locals_selected or integer_words_selected or integer_selected or multiple_selected or buffers or recursive or mutable_selected or aligned or entry_switch or scalar_switch:
         evidence['original_elf_sha256'] = sha(original_elf)
     return '\n'.join([f'# 0x{address:08X}','',f'* verification: `{manifest["profile"]}`',
-        f'* owner runtime: {integer_words.SELECTOR if integer_words_selected else integer_native.SELECTOR if integer_selected else multiple_native.SELECTOR if multiple_selected else THUNK_SWITCH_SELECTOR if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_SELECTOR if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_SELECTOR if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_SELECTOR if entry_switch else CYCLIC_SELECTOR if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_SELECTOR if aligned else mutable_native.SELECTOR if mutable_selected else entry.SELECTOR if recursive else resident_word.SELECTOR if resident_selected else word_buffer.SELECTOR if word_selected else r6_profile[0] if r6_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.BIOS_SELECTOR if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else next(selector for selector,schema in callee_constant.PROFILES.items() if schema == manifest["profile"]) if constant else next(selector for selector, schema in disjunctive.PROFILES.items() if schema == manifest["profile"]) if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else dynamic_div.SELECTOR if manifest["profile"] == dynamic_div.SCHEMA else three_output.SELECTOR if manifest["profile"] == three_output.SCHEMA else direct_output.SELECTOR if manifest["profile"] == direct_output.SCHEMA else nested_output.SELECTOR if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_SELECTOR if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.SELECTOR if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_SELECTOR if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_SELECTOR if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.FAST_FILL_SELECTOR if manifest["profile"] == named_buffer.FAST_FILL_SCHEMA else named_buffer.BIOS_SQRT_SELECTOR if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_SELECTOR if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_SELECTOR if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
-        f'* control flow: {integer_words.CONTROL_FLOW if integer_words_selected else integer_native.CONTROL_FLOW if integer_selected else multiple_native.CONTROL_FLOW if multiple_selected else THUNK_SWITCH_CONTROL_FLOW if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_CONTROL_FLOW if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_CONTROL_FLOW if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_CONTROL_FLOW if entry_switch else CYCLIC_CONTROL_FLOW if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_CONTROL_FLOW if manifest["profile"] == ALIGNED_SCHEMA else mutable_native.CONTROL_FLOW if mutable_selected else entry.CONTROL_FLOW if recursive else resident_word.CONTROL_FLOW if resident_selected else word_buffer.CONTROL_FLOW if word_selected else r6_profile[1] if r6_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.BIOS_CONTROL_FLOW if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.control_flow(next(selector for selector,schema in callee_constant.PROFILES.items() if schema == manifest["profile"])) if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else dynamic_div.CONTROL_FLOW if manifest["profile"] == dynamic_div.SCHEMA else three_output.CONTROL_FLOW if manifest["profile"] == three_output.SCHEMA else direct_output.CONTROL_FLOW if manifest["profile"] == direct_output.SCHEMA else nested_output.CONTROL_FLOW if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.CONTROL_FLOW if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.FAST_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.FAST_FILL_SCHEMA else named_buffer.BIOS_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_FILL_SCHEMA else named_buffer.BIOS_SQRT_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_CONTROL_FLOW if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_CONTROL_FLOW if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
+        f'* owner runtime: {integer_locals.SELECTOR if integer_locals_selected else integer_words.SELECTOR if integer_words_selected else integer_native.SELECTOR if integer_selected else multiple_native.SELECTOR if multiple_selected else THUNK_SWITCH_SELECTOR if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_SELECTOR if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_SELECTOR if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_SELECTOR if entry_switch else CYCLIC_SELECTOR if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_SELECTOR if aligned else mutable_native.SELECTOR if mutable_selected else entry.SELECTOR if recursive else resident_word.SELECTOR if resident_selected else word_buffer.SELECTOR if word_selected else r6_profile[0] if r6_selected else r7_buffer.SELECTOR if r7_selected else formal_spill.BIOS_SELECTOR if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.SELECTOR if spilled else cursor.SELECTOR if cursor_value else next(selector for selector,schema in callee_constant.PROFILES.items() if schema == manifest["profile"]) if constant else next(selector for selector, schema in disjunctive.PROFILES.items() if schema == manifest["profile"]) if alternatives else single_store.SELECTOR if store else output_alias.SELECTOR if output else watched_switch.SELECTOR if switch else descriptor.SELECTOR if words else static_buffer.SELECTOR if static else dynamic_div.SELECTOR if manifest["profile"] == dynamic_div.SCHEMA else three_output.SELECTOR if manifest["profile"] == three_output.SCHEMA else direct_output.SELECTOR if manifest["profile"] == direct_output.SCHEMA else nested_output.SELECTOR if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_SELECTOR if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.SELECTOR if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_SELECTOR if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_SELECTOR if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.FAST_FILL_SELECTOR if manifest["profile"] == named_buffer.FAST_FILL_SCHEMA else named_buffer.BIOS_SQRT_SELECTOR if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_SELECTOR if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_SELECTOR if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.SELECTOR if buffers else ignored_leaf.SELECTOR if ignored else ACYCLIC_SELECTOR if acyclic else SELECTOR}',
+        f'* control flow: {integer_locals.CONTROL_FLOW if integer_locals_selected else integer_words.CONTROL_FLOW if integer_words_selected else integer_native.CONTROL_FLOW if integer_selected else multiple_native.CONTROL_FLOW if multiple_selected else THUNK_SWITCH_CONTROL_FLOW if manifest["profile"] == THUNK_SWITCH_SCHEMA else DIRECT_SWITCH_CONTROL_FLOW if manifest["profile"] == DIRECT_SWITCH_SCHEMA else ENTRY_DATA_SWITCH_CONTROL_FLOW if manifest["profile"] == ENTRY_DATA_SWITCH_SCHEMA else ENTRY_SWITCH_CONTROL_FLOW if entry_switch else CYCLIC_CONTROL_FLOW if manifest["profile"] == CYCLIC_SCHEMA else ALIGNED_CONTROL_FLOW if manifest["profile"] == ALIGNED_SCHEMA else mutable_native.CONTROL_FLOW if mutable_selected else entry.CONTROL_FLOW if recursive else resident_word.CONTROL_FLOW if resident_selected else word_buffer.CONTROL_FLOW if word_selected else r6_profile[1] if r6_selected else r7_buffer.CONTROL_FLOW if r7_selected else formal_spill.BIOS_CONTROL_FLOW if manifest["profile"] == formal_spill.BIOS_SCHEMA else formal_spill.CONTROL_FLOW if spilled else cursor.CONTROL_FLOW if cursor_value else callee_constant.control_flow(next(selector for selector,schema in callee_constant.PROFILES.items() if schema == manifest["profile"])) if constant else disjunctive.CONTROL_FLOW if alternatives else single_store.CONTROL_FLOW if store else output_alias.CONTROL_FLOW if output else watched_switch.CONTROL_FLOW if switch else descriptor.CONTROL_FLOW if words else static_buffer.CONTROL_FLOW if static else dynamic_div.CONTROL_FLOW if manifest["profile"] == dynamic_div.SCHEMA else three_output.CONTROL_FLOW if manifest["profile"] == three_output.SCHEMA else direct_output.CONTROL_FLOW if manifest["profile"] == direct_output.SCHEMA else nested_output.CONTROL_FLOW if manifest["profile"] == nested_output.SCHEMA else named_buffer.ROOT_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.ROOT_SWITCH_SCHEMA else bios_div.CONTROL_FLOW if manifest["profile"] == bios_div.SCHEMA else named_buffer.GUARDED_ALIAS_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_ALIAS_SCHEMA else named_buffer.GUARDED_SWITCH_CONTROL_FLOW if manifest["profile"] == named_buffer.GUARDED_SWITCH_SCHEMA else named_buffer.FAST_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.FAST_FILL_SCHEMA else named_buffer.BIOS_FILL_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_FILL_SCHEMA else named_buffer.BIOS_SQRT_CONTROL_FLOW if manifest["profile"] == named_buffer.BIOS_SQRT_SCHEMA else named_buffer.SCRATCH_CONTROL_FLOW if manifest["profile"] == named_buffer.SCRATCH_SCHEMA else named_buffer.DATAFREE_CONTROL_FLOW if manifest["profile"] == named_buffer.DATAFREE_SCHEMA else named_buffer.CONTROL_FLOW if buffers else ignored_leaf.CONTROL_FLOW if ignored else ACYCLIC_CONTROL_FLOW if acyclic else CONTROL_FLOW}',
         '* verified extent: complete ELF function symbol, including literal pools',
         '* relocations: none','* source plausibility: plausible','* hand-asm allow list: not listed',
         f'* owner runtime evidence: `{text(evidence)}`',f'* compiled : `{data.hex()}`',
@@ -927,7 +933,7 @@ def issue(root,address,args):
                 'signed_runtime_profile', 'addressed_signed_runtime_profile',
                 'switch_data_profile')):
         raise ValueError('entry selector excludes other profile policies')
-    if args.owner_runtime_profile in (integer_words.SELECTOR, integer_native.SELECTOR, multiple_native.SELECTOR) and any(
+    if args.owner_runtime_profile in (integer_locals.SELECTOR, integer_words.SELECTOR, integer_native.SELECTOR, multiple_native.SELECTOR) and any(
             getattr(args, name, None) for name in ('signed_quotient_profile',
                 'signed_runtime_profile', 'unsigned_runtime_profile',
                 'addressed_signed_runtime_profile', 'switch_data_profile')):
@@ -943,7 +949,7 @@ def issue(root,address,args):
     if not args.no_write:
         path=Path(root)/'docs/match'/f'{address:08X}.md';path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(report)
-    control_flow = integer_words.CONTROL_FLOW if args.owner_runtime_profile == integer_words.SELECTOR else integer_native.CONTROL_FLOW if args.owner_runtime_profile == integer_native.SELECTOR else multiple_native.CONTROL_FLOW if args.owner_runtime_profile == multiple_native.SELECTOR else THUNK_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == THUNK_SWITCH_SELECTOR else DIRECT_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == DIRECT_SWITCH_SELECTOR else ENTRY_DATA_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == ENTRY_DATA_SWITCH_SELECTOR else ENTRY_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == ENTRY_SWITCH_SELECTOR else \
+    control_flow = integer_locals.CONTROL_FLOW if args.owner_runtime_profile == integer_locals.SELECTOR else integer_words.CONTROL_FLOW if args.owner_runtime_profile == integer_words.SELECTOR else integer_native.CONTROL_FLOW if args.owner_runtime_profile == integer_native.SELECTOR else multiple_native.CONTROL_FLOW if args.owner_runtime_profile == multiple_native.SELECTOR else THUNK_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == THUNK_SWITCH_SELECTOR else DIRECT_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == DIRECT_SWITCH_SELECTOR else ENTRY_DATA_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == ENTRY_DATA_SWITCH_SELECTOR else ENTRY_SWITCH_CONTROL_FLOW if args.owner_runtime_profile == ENTRY_SWITCH_SELECTOR else \
         CYCLIC_CONTROL_FLOW if args.owner_runtime_profile == CYCLIC_SELECTOR else \
         ALIGNED_CONTROL_FLOW if args.owner_runtime_profile == ALIGNED_SELECTOR else \
         mutable_native.CONTROL_FLOW if args.owner_runtime_profile == mutable_native.SELECTOR else \
