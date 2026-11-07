@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "f1ebac8b75460a7628dd1aba3c60d3388d890abdab53c6dc1e8425ff14a8bb2a",
+    "acknowledged_cursor": 6707997910,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "f1ebac8b75460a7628dd1aba3c60d3388d890abdab53c6dc1e8425ff14a8bb2a",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080570D8\",\"who\":\"codex-080570D8\",\"note\":\"Natural unit-list display initializer; isolated owner repair to57270 covers referenced tail literals; existing BIOS/function-literal profile.\"}",
+      "created_at": "2026-11-07T14:11:00Z",
+      "id": 6707997910,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T14:11:00Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "b9c5f589b811694cda65ad78fa7ab1ac1883f503b9b9985fede2e9b5b1a761cf",
+    "result": {
+      "address": "0x080570D8",
+      "claim_id": 6707997910,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6707997910,
+      "status": "accepted",
+      "who": "codex-080570D8"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "88557ed14b989571e25529b07f7d1886a1b8e04661ea34a9ba70442f6c914d06",
+    "acknowledged_cursor": 6708044547,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "88557ed14b989571e25529b07f7d1886a1b8e04661ea34a9ba70442f6c914d06",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080570D8\",\"who\":\"codex-080570D8\",\"claim_id\":6707997910,\"reason\":\"Parked408B initializer403/408 identical; five r8/r9 allocation differences. ROM-backed owner tail correction through57270 applied independently.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; typed layouts, cursor/window/content locals, narrow/wide count return; addressed-native-bios-fill-function-literals-data-v1\"}",
+      "created_at": "2026-11-07T14:15:30Z",
+      "id": 6708044547,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T14:15:30Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "f2c4064af680bd8ac7d186fee287b515c15415f48336ffe6d0f9bea91fed83a6",
+    "result": {
+      "address": "0x080570D8",
+      "claim_id": 6707997910,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6708044547,
+      "status": "accepted",
+      "who": "codex-080570D8"
+    }
+  }
+}
