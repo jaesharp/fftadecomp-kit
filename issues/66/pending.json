@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "c149ddca258fa6c5d1dd9ad2ccbfa06a418d605776f83baf73d3f8f8caff11bf",
-        "acknowledged_cursor": 6705028982,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c149ddca258fa6c5d1dd9ad2ccbfa06a418d605776f83baf73d3f8f8caff11bf",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08089BA4\",\"who\":\"codex-08089BA4-1107\",\"note\":\"Recover recursive masked-byte quicksort; dedicated native subagent and existing recursive profile; parent owns verification/release.\"}",
-          "created_at": "2026-11-07T09:25:18Z",
-          "id": 6705028982,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:25:18Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a47f3c62992855ab4e6e0ce4d302b16c30c9281ffcc79db9910f49b6a8337664",
-        "result": {
-          "address": "0x08089BA4",
-          "claim_id": 6705028982,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6705028982,
-          "status": "accepted",
-          "who": "codex-08089BA4-1107"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "e7bfa8e4eaab04afd2b4b2b7aa5e5e28df2fc97c46197581820faea63065b2ed",
-        "acknowledged_cursor": 6705052844,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e7bfa8e4eaab04afd2b4b2b7aa5e5e28df2fc97c46197581820faea63065b2ed",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08089BA4\",\"who\":\"codex-08089BA4-1107\",\"claim_id\":6705028982,\"reason\":\"Parked diagnostic exact168byte recursive masked quicksort; existing recursive profile excludes actual byte loads/stores; no MATCH or verifier weakening.\",\"unmatchable\":true,\"tried\":\"fixed -mthumb-interwork -O2; natural signed-index quicksort; entry-recursive-ordinary-call-v1\"}",
-          "created_at": "2026-11-07T09:27:57Z",
-          "id": 6705052844,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:27:57Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7b1f2fe74bff45c0a8d2c8efb4f274be7cfbb8aca9585bce643f6170c8f1bfe8",
-        "result": {
-          "address": "0x08089BA4",
-          "claim_id": 6705028982,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6705052844,
-          "status": "accepted",
-          "who": "codex-08089BA4-1107"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c40044e846781c43221a501143c25ccfb65b1ba132211c84d44f9002077f8fff",
         "acknowledged_cursor": 6705068898,
         "body_provenance": "acceptance-time",
