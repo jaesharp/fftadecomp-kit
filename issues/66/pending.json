@@ -59,6 +59,38 @@
           "who": "sol-0812A52C-3755"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "1b33e266861d34532e2f1adf3ea22d01461b0a4699738b020982c2ebdbb22678",
+        "acknowledged_cursor": 6712529558,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1b33e266861d34532e2f1adf3ea22d01461b0a4699738b020982c2ebdbb22678",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CBB40\",\"who\":\"FFTA-Team2-native113\",\"note\":\"Solo natural branch-selected ROM data pointer return; actual complete60B throughBB7C; independently reconcile missing tail/literals and exact canonical DATA points only. Original artifacts/all167 preserved; no invented memory extent/effects or source steering.\"}",
+          "created_at": "2026-11-07T20:19:57Z",
+          "id": 6712529558,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:19:57Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "2d8dfd25d45e7cdb76e8ed3d255af41500e43168f2fa820426c4c78b14893ea5",
+        "result": {
+          "address": "0x080CBB40",
+          "claim_id": 6712529558,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712529558,
+          "status": "accepted",
+          "who": "FFTA-Team2-native113"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
