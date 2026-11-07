@@ -155,6 +155,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "67ff2724bb5307f54538b987378e6bcc4107848871183401023ab2b1fe67742f",
+        "acknowledged_cursor": 6710902302,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "67ff2724bb5307f54538b987378e6bcc4107848871183401023ab2b1fe67742f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08035CAC\",\"who\":\"FFTA-Team2-native-104-format\",\"note\":\"First natural C of complete indexed84B two-digit text formatter. Actual unsigned quotient/remainder by10 use existing published profile; isolated source/private packet, original artifacts, no shared map/header edits.\"}",
+          "created_at": "2026-11-07T17:49:39Z",
+          "id": 6710902302,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T17:49:39Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9850c451de625287def130668d4c371781723518352b9edb85dafe56cb1f0b5d",
+        "result": {
+          "address": "0x08035CAC",
+          "claim_id": 6710902302,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6710902302,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-104-format"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
