@@ -122,7 +122,35 @@
           "who": "sol-080CD1FC-3771"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "30e4f494bd7adc8cce8e54e5d55965a45d95b4d7d37134a1f280f76fc9bf1a4f",
+        "acknowledged_cursor": 6714100233,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "30e4f494bd7adc8cce8e54e5d55965a45d95b4d7d37134a1f280f76fc9bf1a4f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CD1FC\",\"who\":\"sol-080CD1FC-3771\",\"claim_id\":6714061220,\"reason\":\"Grounded typed-interface/packed-pair recovery remains plausible whole-body native NONMATCH; final difference is operand-register or adjacent instruction scheduling, no independent further correction.\",\"unmatchable\":true,\"tried\":\"Fixed -mthumb-interwork -O2; independently grounded actual typed interface and two-byte marker/value pair layouts. No steering/replay.\"}",
+          "created_at": "2026-11-07T22:51:51Z",
+          "id": 6714100233,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:51:51Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "6d56fb21530d500d32f4c75221dcbac600f93f71697553b251bec90c3b934647",
+        "result": {
+          "address": "0x080CD1FC",
+          "claim_id": 6714061220,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714100233,
+          "status": "accepted",
+          "who": "sol-080CD1FC-3771"
+        }
+      }
     }
   ],
   "issue": 66,
