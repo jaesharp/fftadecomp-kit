@@ -94,7 +94,35 @@
           "who": "sol-081430B4-3365"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "589e1de751737ba21966ecedc63f3fe4a2b61bde6f39bf0caf4de0a77bf2008f",
+        "acknowledged_cursor": 6701909202,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "589e1de751737ba21966ecedc63f3fe4a2b61bde6f39bf0caf4de0a77bf2008f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081430B4\",\"who\":\"sol-081430B4-3365\",\"claim_id\":6701877493,\"reason\":\"First native MATCH3368 complete60B original ELF under published tested double selected-record policy; one native/compiler, plausible, all integrity checks and entire original qualification manifest identical. All originals preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T03:53:58Z",
+          "id": 6701909202,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T03:53:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1554dd1b37abf5f90d88219a2e58863f5e59cb9e25f76d993c34a34c04940c52",
+        "result": {
+          "address": "0x081430B4",
+          "claim_id": 6701877493,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701909202,
+          "status": "accepted",
+          "who": "sol-081430B4-3365"
+        }
+      }
     },
     {
       "claim": {
