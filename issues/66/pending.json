@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "f52efd955e2a55763d55c874099646b68297899a628602d606481e8f572ec102",
-        "acknowledged_cursor": 6714584524,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f52efd955e2a55763d55c874099646b68297899a628602d606481e8f572ec102",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08122ABC\",\"who\":\"sol-08122ABC-3773\",\"note\":\"Finish ordinary plausible C matching with existing native profiles; natural expressions/scopes/types allowed, no artificial operations or tooling.\"}",
-          "created_at": "2026-11-07T23:41:03Z",
-          "id": 6714584524,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:41:03Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "18e0f22895dd983b06ed76d14821887880e686fc1676651bc24d7c79d7dfd5b9",
-        "result": {
-          "address": "0x08122ABC",
-          "claim_id": 6714584524,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714584524,
-          "status": "accepted",
-          "who": "sol-08122ABC-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a4116a869fcc0c932cf9f8caef03d61d5e328985cb8bf557316ea6d8c7a8a313",
-        "acknowledged_cursor": 6714647360,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a4116a869fcc0c932cf9f8caef03d61d5e328985cb8bf557316ea6d8c7a8a313",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08122ABC\",\"who\":\"sol-08122ABC-3773\",\"claim_id\":6714584524,\"reason\":\"Native MATCH exit0, plausible complete function identical to ROM; source and full FUNC frozen. C matching owner fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T23:47:41Z",
-          "id": 6714647360,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:47:41Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "71534b0bf7074c5267935f0e4ac64e7bcb9c5b39867e56a249122b5a5465ea16",
-        "result": {
-          "address": "0x08122ABC",
-          "claim_id": 6714584524,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714647360,
-          "status": "accepted",
-          "who": "sol-08122ABC-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "55f9254eca45afc883bd247c399b6338f7e51836dbeb746e3f80557e33520959",
         "acknowledged_cursor": 6714591104,
         "body_provenance": "acceptance-time",
