@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "900dec7996558a186e143e3750a766c0dffd9835ea511d09ba574379b10dd85d",
-        "acknowledged_cursor": 6708124587,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "900dec7996558a186e143e3750a766c0dffd9835ea511d09ba574379b10dd85d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08081BEC\",\"who\":\"codex-08081BEC\",\"note\":\"Natural menu initialization316B; existing data/function-address admission, isolated workspace.\"}",
-          "created_at": "2026-11-07T14:22:34Z",
-          "id": 6708124587,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:22:34Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e602a9d1f57b082b9b98bbca219a65ada1f2687ce942393f44d96d3f62dcc7ad",
-        "result": {
-          "address": "0x08081BEC",
-          "claim_id": 6708124587,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6708124587,
-          "status": "accepted",
-          "who": "codex-08081BEC"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "28ac575d992b764594352831fcb9737a5bee8148c5cab1deeaffd3e06863ff40",
-        "acknowledged_cursor": 6708221705,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "28ac575d992b764594352831fcb9737a5bee8148c5cab1deeaffd3e06863ff40",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08081BEC\",\"who\":\"codex-08081BEC\",\"claim_id\":6708124587,\"reason\":\"Parked natural menu initializer300vs316 bytes; later recordbase CSE vs region/window bases changes registers/pools; verified map is complete.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; nested/flat layouts, typed region/list/cursor, callback locals, address forms; sibling layout check; default function-address path\"}",
-          "created_at": "2026-11-07T14:31:25Z",
-          "id": 6708221705,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:31:25Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "0653d07ac0cdc33699c5bc604e1a2da78c13c0515f03f4ff29a7de1e0cf509b3",
-        "result": {
-          "address": "0x08081BEC",
-          "claim_id": 6708124587,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6708221705,
-          "status": "accepted",
-          "who": "codex-08081BEC"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "7f3c517dbd84b385e894475dba57b36920f115bd822a9817a2f6cef713fe2805",
         "acknowledged_cursor": 6708317745,
         "body_provenance": "acceptance-time",
