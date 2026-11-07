@@ -63,6 +63,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "629b273cbde27693a5be459a86f52df23db6e7d25a9231004b4d88376b64c936",
+        "acknowledged_cursor": 6714184989,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "629b273cbde27693a5be459a86f52df23db6e7d25a9231004b4d88376b64c936",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080035F8\",\"who\":\"Team2-native144-080035F8\",\"note\":\"Retained exact original C; newly tested explicit eight-byte ROM-to-local table proof; current count-only metadata and genuine typed data identities; no source steering.\"}",
+          "created_at": "2026-11-07T23:00:20Z",
+          "id": 6714184989,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:00:20Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "53d3c4f3620780b7d2a80488385e010ffb388a471c7b4bfc6e803fd485190e98",
+        "result": {
+          "address": "0x080035F8",
+          "claim_id": 6714184989,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714184989,
+          "status": "accepted",
+          "who": "Team2-native144-080035F8"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
