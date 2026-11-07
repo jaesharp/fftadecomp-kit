@@ -16,6 +16,7 @@ import allocator_remove_relation as remove
 SELECTOR='conditional-scheduler-allocator-list-state-v1'
 MAX_LINKS=128
 ZERO92_SHA256='cee672a0c6580d8e53ee28f4c9ec61ae7a4b18eb2b237f8b6d9fe61b3b376046'
+ZERO112_SHA256='0b1975920e093915955367a11337798791b506defa1b044127acd746f8bb93b7'
 HEAD=bytes.fromhex('f0b5 4f46 4646 c0b4 87b0 051c 8846 141c 9946 0e9e 2404 e020 4003 2418 240c 2868 211c')
 POST=bytes.fromhex('071c 0e48 0268 381c 211c')
 LINK1=bytes.fromhex('''
@@ -165,9 +166,29 @@ def _zero92(memory,receipt,target,count,destination,sp,site):
                                   origin='retained direct count92 effect'))
 
 
+def _zero112(memory,receipt,target,count,destination,sp,site):
+    if type(receipt)is not bytes or hashlib.sha256(receipt).hexdigest()!=ZERO112_SHA256:
+        raise remove._Boundary(site,'retained first count112 zero certificate absent or changed')
+    rule=json.loads(receipt)
+    if count!=rule['count']:
+        raise remove._Boundary(site,'actual scheduler count differs from retained count112 effect')
+    if type(target)is not int or target!=(rule['entry']|1):
+        raise remove._Boundary(site,'direct zero R2 word lacks retained installed Thumb identity')
+    memory.check_field(destination,count,site,'direct zero destination')
+    memory.guard(sp-4,4,site,'direct zero private save')
+    memory.events.append(dict(site=site,operation='conditional-installed-zero112',target=target,
+        destination=destination,count=count,receipt_sha256=ZERO112_SHA256,private_save=[sp-4,sp],
+        alignment_case=0,installed_identity_proved=False,physical_permission_proved=False))
+    for region,offset,width in rule['alignment_cases'][0]['writes']:
+        if region!='destination':continue
+        for i in range(width):memory.cells[destination+offset+i]=0;memory.changed.add(destination+offset+i)
+        memory.events.append(dict(site=site,operation='zero-write',coordinate=destination+offset,width=width,value=0,
+                                  origin='retained direct count112 effect'))
+
+
 def derive(layout,size_word,cells,scheduler_offset,descriptor_offset,callback_word,entry_sp,*,selector,
            zero12_receipt=None,zero92_receipt=None,observed_zero_target=None,protected_spans=(),
-           max_links=MAX_LINKS,max_search_transitions=256,max_median_links=256):
+           max_links=MAX_LINKS,max_search_transitions=256,max_median_links=256,zero112_receipt=None):
     """Derive only the conditional pre-copy state. All addresses share one base."""
     if type(selector)is not str or selector!=SELECTOR or type(layout)is not Layout:
         raise ValueError('explicit scheduler-state selector and retained layout required')
@@ -216,7 +237,10 @@ def derive(layout,size_word,cells,scheduler_offset,descriptor_offset,callback_wo
                                   value=observed_zero_target,origin_proved=False))
         if allocation is None:
             raise remove._Boundary(c+48,'actual zero destination is null; no writable null span is admitted')
-        _zero92(memory,zero92_receipt,observed_zero_target,count,allocation,sp,c+48)
+        if zero112_receipt is None:
+            _zero92(memory,zero92_receipt,observed_zero_target,count,allocation,sp,c+48)
+        else:
+            _zero112(memory,zero112_receipt,observed_zero_target,count,allocation,sp,c+48)
         memory.callback_store(allocation,callback_word,c+54)
         phase=memory.half(scheduler_offset+12,c+56,'scheduler phase after allocator/zero/callback writes')
         memory.half_store(allocation+22,phase,c+58,'allocation phase')
@@ -273,6 +297,6 @@ def derive(layout,size_word,cells,scheduler_offset,descriptor_offset,callback_wo
             ('physical-memory', 'The common heap base is word aligned; every coordinate and pointer operation is valid, nonwrapping ordinary memory with required access and object lifetime. No role or literal point grants extent.'),
             ('frame-and-source', 'All actual caller/source/saved/code protections are complete and live. The checked132-byte envelope and incoming-word protection express numeric conditions, not actual separation facts.'),
             ('retained-allocator', 'Every frozen allocator/search/remove/insert/wrapper condition applies to this new byte state; unknown origins are not promoted to scalar or pointer bits.'),
-            ('installed-zero', 'Both retained zero12 and zero92 installed-image, target, private-save, destination, return and no-interference conditions hold when used.'),
+            ('installed-zero', 'Retained zero12 and the selected direct zero92 or zero112 installed-image, target, private-save, destination, return and no-interference conditions hold when used.'),
             ('stable-list', 'Only listed writes occur; synchronous ordinary reads have no asynchronous/device interference. Cycles and budget exhaustion remain refusals, not termination evidence.'),
             ('copy-and-callback', 'This ends before descriptor copy. The reported post-effect source/callback bytes must feed the retained copy and actual callback contracts; original initialization/identity cannot be reused after an alias overwrite.')]])

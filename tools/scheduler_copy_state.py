@@ -83,7 +83,7 @@ def _transport(source):
 def derive(layout, size_word, cells, scheduler_offset, descriptor_offset, callback_word,
            entry_sp, ambient_registers, *, selector, zero12_receipt=None, zero92_receipt=None,
            observed_zero_target=None, protected_spans=(), max_links=128,
-           max_search_transitions=256, max_median_links=256):
+           max_search_transitions=256, max_median_links=256, zero112_receipt=None):
     """New composition on a new state; do not replay a frozen actual derive.
 
 All coordinates retain069's common symbolic heap base. R10..R12 must carry
@@ -99,7 +99,8 @@ Actual entry state, source access/lifetime and external effects stay premises.
         callback_word, entry_sp, selector=state.SELECTOR, zero12_receipt=zero12_receipt,
         zero92_receipt=zero92_receipt, observed_zero_target=observed_zero_target,
         protected_spans=protected_spans, max_links=max_links,
-        max_search_transitions=max_search_transitions, max_median_links=max_median_links)
+        max_search_transitions=max_search_transitions, max_median_links=max_median_links,
+        zero112_receipt=zero112_receipt)
     c = layout.address
     sp = entry_sp-56
     allocation = prefix['allocation']
