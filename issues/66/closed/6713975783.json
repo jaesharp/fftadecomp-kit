@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "a75baf1b9435377cd6d8afd6c54e361fae83d48654a14dcdaa33225b5bf479a6",
+    "acknowledged_cursor": 6713975783,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "a75baf1b9435377cd6d8afd6c54e361fae83d48654a14dcdaa33225b5bf479a6",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CD544\",\"who\":\"sol-080CD544-3771\",\"note\":\"Match byte-indexed bit7 setter using actual one-byte packed field layout; old unpacked record had wrong stride4. No tooling.\"}",
+      "created_at": "2026-11-07T22:39:24Z",
+      "id": 6713975783,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:39:24Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "7fe4a00e417d4c796ff267e0980d6c11d8d25fa7c2579f834a267c11bebe4d11",
+    "result": {
+      "address": "0x080CD544",
+      "claim_id": 6713975783,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6713975783,
+      "status": "accepted",
+      "who": "sol-080CD544-3771"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "371d7fc43820d5fa720845a27e588d7b392b968fd703a35eb49fee8d550717a7",
+    "acknowledged_cursor": 6714018662,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "371d7fc43820d5fa720845a27e588d7b392b968fd703a35eb49fee8d550717a7",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CD544\",\"who\":\"sol-080CD544-3771\",\"claim_id\":6713975783,\"reason\":\"Grounded packed one-byte bitfield correction remains plausible native NONMATCH: complete26B, byte-load/mask operand registers differ at CD552/CD554; no further independent correction.\",\"unmatchable\":true,\"tried\":\"One ROM-grounded packed one-byte layout with fixed -mthumb-interwork -O2; no tuning or replay.\"}",
+      "created_at": "2026-11-07T22:43:32Z",
+      "id": 6714016829,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:43:32Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "4c89bb4dedc2cd2db1414407c2a28c040d6157cabaeed8337fc1770b890bef50",
+    "result": {
+      "address": "0x080CD544",
+      "claim_id": 6713975783,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6714016829,
+      "status": "accepted",
+      "who": "sol-080CD544-3771"
+    }
+  }
+}

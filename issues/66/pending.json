@@ -90,7 +90,35 @@
           "who": "sol-080CD544-3771"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "371d7fc43820d5fa720845a27e588d7b392b968fd703a35eb49fee8d550717a7",
+        "acknowledged_cursor": 6714018662,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "371d7fc43820d5fa720845a27e588d7b392b968fd703a35eb49fee8d550717a7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CD544\",\"who\":\"sol-080CD544-3771\",\"claim_id\":6713975783,\"reason\":\"Grounded packed one-byte bitfield correction remains plausible native NONMATCH: complete26B, byte-load/mask operand registers differ at CD552/CD554; no further independent correction.\",\"unmatchable\":true,\"tried\":\"One ROM-grounded packed one-byte layout with fixed -mthumb-interwork -O2; no tuning or replay.\"}",
+          "created_at": "2026-11-07T22:43:32Z",
+          "id": 6714016829,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:43:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4c89bb4dedc2cd2db1414407c2a28c040d6157cabaeed8337fc1770b890bef50",
+        "result": {
+          "address": "0x080CD544",
+          "claim_id": 6713975783,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714016829,
+          "status": "accepted",
+          "who": "sol-080CD544-3771"
+        }
+      }
     },
     {
       "claim": {
@@ -120,6 +148,66 @@
           "request_id": 6713997099,
           "status": "accepted",
           "who": "FFTA-Team2-native142"
+        }
+      },
+      "release": {
+        "acceptance_body_sha256": "7597e760f08463d4dc0ca537e60d662e850bbceaaddcd02dfd5c4a582b2df9d6",
+        "acknowledged_cursor": 6714018662,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7597e760f08463d4dc0ca537e60d662e850bbceaaddcd02dfd5c4a582b2df9d6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08035CAC\",\"who\":\"FFTA-Team2-native142\",\"claim_id\":6713997099,\"reason\":\"Stopped84B/84B nonidentical after one independently published glyph-base correction. Preserve both original141/142 sources and all ET_REL/ELF/FUNC/errors. Zero native credit; no further grounded form.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T22:43:24Z",
+          "id": 6714015428,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:43:24Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4c89bb4dedc2cd2db1414407c2a28c040d6157cabaeed8337fc1770b890bef50",
+        "result": {
+          "address": "0x08035CAC",
+          "claim_id": 6713997099,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714015428,
+          "status": "accepted",
+          "who": "FFTA-Team2-native142"
+        }
+      }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "5f5b9eea9f52553fffc2deb80a94ead4f2fdf466ae811db37f34b351cb48e8de",
+        "acknowledged_cursor": 6714018662,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5f5b9eea9f52553fffc2deb80a94ead4f2fdf466ae811db37f34b351cb48e8de",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CCF44\",\"who\":\"sol-080CCF44-3771\",\"note\":\"Match effect-record routine with evidence-based defining typed object interface; retained void formal/local cast differs from subsystem contract. No tooling.\"}",
+          "created_at": "2026-11-07T22:43:43Z",
+          "id": 6714018662,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:43:43Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4c89bb4dedc2cd2db1414407c2a28c040d6157cabaeed8337fc1770b890bef50",
+        "result": {
+          "address": "0x080CCF44",
+          "claim_id": 6714018662,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714018662,
+          "status": "accepted",
+          "who": "sol-080CCF44-3771"
         }
       },
       "release": null
