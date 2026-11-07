@@ -30,7 +30,35 @@
           "who": "codex-08027800"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c285a148a4ca370508d356ecc17bbef6a61305f50c45a3b5350099569ba4b33f",
+        "acknowledged_cursor": 6707259731,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c285a148a4ca370508d356ecc17bbef6a61305f50c45a3b5350099569ba4b33f",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08027800\",\"who\":\"codex-08027800\",\"claim_id\":6707036014,\"reason\":\"Integrated src/08027800.c: natural280byte inventory menu, parent native named-data-buffer-v1 MATCH and plausible.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T13:00:11Z",
+          "id": 6707259731,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T13:00:11Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a5c65768e6edcc0048d2c052732e8bc9cf3b5c405a76d5b92f9ef6e857694361",
+        "result": {
+          "address": "0x08027800",
+          "claim_id": 6707036014,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6707259731,
+          "status": "accepted",
+          "who": "codex-08027800"
+        }
+      }
     },
     {
       "claim": {
@@ -62,7 +90,35 @@
           "who": "codex-080A901C"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "48d83f771c009023084aca0717e8bc6fa0f11c6ce23e0bd3f93bcecaac52323d",
+        "acknowledged_cursor": 6707259731,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "48d83f771c009023084aca0717e8bc6fa0f11c6ce23e0bd3f93bcecaac52323d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080A901C\",\"who\":\"codex-080A901C\",\"claim_id\":6707133517,\"reason\":\"Integrated src/080A901C.c:576byte display updater parent native addressed-signed-runtime-data-v1 MATCH and plausible; three ROM-backed data mappings.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T13:00:10Z",
+          "id": 6707259618,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T13:00:10Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a5c65768e6edcc0048d2c052732e8bc9cf3b5c405a76d5b92f9ef6e857694361",
+        "result": {
+          "address": "0x080A901C",
+          "claim_id": 6707133517,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6707259618,
+          "status": "accepted",
+          "who": "codex-080A901C"
+        }
+      }
     }
   ],
   "issue": 66,
