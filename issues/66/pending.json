@@ -91,6 +91,38 @@
           "who": "sol-0808B288-3752"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "54283240cd73d379361f20a770c54c49277c10c482f5cc6c0c5c5db086382f8e",
+        "acknowledged_cursor": 6712298199,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "54283240cd73d379361f20a770c54c49277c10c482f5cc6c0c5c5db086382f8e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08070260\",\"who\":\"FFTA-Team2-native109\",\"note\":\"First natural C for actual136B sixteen-halfword channel scaling; scalar canonical division; separate from active108 publication.\"}",
+          "created_at": "2026-11-07T19:58:12Z",
+          "id": 6712298199,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T19:58:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b81046ce280cc72d9a0b2db03695ebcccc2ddcb13f7d8e896614d27c5c9771ec",
+        "result": {
+          "address": "0x08070260",
+          "claim_id": 6712298199,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712298199,
+          "status": "accepted",
+          "who": "FFTA-Team2-native109"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
