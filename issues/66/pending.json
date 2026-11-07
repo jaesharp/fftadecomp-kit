@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "90e76207c18775927c72069b233c5c81eb99e35e588a647716f09b1875948e78",
-        "acknowledged_cursor": 6704885001,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "90e76207c18775927c72069b233c5c81eb99e35e588a647716f09b1875948e78",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0806F8DC\",\"who\":\"codex-0806F8DC-1107\",\"note\":\"Recover natural state-machine switch with typed direct calls; dedicated native agent, parent owns proof and lease.\"}",
-          "created_at": "2026-11-07T09:09:38Z",
-          "id": 6704885001,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:09:38Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "d12c41e10e4ff6f39870b2d8e3587e555501852e8e18fa3914ebf0960583407f",
-        "result": {
-          "address": "0x0806F8DC",
-          "claim_id": 6704885001,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6704885001,
-          "status": "accepted",
-          "who": "codex-0806F8DC-1107"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "dc4465e11042e7641d4854ab7e9fcf238e6d7649184d049c8bd2e506eedbccff",
-        "acknowledged_cursor": 6704919103,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "dc4465e11042e7641d4854ab7e9fcf238e6d7649184d049c8bd2e506eedbccff",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0806F8DC\",\"who\":\"codex-0806F8DC-1107\",\"claim_id\":6704885001,\"reason\":\"Parked natural182byte switch candidate; dispatch/data/external-alignment profile composition unsupported; typed-linked byte equality unproved, no verifier weakening.\",\"unmatchable\":true,\"tried\":\"fixed -mthumb-interwork -O2; u16-scalars-v1; restoring-owner-switch-entry-word-v1\"}",
-          "created_at": "2026-11-07T09:13:08Z",
-          "id": 6704919103,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T09:13:08Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "da3565b54768a97d3d9640059f237395241cbc4c0569900cd3e73e916951eb56",
-        "result": {
-          "address": "0x0806F8DC",
-          "claim_id": 6704885001,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6704919103,
-          "status": "accepted",
-          "who": "codex-0806F8DC-1107"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "d4107067b4e2752f0ac8028554244c3578ff227ffaba88fc6887db3be4d95831",
         "acknowledged_cursor": 6704950220,
         "body_provenance": "acceptance-time",
