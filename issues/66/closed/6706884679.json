@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "d17874e211b16b41a783451057e708ca27f708c6380664e2358366853cf088b7",
+    "acknowledged_cursor": 6706884679,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "d17874e211b16b41a783451057e708ca27f708c6380664e2358366853cf088b7",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802F27C\",\"who\":\"codex-0802F27C\",\"note\":\"Natural 224-byte graphics loader; isolated scratch mapping from ROM literals; canonical-thunks-v1.\"}",
+      "created_at": "2026-11-07T12:22:51Z",
+      "id": 6706884679,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T12:22:51Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "77395feeb807899af486a9609a312df7c8327ab25bca9f686f130225ea66c683",
+    "result": {
+      "address": "0x0802F27C",
+      "claim_id": 6706884679,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6706884679,
+      "status": "accepted",
+      "who": "codex-0802F27C"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "597ff9d0990d5be0971ced77a8ae0a4e2e19c3cbc2eb9ca2b00c278220ffeea5",
+    "acknowledged_cursor": 6706925660,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "597ff9d0990d5be0971ced77a8ae0a4e2e19c3cbc2eb9ca2b00c278220ffeea5",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0802F27C\",\"who\":\"codex-0802F27C\",\"claim_id\":6706884679,\"reason\":\"Integrated src/0802F27C.c: parent native canonical-thunks-v1 MATCH224/224bytes76/76instructions, plausible. Refreshing mapping-bound aggregate evidence.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T12:26:51Z",
+      "id": 6706925660,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T12:26:51Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "eef0a7973e4cd7461effb9cbb15ec07f1cee7aeb0beddafa91a8c580ed089a3f",
+    "result": {
+      "address": "0x0802F27C",
+      "claim_id": 6706884679,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6706925660,
+      "status": "accepted",
+      "who": "codex-0802F27C"
+    }
+  }
+}
