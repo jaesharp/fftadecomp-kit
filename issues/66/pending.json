@@ -95,6 +95,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "21edb5b5d1e21d3a612c9a3b9de39b4e7394bdc800680f19fdd308c560f3b810",
+        "acknowledged_cursor": 6703765475,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "21edb5b5d1e21d3a612c9a3b9de39b4e7394bdc800680f19fdd308c560f3b810",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08058348\",\"who\":\"codex-08058348-1107\",\"note\":\"Recover natural C two-row tile palette update; parent owns reservation and boundary verification.\"}",
+          "created_at": "2026-11-07T07:11:19Z",
+          "id": 6703765475,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T07:11:19Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a85fc521a9fb9deef88c01fc3ffc03827c094c1af5168e4da48125dca969d155",
+        "result": {
+          "address": "0x08058348",
+          "claim_id": 6703765475,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6703765475,
+          "status": "accepted",
+          "who": "codex-08058348-1107"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
