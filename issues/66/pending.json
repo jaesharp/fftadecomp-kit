@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "59ca51ec4774bdb5c55392fb45a30ec00b0426a779c4a5df2b8155c56c1bfdf8",
-        "acknowledged_cursor": 6710106054,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "59ca51ec4774bdb5c55392fb45a30ec00b0426a779c4a5df2b8155c56c1bfdf8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080A7EC4\",\"who\":\"FFTA-Team2-native-103\",\"note\":\"First native qualification of unchanged frozen 256-byte exact original using published explicit multiple-switch admission; no C edits\"}",
-          "created_at": "2026-11-07T16:46:36Z",
-          "id": 6710106054,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T16:46:36Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "fae7568f339427da50963b8c2fc0a72b7ba9cefbe5a0f8bbc2cd536477d34aa0",
-        "result": {
-          "address": "0x080A7EC4",
-          "claim_id": 6710106054,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6710106054,
-          "status": "accepted",
-          "who": "FFTA-Team2-native-103"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "faaf0458e2ca64618e9a34816ec1451e67b3efcd682596e89c424945d0898dea",
-        "acknowledged_cursor": 6710162494,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "faaf0458e2ca64618e9a34816ec1451e67b3efcd682596e89c424945d0898dea",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080A7EC4\",\"who\":\"FFTA-Team2-native-103\",\"claim_id\":6710106054,\"reason\":\"First native MATCH256B under published ordinary-multiple-switch policy after independently grounded dual-index128to57 count reconciliation; unchanged frozen C, compiler1/native1, publication pending\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T16:50:20Z",
-          "id": 6710162494,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T16:50:20Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e9fb337cc4c4b93ea5653e5703799b8b2f52b7d23b81e0ed1ac769c806092543",
-        "result": {
-          "address": "0x080A7EC4",
-          "claim_id": 6710106054,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6710162494,
-          "status": "accepted",
-          "who": "FFTA-Team2-native-103"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "cdb39cf8541fe2811b0186e40d7e3afddd72df6b64ba44e0e7b122ca8bb96887",
         "acknowledged_cursor": 6710240646,
         "body_provenance": "acceptance-time",
