@@ -62,66 +62,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "3023a8193f13bbd12345fcc2c835ecf8e29296733cb4a55c256909e81d7cac3d",
-        "acknowledged_cursor": 6706687685,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3023a8193f13bbd12345fcc2c835ecf8e29296733cb4a55c256909e81d7cac3d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08013BC0\",\"who\":\"codex-08013BC0\",\"note\":\"Natural unsigned round-up helper,44byte complete owner; isolated source and existing unsigned-runtime profile.\"}",
-          "created_at": "2026-11-07T12:02:48Z",
-          "id": 6706686686,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:02:48Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2cad11269b5a68cc5993e97a6be1401722c1f8efa394de39cc3ffbac03bbc62e",
-        "result": {
-          "address": "0x08013BC0",
-          "claim_id": 6706686686,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706686686,
-          "status": "accepted",
-          "who": "codex-08013BC0"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4a14b6b7ff188b671b16c56143c7fe2197036e4d5bae70e8c87b00820ca91d2e",
-        "acknowledged_cursor": 6706710329,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4a14b6b7ff188b671b16c56143c7fe2197036e4d5bae70e8c87b00820ca91d2e",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08013BC0\",\"who\":\"codex-08013BC0\",\"claim_id\":6706686686,\"reason\":\"Integrated natural unsigned round-up helper;44 complete bytes exact, plausible addressed-unsigned-runtime-v1 MATCH in primary. Original zero-divisor runtime boundary retained.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T12:05:08Z",
-          "id": 6706710329,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:05:08Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "fb2c0c85292d99aae9e50899171a119740cc289550274ce6dff3c161dcb11897",
-        "result": {
-          "address": "0x08013BC0",
-          "claim_id": 6706686686,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706710329,
-          "status": "accepted",
-          "who": "codex-08013BC0"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "5ffdf6c716bda49c65ed086c9959fb3026893239cb759ec6d06279a17c497350",
         "acknowledged_cursor": 6706687685,
         "body_provenance": "acceptance-time",
