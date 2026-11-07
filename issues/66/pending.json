@@ -30,7 +30,35 @@
           "who": "codex-0808C53C"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7a21322d99f899905f77dba742742fb3bf15866619dc67f79071a81e43671012",
+        "acknowledged_cursor": 6706902152,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7a21322d99f899905f77dba742742fb3bf15866619dc67f79071a81e43671012",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808C53C\",\"who\":\"codex-0808C53C\",\"claim_id\":6706832178,\"reason\":\"Parked natural244byte source: two byte positions differ from reversed source-move/destination-load at0808C610. Native profile rejects.\",\"unmatchable\":true,\"tried\":\"-O2,-O3,-Os; named/numeric destination, destination local, explicit source, branch-local calls; -O1 section rejection\"}",
+          "created_at": "2026-11-07T12:24:30Z",
+          "id": 6706902152,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T12:24:30Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8a803a67b48401d14e352239e6e08ad5b29bc7b2b821699f5db783f693209fd8",
+        "result": {
+          "address": "0x0808C53C",
+          "claim_id": 6706832178,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6706902152,
+          "status": "accepted",
+          "who": "codex-0808C53C"
+        }
+      }
     },
     {
       "claim": {
