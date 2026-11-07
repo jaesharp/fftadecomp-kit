@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "5f5b9eea9f52553fffc2deb80a94ead4f2fdf466ae811db37f34b351cb48e8de",
+    "acknowledged_cursor": 6714018662,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "5f5b9eea9f52553fffc2deb80a94ead4f2fdf466ae811db37f34b351cb48e8de",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CCF44\",\"who\":\"sol-080CCF44-3771\",\"note\":\"Match effect-record routine with evidence-based defining typed object interface; retained void formal/local cast differs from subsystem contract. No tooling.\"}",
+      "created_at": "2026-11-07T22:43:43Z",
+      "id": 6714018662,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:43:43Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "4c89bb4dedc2cd2db1414407c2a28c040d6157cabaeed8337fc1770b890bef50",
+    "result": {
+      "address": "0x080CCF44",
+      "claim_id": 6714018662,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6714018662,
+      "status": "accepted",
+      "who": "sol-080CCF44-3771"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "cad49e8b59196ff9f13a01ef894db8341851b67d3f21d3f90ad98b2af9e72e27",
+    "acknowledged_cursor": 6714096483,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "cad49e8b59196ff9f13a01ef894db8341851b67d3f21d3f90ad98b2af9e72e27",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CCF44\",\"who\":\"sol-080CCF44-3771\",\"claim_id\":6714018662,\"reason\":\"Grounded typed-interface/packed-pair recovery remains plausible whole-body native NONMATCH; final difference is operand-register or adjacent instruction scheduling, no independent further correction.\",\"unmatchable\":true,\"tried\":\"Fixed -mthumb-interwork -O2; independently grounded actual typed interface and two-byte marker/value pair layouts. No steering/replay.\"}",
+      "created_at": "2026-11-07T22:51:28Z",
+      "id": 6714096483,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:51:28Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "75434290cbc120a130c79af71fcc5481a75d6fcf51b0daeb09f885fd78ce99d8",
+    "result": {
+      "address": "0x080CCF44",
+      "claim_id": 6714018662,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6714096483,
+      "status": "accepted",
+      "who": "sol-080CCF44-3771"
+    }
+  }
+}
