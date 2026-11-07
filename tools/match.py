@@ -4244,6 +4244,7 @@ def main():
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
                                                       "named-data-buffer-v1", "bounded-buffer-datafree-caller-v1",
+                                                      "conditional-two-word-callback-closure-v1",
                                                       "bounded-buffer-discarded-return-scratch-v1",
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
                                                       "bounded-buffer-bios-fill-source-v1",

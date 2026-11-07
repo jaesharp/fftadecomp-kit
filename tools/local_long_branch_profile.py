@@ -96,8 +96,10 @@ def prove_frame(instructions, edges, address, branches, calls, *,
     root_switch_buffer = type(buffer_proof) is RootGuardedSwitchBufferProof
     from static_callback_r6_frame_profile import RestoringLocalBufferProof
     restoring_local_buffer = type(buffer_proof) is RestoringLocalBufferProof
+    from two_word_callback_closure_profile import _ContextRead
+    callback_context_buffer = type(buffer_proof) is _ContextRead
     if type(stack_aliases) is not bool or buffer_proof is not None and (
-            not stack_aliases or not root_switch_buffer and not restoring_local_buffer and (
+            not stack_aliases or not root_switch_buffer and not restoring_local_buffer and not callback_context_buffer and (
                 type(buffer_proof) is not BufferCallProof or buffer_proof.stack_arguments)):
         raise ValueError("local aliases require explicit Boolean policy and native buffer proof")
     if bounded_output_proof is not None:
@@ -142,7 +144,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
             raise ValueError('formal stack callees require their exclusive fresh native proof and local slots')
         formal_stack_callee_proof.validate_calls(calls)
     discarded_aliases = set()
-    if restoring_local_buffer:
+    if restoring_local_buffer or callback_context_buffer:
         buffer_proof.validate_frame(instructions, edges, address, branches, calls,
                                     call_preservation, discarded_exit_scratch)
     if discarded_exit_scratch is not None:
@@ -434,7 +436,7 @@ def prove_frame(instructions, edges, address, branches, calls, *,
                 if (bounded_output_proof.check_call(calls[site],offsets,native_stack,site=site)
                         if bounded_output_proof is not None else
                         buffer_proof.check_call(calls[site], offsets, native_stack,
-                            **({'site':site} if root_switch_buffer or restoring_local_buffer or buffer_proof.bios_fill_proof is not None else {}))):
+                            **({'site':site} if root_switch_buffer or restoring_local_buffer or callback_context_buffer or buffer_proof.bios_fill_proof is not None else {}))):
                     raise ValueError("local alias return requires a separate provenance policy")
                 # A proved callee may write through any passed local buffer.
                 # Do not retain a saved-register token in potentially changed bytes.
