@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "0d5c5e166f1a3c07a088fb3f76da9eb3c360e501f8123fd5902ac855cd823dc1",
-        "acknowledged_cursor": 6712923471,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0d5c5e166f1a3c07a088fb3f76da9eb3c360e501f8123fd5902ac855cd823dc1",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08037C84\",\"who\":\"sol-08037C84-3763\",\"note\":\"Natural C matching for complete leaf owner with bounded constant stack offsets; existing published native matcher only, no tooling development or steering.\"}",
-          "created_at": "2026-11-07T20:57:31Z",
-          "id": 6712923471,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:57:31Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1afdc71ec0e200ac77e49df1df94927791f6dee9fcafcca4e04faecfa261009a",
-        "result": {
-          "address": "0x08037C84",
-          "claim_id": 6712923471,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712923471,
-          "status": "accepted",
-          "who": "sol-08037C84-3763"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "11ce447621aa2ac842ee2fa4c311a77842abd5de1373949c0ebf7f9fc27313a3",
-        "acknowledged_cursor": 6713009615,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "11ce447621aa2ac842ee2fa4c311a77842abd5de1373949c0ebf7f9fc27313a3",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08037C84\",\"who\":\"sol-08037C84-3763\",\"claim_id\":6712923471,\"reason\":\"Natural source356B versus364B owner; native incoming-byte-alias rejected stack alias arithmetic leaves tracked frame. Initial C99 flexible-array compiler error corrected to supported GNU zero-length record; both originals retained, no allocation/shape steering or new tooling.\",\"unmatchable\":true,\"tried\":\"Fixed -mthumb-interwork -O2; natural record source, one compiler compatibility correction\"}",
-          "created_at": "2026-11-07T21:05:26Z",
-          "id": 6713007119,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T21:05:26Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "cac3085b60a43005f1650bd825cf9afe3658d79035daf07554ea0fe428ad62d0",
-        "result": {
-          "address": "0x08037C84",
-          "claim_id": 6712923471,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6713007119,
-          "status": "accepted",
-          "who": "sol-08037C84-3763"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "278bed55fc4ca9cfd8dec797d915ee0cba53e3169f7fb9aa8fae6271002f3ac6",
         "acknowledged_cursor": 6712964163,
         "body_provenance": "acceptance-time",
@@ -91,66 +31,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "c11d18fc4409e52223e450d44ec9a0459b1b37eb4edf3bbe75321032f41a3496",
-        "acknowledged_cursor": 6712982421,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c11d18fc4409e52223e450d44ec9a0459b1b37eb4edf3bbe75321032f41a3496",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002838\",\"who\":\"FFTA-Team2-native122\",\"note\":\"First natural complete144B scalar random distribution from actualfour LCG updates and genuine canonical signed remainder; no steering or invented effects\"}",
-          "created_at": "2026-11-07T21:03:05Z",
-          "id": 6712982421,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T21:03:05Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c1e908c47e6339d3a1bf175e57d4dda71dca2595561fcca9cc5505cddfd56ccb",
-        "result": {
-          "address": "0x08002838",
-          "claim_id": 6712982421,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712982421,
-          "status": "accepted",
-          "who": "FFTA-Team2-native122"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "3df84bb0a7e3fca468e9151def1c0e2a65c659af3e01522bafca7fb653a0fb20",
-        "acknowledged_cursor": 6712999823,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "3df84bb0a7e3fca468e9151def1c0e2a65c659af3e01522bafca7fb653a0fb20",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002838\",\"who\":\"FFTA-Team2-native122\",\"claim_id\":6712982421,\"reason\":\"Frozen144B scalar first natural candidate with55 differing bytes; strict native exact-body refusal retained, no scheduling or register steering\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T21:04:44Z",
-          "id": 6712999823,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T21:04:44Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7b7bfcc74702a0cc8aa9a33af23cc963ab0745e7faf0b007432192a13a144cd5",
-        "result": {
-          "address": "0x08002838",
-          "claim_id": 6712982421,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712999823,
-          "status": "accepted",
-          "who": "FFTA-Team2-native122"
-        }
-      }
     },
     {
       "claim": {
