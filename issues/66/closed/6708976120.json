@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "26f003b55200f90d959ffc7f33689a7b1beea6b8a21f96f52f20c641cc85b7e0",
+    "acknowledged_cursor": 6708976120,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "26f003b55200f90d959ffc7f33689a7b1beea6b8a21f96f52f20c641cc85b7e0",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08145BF4\",\"who\":\"codex-08145BF4\",\"note\":\"Recover80-byte audio-register selector; complete native leaf/data ROM screening and existing MMIO maps; isolated one-function attempt.\"}",
+      "created_at": "2026-11-07T15:26:24Z",
+      "id": 6708976120,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T15:26:24Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "dbe075dc6944712c700610123c7332c3b3da75e0594ea337a16f8a3c248c15fa",
+    "result": {
+      "address": "0x08145BF4",
+      "claim_id": 6708976120,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6708976120,
+      "status": "accepted",
+      "who": "codex-08145BF4"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "a796ca22266eb265def8a0df321a7f5f3a1b690f67855da85517f519c9fa0120",
+    "acknowledged_cursor": 6709029951,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "a796ca22266eb265def8a0df321a7f5f3a1b690f67855da85517f519c9fa0120",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08145BF4\",\"who\":\"codex-08145BF4\",\"claim_id\":6708976120,\"reason\":\"Natural audio-register selector produces84vs80bytes; extra LR save/restore prevents full leaf match. Best candidate preserved in Parked/08145BF4; no flag/toolchain changes.\",\"unmatchable\":true,\"tried\":\"fixed agbcc -mthumb-interwork -O2; natural switch and shared store, typed/numeric MMIO, scalar stores, if-chain and nested branches\"}",
+      "created_at": "2026-11-07T15:30:29Z",
+      "id": 6709029951,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T15:30:29Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "a8ff3a84956eb1e627976f58a2d2127768c416be942be838569f01cffefece21",
+    "result": {
+      "address": "0x08145BF4",
+      "claim_id": 6708976120,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6709029951,
+      "status": "accepted",
+      "who": "codex-08145BF4"
+    }
+  }
+}
