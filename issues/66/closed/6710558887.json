@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "aca7a3b4efe9235e823d5bb15f8f94a185dd8c85205a7176f7d024026432528d",
+    "acknowledged_cursor": 6710559035,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "aca7a3b4efe9235e823d5bb15f8f94a185dd8c85205a7176f7d024026432528d",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D9F60\",\"who\":\"sol-080D9F60-3727\",\"note\":\"Natural C reconstruction using existing native profiles only. No toolkit changes.\"}",
+      "created_at": "2026-11-07T17:18:26Z",
+      "id": 6710558887,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T17:18:26Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "371c4cf3d62c4121c792e737b91bd282756327b4d856eb6c73d179cc8b7b5294",
+    "result": {
+      "address": "0x080D9F60",
+      "claim_id": 6710558887,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6710558887,
+      "status": "accepted",
+      "who": "sol-080D9F60-3727"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "aceeac8c6ce3d67fc88970fdc64ae8c89faa4e89348fdc05e02384a7d93c4be5",
+    "acknowledged_cursor": 6710782859,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "aceeac8c6ce3d67fc88970fdc64ae8c89faa4e89348fdc05e02384a7d93c4be5",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D9F60\",\"who\":\"sol-080D9F60-3727\",\"claim_id\":6710558887,\"reason\":\"Stopped natural matching; ordinary RAM reads remain missing, no match.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T17:38:54Z",
+      "id": 6710782823,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T17:38:54Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "25fd57e83b7026d410166a992e6ee357bce5a8fe97389f6e1a00cbb845aa490d",
+    "result": {
+      "address": "0x080D9F60",
+      "claim_id": 6710558887,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6710782823,
+      "status": "accepted",
+      "who": "sol-080D9F60-3727"
+    }
+  }
+}
