@@ -254,7 +254,35 @@
           "who": "sol-080D9F60-3224"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "b7efb040d1284aaac415843cbe72cb205c3e3b1db7336fe120a6ba07a3c8793a",
+        "acknowledged_cursor": 6700514532,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "b7efb040d1284aaac415843cbe72cb205c3e3b1db7336fe120a6ba07a3c8793a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D9F60\",\"who\":\"sol-080D9F60-3224\",\"claim_id\":6700418218,\"reason\":\"Historical238B bodies omit eight actual discarded LDRB; existing packed stride correction already retained. No independent natural storage correction, zero compiler replay.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T01:42:26Z",
+          "id": 6700514532,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T01:42:26Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a115bb6246581bedf870db2b26f5d7b2410ab219338da5a90f48d4f3cba93fbf",
+        "result": {
+          "address": "0x080D9F60",
+          "claim_id": 6700418218,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6700514532,
+          "status": "accepted",
+          "who": "sol-080D9F60-3224"
+        }
+      }
     },
     {
       "claim": {
