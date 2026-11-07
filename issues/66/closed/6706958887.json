@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "0844fcdfe2465f33ada7d2bfbc94e99f00f33a0909f34867e32ed0886d5c3f22",
+    "acknowledged_cursor": 6706962083,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "0844fcdfe2465f33ada7d2bfbc94e99f00f33a0909f34867e32ed0886d5c3f22",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002ECC\",\"who\":\"codex-08002ECC\",\"note\":\"Natural104byte variable-width signed formatter; adjacent08002DE8 precedent; existing addressed signed runtime profile, no mappings.\"}",
+      "created_at": "2026-11-07T12:30:03Z",
+      "id": 6706958887,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T12:30:03Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "3d25e2d42f6e5c0c7f79b034220247b44d400f17156a237bb305d2d2a96f69fe",
+    "result": {
+      "address": "0x08002ECC",
+      "claim_id": 6706958887,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6706958887,
+      "status": "accepted",
+      "who": "codex-08002ECC"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "538ba559951b9a3d36c09a0dae350b22e62d0c2917a6f8e4403a307398b06430",
+    "acknowledged_cursor": 6706975614,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "538ba559951b9a3d36c09a0dae350b22e62d0c2917a6f8e4403a307398b06430",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002ECC\",\"who\":\"codex-08002ECC\",\"claim_id\":6706958887,\"reason\":\"Integrated natural variable-width formatter104bytes; parent addressed-signed-runtime-v1 native MATCH and plausible.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T12:31:42Z",
+      "id": 6706975614,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T12:31:42Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "09e906825d147d1aa836eb0fd4fae5646b745b43528c6535847bcc28381101b6",
+    "result": {
+      "address": "0x08002ECC",
+      "claim_id": 6706958887,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6706975614,
+      "status": "accepted",
+      "who": "codex-08002ECC"
+    }
+  }
+}
