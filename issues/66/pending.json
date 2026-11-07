@@ -90,7 +90,35 @@
           "who": "codex-0812D398"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "f5b64bf94bdf7c12cc632ae9d509b37f6dec59ca2f821843a32f8b3fae70a1ba",
+        "acknowledged_cursor": 6706592389,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f5b64bf94bdf7c12cc632ae9d509b37f6dec59ca2f821843a32f8b3fae70a1ba",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D398\",\"who\":\"codex-0812D398\",\"claim_id\":6706541776,\"reason\":\"Parked natural guarded percentage calculation:138 vs140 bytes; initial mask move, factor arithmetic scheduling and final clamp registers differ. Existing verifier correctly rejects extent; no steering/index/tool edits.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; natural arithmetic stages, signedness, mask ordering, guard forms\"}",
+          "created_at": "2026-11-07T11:53:04Z",
+          "id": 6706592389,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T11:53:04Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "270f57c729a90aa624cb79521801823521ac20e1a9b3697fc7eb69acd2abd5ef",
+        "result": {
+          "address": "0x0812D398",
+          "claim_id": 6706541776,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6706592389,
+          "status": "accepted",
+          "who": "codex-0812D398"
+        }
+      }
     }
   ],
   "issue": 66,
