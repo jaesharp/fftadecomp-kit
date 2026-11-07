@@ -191,6 +191,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "62ff3e5a000ee55976e830ddaa2277c0817ae3cb6be18658b53e6adb2a2f2521",
+        "acknowledged_cursor": 6710670070,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "62ff3e5a000ee55976e830ddaa2277c0817ae3cb6be18658b53e6adb2a2f2521",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08099714\",\"who\":\"FFTA-Team2-native-104\",\"note\":\"Original frozen72B exact source; first native qualification under current restoring R6 compact callback policy. No source steering; complete artifacts retained.\"}",
+          "created_at": "2026-11-07T17:28:42Z",
+          "id": 6710670070,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T17:28:42Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "7d095ddd174cab703e4afc922aa2bfd775ff96da6aab4de1d2757a6a8869a061",
+        "result": {
+          "address": "0x08099714",
+          "claim_id": 6710670070,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6710670070,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-104"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
