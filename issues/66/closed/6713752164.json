@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "5a6eb1815d20060b39450b8630f6237959051ec29f653399e5fb66ef3a42f71d",
+    "acknowledged_cursor": 6713752164,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "5a6eb1815d20060b39450b8630f6237959051ec29f653399e5fb66ef3a42f71d",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08035A68\",\"who\":\"FFTA-Team2-native138\",\"note\":\"First natural complete112B zero-fill and unsigned decimal tile formatter; original artifacts retained, native qualification only through published policy.\"}",
+      "created_at": "2026-11-07T22:17:31Z",
+      "id": 6713752164,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:17:31Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "6c714cf47fc309daae5a766ea98c145dd76893d3f9030c72c984f560f43bdd8e",
+    "result": {
+      "address": "0x08035A68",
+      "claim_id": 6713752164,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6713752164,
+      "status": "accepted",
+      "who": "FFTA-Team2-native138"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "92374db30786520b82365c12540f1d386688bc194ca26e2a5baee206572c53f0",
+    "acknowledged_cursor": 6713777636,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "92374db30786520b82365c12540f1d386688bc194ca26e2a5baee206572c53f0",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08035A68\",\"who\":\"FFTA-Team2-native138\",\"claim_id\":6713752164,\"reason\":\"First natural complete112B unsigned decimal formatter produces106B; original artifacts retained, no steering/replay. Isolated raw count53 versus56 retained. Frozen native138 result.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2, one grounded form, native1/compiler1\"}",
+      "created_at": "2026-11-07T22:20:04Z",
+      "id": 6713777636,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:20:04Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "f11ba218ed0cda16a48efdb82dc7f6d0536af9bca3ba95753f76334f66fc79e5",
+    "result": {
+      "address": "0x08035A68",
+      "claim_id": 6713752164,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6713777636,
+      "status": "accepted",
+      "who": "FFTA-Team2-native138"
+    }
+  }
+}
