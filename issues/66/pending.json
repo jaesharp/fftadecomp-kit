@@ -90,7 +90,35 @@
           "who": "codex-08097A04"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8ccf6d15b0b7a302a582951a2c2f6723c5c4ad9801a4c4008bed3d13e1eb508d",
+        "acknowledged_cursor": 6708558866,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8ccf6d15b0b7a302a582951a2c2f6723c5c4ad9801a4c4008bed3d13e1eb508d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08097A04\",\"who\":\"codex-08097A04\",\"claim_id\":6708481757,\"reason\":\"Parked complete natural actor movement/render recovery1276vs1280; packed-local reloads, predicate result allocation, effect-loop bases differ; possible originalinlineboundary not manufactured\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; evidence-backed signed16bit Position; natural Boolean and early-failure forms; direct effect array vs local record pointer; no helpers or steering\"}",
+          "created_at": "2026-11-07T14:57:23Z",
+          "id": 6708558866,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T14:57:23Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ff66a177a1ae483bd1697c4e1c9b26a2b402648f3c03fb3077f682ca9d43c4a7",
+        "result": {
+          "address": "0x08097A04",
+          "claim_id": 6708481757,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6708558866,
+          "status": "accepted",
+          "who": "codex-08097A04"
+        }
+      }
     }
   ],
   "issue": 66,
