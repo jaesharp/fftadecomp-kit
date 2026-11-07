@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "5ffdf6c716bda49c65ed086c9959fb3026893239cb759ec6d06279a17c497350",
-        "acknowledged_cursor": 6706687685,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5ffdf6c716bda49c65ed086c9959fb3026893239cb759ec6d06279a17c497350",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800C4B4\",\"who\":\"codex-0800C4B4\",\"note\":\"Natural double-buffer graphics transfer update,320byte complete owner; isolated C, mapped data and existing canonical thunk profile.\"}",
-          "created_at": "2026-11-07T12:02:54Z",
-          "id": 6706687685,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:02:54Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2cad11269b5a68cc5993e97a6be1401722c1f8efa394de39cc3ffbac03bbc62e",
-        "result": {
-          "address": "0x0800C4B4",
-          "claim_id": 6706687685,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706687685,
-          "status": "accepted",
-          "who": "codex-0800C4B4"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "f43f074457121419b944a8a33f0a378df6ebd2bd0573984829c74291d16e3bd7",
-        "acknowledged_cursor": 6706764878,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f43f074457121419b944a8a33f0a378df6ebd2bd0573984829c74291d16e3bd7",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800C4B4\",\"who\":\"codex-0800C4B4\",\"claim_id\":6706687685,\"reason\":\"Parked buffered transfer update:316 vs320 bytes; buffer/register selection and folded MMIO shadow relocation differ. Natural alternative arithmetic did not match; no verifier changes.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; conditionals/ternaries, pointer/integer fields, signed/unsigned address arithmetic\"}",
-          "created_at": "2026-11-07T12:10:37Z",
-          "id": 6706764878,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:10:37Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "6a655cc6767c9db028a046adf4aacbe1a755f659707acb0d33b5a6e066de7e71",
-        "result": {
-          "address": "0x0800C4B4",
-          "claim_id": 6706687685,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706764878,
-          "status": "accepted",
-          "who": "codex-0800C4B4"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "f9a081650fed661d5a58e6065e48c0e49e157c6f2840aee418072f5de6e68408",
         "acknowledged_cursor": 6706832178,
         "body_provenance": "acceptance-time",
