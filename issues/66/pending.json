@@ -191,6 +191,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "860e12a754fce965c05474c28585f8bb9795af3182c32a0da8e087e3377be0d8",
+        "acknowledged_cursor": 6710869486,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "860e12a754fce965c05474c28585f8bb9795af3182c32a0da8e087e3377be0d8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002950\",\"who\":\"FFTA-Team2-native-104-numeric\",\"note\":\"First natural C matching of complete indexed 124-byte string-to-signed-halfword parser. Own isolated source only, no shared header/map changes; freeze original compiler artifacts and exact full-FUNC comparison.\"}",
+          "created_at": "2026-11-07T17:46:38Z",
+          "id": 6710869486,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T17:46:38Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "649a91b4842e2e5e49eafa5417d62300f80ad70b847aa75cd2d1a2e734269131",
+        "result": {
+          "address": "0x08002950",
+          "claim_id": 6710869486,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6710869486,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-104-numeric"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
