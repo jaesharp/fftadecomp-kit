@@ -94,7 +94,35 @@
           "who": "sol-0801D938-3290"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "85539ed881c95aa6052ceaf285d005cad4e62618c81bc3bc703af893fa2a08d0",
+        "acknowledged_cursor": 6701205179,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "85539ed881c95aa6052ceaf285d005cad4e62618c81bc3bc703af893fa2a08d0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801D938\",\"who\":\"sol-0801D938-3290\",\"claim_id\":6701016804,\"reason\":\"One natural72B source compiled and typed-linked once, residual block20..29 scheduling. Installed-IWRAM/interface boundary preserved, no native/proof credit.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T02:45:19Z",
+          "id": 6701205179,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T02:45:19Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c5fbeb07137daacdffec1ccd7a342feeb7d5e6a909ae0f709e9a680c0d1d0a00",
+        "result": {
+          "address": "0x0801D938",
+          "claim_id": 6701016804,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701205179,
+          "status": "accepted",
+          "who": "sol-0801D938-3290"
+        }
+      }
     },
     {
       "claim": {
