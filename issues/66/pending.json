@@ -59,6 +59,38 @@
           "who": "codex-08097A04"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "a74e633d5f3eb263dbfbe9d677e42d9a97ec141d0d3b3e99727aad373215d287",
+        "acknowledged_cursor": 6708575055,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a74e633d5f3eb263dbfbe9d677e42d9a97ec141d0d3b3e99727aad373215d287",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0805DF94\",\"who\":\"codex-0805DF94\",\"note\":\"Recover960-byte menu eligibility/setup under existing canonical-thunks-v1; complete ROMmanifest passed; no new maps/index\"}",
+          "created_at": "2026-11-07T14:58:26Z",
+          "id": 6708575055,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T14:58:26Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e9caf6c2fb72d9274848715fa6c8c8e8d9828b5e3b702fffbb37399b4c02d7af",
+        "result": {
+          "address": "0x0805DF94",
+          "claim_id": 6708575055,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6708575055,
+          "status": "accepted",
+          "who": "codex-0805DF94"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
