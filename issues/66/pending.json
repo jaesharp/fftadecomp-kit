@@ -30,7 +30,35 @@
           "who": "codex-0812D7FC"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "0f462668ef974cf146724f9fc8ffcd252dfba18500d2e84ac8433d6f62768635",
+        "acknowledged_cursor": 6707862843,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "0f462668ef974cf146724f9fc8ffcd252dfba18500d2e84ac8433d6f62768635",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D7FC\",\"who\":\"codex-0812D7FC\",\"claim_id\":6707815075,\"reason\":\"Parked natural bounded weighted evaluator:396 vs416 bytes;20 vs24 local frame, selector scheduling and loop induction differ.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; bounded for, explicit bound/break, coordinate declarations, while/break separate success; compiler-signed-runtime-data-v1\"}",
+          "created_at": "2026-11-07T13:58:45Z",
+          "id": 6707862843,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T13:58:45Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c8b445bb242274367745e86e61e5e1329a94afe069c21b0123552a65080a61bf",
+        "result": {
+          "address": "0x0812D7FC",
+          "claim_id": 6707815075,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6707862843,
+          "status": "accepted",
+          "who": "codex-0812D7FC"
+        }
+      }
     }
   ],
   "issue": 66,
