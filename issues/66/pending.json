@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "6e3262887c87dc01efa9a95ea972f54a0fdfae940ac56b8dc7e4c6566cfcf1d9",
-        "acknowledged_cursor": 6714340233,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6e3262887c87dc01efa9a95ea972f54a0fdfae940ac56b8dc7e4c6566cfcf1d9",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0808ADD4\",\"who\":\"sol-0808ADD4-3773\",\"note\":\"C matching continuation from complete plausible near-match. Normal natural C expression/control/interface recovery allowed. Existing native tools only, no artificial code or tooling development.\"}",
-          "created_at": "2026-11-07T23:15:53Z",
-          "id": 6714340233,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:15:53Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3c9dd5e6373e5b041b8a277cde3410923cd7a3405094888a01638afff2e6d334",
-        "result": {
-          "address": "0x0808ADD4",
-          "claim_id": 6714340233,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714340233,
-          "status": "accepted",
-          "who": "sol-0808ADD4-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "d7a770bbc71c2aeaf7a3772aa556967114b4da59a9993e1076394147141cf2c8",
-        "acknowledged_cursor": 6714491367,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "d7a770bbc71c2aeaf7a3772aa556967114b4da59a9993e1076394147141cf2c8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0808ADD4\",\"who\":\"sol-0808ADD4-3773\",\"claim_id\":6714340233,\"reason\":\"Twelve plausible C native attempts retain complete794B with one wrong stack-slot load byte. Exact original outputs/errors retained; owner fully stopped, no MATCH credit.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T23:31:14Z",
-          "id": 6714489893,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:31:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ce1fddf96b69e27b7804ee2d8980d47bbc2a7fd5eb780da3d8133e5c69034fbb",
-        "result": {
-          "address": "0x0808ADD4",
-          "claim_id": 6714340233,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714489893,
-          "status": "accepted",
-          "who": "sol-0808ADD4-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "22a95af57a8371922e91e15f61ced1883fef99160cefcf1d9cae87d9cf029008",
         "acknowledged_cursor": 6714355147,
         "body_provenance": "acceptance-time",
@@ -91,66 +31,6 @@
         }
       },
       "release": null
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "7c40757bfd2ee94b86e5c0a9f2b76457e1eef231ee38d1c360dc502f90c4dcdf",
-        "acknowledged_cursor": 6714368033,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7c40757bfd2ee94b86e5c0a9f2b76457e1eef231ee38d1c360dc502f90c4dcdf",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CBDC0\",\"who\":\"sol-080CBDC0-3773\",\"note\":\"C matching continuation from complete plausible near-match. Normal natural C expression/control/interface recovery allowed. Existing native tools only, no artificial code or tooling development.\"}",
-          "created_at": "2026-11-07T23:18:44Z",
-          "id": 6714368033,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:18:44Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "81108cd873b31580bb9b8c83e8b4909974e7c375132bf058a8cf17022c24901f",
-        "result": {
-          "address": "0x080CBDC0",
-          "claim_id": 6714368033,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714368033,
-          "status": "accepted",
-          "who": "sol-080CBDC0-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "fab9e4669c3cbd68c1e3ad9844abd690b9936d7b4672c2bc9783840b32641550",
-        "acknowledged_cursor": 6714488611,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "fab9e4669c3cbd68c1e3ad9844abd690b9936d7b4672c2bc9783840b32641550",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080CBDC0\",\"who\":\"sol-080CBDC0-3773\",\"claim_id\":6714368033,\"reason\":\"Seven plausible C forms retain complete370B NONMATCH. Both ADDs corrected but category/range encodings differ. All originals/errors retained; owner fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T23:31:06Z",
-          "id": 6714488611,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:31:06Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "79993cd3a9ef8657b32e6e51f88ca347c7693e69ff86eec3c7ae0aeee0e5e0f3",
-        "result": {
-          "address": "0x080CBDC0",
-          "claim_id": 6714368033,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714488611,
-          "status": "accepted",
-          "who": "sol-080CBDC0-3773"
-        }
-      }
     },
     {
       "claim": {
