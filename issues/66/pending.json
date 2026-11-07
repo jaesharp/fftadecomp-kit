@@ -59,6 +59,38 @@
           "who": "sol-08018E20-3758"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "f99d442b55b2655ccf9ee40be21fd1829649cca90fc3291617ddc700472e51e6",
+        "acknowledged_cursor": 6712800698,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "f99d442b55b2655ccf9ee40be21fd1829649cca90fc3291617ddc700472e51e6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0802ED88\",\"who\":\"sol-0802ED88-3761\",\"note\":\"First natural C matching for complete ROM owner after truncated prefix correction; unchanged published native tools, no tooling development or steering.\"}",
+          "created_at": "2026-11-07T20:45:41Z",
+          "id": 6712800698,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:45:41Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "e24bc1f606b2b5dfdac97839c8a26d51bd584ccb833734e5cd54094dd2e5693d",
+        "result": {
+          "address": "0x0802ED88",
+          "claim_id": 6712800698,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712800698,
+          "status": "accepted",
+          "who": "sol-0802ED88-3761"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
