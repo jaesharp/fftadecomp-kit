@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "814248ed42e3273755bd0fb6a183fd91e773a5f330c4de555e534fe722b7f839",
+    "acknowledged_cursor": 6711991496,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "814248ed42e3273755bd0fb6a183fd91e773a5f330c4de555e534fe722b7f839",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0806F8DC\",\"who\":\"FFTA-Team2-native-107-switch\",\"note\":\"First natural C for actual complete182B five-state entry. Current fixed map and ROM; original artifact capture; no steering or proof relaxation.\"}",
+      "created_at": "2026-11-07T19:29:09Z",
+      "id": 6711991496,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T19:29:09Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "f7282b9ab323a3559fe448d8983a43d278b5f02fedad60f8b1fe3a1b69cfc594",
+    "result": {
+      "address": "0x0806F8DC",
+      "claim_id": 6711991496,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6711991496,
+      "status": "accepted",
+      "who": "FFTA-Team2-native-107-switch"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "dc77eb6ae6461244d031f2548c9088e221a044278d44edc09aeecfd719ac03aa",
+    "acknowledged_cursor": 6712043668,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "dc77eb6ae6461244d031f2548c9088e221a044278d44edc09aeecfd719ac03aa",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0806F8DC\",\"who\":\"FFTA-Team2-native-107-switch\",\"claim_id\":6711991496,\"reason\":\"First natural C complete182B original typed ELF exactly equals ROM. Frozen diagnostic only; native default retains one-numeric-interposed switch guard refusal. No source steering/replay; originals retained. Separate tested native prerequisite required; zero native credit.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T19:34:02Z",
+      "id": 6712043668,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T19:34:02Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "470387fd7c03df6590c5dd410d849676a6f13a2a8ed8b2e5cc4b16c7476a0ca2",
+    "result": {
+      "address": "0x0806F8DC",
+      "claim_id": 6711991496,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6712043668,
+      "status": "accepted",
+      "who": "FFTA-Team2-native-107-switch"
+    }
+  }
+}
