@@ -128,7 +128,7 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                   scalar_entries=None, allowed_writes=None, stack_load_widths=(4,),
                   stack_store_widths=(4,), stack_input_words=(), stack_adjusted_returns=False, thumb_pc_returns=(),
                   argument_effect_policy=None, return_pointer_policy=None,
-                  compose_pointer_returns=False):
+                  compose_pointer_returns=False, absolute_read_policy=None):
     """Prove this pinned body's local returns and callee-saved/write ABI.
 
     This is deliberately separate from the caller verifier. Loads are target
@@ -184,6 +184,25 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
         return {tuple(item) for item in value}
 
     pointer_policy = None if return_pointer_policy is None else pointer_records(return_pointer_policy)
+    absolute_schema = "thumb-conditional-absolute-reads-v1"
+
+    def absolute_footprints(value):
+        if type(value) is not list or len(value) > 64 or any(
+                type(item) is not list or len(item) != 2 or
+                any(type(part) is not int for part in item) or
+                item[1] not in (1, 2, 4) or not 0 <= item[0] <= 0x100000000-item[1] or
+                item[0] % item[1] for item in value) or value != sorted(value) or \
+                len({tuple(item) for item in value}) != len(value):
+            raise ValueError("software-float absolute reads require ordered finite aligned footprints")
+        return {tuple(item) for item in value}
+
+    absolute_bounds = set()
+    if absolute_read_policy is not None:
+        if argument_effect_policy is None or type(absolute_read_policy) is not dict or \
+                set(absolute_read_policy) != {"schema", "reads"} or \
+                absolute_read_policy["schema"] != absolute_schema:
+            raise ValueError("software-float absolute reads require an explicit conditional policy and argument effects")
+        absolute_bounds = absolute_footprints(absolute_read_policy["reads"])
     finite_pointers = pointer_policy is not None or compose_pointer_returns
     body = rom[start - 0x08000000:end - 0x08000000]
     layout = refine_function(body, start, entries, max_bytes=end - start,
@@ -220,6 +239,7 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
     states, pending, edges, returns, writes = {start: (initial, {}, frozenset())}, [start], {}, set(), set()
     stack_reads = set()
     argument_reads, argument_accesses = set(), set()
+    absolute_reads = set()
     returned_pointers = {}
 
     def alternatives(value):
@@ -288,6 +308,10 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                     for slot in memory:
                         if offset < slot + 4 and slot < offset + width:
                             memory[slot] = unknown
+            elif loading and absolute_read_policy is not None and pointer is not None and pointer[0] == "constant":
+                if (pointer[1], width) not in absolute_bounds:
+                    raise ValueError("software-float absolute read exceeds its conditional footprint")
+                absolute_reads.add((pointer[1], width))
             elif loading and argument_effect_policy is not None:
                 if pointer is None or pointer[0] != "entry" or \
                         not ARM_REG_R0 <= pointer[1] <= ARM_REG_R3 or pointer[2] % width or \
@@ -365,6 +389,24 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
                 if not child_reads <= bounds[0] or not child_writes <= bounds[1] or \
                         child_writes != {tuple(item) for item in child["writes"]}:
                     raise ValueError("software-float child actual effects differ from its bound receipt")
+                if "absolute_reads" in child:
+                    absolute = child["absolute_reads"]
+                    if type(absolute) is not dict or set(absolute) != {
+                            "schema", "complete", "address", "end", "body_sha256", "policy", "reads", "loaded_values"} or \
+                            absolute["schema"] != absolute_schema or absolute["complete"] is not True or \
+                            type(absolute["address"]) is not int or type(absolute["end"]) is not int or \
+                            absolute["address"] != target or absolute["end"] != effect["end"] or \
+                            absolute["body_sha256"] != effect["body_sha256"] or \
+                            absolute["loaded_values"] != "unknown scalars; readability is a conditional premise":
+                        raise ValueError("software-float child absolute-read receipt differs")
+                    actual_absolute = absolute_footprints(absolute["reads"])
+                    child_absolute_policy = absolute["policy"]
+                    if type(child_absolute_policy) is not dict or set(child_absolute_policy) != {"schema", "reads"} or \
+                            child_absolute_policy["schema"] != absolute_schema or \
+                            not actual_absolute <= absolute_footprints(child_absolute_policy["reads"]):
+                        raise ValueError("software-float child absolute reads exceed their policy")
+                    for location, width in sorted(actual_absolute):
+                        access(("constant", location, 0), True, width=width, argument_read=True)
                 if compose_pointer_returns and "return_pointers" in child:
                     receipt = child["return_pointers"]
                     if type(receipt) is not dict or set(receipt) != {
@@ -518,6 +560,12 @@ def prove_runtime(rom, entries, start, end, count, dependencies, *, call_edges=N
             "writes": [list(item) for item in sorted(writes)],
             "loaded_values": "unknown scalars; no numeric facts"}
         proof["argument_accesses"] = [list(item[:-1])+[list(item[-1])] for item in sorted(argument_accesses)]
+    if absolute_read_policy is not None:
+        proof["absolute_reads"] = {"schema": absolute_schema, "complete": True,
+            "address": start, "end": end, "body_sha256": hashlib.sha256(body).hexdigest(),
+            "policy": {"schema": absolute_schema, "reads": [list(item) for item in sorted(absolute_bounds)]},
+            "reads": [list(item) for item in sorted(absolute_reads)],
+            "loaded_values": "unknown scalars; readability is a conditional premise"}
     return proof
 
 
