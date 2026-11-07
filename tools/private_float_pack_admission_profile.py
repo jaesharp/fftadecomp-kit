@@ -22,6 +22,7 @@ import private_scalar_division_locals_inventory as scalar_division_locals
 import private_float_extension_effects_inventory as extension
 import private_float_comparison_effects_inventory as comparison
 import private_float_selected_record_inventory as selected_record
+import private_double_selected_record_inventory as double_selected_record
 import private_float_unsigned_conversion_inventory as unsigned_conversion
 import private_float_inline_division_inventory as inline_division
 import private_double_comparison_effects_inventory as double_comparison
@@ -53,13 +54,15 @@ DOUBLE_SCALAR_PACK_SELECTOR = 'private-double-scalar-pack-v1'
 DOUBLE_SCALAR_PACK_SCHEMA = 'elf-symbol-thumb-private-double-scalar-pack-v1'
 SCALAR_DIVISION_LOCALS_SELECTOR = 'private-scalar-division-byte-locals-v1'
 SCALAR_DIVISION_LOCALS_SCHEMA = 'elf-symbol-thumb-private-scalar-division-byte-locals-v1'
+DOUBLE_SELECTED_RECORD_SELECTOR = 'private-double-selected-record-v1'
+DOUBLE_SELECTED_RECORD_SCHEMA = 'elf-symbol-thumb-private-double-selected-record-v1'
 SELECTED_RECORD_SELECTOR = 'private-float-selected-record-v1'
 SELECTED_RECORD_SCHEMA = 'elf-symbol-thumb-private-float-selected-record-v1'
 UNSIGNED_CONVERSION_SELECTOR = 'private-float-unsigned-conversion-v1'
 UNSIGNED_CONVERSION_SCHEMA = 'elf-symbol-thumb-private-float-unsigned-conversion-v1'
 INLINE_DIVISION_SELECTOR = 'private-float-inline-division-v1'
 INLINE_DIVISION_SCHEMA = 'elf-symbol-thumb-private-float-inline-division-v1'
-SELECTORS = (INLINE_DIVISION_SELECTOR, UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
+SELECTORS = (DOUBLE_SELECTED_RECORD_SELECTOR, INLINE_DIVISION_SELECTOR, UNSIGNED_CONVERSION_SELECTOR, SELECTED_RECORD_SELECTOR, SCALAR_DIVISION_LOCALS_SELECTOR, DOUBLE_SCALAR_PACK_SELECTOR, DOUBLE_TRUNCATION_SELECTOR, DOUBLE_PACK_SELECTOR, SELECTOR, EXTENSION_SELECTOR, COMPARISON_SELECTOR, DOUBLE_COMPARISON_SELECTOR,
              SCALAR_CONVERSION_SELECTOR, DOUBLE_SCALAR_CONVERSION_SELECTOR)
 CONTRACT = ('pinned unpack/pack finite argument effects into live abstract locals; '
             'loaded words and result unknown; initialized contents, IEEE and C '
@@ -71,6 +74,8 @@ _replay = ContextVar('private_float_pack_replay', default=False)
 def profile(selector):
     if type(selector) is not str or selector not in SELECTORS:
         raise ValueError('private float admission requires its explicit selector')
+    if selector == DOUBLE_SELECTED_RECORD_SELECTOR:
+        return double_selected_record, DOUBLE_SELECTED_RECORD_SCHEMA, double_selected_record.CONTRACT
     if selector == INLINE_DIVISION_SELECTOR:
         return inline_division, INLINE_DIVISION_SCHEMA, inline_division.CONTRACT
     if selector == UNSIGNED_CONVERSION_SELECTOR:
@@ -117,7 +122,7 @@ def producer_fingerprint():
 
 def selector_for_report(report):
     lines = report.splitlines()
-    if not any(INLINE_DIVISION_SCHEMA in line or UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
+    if not any(DOUBLE_SELECTED_RECORD_SCHEMA in line or INLINE_DIVISION_SCHEMA in line or UNSIGNED_CONVERSION_SCHEMA in line or SELECTED_RECORD_SCHEMA in line or SCALAR_DIVISION_LOCALS_SCHEMA in line or DOUBLE_SCALAR_PACK_SCHEMA in line or DOUBLE_TRUNCATION_SCHEMA in line or DOUBLE_PACK_SCHEMA in line or SCHEMA in line or EXTENSION_SCHEMA in line or COMPARISON_SCHEMA in line or DOUBLE_COMPARISON_SCHEMA in line or SCALAR_CONVERSION_SCHEMA in line or DOUBLE_SCALAR_CONVERSION_SCHEMA in line or marker_text(line).startswith('* private float pack')
                for line in lines):
         return None
     for selector in SELECTORS:
