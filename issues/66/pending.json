@@ -30,6 +30,66 @@
           "who": "codex-080812E8-1107"
         }
       },
+      "release": {
+        "acceptance_body_sha256": "aacff8840d1321926decc3f1c74deef2e6922c70a0b35eb126e6c4e7f0bf3c5e",
+        "acknowledged_cursor": 6704979442,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "aacff8840d1321926decc3f1c74deef2e6922c70a0b35eb126e6c4e7f0bf3c5e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080812E8\",\"who\":\"codex-080812E8-1107\",\"claim_id\":6704950220,\"reason\":\"Parked132byte candidate with16instruction differences; unsupported unsigned remainder48/40 plus R2 callback thunk; no proof weakening.\",\"unmatchable\":true,\"tried\":\"fixed -mthumb-interwork -O2; canonical remainder; addressed modulo alias; umod48-r1-thunks-v1\"}",
+          "created_at": "2026-11-07T09:19:30Z",
+          "id": 6704978067,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T09:19:30Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a17eb832a2b8c9f566737ddfb63d7990b6ef703a5dec1946c4f05d22f812f9bc",
+        "result": {
+          "address": "0x080812E8",
+          "claim_id": 6704950220,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6704978067,
+          "status": "accepted",
+          "who": "codex-080812E8-1107"
+        }
+      }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "a49aff563163625fd856bf857e0a6f3ca93b23740c7248b0cae50441523b4400",
+        "acknowledged_cursor": 6704979442,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a49aff563163625fd856bf857e0a6f3ca93b23740c7248b0cae50441523b4400",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D99C\",\"who\":\"codex-0812D99C-1107\",\"note\":\"Natural conditional ratio recovery, direct calls and existing mapped table; native subagent; parent verifies/releases.\"}",
+          "created_at": "2026-11-07T09:19:39Z",
+          "id": 6704979442,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T09:19:39Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "a17eb832a2b8c9f566737ddfb63d7990b6ef703a5dec1946c4f05d22f812f9bc",
+        "result": {
+          "address": "0x0812D99C",
+          "claim_id": 6704979442,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704979442,
+          "status": "accepted",
+          "who": "codex-0812D99C-1107"
+        }
+      },
       "release": null
     }
   ],
