@@ -31,6 +31,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "ceabf44f7fe0a7aed7e8cfd35b5a22e46085bd3bcb16fdb1cf0e09fe4418b41a",
+        "acknowledged_cursor": 6712590094,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ceabf44f7fe0a7aed7e8cfd35b5a22e46085bd3bcb16fdb1cf0e09fe4418b41a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0804C8C4\",\"who\":\"sol-0804C8C4-3757\",\"note\":\"Saved natural complete184B panel initializer, first original native check using existing static callback and BIOS buffer support; no tooling changes, no steering.\"}",
+          "created_at": "2026-11-07T20:25:39Z",
+          "id": 6712590094,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:25:39Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "479d65cf7920f3acf362a3c125b64ed5accf32b9991fa70843ea8294589c1c29",
+        "result": {
+          "address": "0x0804C8C4",
+          "claim_id": 6712590094,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712590094,
+          "status": "accepted",
+          "who": "sol-0804C8C4-3757"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
