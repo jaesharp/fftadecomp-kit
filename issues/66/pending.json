@@ -30,7 +30,35 @@
           "who": "sol-08037C84-3763"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "11ce447621aa2ac842ee2fa4c311a77842abd5de1373949c0ebf7f9fc27313a3",
+        "acknowledged_cursor": 6713009615,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "11ce447621aa2ac842ee2fa4c311a77842abd5de1373949c0ebf7f9fc27313a3",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08037C84\",\"who\":\"sol-08037C84-3763\",\"claim_id\":6712923471,\"reason\":\"Natural source356B versus364B owner; native incoming-byte-alias rejected stack alias arithmetic leaves tracked frame. Initial C99 flexible-array compiler error corrected to supported GNU zero-length record; both originals retained, no allocation/shape steering or new tooling.\",\"unmatchable\":true,\"tried\":\"Fixed -mthumb-interwork -O2; natural record source, one compiler compatibility correction\"}",
+          "created_at": "2026-11-07T21:05:26Z",
+          "id": 6713007119,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:05:26Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cac3085b60a43005f1650bd825cf9afe3658d79035daf07554ea0fe428ad62d0",
+        "result": {
+          "address": "0x08037C84",
+          "claim_id": 6712923471,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6713007119,
+          "status": "accepted",
+          "who": "sol-08037C84-3763"
+        }
+      }
     },
     {
       "claim": {
@@ -123,6 +151,38 @@
           "who": "FFTA-Team2-native122"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "0509ec1708e57fe1d79507b235bd34e7f7cc6818e5dd11f9fe42eb57f2b76a48",
+        "acknowledged_cursor": 6713009615,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "0509ec1708e57fe1d79507b235bd34e7f7cc6818e5dd11f9fe42eb57f2b76a48",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08092390\",\"who\":\"FFTA-Team2-native123\",\"note\":\"First natural complete174B motion scalar owner from actual signed abs/max/division paths; genuine canonical integer runtime only; no steering\"}",
+          "created_at": "2026-11-07T21:05:41Z",
+          "id": 6713009615,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:05:41Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cac3085b60a43005f1650bd825cf9afe3658d79035daf07554ea0fe428ad62d0",
+        "result": {
+          "address": "0x08092390",
+          "claim_id": 6713009615,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713009615,
+          "status": "accepted",
+          "who": "FFTA-Team2-native123"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
