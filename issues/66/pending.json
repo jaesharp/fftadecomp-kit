@@ -62,7 +62,35 @@
           "who": "codex-080975DC"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "5244e77e1cb2fad5a61578e47918d7538ee3d475b9bbd840eea2714ff1022615",
+        "acknowledged_cursor": 6705911928,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "5244e77e1cb2fad5a61578e47918d7538ee3d475b9bbd840eea2714ff1022615",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080975DC\",\"who\":\"codex-080975DC\",\"claim_id\":6705872930,\"reason\":\"Parked natural renderer-state recovery:288 vs296 bytes, remaining materialized-boolean sequence. Adjacent matched helper explains pattern but this attempt kept one C definition. No maps/index/verifier edits; no MATCH claim.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; direct boolean comparison and local switch assignment, explicit position if/else\"}",
+          "created_at": "2026-11-07T10:57:17Z",
+          "id": 6705911928,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:57:17Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "11b0bd01134325af9c5f78d18e853f038c5bcf42ccdd70d11f91cafd84095868",
+        "result": {
+          "address": "0x080975DC",
+          "claim_id": 6705872930,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6705911928,
+          "status": "accepted",
+          "who": "codex-080975DC"
+        }
+      }
     },
     {
       "claim": {
@@ -92,6 +120,38 @@
           "request_id": 6705905545,
           "status": "accepted",
           "who": "sol-0805862C-3623"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "97e78cf0a9580213e70b1d8b14aaca96bdbfbc8b183dd19d4f34a2d21a620271",
+        "acknowledged_cursor": 6705911928,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "97e78cf0a9580213e70b1d8b14aaca96bdbfbc8b183dd19d4f34a2d21a620271",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002FB8\",\"who\":\"sol-08002FB8-3623\",\"note\":\"First natural C attempt; only old inventory or rejected broker checks exist. Fresh syntactic complete-owner/literal-span preparation3612. Primary owns native admission, fullbody evidence and publication; no fabricated native closure.\"}",
+          "created_at": "2026-11-07T10:57:16Z",
+          "id": 6705911816,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:57:16Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "11b0bd01134325af9c5f78d18e853f038c5bcf42ccdd70d11f91cafd84095868",
+        "result": {
+          "address": "0x08002FB8",
+          "claim_id": 6705911816,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6705911816,
+          "status": "accepted",
+          "who": "sol-08002FB8-3623"
         }
       },
       "release": null
