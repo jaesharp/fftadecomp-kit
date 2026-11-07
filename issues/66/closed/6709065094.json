@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "7042a6719bdcc399534a4ed9d8775ab3e0bc976a0a810975bba56dab262c3808",
+    "acknowledged_cursor": 6709065094,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "7042a6719bdcc399534a4ed9d8775ab3e0bc976a0a810975bba56dab262c3808",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0800FC8C\",\"who\":\"codex-0800FC8C\",\"note\":\"Recover192byte companion scanline constructor; full default function-address ROM admission passes, existing maps; isolated scratch attempt.\"}",
+      "created_at": "2026-11-07T15:33:02Z",
+      "id": 6709065094,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T15:33:02Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "487f08a7308a7e6b5677ad83e88f16b45615c661b0a1b4d072ce67faa0f205b2",
+    "result": {
+      "address": "0x0800FC8C",
+      "claim_id": 6709065094,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6709065094,
+      "status": "accepted",
+      "who": "codex-0800FC8C"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "fb9261df9a90d66b83a81920fb94c8b59fc9739c1b78383822df52d4df520167",
+    "acknowledged_cursor": 6709122242,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "fb9261df9a90d66b83a81920fb94c8b59fc9739c1b78383822df52d4df520167",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0800FC8C\",\"who\":\"codex-0800FC8C\",\"claim_id\":6709065094,\"reason\":\"Natural no-helper constructor is184vs192bytes; geometry offset CSE differs from ROM rematerialization. Preserved in Parked/0800FC8C with adjacent inline-boundary evidence.\",\"unmatchable\":true,\"tried\":\"fixed agbcc -mthumb-interwork -O2; same pointer, distinct scoped render pointer, explicit scalar snapshots; no helper/flag changes\"}",
+      "created_at": "2026-11-07T15:36:55Z",
+      "id": 6709122242,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T15:36:55Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "37185862c10b312983bdc3dbe9cda3d0c1ddea612ea303ab84c20456e7fdabfd",
+    "result": {
+      "address": "0x0800FC8C",
+      "claim_id": 6709065094,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6709122242,
+      "status": "accepted",
+      "who": "codex-0800FC8C"
+    }
+  }
+}
