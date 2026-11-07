@@ -63,6 +63,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "1de650e6c36667655b303c8657436aa1cb3b62cab82c74d4e41c1ea545ccd8e0",
+        "acknowledged_cursor": 6705739020,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "1de650e6c36667655b303c8657436aa1cb3b62cab82c74d4e41c1ea545ccd8e0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080686F4\",\"who\":\"sol-080686F4-3609\",\"note\":\"First natural C attempt; only old inventory or rejected broker checks exist. Fresh syntactic complete-owner/literal-span preparation3608. Primary owns native admission, fullbody evidence and publication; no fabricated native closure.\"}",
+          "created_at": "2026-11-07T10:40:32Z",
+          "id": 6705739020,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T10:40:32Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "0abb4fcf5a2132777778153817bf6c36ebbe8b411d43e250a3d6bf1c07962e35",
+        "result": {
+          "address": "0x080686F4",
+          "claim_id": 6705739020,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6705739020,
+          "status": "accepted",
+          "who": "sol-080686F4-3609"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
