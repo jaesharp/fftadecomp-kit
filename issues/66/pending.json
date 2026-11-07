@@ -59,6 +59,38 @@
           "who": "codex-0812D660"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "c00ebfcdae430d8ec9b957ff8ede1c636244e3afc7eae00fb92c2ed90e850a5d",
+        "acknowledged_cursor": 6707815075,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c00ebfcdae430d8ec9b957ff8ede1c636244e3afc7eae00fb92c2ed90e850a5d",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D7FC\",\"who\":\"codex-0812D7FC\",\"note\":\"Bounded weighted-choice evaluator with fallback; natural reconstruction in isolated scratch, ROM-evidenced table.\"}",
+          "created_at": "2026-11-07T13:54:19Z",
+          "id": 6707815075,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T13:54:19Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "96c4982557b04bca7880f38f1de1488737289117e85e47c0a91a18bd5d28ae2c",
+        "result": {
+          "address": "0x0812D7FC",
+          "claim_id": 6707815075,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6707815075,
+          "status": "accepted",
+          "who": "codex-0812D7FC"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
