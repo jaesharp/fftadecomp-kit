@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "97e78cf0a9580213e70b1d8b14aaca96bdbfbc8b183dd19d4f34a2d21a620271",
+    "acknowledged_cursor": 6705911928,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "97e78cf0a9580213e70b1d8b14aaca96bdbfbc8b183dd19d4f34a2d21a620271",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002FB8\",\"who\":\"sol-08002FB8-3623\",\"note\":\"First natural C attempt; only old inventory or rejected broker checks exist. Fresh syntactic complete-owner/literal-span preparation3612. Primary owns native admission, fullbody evidence and publication; no fabricated native closure.\"}",
+      "created_at": "2026-11-07T10:57:16Z",
+      "id": 6705911816,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T10:57:16Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "11b0bd01134325af9c5f78d18e853f038c5bcf42ccdd70d11f91cafd84095868",
+    "result": {
+      "address": "0x08002FB8",
+      "claim_id": 6705911816,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6705911816,
+      "status": "accepted",
+      "who": "sol-08002FB8-3623"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "ae4fa0c1ab8f82087dc00d919bb2fa4db35739ad9da9095e5d7861e95f3feb29",
+    "acknowledged_cursor": 6706026369,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "ae4fa0c1ab8f82087dc00d919bb2fa4db35739ad9da9095e5d7861e95f3feb29",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002FB8\",\"who\":\"sol-08002FB8-3623\",\"claim_id\":6705911816,\"reason\":\"Matching stopped; natural complete-FUNC nonmatch or zero-C storage boundary frozen. No independently grounded correction remains. Actual discarded destination loads, genuine stride correction and real errors preserved. No invented reads/bitfields/volatile, source steering, replay, native/proof or MATCH credit.\",\"unmatchable\":true,\"tried\":\"Fixed agbcc -mthumb-interwork -O2; original first form and genuine typed linking. Exact command/adapter/runtime/compiler counts and original limitations retained in frozen result.\"}",
+      "created_at": "2026-11-07T11:08:49Z",
+      "id": 6706025472,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:08:49Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "25ea353878466d6761161391924b3e435b55fb68282252caa0725cd0b7bfb949",
+    "result": {
+      "address": "0x08002FB8",
+      "claim_id": 6705911816,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6706025472,
+      "status": "accepted",
+      "who": "sol-08002FB8-3623"
+    }
+  }
+}
