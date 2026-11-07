@@ -30,7 +30,35 @@
           "who": "codex-080200C8"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8053e517f84489b495a5add32999e86de52a4c425693c7bb90438cbc44eb44c6",
+        "acknowledged_cursor": 6708379868,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8053e517f84489b495a5add32999e86de52a4c425693c7bb90438cbc44eb44c6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080200C8\",\"who\":\"codex-080200C8\",\"claim_id\":6708317745,\"reason\":\"Parked natural resource initializer408vs428 bytes: direct pointer tests omit two Boolean materializations; grouped index/address scheduling differs. Existing inline predicate evidence is not proof.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; full resource state and operation-member views; packed resource layouts; branch-local indexing; no helpers or Boolean scaffolding\"}",
+          "created_at": "2026-11-07T14:44:20Z",
+          "id": 6708379868,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T14:44:20Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "5684ca25927a2c22b1c2fd6c36ab1f23e7e80fa63c591e8534d34bb9a8e25c5f",
+        "result": {
+          "address": "0x080200C8",
+          "claim_id": 6708317745,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 31369,
+          "request_id": 6708379868,
+          "status": "accepted",
+          "who": "codex-080200C8"
+        }
+      }
     }
   ],
   "issue": 66,
