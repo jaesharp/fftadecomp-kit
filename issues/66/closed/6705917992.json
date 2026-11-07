@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "7319813ea2cee6ead2e9c61dcc2c0905ebc7e001daf13df6d21758aa1aaa9a95",
+    "acknowledged_cursor": 6705917992,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "7319813ea2cee6ead2e9c61dcc2c0905ebc7e001daf13df6d21758aa1aaa9a95",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002DE8\",\"who\":\"sol-08002DE8-3623\",\"note\":\"First natural C attempt; only old inventory or rejected broker checks exist. Fresh syntactic complete-owner/literal-span preparation3612. Primary owns native admission, fullbody evidence and publication; no fabricated native closure.\"}",
+      "created_at": "2026-11-07T10:57:57Z",
+      "id": 6705917992,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T10:57:57Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "b95a57b469ffaa43b0092e7a457c02e93d8f5ae28e89730fcea35ed77f3063cf",
+    "result": {
+      "address": "0x08002DE8",
+      "claim_id": 6705917992,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6705917992,
+      "status": "accepted",
+      "who": "sol-08002DE8-3623"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "d6174efe6e6a46a1c9e98c1631d58235235950aa8f38a1824ec08c672bd77cf3",
+    "acknowledged_cursor": 6706060821,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "d6174efe6e6a46a1c9e98c1631d58235235950aa8f38a1824ec08c672bd77cf3",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08002DE8\",\"who\":\"sol-08002DE8-3623\",\"claim_id\":6705917992,\"reason\":\"Complete whole-function native MATCH and plausible source frozen; matching stopped. Primary integrating source and native report for mandatory full game status, native publication and exact CI. All original diagnostics and actual native evidence preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T11:12:18Z",
+      "id": 6706060821,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:12:18Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "c3eb5805b7984e16c2c085109357260f05009f32dc19f4918665a692638517fa",
+    "result": {
+      "address": "0x08002DE8",
+      "claim_id": 6705917992,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6706060821,
+      "status": "accepted",
+      "who": "sol-08002DE8-3623"
+    }
+  }
+}
