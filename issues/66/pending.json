@@ -63,6 +63,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "278bed55fc4ca9cfd8dec797d915ee0cba53e3169f7fb9aa8fae6271002f3ac6",
+        "acknowledged_cursor": 6712964163,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "278bed55fc4ca9cfd8dec797d915ee0cba53e3169f7fb9aa8fae6271002f3ac6",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080E2C00\",\"who\":\"sol-080E2C00-3764\",\"note\":\"Natural84B caller matching using existing bounded-buffer-direct-halfword-output-v1 for real0801C984 helper. No new tooling/steering.\"}",
+          "created_at": "2026-11-07T21:01:23Z",
+          "id": 6712964163,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:01:23Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "460aea54e868be3e2ed7a5b02cae0103dc80f5e9667140bb24fdcc6799934d7d",
+        "result": {
+          "address": "0x080E2C00",
+          "claim_id": 6712964163,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712964163,
+          "status": "accepted",
+          "who": "sol-080E2C00-3764"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
