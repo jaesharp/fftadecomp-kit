@@ -59,6 +59,70 @@
           "who": "codex-08003014"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "2aecf4720fbfdb06f756a3f53ab45e3490f9991921e9c2a87d9985ac6cd4b222",
+        "acknowledged_cursor": 6707037009,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "2aecf4720fbfdb06f756a3f53ab45e3490f9991921e9c2a87d9985ac6cd4b222",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08027800\",\"who\":\"codex-08027800\",\"note\":\"Natural280byte inventory menu population; matched08027750 layout/callee precedent; named-data-buffer-v1, existing mappings.\"}",
+          "created_at": "2026-11-07T12:37:31Z",
+          "id": 6707036014,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T12:37:31Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "895175740c69b0cad4d674d6afb026734e1adb93c113a2e095dd57e64a65ff25",
+        "result": {
+          "address": "0x08027800",
+          "claim_id": 6707036014,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6707036014,
+          "status": "accepted",
+          "who": "codex-08027800"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "9729b535fc18f7565ae9905cdef9d12a78b06987bf6c66092177f6bebab1c0a7",
+        "acknowledged_cursor": 6707037009,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9729b535fc18f7565ae9905cdef9d12a78b06987bf6c66092177f6bebab1c0a7",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08025FDC\",\"who\":\"codex-08025FDC\",\"note\":\"Natural260byte ability eligibility scanner; matched08026AB8 outbuffer callee precedent; existing named-data-buffer-v1 and mappings.\"}",
+          "created_at": "2026-11-07T12:37:37Z",
+          "id": 6707037009,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T12:37:37Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "895175740c69b0cad4d674d6afb026734e1adb93c113a2e095dd57e64a65ff25",
+        "result": {
+          "address": "0x08025FDC",
+          "claim_id": 6707037009,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6707037009,
+          "status": "accepted",
+          "who": "codex-08025FDC"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
