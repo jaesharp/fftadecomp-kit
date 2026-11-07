@@ -37,6 +37,8 @@ def linked_bytes(original, linked, address, bindings, targets):
     name = f'func_{address:08X}'
     root, offset = match.function_record(linked, name, address, True)
     source, _ = match.function_record(original, name, address, True)
+    from addressed_signed_runtime_profile import terminal_alignment
+    terminal_alignment(linked, root)
     if linked['type'] != 2 or linked['relocations'] or offset or \
             root['size'] != source['size'] or len(linked['text']) != len(original['text']) or any(
                 symbol['name'] and not symbol['section'] for symbol in linked['symbols']):

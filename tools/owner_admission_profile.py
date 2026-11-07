@@ -672,12 +672,15 @@ def original_bindings(image,address,rom,mapping,objects, *, selector=SELECTOR, i
     match.allocated_text_only(image)
     symbol,offset=match.function_record(image,f'func_{address:08X}',address,True)
     size=symbol['size']
+    if selector == integer_native.SELECTOR:
+        import addressed_signed_runtime_profile as alignment
+        alignment.terminal_alignment(image,symbol)
     if selector in (ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES):
         import addressed_signed_runtime_profile as alignment
         alignment.terminal_alignment(image,symbol)
         if len(image['text']) != size+2:
             raise ValueError('aligned owner requires actual external two-byte Thumb alignment')
-    external_alignment=(selector in (*named_buffer.SELECTORS,ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES) and size%4==2 and
+    external_alignment=(selector in (integer_native.SELECTOR,*named_buffer.SELECTORS,ALIGNED_SELECTOR,CYCLIC_SELECTOR,*r6_buffer.ALIGNED_POLICIES) and size%4==2 and
                         len(image['text'])==size+2 and image['text'][size:]==b'\xc0\x46')
     if offset or (size!=len(image['text']) and not external_alignment) or any(
             item['type']==2 and item is not symbol and item['section'] or
