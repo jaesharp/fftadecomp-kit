@@ -59,6 +59,38 @@
           "who": "FFTA-Team2-native135"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "78b10ef352f08f90087d792bac69a6df3188402962c3e2e8ab8fe6981a0548fa",
+        "acknowledged_cursor": 6713516509,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "78b10ef352f08f90087d792bac69a6df3188402962c3e2e8ab8fe6981a0548fa",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08148A0C\",\"who\":\"sol-08148A0C-3769\",\"note\":\"Matching only: independently corroborate packed grid direction and validity fields using separate ROM caller and grid writer, then apply only grounded type/layout correction. No tooling changes or compiler-steering search.\"}",
+          "created_at": "2026-11-07T21:54:50Z",
+          "id": 6713516509,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:54:50Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "451c88fef254d7efdc97109aaef017fdf1f9c5ef38c07a53d026254bec76c5ff",
+        "result": {
+          "address": "0x08148A0C",
+          "claim_id": 6713516509,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713516509,
+          "status": "accepted",
+          "who": "sol-08148A0C-3769"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
