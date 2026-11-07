@@ -439,8 +439,8 @@ def main():
                     help="validate only this toolkit checkout instead of a decompilation")
     ap.add_argument("--remote", default=DEFAULT_REMOTE)
     ap.add_argument("--branch", default=DEFAULT_BRANCH)
-    ap.add_argument("--jobs", type=int, choices=range(1, 25), default=1, metavar="N",
-                    help="forward N concurrent source checks to status (1..24; default: 1)")
+    ap.add_argument("--jobs", type=int, choices=range(1, 65), default=1, metavar="N",
+                    help="forward N concurrent source checks to status (1..64; default: 1)")
     ap.add_argument("--check-only", action="store_true",
                     help="run every check but push nothing")
     ap.add_argument("--working-tree", action="store_true",

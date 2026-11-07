@@ -248,7 +248,11 @@ do not merge main into the contribution branch. See `AGENTS.md` for the rules.
 
 ## Publishing through the gate
 
-Use `tools/push.py`, not a separate `git push`. Decompilation mode verifies
+Use `tools/push.py`, not a separate `git push`. `push.py --jobs N` and
+`status.py --jobs N` accept 1 through 64 concurrent source checks; the default
+remains one. Higher values are opt-in for hosts with sufficient CPU and memory.
+Every source and publication check still runs, results retain source order, and
+duplicate report destinations remain serialized. Decompilation mode verifies
 history, tracked-file restrictions, fresh ROM matches, plausibility and reports.
 Use `--check-only` to run the gate without publishing.
 

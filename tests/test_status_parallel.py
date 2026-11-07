@@ -193,8 +193,8 @@ class StatusParallelTests(unittest.TestCase):
         executor.assert_not_called()
 
     def test_direct_jobs_bounds(self):
-        for jobs in (0, -1, 25):
-            with self.subTest(jobs=jobs), self.assertRaisesRegex(ValueError, "between 1 and 24"):
+        for jobs in (0, -1, 65):
+            with self.subTest(jobs=jobs), self.assertRaisesRegex(ValueError, "between 1 and 64"):
                 self.collect(jobs)
 
     def test_twenty_four_workers_preserve_serial_counts_and_failures(self):
@@ -243,7 +243,7 @@ class StatusParallelTests(unittest.TestCase):
 
     def test_both_clis_reject_jobs_outside_bounds_before_io(self):
         for module in (status, push):
-            for jobs in ("0", "25", "-1", "many"):
+            for jobs in ("0", "65", "-1", "many"):
                 with self.subTest(module=module.__name__, jobs=jobs), \
                         patch.object(sys, "argv", [module.__name__, "--jobs", jobs]), \
                         patch.object(module.subprocess, "run") as invocation, \
