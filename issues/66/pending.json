@@ -250,7 +250,35 @@
           "who": "sol-08142E10-3345"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "458b3c8f7350fdeb239c051595570cc865b87d5c5725df198f6eb4021e77e58a",
+        "acknowledged_cursor": 6701592284,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "458b3c8f7350fdeb239c051595570cc865b87d5c5725df198f6eb4021e77e58a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08142E10\",\"who\":\"sol-08142E10-3345\",\"claim_id\":6701465172,\"reason\":\"Stopped read-only complete helper inspection3345; no independently grounded correction, zero new compiler/proof. Original artifacts and167 inputs preserved.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T03:22:45Z",
+          "id": 6701592284,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T03:22:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ab19d692dec82788ab799b918aa5d374000d238b6f1831690b8152b14b8c3796",
+        "result": {
+          "address": "0x08142E10",
+          "claim_id": 6701465172,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6701592284,
+          "status": "accepted",
+          "who": "sol-08142E10-3345"
+        }
+      }
     }
   ],
   "issue": 66,
