@@ -2088,3 +2088,16 @@ words, local pointer materialization, local cycles and mixed runtime policies
 are rejected. Ordinary callee effects remain conditional on the returning ABI;
 this does not prove memory safety, physical separation, numeric equivalence or
 termination. A data-only owner API cannot select this source profile.
+
+### Two incoming words with canonical integer calls
+
+`--owner-runtime-profile canonical-integer-two-words-data-source-v1` is an explicit
+source selector for a complete original relocatable function with compiler-emitted
+canonical integer calls and zero-addend named data literals. The existing closed
+frame proof requires actual direct reads of both incoming words at entry SP+0 and
+SP+4; stores, a third incoming word, SP-address escape, or unbalanced frames fail.
+The original and typed linked ELF roles, both indexes, full ROM body, producer
+pins, source and headers remain authenticated. The default scalar and six-word
+selectors retain their existing boundaries. Readable aligned incoming words and
+ordinary returning callee ABI contracts are explicit premises; named object
+points grant no contents, extents or physical memory permissions.
