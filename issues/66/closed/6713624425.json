@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "53a3f1c5fd56ebe19dd952d63b5522a4ac180ed3fc82a67457611127dce5e63f",
+    "acknowledged_cursor": 6713624425,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "53a3f1c5fd56ebe19dd952d63b5522a4ac180ed3fc82a67457611127dce5e63f",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D474\",\"who\":\"FFTA-Team2-native137\",\"note\":\"Fresh300B complete32-entry query selector; actual complete helpers and ROM halfword tables captured. First natural C in isolated original native context; no source steering.\"}",
+      "created_at": "2026-11-07T22:05:16Z",
+      "id": 6713624425,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:05:16Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "c9c9d5fcfd7f54df4e0d9d3156088ae87090162d174e85fb1ce14ff83cb4a50f",
+    "result": {
+      "address": "0x0812D474",
+      "claim_id": 6713624425,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6713624425,
+      "status": "accepted",
+      "who": "FFTA-Team2-native137"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "86ccf3b58acfffa2272693068a0da7f9e16ac25d1c44e5b81a14579f7518999b",
+    "acknowledged_cursor": 6713670390,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "86ccf3b58acfffa2272693068a0da7f9e16ac25d1c44e5b81a14579f7518999b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812D474\",\"who\":\"FFTA-Team2-native137\",\"claim_id\":6713624425,\"reason\":\"Two grounded natural forms each318B vs300B actual; shared-query correction verified, remaining boolean lowering/branch residual. Frozen native-game-137 complete originals, fully stopped, no credit.\",\"unmatchable\":true,\"tried\":\"Initial per-case query; independently decoded single shared D424 call/table-count selection. No predicate/order/register sweeps.\"}",
+      "created_at": "2026-11-07T22:09:43Z",
+      "id": 6713670390,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T22:09:43Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "47754ec1652d2aeeb39404e1ffddc79ec8648359bdbaad290c3b3c8073686b8e",
+    "result": {
+      "address": "0x0812D474",
+      "claim_id": 6713624425,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6713670390,
+      "status": "accepted",
+      "who": "FFTA-Team2-native137"
+    }
+  }
+}
