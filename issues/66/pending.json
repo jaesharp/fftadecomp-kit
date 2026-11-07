@@ -30,7 +30,35 @@
           "who": "sol-08021E3C-3771"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "35138377ac4ef0b2769a0e8bff14625347fdbb74a4c865d45731e7a6abc87122",
+        "acknowledged_cursor": 6714002275,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "35138377ac4ef0b2769a0e8bff14625347fdbb74a4c865d45731e7a6abc87122",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08021E3C\",\"who\":\"sol-08021E3C-3771\",\"claim_id\":6713966759,\"reason\":\"Prior natural signed-field recovery remains30B vs34B ROM; adjacent actual accessors establish no independent correction. Zero new C/native/compiler; no unchanged replay.\",\"unmatchable\":true,\"tried\":\"Existing three direct signed-field forms preserved; current accessor/interface qualification adds no grounded route.\"}",
+          "created_at": "2026-11-07T22:42:05Z",
+          "id": 6714002275,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:42:05Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c4470a551cc3d2ef45bd8f9fa97ea51722b412ef52fc301ecd5ec4df047322d6",
+        "result": {
+          "address": "0x08021E3C",
+          "claim_id": 6713966759,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714002275,
+          "status": "accepted",
+          "who": "sol-08021E3C-3771"
+        }
+      }
     },
     {
       "claim": {
