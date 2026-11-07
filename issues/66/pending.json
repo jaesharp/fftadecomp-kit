@@ -59,6 +59,38 @@
           "who": "sol-080CD1FC-3773"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "7ac6671dccb6ba4f223b6106b93fa52b1d1ab0935885fcad3901388d09441649",
+        "acknowledged_cursor": 6714273604,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7ac6671dccb6ba4f223b6106b93fa52b1d1ab0935885fcad3901388d09441649",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08002D84\",\"who\":\"sol-08002D84-3773\",\"note\":\"Finish ordinary plausible C matching from retained complete near-match with existing native tools. No artificial code, compiler flag changes, or tooling development.\"}",
+          "created_at": "2026-11-07T23:09:12Z",
+          "id": 6714273604,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:09:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "fd16af3dc6e3f32bce43f1bfccf1924aa4f461ec0abab848088e8d900ae216d8",
+        "result": {
+          "address": "0x08002D84",
+          "claim_id": 6714273604,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714273604,
+          "status": "accepted",
+          "who": "sol-08002D84-3773"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
