@@ -155,6 +155,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "d2386ae63c75f8f43d79395a6afe5b739b5e98ad1f3e092c41cc9cdab89b28cb",
+        "acknowledged_cursor": 6714478039,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "d2386ae63c75f8f43d79395a6afe5b739b5e98ad1f3e092c41cc9cdab89b28cb",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D8708\",\"who\":\"sol-080D8708-3773\",\"note\":\"C matching continuation for complete plausible near-match with commuted address additions. Natural C expressions/scopes/types allowed, no artificial operations or tooling development.\"}",
+          "created_at": "2026-11-07T23:30:02Z",
+          "id": 6714478039,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:30:02Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "ba90bd71befd94761a3f832c3f606cc1c76406f36c05518b32b91ba716bf93c4",
+        "result": {
+          "address": "0x080D8708",
+          "claim_id": 6714478039,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714478039,
+          "status": "accepted",
+          "who": "sol-080D8708-3773"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
