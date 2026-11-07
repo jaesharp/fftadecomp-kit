@@ -100,6 +100,7 @@ def verify_context(data, address, calls, context):
 def prove_operands(instructions, edges, address, sites, *, logical_shift_signed16=False):
     from capstone import CS_GRP_CALL
     from capstone.arm_const import (ARM_CC_AL, ARM_CC_INVALID, ARM_CC_EQ, ARM_CC_NE,
+                                   ARM_CC_LT, ARM_CC_GE, ARM_CC_GT, ARM_CC_LE,
                                    ARM_INS_ASR, ARM_INS_LSR, ARM_INS_LSL, ARM_INS_B, ARM_INS_CMP,
                                    ARM_OP_IMM, ARM_OP_REG, ARM_REG_R0, ARM_REG_R1,
                                    ARM_REG_R2, ARM_REG_R3, ARM_REG_R12, ARM_REG_LR)
@@ -170,23 +171,31 @@ def prove_operands(instructions, edges, address, sites, *, logical_shift_signed1
                                     if register == source)
         guarded_register = None
         if instruction.id == ARM_INS_B and instruction.size == 2 and \
-                instruction.cc in (ARM_CC_EQ, ARM_CC_NE) and \
+                instruction.cc in (ARM_CC_EQ, ARM_CC_NE, ARM_CC_LT, ARM_CC_GE,
+                                   ARM_CC_GT, ARM_CC_LE) and \
                 predecessors[current] == {current - 2}:
             comparison = instructions[current - 2]
             compared = comparison.operands
             if comparison.id == ARM_INS_CMP and comparison.size == 2 and \
-                    comparison.cc in (ARM_CC_AL, ARM_CC_INVALID) and len(compared) == 2 and \
-                    compared[0].type == ARM_OP_REG and compared[1].type == ARM_OP_IMM and \
-                    compared[1].imm == 0:
-                guarded_register = compared[0].reg
+                    comparison.cc in (ARM_CC_AL, ARM_CC_INVALID) and len(compared) == 2:
+                for zero, other in (compared, tuple(reversed(compared))):
+                    if other.type == ARM_OP_REG and (
+                            zero.type == ARM_OP_IMM and zero.imm == 0 or
+                            zero.type == ARM_OP_REG and
+                            (zero.reg, ("const", 0)) in incoming):
+                        guarded_register = other.reg
+                        break
         per_successor = {}
         for successor in edges[current]:
             facts = set(outgoing)
             if guarded_register is not None:
                 target = operands[0].imm
                 fallthrough = current + instruction.size
-                if target != fallthrough and ((instruction.cc == ARM_CC_NE and successor == target) or
-                                              (instruction.cc == ARM_CC_EQ and successor == fallthrough)):
+                # Strict signed inequalities against zero exclude zero in
+                # either operand order. Their complements include equality.
+                if target != fallthrough and (
+                        instruction.cc in (ARM_CC_NE, ARM_CC_LT, ARM_CC_GT) and successor == target or
+                        instruction.cc in (ARM_CC_EQ, ARM_CC_GE, ARM_CC_LE) and successor == fallthrough):
                     facts.add((guarded_register, "nz"))
             frozen = frozenset(facts)
             per_successor[successor] = per_successor.get(successor, frozen) & frozen
