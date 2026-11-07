@@ -123,6 +123,38 @@
           "who": "sol-08138284-3509"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "9120a61b60c2c819d74f6ac46f6704afb4d6ea95805c7a29195bc348f0a1fb34",
+        "acknowledged_cursor": 6704376262,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "9120a61b60c2c819d74f6ac46f6704afb4d6ea95805c7a29195bc348f0a1fb34",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080096E0\",\"who\":\"codex-080096E0-1107\",\"note\":\"Recover natural C for complete Thumb owner; isolated native subagent, orchestrator owns verification and release.\"}",
+          "created_at": "2026-11-07T08:15:51Z",
+          "id": 6704376262,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T08:15:51Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "f5aefe5ec36eff8636c310fca51a5bfbda66dd26b190be840161a6f319c9750e",
+        "result": {
+          "address": "0x080096E0",
+          "claim_id": 6704376262,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6704376262,
+          "status": "accepted",
+          "who": "codex-080096E0-1107"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
