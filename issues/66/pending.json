@@ -66,66 +66,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "5a3518f404d4b11d44d0d42312f53df93b9a98254b9b544abe6eb9d4ad977d84",
-        "acknowledged_cursor": 6701877655,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5a3518f404d4b11d44d0d42312f53df93b9a98254b9b544abe6eb9d4ad977d84",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081430B4\",\"who\":\"sol-081430B4-3365\",\"note\":\"Actual natural C matching of complete indexed owner; parent owns reservations and publication.\"}",
-          "created_at": "2026-11-07T03:50:39Z",
-          "id": 6701877493,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T03:50:39Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "72b14c5ab12881e69fbf5c7e610715fe182f522ec624ac2e282310cec4f67dbf",
-        "result": {
-          "address": "0x081430B4",
-          "claim_id": 6701877493,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6701877493,
-          "status": "accepted",
-          "who": "sol-081430B4-3365"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "589e1de751737ba21966ecedc63f3fe4a2b61bde6f39bf0caf4de0a77bf2008f",
-        "acknowledged_cursor": 6701909202,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "589e1de751737ba21966ecedc63f3fe4a2b61bde6f39bf0caf4de0a77bf2008f",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081430B4\",\"who\":\"sol-081430B4-3365\",\"claim_id\":6701877493,\"reason\":\"First native MATCH3368 complete60B original ELF under published tested double selected-record policy; one native/compiler, plausible, all integrity checks and entire original qualification manifest identical. All originals preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T03:53:58Z",
-          "id": 6701909202,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T03:53:58Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1554dd1b37abf5f90d88219a2e58863f5e59cb9e25f76d993c34a34c04940c52",
-        "result": {
-          "address": "0x081430B4",
-          "claim_id": 6701877493,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6701909202,
-          "status": "accepted",
-          "who": "sol-081430B4-3365"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "167d1eb32686a916c23019d85c63bca11517713a795a388bbe546e7ef9ab434c",
         "acknowledged_cursor": 6701973006,
         "body_provenance": "acceptance-time",
