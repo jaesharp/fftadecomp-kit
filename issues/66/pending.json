@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "46978776f8ab330025726b3d034d38394f838dde8f4e831d4443e36ddcde1373",
-        "acknowledged_cursor": 6707934090,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "46978776f8ab330025726b3d034d38394f838dde8f4e831d4443e36ddcde1373",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08057454\",\"who\":\"codex-08057454\",\"note\":\"Natural unit display constructor; isolated corrected owner through57500 includes four referenced literal words, no overlap.\"}",
-          "created_at": "2026-11-07T14:05:02Z",
-          "id": 6707934090,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:05:02Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e48751e49af39d2c8a25653672a15a691ecf4bf9d1a569ad2753428839aeaa7b",
-        "result": {
-          "address": "0x08057454",
-          "claim_id": 6707934090,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6707934090,
-          "status": "accepted",
-          "who": "codex-08057454"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "37bc2fde7a5e0eb26c7afc85755d80f24742e64f7f130abcac67de7202ad79b5",
-        "acknowledged_cursor": 6707985367,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "37bc2fde7a5e0eb26c7afc85755d80f24742e64f7f130abcac67de7202ad79b5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08057454\",\"who\":\"codex-08057454\",\"claim_id\":6707934090,\"reason\":\"Parked172B candidate132/172 equal; context/index/unit register allocation and display address scheduling differ. Complete owner correction through57500 documented scratch-only.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; natural direct/local-table indexing, selected-index variable, separate lookups, display local, byte records\"}",
-          "created_at": "2026-11-07T14:09:49Z",
-          "id": 6707985367,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:09:49Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "015edb5fbaff2e76c8cf04d6573a61af845029ff8bb608cd000d096f545c2cb7",
-        "result": {
-          "address": "0x08057454",
-          "claim_id": 6707934090,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6707985367,
-          "status": "accepted",
-          "who": "codex-08057454"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "f1ebac8b75460a7628dd1aba3c60d3388d890abdab53c6dc1e8425ff14a8bb2a",
         "acknowledged_cursor": 6707997910,
         "body_provenance": "acceptance-time",
