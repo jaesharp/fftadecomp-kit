@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "749534c7c64a70ceea8122dffebe7836c83da55745100cd424c6c29e5295a0bf",
+    "acknowledged_cursor": 6704630675,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "749534c7c64a70ceea8122dffebe7836c83da55745100cd424c6c29e5295a0bf",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08A38A2C\",\"who\":\"sol-08A38A2C-3540\",\"note\":\"Natural C matching of separate installer-backed lateROM memory routine; original ordinary leaf preflightPASS3539. Primary owns native admission and publication; RAM alias not extra function.\"}",
+      "created_at": "2026-11-07T08:43:08Z",
+      "id": 6704630675,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T08:43:08Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "38df162b166458c02be38cc21184b082670b056e431826bcf029305befdd0713",
+    "result": {
+      "address": "0x08A38A2C",
+      "claim_id": 6704630675,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6704630675,
+      "status": "accepted",
+      "who": "sol-08A38A2C-3540"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "d6ee04b3bb6154954c80afa22e773b398c5834371838a1c10e1d9ff2c39e985b",
+    "acknowledged_cursor": 6704716556,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "d6ee04b3bb6154954c80afa22e773b398c5834371838a1c10e1d9ff2c39e985b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08A38A2C\",\"who\":\"sol-08A38A2C-3540\",\"claim_id\":6704630675,\"reason\":\"Firstnatural complete original lateROMmemoryroutine frozen; emitted size/controlflow differ. No independently grounded semantic/interface/storage correction remains; no controlspelling orregister steering. Candidate/intermediates/failures retained,0MATCHcredit.\",\"unmatchable\":true,\"tried\":\"Fixed agbcc -mthumb-interwork -O2; one genuine natural form, one native/compiler invocation; no replay.\"}",
+      "created_at": "2026-11-07T08:52:13Z",
+      "id": 6704716556,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T08:52:13Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "53d992c81c16ec5e59f4eef6af648b129a8c6b3b1198bc17e13213f40ed39e6c",
+    "result": {
+      "address": "0x08A38A2C",
+      "claim_id": 6704630675,
+      "code": 0,
+      "message": "release accepted; unmatchable evidence requires maintainer review",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6704716556,
+      "status": "accepted",
+      "who": "sol-08A38A2C-3540"
+    }
+  }
+}
