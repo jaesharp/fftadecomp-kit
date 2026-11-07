@@ -59,66 +59,6 @@
           "who": "sol-08148A0C-3769"
         }
       }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "11784cf859311829f2fc1bbaac5057a6479088c9ffe596237a294590bfd1634a",
-        "acknowledged_cursor": 6713522655,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "11784cf859311829f2fc1bbaac5057a6479088c9ffe596237a294590bfd1634a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080B42E4\",\"who\":\"FFTA-Team2-native136\",\"note\":\"Fresh first natural C for complete262B indexed category/flags selector. Actual complete CA7A4 and CCD50 interfaces, no source steering; isolated original native check.\"}",
-          "created_at": "2026-11-07T21:55:26Z",
-          "id": 6713522655,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T21:55:26Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "26fa206686adee81794d5e9b57a653ac10319df9986eab30f50f3cae36c86167",
-        "result": {
-          "address": "0x080B42E4",
-          "claim_id": 6713522655,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6713522655,
-          "status": "accepted",
-          "who": "FFTA-Team2-native136"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "e883b1ef139b0c76684a9f555b0a9a6c36a11f31319a0c8362698e000990b753",
-        "acknowledged_cursor": 6713544262,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e883b1ef139b0c76684a9f555b0a9a6c36a11f31319a0c8362698e000990b753",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080B42E4\",\"who\":\"FFTA-Team2-native136\",\"claim_id\":6713522655,\"reason\":\"First natural C compiled256B versus complete262B, strict mapped switch-span rejected. Original ET_REL/typed ELF/fullFUNC and current pins frozen native-game-136; fully stopped, zero credit.\",\"unmatchable\":true,\"tried\":\"One natural category/flags selector; actual complete CA7A4/CCD50 interfaces. No source order/register/control-flow steering or compiler replay.\"}",
-          "created_at": "2026-11-07T21:57:33Z",
-          "id": 6713544262,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T21:57:33Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1ddf2e755ccd81b2a5626f283caed15923ec09927f6a50fc5c42dcb85e8bdbce",
-        "result": {
-          "address": "0x080B42E4",
-          "claim_id": 6713522655,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6713544262,
-          "status": "accepted",
-          "who": "FFTA-Team2-native136"
-        }
-      }
     }
   ],
   "issue": 66,
