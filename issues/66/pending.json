@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "7745f57cfc7741fed1ea9f711f7aa31e5a6ba64b24c70a50f265871a9d3e7067",
-        "acknowledged_cursor": 6712452932,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7745f57cfc7741fed1ea9f711f7aa31e5a6ba64b24c70a50f265871a9d3e7067",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812A52C\",\"who\":\"sol-0812A52C-3755\",\"note\":\"Saved natural complete144B draw dispatcher, first native source check with existing typed outgoing frame support; no tooling changes or C steering.\"}",
-          "created_at": "2026-11-07T20:12:43Z",
-          "id": 6712452932,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:12:43Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "53da9dd8dd070326c74b8196dd6757ba8252ec0fd1b2f3976e3b8cc6cabab046",
-        "result": {
-          "address": "0x0812A52C",
-          "claim_id": 6712452932,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6712452932,
-          "status": "accepted",
-          "who": "sol-0812A52C-3755"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "7c4272fa29a5fc2ab6a3b634953eae9703215abc1d70a79c1d21e745c4b41f88",
-        "acknowledged_cursor": 6712524501,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7c4272fa29a5fc2ab6a3b634953eae9703215abc1d70a79c1d21e745c4b41f88",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0812A52C\",\"who\":\"sol-0812A52C-3755\",\"claim_id\":6712452932,\"reason\":\"Native MATCH exit0, plausible complete144/144 bytes and60instructions; exact natural source and original artifacts frozen for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-07T20:19:29Z",
-          "id": 6712524501,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T20:19:29Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ff3afef9acd3e039ddad4a262da4f6437b8da46f7993eaaf778a7a1489b4450e",
-        "result": {
-          "address": "0x0812A52C",
-          "claim_id": 6712452932,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6712524501,
-          "status": "accepted",
-          "who": "sol-0812A52C-3755"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "1b33e266861d34532e2f1adf3ea22d01461b0a4699738b020982c2ebdbb22678",
         "acknowledged_cursor": 6712529558,
         "body_provenance": "acceptance-time",
