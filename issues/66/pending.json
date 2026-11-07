@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "a3c32f1352ebc4dca8d9bbeb38006b6325118994f9d5cc790751898835371640",
-        "acknowledged_cursor": 6708481757,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a3c32f1352ebc4dca8d9bbeb38006b6325118994f9d5cc790751898835371640",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08097A04\",\"who\":\"codex-08097A04\",\"note\":\"Recover1280-byte actor movement/render update with evidence-backed signed16bit packed terrain positions; default native admission\"}",
-          "created_at": "2026-11-07T14:52:05Z",
-          "id": 6708481757,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:52:05Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "1fcb35ade06f45250ba9c9277968d873500c31c8d1a0519ca37ff03ef9010008",
-        "result": {
-          "address": "0x08097A04",
-          "claim_id": 6708481757,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6708481757,
-          "status": "accepted",
-          "who": "codex-08097A04"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "8ccf6d15b0b7a302a582951a2c2f6723c5c4ad9801a4c4008bed3d13e1eb508d",
-        "acknowledged_cursor": 6708558866,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "8ccf6d15b0b7a302a582951a2c2f6723c5c4ad9801a4c4008bed3d13e1eb508d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08097A04\",\"who\":\"codex-08097A04\",\"claim_id\":6708481757,\"reason\":\"Parked complete natural actor movement/render recovery1276vs1280; packed-local reloads, predicate result allocation, effect-loop bases differ; possible originalinlineboundary not manufactured\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; evidence-backed signed16bit Position; natural Boolean and early-failure forms; direct effect array vs local record pointer; no helpers or steering\"}",
-          "created_at": "2026-11-07T14:57:23Z",
-          "id": 6708558866,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T14:57:23Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ff66a177a1ae483bd1697c4e1c9b26a2b402648f3c03fb3077f682ca9d43c4a7",
-        "result": {
-          "address": "0x08097A04",
-          "claim_id": 6708481757,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6708558866,
-          "status": "accepted",
-          "who": "codex-08097A04"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "a74e633d5f3eb263dbfbe9d677e42d9a97ec141d0d3b3e99727aad373215d287",
         "acknowledged_cursor": 6708575055,
         "body_provenance": "acceptance-time",
