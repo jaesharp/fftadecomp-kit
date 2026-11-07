@@ -91,6 +91,38 @@
           "who": "sol-080CD1FC-3771"
         }
       }
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "fb50f07d58c731aa6718c1acba9a11101e2851fef2c9ecb69724d267a8f422f0",
+        "acknowledged_cursor": 6714109042,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "fb50f07d58c731aa6718c1acba9a11101e2851fef2c9ecb69724d267a8f422f0",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080CD544\",\"who\":\"sol-080CD544-object-3771\",\"note\":\"Distinct defining object/interface recovery for actual variable-length byte flag member at+0x40; preceding packed-element attempt used void pointer/cast. Previous lease released. No tooling.\"}",
+          "created_at": "2026-11-07T22:52:45Z",
+          "id": 6714109042,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T22:52:45Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "b1a3d9ee13f78b39aee4332ff4008bae6af74d64b72fd8746dcbd4c9fe545743",
+        "result": {
+          "address": "0x080CD544",
+          "claim_id": 6714109042,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6714109042,
+          "status": "accepted",
+          "who": "sol-080CD544-object-3771"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
