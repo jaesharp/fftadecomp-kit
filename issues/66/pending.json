@@ -1470,7 +1470,35 @@
           "who": "sol-08017734-3224"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "af9e70fe31a01fe7f1bc5ecab27d6c5682aea763c87399de69252f40fd6603ab",
+        "acknowledged_cursor": 6700474371,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "af9e70fe31a01fe7f1bc5ecab27d6c5682aea763c87399de69252f40fd6603ab",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08017734\",\"who\":\"sol-08017734-3224\",\"claim_id\":6700418354,\"reason\":\"Eight preserved original forms inspected without replay;280B full FUNC230B equal, residual register/stack-slot/narrowing/scheduling differences with no independent semantic correction.\",\"unmatchable\":true,\"tried\":\"Distinct natural C/native outcomes retained privately; no steering, successful replay or shared fixed-input changes.\"}",
+          "created_at": "2026-11-07T01:38:44Z",
+          "id": 6700474371,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T01:38:44Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "28122cdf353d00ef3746ea9f1a45f5f8aaafd93d4088d40cc7c43d189623f37f",
+        "result": {
+          "address": "0x08017734",
+          "claim_id": 6700418354,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6700474371,
+          "status": "accepted",
+          "who": "sol-08017734-3224"
+        }
+      }
     },
     {
       "claim": {
