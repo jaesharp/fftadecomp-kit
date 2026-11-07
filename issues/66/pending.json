@@ -218,7 +218,35 @@
           "who": "sol-080DDC18-3773"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e3498d9841a102eed9edb62b94123badda21288101dfa916c01e98fde4f7526a",
+        "acknowledged_cursor": 6714449329,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e3498d9841a102eed9edb62b94123badda21288101dfa916c01e98fde4f7526a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DDC18\",\"who\":\"sol-080DDC18-3773\",\"claim_id\":6714400976,\"reason\":\"Plausible native MATCH exit0 complete390bytes. Original successful invocation retained, compiler work explicitly stopped, source/report frozen for publication.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T23:27:03Z",
+          "id": 6714449329,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T23:27:03Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "97586b9a209617e4ed6eb56c2fdaf333f1b3884466472786024a9ea055633744",
+        "result": {
+          "address": "0x080DDC18",
+          "claim_id": 6714400976,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714449329,
+          "status": "accepted",
+          "who": "sol-080DDC18-3773"
+        }
+      }
     }
   ],
   "issue": 66,
