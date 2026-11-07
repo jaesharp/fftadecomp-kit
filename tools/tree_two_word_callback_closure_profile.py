@@ -13,9 +13,7 @@ import owner_admission_profile as owner
 import owner_graph_profile as graph
 import function_thunk_profile as thunk
 import local_long_branch_profile as frame
-import two_output_callback_adapter_inventory as adapter
 import scalar_callback_adapter_inventory as scalar
-from two_word_callback_closure_profile import _ContextRead, PRESERVED
 from software_double_profile import indices, span_record
 
 SELECTOR = 'conditional-two-word-tree-callback-closure-v1'
@@ -41,6 +39,9 @@ def complete(address,size,count,rom,mapping,index):
 
 
 def prove(data,address,rom,mapping,index,*,selector):
+    # Owner dispatch can initialize while the shared callback policy is loading.
+    import two_output_callback_adapter_inventory as adapter
+    from two_word_callback_closure_profile import _ContextRead, PRESERVED
     if type(selector)is not str or selector!=SELECTOR or type(address)is not int or \
             any(type(v)is not bytes for v in(data,rom,mapping,index)):
         raise ValueError('two-word closure requires its exact explicit policy and immutable inputs')
