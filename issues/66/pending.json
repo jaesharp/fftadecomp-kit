@@ -63,6 +63,70 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "ba2227a871463284e3b327436becbb12ebcbce0d587f23f80706fb057be37ae8",
+        "acknowledged_cursor": 6712850151,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "ba2227a871463284e3b327436becbb12ebcbce0d587f23f80706fb057be37ae8",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08142124\",\"who\":\"sol-08142124-3762\",\"note\":\"First natural C matching for full budgeted FF-byte scan owner36B after truncated-prefix correction; unchanged published tools, no tooling development.\"}",
+          "created_at": "2026-11-07T20:50:24Z",
+          "id": 6712850037,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:50:24Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "48986b04b756ba2c850372c043ee2201c068e26919020180613486208e2525a6",
+        "result": {
+          "address": "0x08142124",
+          "claim_id": 6712850037,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712850037,
+          "status": "accepted",
+          "who": "sol-08142124-3762"
+        }
+      },
+      "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "26c07d95516da143283ac8194e60c7e5aaa1facfc0288185ce4e7a5e0315c35b",
+        "acknowledged_cursor": 6712850151,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "26c07d95516da143283ac8194e60c7e5aaa1facfc0288185ce4e7a5e0315c35b",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0812D99C\",\"who\":\"FFTA-Team2-native118\",\"note\":\"First natural scalar C from complete actual110B owner and indexed helper interfaces; preserve originals; no steering\"}",
+          "created_at": "2026-11-07T20:50:25Z",
+          "id": 6712850151,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T20:50:25Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "48986b04b756ba2c850372c043ee2201c068e26919020180613486208e2525a6",
+        "result": {
+          "address": "0x0812D99C",
+          "claim_id": 6712850151,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6712850151,
+          "status": "accepted",
+          "who": "FFTA-Team2-native118"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
