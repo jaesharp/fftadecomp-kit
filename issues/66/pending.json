@@ -94,7 +94,35 @@
           "who": "sol-0809D640-3448"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "4b20f33b14080cae35ac04f86e965e5cbded64574c65a01856de2951c7468ace",
+        "acknowledged_cursor": 6703370019,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "4b20f33b14080cae35ac04f86e965e5cbded64574c65a01856de2951c7468ace",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809D640\",\"who\":\"sol-0809D640-3448\",\"claim_id\":6703297405,\"reason\":\"First conditional known-query native workflow MATCH: one compiler, complete44B exact, plausible source and all context pins unchanged; result SHA256 1f0b5524863f8bd43da82d2b9ffeee898864a095bc78977808224fa652beece0\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T06:28:12Z",
+          "id": 6703370019,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T06:28:12Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "c4cea327a5c2fe900d5550e612160ac43e389c3b8f438ad8c607783c236d3948",
+        "result": {
+          "address": "0x0809D640",
+          "claim_id": 6703297405,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6703370019,
+          "status": "accepted",
+          "who": "sol-0809D640-3448"
+        }
+      }
     }
   ],
   "issue": 66,
