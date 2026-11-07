@@ -30,7 +30,35 @@
           "who": "FFTA-Team2-native-103"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "7e3705318dd96daef8cc918680e948b9bdd28abfffe63c870c35826ae3181e05",
+        "acknowledged_cursor": 6709984576,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "7e3705318dd96daef8cc918680e948b9bdd28abfffe63c870c35826ae3181e05",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08024860\",\"who\":\"FFTA-Team2-native-103\",\"claim_id\":6709947578,\"reason\":\"Frozen original preserved; native103 explicit dynamic-division profile refuses genuine compiler runtime function-address identity; no new match credit\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-07T16:38:14Z",
+          "id": 6709984576,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T16:38:14Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "4eaaeb52d7dc73d4f91de83ee6456655637326b178d5c6fada7409aebc35dde3",
+        "result": {
+          "address": "0x08024860",
+          "claim_id": 6709947578,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6709984576,
+          "status": "accepted",
+          "who": "FFTA-Team2-native-103"
+        }
+      }
     }
   ],
   "issue": 66,
