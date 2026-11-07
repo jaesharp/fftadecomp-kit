@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "e68fb3a13a34377cff5ad39904ac01c246f6818a261b49393fffe5b7852b9b36",
+    "acknowledged_cursor": 6706497785,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "e68fb3a13a34377cff5ad39904ac01c246f6818a261b49393fffe5b7852b9b36",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0813F080\",\"who\":\"sol-0813F080-3656\",\"note\":\"First native admission of already-frozen natural164B complete exact source; new closed three-read-only-incoming-ABI-words profile and first originalELF proof3654PASS. No C edit or diagnostic replay. Primary owns publication.\"}",
+      "created_at": "2026-11-07T11:44:08Z",
+      "id": 6706495640,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:44:08Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "4a8d2a40e5fe004f6222adc771eae6fd4cc798dd7217312ad56180851865519b",
+    "result": {
+      "address": "0x0813F080",
+      "claim_id": 6706495640,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 18360463,
+      "request_id": 6706495640,
+      "status": "accepted",
+      "who": "sol-0813F080-3656"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "0def978126a55cb09d06c644c7c4948146182ec474e18ffe485a88537703f7de",
+    "acknowledged_cursor": 6706562185,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "0def978126a55cb09d06c644c7c4948146182ec474e18ffe485a88537703f7de",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0813F080\",\"who\":\"sol-0813F080-3656\",\"claim_id\":6706495640,\"reason\":\"Complete original164B native MATCH, plausible source and exact Primary3654 manifest frozen. Matching stopped, source unchanged. Primary owns tested toolkit and game full status/native publication/exact CI. All diagnostic and mandatory internal proof evidence preserved.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T11:50:02Z",
+      "id": 6706562185,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:50:02Z",
+      "user": {
+        "id": 18360463,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "5dab02696ccc806456fb1eab8305d6fe53c9f49b7c661fa44030b8acaa0325d3",
+    "result": {
+      "address": "0x0813F080",
+      "claim_id": 6706495640,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 18360463,
+      "request_id": 6706562185,
+      "status": "accepted",
+      "who": "sol-0813F080-3656"
+    }
+  }
+}
