@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "0cbb4b35f1e837ddec100588fda0178f1346dcbbb1459c2f5c2431177c2e3858",
-        "acknowledged_cursor": 6706659468,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "0cbb4b35f1e837ddec100588fda0178f1346dcbbb1459c2f5c2431177c2e3858",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08092390\",\"who\":\"codex-08092390\",\"note\":\"Natural motion speed/distance update,174byte complete owner; isolated source, existing signed runtime profile, no mapping or toolkit changes.\"}",
-          "created_at": "2026-11-07T12:00:02Z",
-          "id": 6706659468,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:00:02Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "c4952d85ff61ce47d352c4060f2292b66d02a0d0fd9d01957a132aa6d57499ec",
-        "result": {
-          "address": "0x08092390",
-          "claim_id": 6706659468,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 31369,
-          "request_id": 6706659468,
-          "status": "accepted",
-          "who": "codex-08092390"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "6118c2575ba111721be5c5c21345a14784e1f7618f6718c58f60d4f4f3962a39",
-        "acknowledged_cursor": 6706721201,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6118c2575ba111721be5c5c21345a14784e1f7618f6718c58f60d4f4f3962a39",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08092390\",\"who\":\"codex-08092390\",\"claim_id\":6706659468,\"reason\":\"Parked natural motion update:174byte instruction/control shape but persistent r4/r5/r6/r7 permutation; native canonical profile reaches byte comparison and rejects. No steering or verifier edits.\",\"unmatchable\":true,\"tried\":\"-mthumb-interwork -O2; abs forms, coordinate lifetimes, natural/addressed division, declaration order\"}",
-          "created_at": "2026-11-07T12:06:12Z",
-          "id": 6706721201,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T12:06:12Z",
-          "user": {
-            "id": 31369,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "cfd7f404a34ea5b5b7b4a7c75639467d629a9236ba068e3d07c5f0fee6d5dd51",
-        "result": {
-          "address": "0x08092390",
-          "claim_id": 6706659468,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 31369,
-          "request_id": 6706721201,
-          "status": "accepted",
-          "who": "codex-08092390"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "5ffdf6c716bda49c65ed086c9959fb3026893239cb759ec6d06279a17c497350",
         "acknowledged_cursor": 6706687685,
         "body_provenance": "acceptance-time",
