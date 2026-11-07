@@ -1,0 +1,60 @@
+{
+  "claim": {
+    "acceptance_body_sha256": "e2da56843c36cec3c00fe3f6ca22d35b947c9067ba225bb0c5296c1b197298d6",
+    "acknowledged_cursor": 6705966333,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "e2da56843c36cec3c00fe3f6ca22d35b947c9067ba225bb0c5296c1b197298d6",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081369B0\",\"who\":\"codex-081369B0\",\"note\":\"Natural C recovery with complete indexed owner and existing runtime profiles; isolated scratch source, no shared-header/index/verifier edits.\"}",
+      "created_at": "2026-11-07T11:02:50Z",
+      "id": 6705966109,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:02:50Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "4e61e804f6f6dc002363b4d52fbb7447caca89cbdff40c29f6fc6669d3c147cf",
+    "result": {
+      "address": "0x081369B0",
+      "claim_id": 6705966109,
+      "code": 0,
+      "message": "claim accepted",
+      "operation": "claim",
+      "owner_id": 31369,
+      "request_id": 6705966109,
+      "status": "accepted",
+      "who": "codex-081369B0"
+    }
+  },
+  "release": {
+    "acceptance_body_sha256": "8e4b36b2298d921e13f7373f01d105b179d9cfeefba4a14aefa57f6620a2ed5b",
+    "acknowledged_cursor": 6706010373,
+    "body_provenance": "acceptance-time",
+    "body_sha256": "8e4b36b2298d921e13f7373f01d105b179d9cfeefba4a14aefa57f6620a2ed5b",
+    "comment": {
+      "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x081369B0\",\"who\":\"codex-081369B0\",\"claim_id\":6705966109,\"reason\":\"Integrated 60-byte exact signed endpoint interpolation with elapsed clamp; canonical-integer-scalar-source-v1 native MATCH and plausible source.\",\"unmatchable\":false,\"tried\":\"\"}",
+      "created_at": "2026-11-07T11:07:23Z",
+      "id": 6706010373,
+      "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+      "updated_at": "2026-11-07T11:07:23Z",
+      "user": {
+        "id": 31369,
+        "type": "User"
+      }
+    },
+    "ledger_body_sha256": "d0db19982a8dbd074b1ba2e4e00c25148346cd76ae8ae4c457c28f507638d9a6",
+    "result": {
+      "address": "0x081369B0",
+      "claim_id": 6705966109,
+      "code": 0,
+      "message": "release accepted",
+      "operation": "release",
+      "owner_id": 31369,
+      "request_id": 6706010373,
+      "status": "accepted",
+      "who": "codex-081369B0"
+    }
+  }
+}
