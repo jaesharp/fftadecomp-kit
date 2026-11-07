@@ -31,6 +31,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "11784cf859311829f2fc1bbaac5057a6479088c9ffe596237a294590bfd1634a",
+        "acknowledged_cursor": 6713522655,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "11784cf859311829f2fc1bbaac5057a6479088c9ffe596237a294590bfd1634a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080B42E4\",\"who\":\"FFTA-Team2-native136\",\"note\":\"Fresh first natural C for complete262B indexed category/flags selector. Actual complete CA7A4 and CCD50 interfaces, no source steering; isolated original native check.\"}",
+          "created_at": "2026-11-07T21:55:26Z",
+          "id": 6713522655,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-07T21:55:26Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "26fa206686adee81794d5e9b57a653ac10319df9986eab30f50f3cae36c86167",
+        "result": {
+          "address": "0x080B42E4",
+          "claim_id": 6713522655,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6713522655,
+          "status": "accepted",
+          "who": "FFTA-Team2-native136"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
