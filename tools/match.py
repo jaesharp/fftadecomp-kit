@@ -2351,7 +2351,7 @@ def stack_alias_assignment(instruction, aliases, depth, constants):
 
 
 def stack_alias_store(stack, pointer_slots, aliases, return_registers,
-                      offset, width, register):
+                      offset, width, register, *, pointer_proof=None):
     """Apply an existing scalar store's bounded stack/provenance effects."""
     if width not in (1, 2, 4) or offset % width or \
             not -4 * len(stack) <= offset or offset + width > 0:
@@ -2359,9 +2359,20 @@ def stack_alias_store(stack, pointer_slots, aliases, return_registers,
     pointer_word = offset - offset % 4
     if pointer_word in pointer_slots and width != 4:
         raise ValueError("partial access to a pointer-bearing local word")
-    if register in aliases:
-        raise ValueError("stack aliases cannot be stored or spilled")
     slot = (offset + 4 * len(stack)) // 4
+    if register in aliases:
+        from conditional_local_buffer_profile import ConditionalLocalBufferProof, SCHEDULER_PAYLOAD
+        if type(pointer_proof) is not ConditionalLocalBufferProof or \
+                pointer_proof.policy != SCHEDULER_PAYLOAD or width != 4:
+            raise ValueError("stack aliases cannot be stored or spilled")
+        value = aliases[register]
+        if value % 4 or register in return_registers:
+            raise ValueError("payload pointer store requires aligned local-pointer provenance")
+        pointer_proof.access(offset, 4, stack)
+        pointer_proof.validate_pointer_value(value, stack)
+        stack[slot] = (False, stack[slot][1], stack[slot][2])
+        pointer_slots[offset] = value
+        return True
     stack[slot] = (width == 4 and register in return_registers,
                    stack[slot][1], stack[slot][2])
     pointer_slots.pop(pointer_word, None)
@@ -3782,8 +3793,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                             if instruction.mnemonic.startswith("ldr"):
                                 loaded_alias = (registers[0], pointer_slots[pointer_word])
                         if instruction.mnemonic.startswith("str"):
-                            stack_alias_store(stack, pointer_slots, aliases, return_registers,
-                                              offset, width, registers[0])
+                            stored_pointer = stack_alias_store(stack, pointer_slots, aliases, return_registers,
+                                              offset, width, registers[0], pointer_proof=buffer_proof)
+                            if stored_pointer:
+                                allowed_aliases.add(registers[0])
                         elif width == 4 and stack[slot][0]:
                             assigned_return = registers[0]
                     if operand.mem.base == ARM_REG_PC:
