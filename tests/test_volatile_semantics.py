@@ -93,8 +93,8 @@ class SemanticDiffTests(unittest.TestCase):
         # the re-read value may only reach pinned byte stores, unchanged:
         # `sym.unknown_3C = (sym.unknown_3D = 0) + 1;` keeps a read the
         # stripped compile does not need
-        used = real.replace("ldrb\tr1, [r2]\n\tstrb\tr0, [r2]",
-                            "ldrb\tr1, [r2]\n\tadd\tr0, r0, #1\n\tstrb\tr0, [r2]")
+        used = real.replace("ldrb\tr0, [r2]\n\tsub\tr2, r2, #1",
+                            "ldrb\tr0, [r2]\n\tadd\tr0, r0, #1\n\tsub\tr2, r2, #1")
         self.assertNotEqual(used, real)
         plus_one = stripped.replace("sub\tr2, r2, #1\n\tstrb\tr1, [r2]",
                                     "sub\tr2, r2, #1\n\tmov\tr1, #1\n\tstrb\tr1, [r2]")
@@ -160,6 +160,77 @@ class SemanticDiffTests(unittest.TestCase):
         plain = assembly("ldr\tr1, .L3", "add\tr1, r1, #60", "mov\tr2, #1", "strb\tr2, [r1]",
                          "bx\tlr")
         self.refused(branchy, plain, "stripped compile")
+
+    def test_read_modify_write_load_must_sit_next_to_its_store(self):
+        # review repro p2/08000002: a planted read, then the value's arithmetic,
+        # then a store to the pinned byte; the store borrows the planted load
+        real = assembly("add\tr3, r0, #0", "ldr\tr0, .L3", "add\tr0, r0, #60", "ldrb\tr2, [r0]",
+                        "mul\tr1, r1, r3", "add\tr3, r1, #7", "strb\tr3, [r0]", "bx\tlr")
+        stripped = assembly("add\tr2, r0, #0", "mov\tr0, r2", "mul\tr0, r0, r1", "add\tr2, r0, #7",
+                            "ldr\tr0, .L3", "add\tr0, r0, #60", "strb\tr2, [r0]", "bx\tlr")
+        self.refused(real, stripped, "is a dead load of")
+        # the genuine shape computes the value first (p2b)
+        genuine = assembly("add\tr2, r0, #0", "mov\tr0, r2", "mul\tr0, r0, r1", "add\tr2, r0, #7",
+                           "ldr\tr0, .L3", "add\tr0, r0, #60", "ldrb\tr1, [r0]", "strb\tr2, [r0]",
+                           "bx\tlr")
+        self.assertEqual(compare(genuine, stripped)[0][1:], (1, [6], []))
+        # a hoisted constant for a later store may sit in between (08050D50)
+        hoisted = assembly("ldr\tr1, .L3", "add\tr1, r1, #61", "ldrb\tr0, [r1]", "mov\tr2, #0",
+                           "mov\tr0, #19", "strb\tr0, [r1]", "sub\tr1, r1, #1", "ldrb\tr0, [r1]",
+                           "strb\tr2, [r1]", "bx\tlr")
+        plain = assembly("ldr\tr1, .L3", "add\tr1, r1, #61", "mov\tr2, #0", "mov\tr0, #19",
+                         "strb\tr0, [r1]", "sub\tr1, r1, #1", "strb\tr2, [r1]", "bx\tlr")
+        self.assertEqual(compare(hoisted, plain)[0][1:], (1, [2, 7], []))
+
+    def test_chained_re_read_needs_the_assignment_shape(self):
+        # review repro 08000004: store 3C, unrelated work, then 3D = 3C
+        real = assembly("ldr\tr3, .L3", "add\tr2, r3, #60", "ldrb\tr1, [r2]", "strb\tr0, [r2]",
+                        "mul\tr0, r0, r0", "strh\tr0, [r3]", "ldrb\tr0, [r2]", "add\tr2, r2, #1",
+                        "ldrb\tr1, [r2]", "strb\tr0, [r2]", "bx\tlr")
+        stripped = assembly("ldr\tr3, .L3", "add\tr2, r3, #60", "strb\tr0, [r2]", "mov\tr1, r0",
+                            "mul\tr1, r1, r1", "strh\tr1, [r3]", "add\tr2, r2, #1", "strb\tr0, [r2]",
+                            "bx\tlr")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            compare(real, stripped)
+        self.assertIn("the qualifier added a read", str(caught.exception))
+
+    def test_object_addresses_must_be_constant_member_offsets(self):
+        # review repro p1: (&sym)[n].unknown_3C
+        indexed = assembly("ldr\tr2, .L3", "mov\tr1, #80", "mul\tr1, r1, r0", "add\tr2, r2, r1",
+                           "add\tr2, r2, #60", "ldrb\tr0, [r2]", "bx\tlr")
+        self.refused(indexed, assembly("bx\tlr"), "combines g_control_flags_03000940 with other terms")
+        outside = assembly("ldr\tr2, .L3", "add\tr2, r2, #80", "mov\tr0, #1", "strb\tr0, [r2]", "bx\tlr")
+        self.refused(outside, outside, "lies outside the object")
+        multiple = assembly("ldr\tr2, .L3", "ldmia\tr2!, {r0, r1}", "bx\tlr")
+        self.refused(multiple, multiple, "multi-register transfer")
+
+    def test_escaping_stack_data_is_compared(self):
+        def frame(value, escape):
+            return assembly("push\t{lr}", "add\tsp, sp, #-4", f"mov\tr1, #{value}", "mov\tr2, sp",
+                            "strb\tr1, [r2]", *escape, "add\tsp, sp, #4", "pop\t{r0}", "bx\tr0")
+        through_call = ("mov\tr0, sp", "bl\tfunc_0802A2C0")
+        through_store = ("ldr\tr3, .L3", "mov\tr2, sp", "str\tr2, [r3]")
+        for escape in (through_call, through_store):
+            with self.subTest(escape=escape):
+                self.assertEqual(compare(frame(1, escape), frame(1, escape))[0][1], 1)
+                self.refused(frame(1, escape), frame(2, escape), "differ in observable behaviour")
+        self.assertTrue(semantics.contains(semantics.add(semantics.SP, -4), semantics.SP))
+
+    def test_low_register_move_sets_the_flags(self):
+        moved = assembly("mov\tr1, r0", "beq\t.L9", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr3, [r2]",
+                         "mov\tr3, #1", "strb\tr3, [r2]", ".L9:", "bx\tlr")
+        # the stripped compile spells the same copy `add r1, r0, #0`; both set Z
+        added = moved.replace("ldrb\tr3, [r2]\n\t", "").replace("mov\tr1, r0", "add\tr1, r0, #0")
+        self.assertNotEqual(added, moved.replace("ldrb\tr3, [r2]\n\t", ""))
+        self.assertEqual(compare(moved, added)[0][1], 2)
+
+    def test_signatures_come_from_consistent_file_scope_declarations(self):
+        scope = semantics.file_scope("extern void g(int);\nint f(u8 a, int b)\n{ if (x) { y(1, 2); } }\n"
+                                     "void h(void);\n")
+        self.assertEqual([semantics.function_signature(scope, name) for name in ("g", "f", "h", "y")],
+                         [(False, 1), (True, 2), (False, 0), (True, None)])
+        with self.assertRaises(semantics.SemanticError):
+            semantics.function_signature(semantics.file_scope("void g(int);\nint g(int, int);\n"), "g")
 
     def test_unmodelled_code_fails_closed(self):
         loop = assembly("ldr\tr1, .L3", "add\tr1, r1, #60", ".L9:", "ldrb\tr2, [r1]", "mov\tr2, #1",
@@ -230,10 +301,10 @@ class CompiledSemanticTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.directory.cleanup()
 
-    def check(self, body):
+    def check(self, body, parameters="void"):
         (self.root / "src" / "08028C34.c").write_text(
             '#include "control_flags.h"\nextern void func_0802A2C0(u8, u8, u8, u8);\n'
-            "void func_08028C34(void)\n{\n" + body + "\n}\n")
+            f"void func_08028C34({parameters})\n{{\n" + body + "\n}\n")
         return match.allowlisted_volatile_semantics(self.root, 0x08028C34)
 
     def test_recovered_bodies_pass(self):
@@ -262,6 +333,25 @@ class CompiledSemanticTests(unittest.TestCase):
                 with self.assertRaises(semantics.SemanticError) as caught:
                     self.check(plant + tail)
                 self.assertIn(reason, str(caught.exception))
+
+    def test_review_repros_are_refused(self):
+        s = SYMBOL
+        for name, parameters, body, reason in (
+                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "combines"),
+                ("08000002", "int a, int b",
+                 f"(void){s}.unknown_3C; a = a * b + 7; {s}.unknown_02[0x3A] = a;", "dead load"),
+                ("08000003", "int a, int b, int c",
+                 f"(void){s}.unknown_43; a = (a * b + 7) ^ (c << 3); b = a * c; {s}.unknown_44[-1] = b;",
+                 "dead load"),
+                ("08000004", "int a, int b, int c, int d",
+                 f"{s}.unknown_3C = a; {s}.display = b * c + d * a + (b ^ d) * c; "
+                 f"{s}.unknown_3D = {s}.unknown_3C;", "the qualifier added a read")):
+            with self.subTest(repro=name):
+                with self.assertRaises(semantics.SemanticError) as caught:
+                    self.check(body, parameters)
+                self.assertIn(reason, str(caught.exception))
+        (record,) = self.check(f"a = a * b + 7; {s}.unknown_3C = a;", "int a, int b")
+        self.assertIn("read-modify-write loads at [7]", record)
 
 
 if __name__ == "__main__":

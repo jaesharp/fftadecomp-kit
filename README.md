@@ -1588,7 +1588,7 @@ window by `config/data_symbols.json`. Such a pointer may only be used for
 member access; retargeting, shadowing and escapes remain rejected. A comment
 alone cannot permit volatile RAM or local variables, asm or steering pragmas.
 
-**Proposed (kit#90, pending maintainer decision):** volatile RAM is otherwise
+**Allowlisted volatile RAM (kit#90):** volatile RAM is otherwise
 allowed only for an object on the maintainer's `tools/volatile_allow.json`
 (agents never edit it). An entry names a symbol, its address, one header, the
 member types that may be volatile and the object's complete declaration. Only
@@ -1615,7 +1615,10 @@ replacement names the symbol; and any `#include` that resolves outside
 `include/` or to a non-header under `src/`, which the sweep would never lint.
 Other headers may not name the symbol, and every
 use must be `symbol.member`, so neither its address nor the whole object reaches pointer
-arithmetic, a macro or a copy. The only exemption is a file with its own
+arithmetic, a macro or a copy. A subscript of one of the object's array
+members must be an integer literal inside the array
+(`symbol.unknown_02[0x3A]` or `[-1]` would reach a volatile byte without its
+qualifier). The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
 declaration hidden behind `#if` exempts nothing. The single
@@ -1636,34 +1639,54 @@ symbolically along every path, and the check requires:
 
 * the same observable behaviour: the same non-stack stores with the same
   values in the same order, the same calls with the same arguments, the same
-  branch conditions and, for a non-void function, the same return value;
-* every load of the object in the real compile to be either a
-  read-modify-write load, a chained re-read or a counterpart of a stripped
-  load. A read-modify-write load is an `ldrb` of a pinned byte whose
-  destination is overwritten before any use, followed by an `strb` to the
-  same byte with no other memory access, call or branch in between. A chained
-  re-read is an `ldrb` of a byte just stored whose value only reaches pinned
-  `strb`s through register copies; agbcc emits it for `a = (b = v)`, and the
-  ROM shows it at `0x08122C6C`. A counterpart is matched in order to the
-  stripped compile's loads of the object, with the same address and width;
+  branch conditions and, for a non-void function, the same return value.
+  When a stack address escapes (as a call argument or a value stored to
+  memory), the frame's contents at that moment, relative to the escaping
+  pointer, are part of the behaviour too;
+* every access to the object to be `symbol + constant` inside it: an
+  address that adds a variable term (`(&sym)[n].x`, a variable subscript),
+  lies outside the object or comes from a multi-register transfer fails
+  closed;
+* every load of the object in the real compile to be one of:
+  - a **read-modify-write load**: an `ldrb` of a pinned byte whose
+    destination is overwritten before any use, followed by its `strb` to the
+    same byte with nothing in between but immediate `mov`s and copies or
+    literal loads into the store's own operand registers. agbcc computes the
+    stored value before the load, and 08028C34, 08050D50, 08050DA0 and
+    08122C6C show exactly this shape;
+  - a **chained re-read** for `a = (b = v)`: an `ldrb` of the byte whose
+    `strb` is the immediately preceding memory access, with only register
+    arithmetic in between, whose value reaches, through copies only, the next
+    store, an `strb` to a pinned byte. Only that store's own read-modify-write
+    load may intervene, and the value is used nowhere else (08122C6C);
+  - a **counterpart**: matched in order to the stripped compile's loads of
+    the object, with the same address and width;
 * every store overlapping a pinned byte to be an `strb` of exactly that byte
-  with its own read-modify-write load (this refuses a non-volatile alias such
-  as `sym.unknown_02[0x3A]`);
+  with its own read-modify-write load;
 * no store to write back the value just loaded from the same byte (an
   `ldrb`/`strb` self-assignment).
+
+The plausibility rules guarantee that the store paired with a read-modify-write
+load is a volatile lvalue: a pinned byte can only be reached through its own
+member, because array subscripts must stay in bounds, the object's address
+never escapes, and variable offsets fail closed here.
 
 A planted read either vanishes from the stripped compile, which leaves a load
 the rules cannot explain, or stays, which shows the qualifier did not produce
 it. Either way it is refused or is ordinary code. The checked spellings are
 `(sym.x, 0);`, `sym.x;`, `(void)sym.x;`, `!sym.x;`, `if (sym.x) ;`, an
 unused local, `switch (sym.x) { default:; }` and `g(0 * sym.x)`, which are
-dead loads; `c ? sym.x : 0;`, which keeps a branch the stripped compile drops;
-`g(sym.x - sym.x)`, which adds a read; and `sym.x |= 0;`, `sym.x = sym.x;`, `sym.x ^= 0;` and `sym.x &= 0xFF;`, which
-are self-assignments. Code the executor does not model fails closed with a
-reason: ARM code, computed jumps, loops whose exit depends on unknown values,
-and more than 256 paths. The check therefore no longer needs the earlier
-syntactic rule against statements that only read `symbol.member`, and that
-rule is gone.
+dead loads; `(void)sym.x;` followed by the value's arithmetic and an
+out-of-bounds subscript store, which is not adjacent to its store;
+`c ? sym.x : 0;`, which keeps a branch the stripped compile drops;
+`g(sym.x - sym.x)` and `sym.y = sym.x` long after `sym.x` was stored, which
+add a read; and `sym.x |= 0;`, `sym.x = sym.x;`, `sym.x ^= 0;` and
+`sym.x &= 0xFF;`, which are self-assignments. Code the executor does not
+model fails closed with a reason: ARM code, computed jumps, loops whose exit
+depends on unknown values, more than 256 paths, and prototypes that are
+missing, inconsistent or too complex to read at file scope. Because the
+check sees every spelling, the earlier syntactic rule against statements
+that only read `symbol.member` is gone.
 
 The match report records `* allowlisted volatile: ...` for each such object,
 with the header's SHA-256, and `* allowlisted volatile semantics: ...`, which
@@ -1681,15 +1704,23 @@ has these gaps:
   optimise differently. Examples are reading a flag twice
   (`if (x) ...; if (x) ...`), spin loops and repeated stores. Such functions
   cannot use the allowlist.
+* It is order-sensitive. Stores, calls and object loads must happen in the
+  same order in both compiles, and volatile accesses are ordering barriers
+  that the stripped compile may schedule across. A function whose stripped
+  compile legally reorders a store around a pinned access is refused even
+  though both orders compute the same thing. The four recoveries keep their
+  order.
+* The read-modify-write shape is empirical. It comes from agbcc's output for
+  the recoveries, and a genuine store whose value is computed between its
+  load and its `strb` would be refused.
 * It reasons about agbcc's assembly. It assumes cc1's output is what the
-  assembler encodes, and that agbcc does not schedule the read-modify-write
-  load of one store next to the store of another.
+  assembler encodes.
 * It does not police reads that stay in both compiles. These are ordinary
   code that any declaration produces, and the general plausibility rules
   apply to them.
-* It does not police stores through variable indices into the object. Its
-  pinned-byte rules see only constant offsets. A non-volatile alias can only
-  remove the documented load, never add one.
+* The executor is new modelling code. A modelling error shared by both
+  compiles could equate different computations. Unknown instructions,
+  addressing forms and transfers fail closed.
 
 Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py` and
 `PYTHONDONTWRITEBYTECODE=1 python tests/test_volatile_semantics.py` (the latter compiles with agbcc when it is installed).

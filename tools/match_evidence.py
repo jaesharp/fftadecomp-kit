@@ -919,7 +919,8 @@ def report_matches(report, root, address):
         if records:
             from match import allowlisted_volatile_semantics
             records += allowlisted_volatile_semantics(root, address)
-    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError, RecursionError,
+            RuntimeError, subprocess.SubprocessError):
         return False
     if [line for line in report.splitlines()
             if line.lstrip().startswith("* allowlisted volatile")] != records:

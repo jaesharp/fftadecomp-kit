@@ -21,20 +21,29 @@ symbolically along every path, and the check requires
    with the same arguments, the same branch conditions and, for a non-void
    function, the same return value.  Memory is modelled as ordinary memory
    for both compiles, so this says the qualifier changed nothing that the
-   program computes;
-2. every load of the object in the real compile to be one of
+   program computes.  When a stack address escapes (a call argument or a
+   stored value), the frame's contents relative to that pointer join the
+   behaviour;
+2. every access to the object to be `symbol + constant` inside it; variable
+   offsets, out-of-object offsets and multi-register transfers fail closed;
+3. every load of the object in the real compile to be one of
    * a read-modify-write load: an `ldrb` of a pinned byte whose destination
-     is overwritten before any use, followed by a `strb` to the same byte
-     with no other memory access, call or branch in between;
-   * a chained re-read: an `ldrb` of a pinned byte just stored, whose value
-     only flows (through register copies) into `strb` to pinned bytes, which
-     is what agbcc emits for `a = (b = v)` with volatile members;
+     is overwritten before any use, followed by its `strb` to the same byte
+     with only immediate moves and copies or literal loads into the store's
+     operand registers in between (read_modify_write_store);
+   * a chained re-read for `a = (b = v)`: the forwarding `strb` is the
+     immediately preceding memory access and the value feeds, through copies
+     only, the next store, an `strb` to a pinned byte (chained_reread);
    * a counterpart of the stripped compile's loads of the object, matched
      in order with the same address and width;
-3. every store overlapping a pinned byte to be an `strb` of exactly that
+4. every store overlapping a pinned byte to be an `strb` of exactly that
    byte with its own read-modify-write load;
-4. no store to write back the value just loaded from the same byte (an
+5. no store to write back the value just loaded from the same byte (an
    `ldrb`/`strb` self-assignment, `sym.x = sym.x` or `sym.x |= 0`).
+
+plausible.py makes the paired store a volatile lvalue: a pinned byte can be
+reached only through its member, since array subscripts must be in-bounds
+literals and the object's address never escapes.
 
 A planted read therefore either vanishes from the stripped compile, so the
 real compile has a load the rules cannot explain, or it stays, which shows
@@ -46,8 +55,9 @@ instructions - fails closed with a reason.
 Known limits (false refusals, never false acceptance of a qualifier
 effect): reading a pinned byte twice where an ordinary declaration would
 reuse the first value (`if (x) ...; if (x) ...`) is refused, as are loops
-whose exit depends on unknown values, and equivalent code that the
-expression normaliser cannot prove equal.
+whose exit depends on unknown values, stripped compiles that legally reorder
+accesses around a pinned one, and equivalent code that the expression
+normaliser cannot prove equal.
 """
 
 import re
@@ -141,27 +151,51 @@ def strip_pinned_volatile(preprocessed, declaration):
     return preprocessed[:start] + body + preprocessed[end:]
 
 
-def function_signature(preprocessed, name):
-    """(returns a value, parameter count or None) from the preprocessed C"""
-    found = re.search(r"(?m)([A-Za-z_][\w\s\*]*?)\b" + re.escape(name) + r"\s*\(([^()]*)\)\s*[;{]",
-                      preprocessed)
-    if found is None:
-        return True, None
-    returns = re.sub(r"\b(?:extern|static|inline|__inline__|const)\b", " ", found[1]).split() != ["void"]
-    parameters = found[2].strip()
-    if parameters in ("void",):
-        return returns, 0
-    if not parameters or "..." in parameters:
-        return returns, None
-    return returns, parameters.count(",") + 1
+def file_scope(preprocessed):
+    """the preprocessed text with linemarkers dropped and every brace body folded to `;`"""
+    text = re.sub(r"(?m)^[ \t]*#.*$", " ", preprocessed)
+    while True:
+        folded = re.sub(r"\{[^{}]*\}", ";", text)
+        if folded == text:
+            return text
+        text = folded
+
+
+def function_signature(scope, name):
+    """(returns a value, parameter count or None) from the file-scope declarations.
+
+    Every file-scope declaration or definition of the name must agree; a
+    name with none is unknown (all four argument registers are compared).
+    """
+    found = set()
+    for match in re.finditer(r"(?:^|;)([^;]*?)\b" + re.escape(name) + r"\s*\(([^;]*?)\)\s*(?=;)", scope):
+        prefix, parameters = match[1], match[2].strip()
+        if "(" in parameters or ")" in parameters or "(" in prefix:
+            raise SemanticError(f"the declaration of {name} is too complex to read its signature")
+        returns = re.sub(r"\b(?:extern|static|inline|__inline__|const)\b", " ", prefix).split() != ["void"]
+        if parameters == "void":
+            arity = 0
+        elif not parameters or "..." in parameters:
+            arity = None
+        else:
+            arity = parameters.count(",") + 1
+        found.add((returns, arity))
+    if len(found) > 1:
+        raise SemanticError(f"the file-scope declarations of {name} disagree")
+    return found.pop() if found else (True, None)
 
 
 # ---------------------------------------------------------------- expressions
 
 def contains(expression, atom):
+    """does atom occur anywhere in expression, including linear terms?"""
     if expression == atom:
         return True
-    return isinstance(expression, tuple) and any(contains(part, atom) for part in expression[1:])
+    if not isinstance(expression, tuple):
+        return False
+    if expression[0] == "lin":
+        return any(contains(term, atom) for term, _ in expression[2])
+    return any(contains(part, atom) for part in expression[1:])
 
 
 def linear(expression):
@@ -381,7 +415,7 @@ class Record:
         self.index, self.text, self.kind = index, text, kind
         self.reads, self.writes = set(reads), set(writes)
         self.address = self.width = self.value_register = None
-        self.signed = self.forwarded = self.copy = self.self_assignment = False
+        self.signed = self.forwarded = self.copy = self.constant = self.self_assignment = False
         self.__dict__.update(fields)
 
 
@@ -475,10 +509,26 @@ def evaluate(code, flags):
 class Executor:
     """symbolic execution of one agbcc Thumb function along one path"""
 
-    def __init__(self, name, function, signatures, label):
+    def __init__(self, name, function, signatures, label, layout):
         self.name, self.label = name, label
         self.instructions, self.labels, self.pools = function
         self.signatures = signatures
+        self.symbol, self.size = layout
+
+    def check_address(self, address, width, text, multiple=False):
+        """fail closed unless an access to the object is `symbol + constant` inside it"""
+        atom = ("sym", self.symbol)
+        if not contains(address, atom):
+            return
+        constant, terms = linear(address)
+        if multiple:
+            self.fail(text, f"a multi-register transfer touches {self.symbol}")
+        if terms != {atom: 1}:
+            self.fail(text, f"the address {show(address)} combines {self.symbol} with other "
+                      "terms; only constant member offsets are modelled")
+        offset = signed32(constant)
+        if offset < 0 or offset + width > self.size:
+            self.fail(text, f"the access at {self.symbol}{offset:+#x} lies outside the object")
 
     def fail(self, record_text, message):
         raise SemanticError(f"{self.label} compile of {self.name}: {message} at `{record_text}`")
@@ -505,6 +555,7 @@ class Executor:
         self.flags = ("entry",)
         self.memory, self.trace, self.records = [], [], []
         self.escaped, self.known, self.conditions = False, {}, []
+        self.frame_base = None
         self.decisions = list(decisions)
         pc, steps = 0, 0
         while True:
@@ -541,7 +592,7 @@ class Executor:
 
     # memory ---------------------------------------------------------------
 
-    def relation(self, a, width_a, b, width_b):
+    def relation(self, a, width_a, b, width_b, private=False):
         ca, ta = linear(a)
         cb, tb = linear(b)
         if ta == tb:
@@ -551,7 +602,7 @@ class Executor:
             if distance >= width_b or -distance >= width_a:
                 return "disjoint"
             return "overlap"
-        if is_stack(a) != is_stack(b) and not self.escaped:
+        if is_stack(a) != is_stack(b) and (not self.escaped or private):
             return "disjoint"
         ga, gb = global_symbol(a), global_symbol(b)
         if ga and gb and ga != gb:
@@ -559,7 +610,11 @@ class Executor:
         return "overlap"
 
     def load(self, width, signed, address, text):
-        stack = is_stack(address) and not self.escaped
+        # Saved-register slots stay private even after the frame escapes:
+        # the escaping pointer addresses locals, not the push area.
+        saved = is_stack(address) and any(entry[0] == "store" and entry[5] and entry[2] == address
+                                          for entry in self.memory)
+        stack = is_stack(address) and (not self.escaped or saved)
         version, forwarded = "entry", None
         for entry in reversed(self.memory):
             if entry[0] == "call":
@@ -567,8 +622,8 @@ class Executor:
                     version = ("call", entry[1])
                     break
                 continue
-            _, stored_width, stored_address, stored, event = entry
-            relation = self.relation(address, width, stored_address, stored_width)
+            _, stored_width, stored_address, stored, event, _ = entry
+            relation = self.relation(address, width, stored_address, stored_width, saved)
             if relation == "same":
                 forwarded = stored
                 break
@@ -580,7 +635,7 @@ class Executor:
         if forwarded is not None:
             value = forwarded
         else:
-            value = ("load", width, address, version)
+            value = ("load", width, self.observed(address), version)
         if signed:
             value = sign_extend(value, width * 8)
         return value, forwarded is not None
@@ -588,15 +643,46 @@ class Executor:
     def current(self, width, address):
         return self.load(width, False, address, "")[0]
 
-    def store(self, width, address, value):
+    def observed(self, address):
+        """an address as the trace records it: escaped stack slots relative to the escape"""
+        if is_stack(address) and self.frame_base is not None:
+            return ("frame", signed32(linear(address)[0]) - self.frame_base)
+        return address
+
+    def escape(self, values, text):
+        """the frame becomes visible to other code through a pointer in values.
+
+        Its contents at that moment join the trace, relative to the escaping
+        pointer, so two compiles cannot hand over different stack data; from
+        then on stack stores are observable and calls may change the frame.
+        """
+        pointers = [value for value in values if contains(value, SP)]
+        if not pointers:
+            return
+        for pointer in pointers:
+            if not is_stack(pointer):
+                self.fail(text, f"a stack address escapes as {show(pointer)}")
+        if self.frame_base is None:
+            self.frame_base = min(signed32(linear(pointer)[0]) for pointer in pointers)
+        self.escaped = True
+        latest = {}
+        for entry in self.memory:
+            if entry[0] == "store" and is_stack(entry[2]) and not entry[5]:
+                offset = signed32(linear(entry[2])[0])
+                if offset >= self.frame_base:
+                    latest[offset] = (entry[1], entry[3])
+        self.trace.append(("escape", tuple((offset - self.frame_base,) + latest[offset]
+                                           for offset in sorted(latest))))
+
+    def store(self, width, address, value, saved=False):
         value = truncate(value, width * 8)
         event = None
-        if contains(value, SP) and not is_stack(address):
-            self.escaped = True
+        if not is_stack(address):
+            self.escape([value], "")
         if not is_stack(address) or self.escaped:
             event = len(self.trace)
-            self.trace.append(("store", width, address, value))
-        self.memory.append(("store", width, address, value, event))
+            self.trace.append(("store", width, self.observed(address), value))
+        self.memory.append(("store", width, address, value, event, saved))
         return value
 
     def call(self, target, text, record):
@@ -607,8 +693,7 @@ class Executor:
         arguments = [self.regs[f"r{n}"] for n in range(min(count, 4))]
         for n in range(4, count):
             arguments.append(self.load(4, False, add(self.regs["sp"], 4 * (n - 4)), text)[0])
-        if any(contains(argument, SP) for argument in arguments):
-            self.escaped = True
+        self.escape(arguments, text)
         event = len(self.trace)
         self.trace.append(("call", target, tuple(arguments)))
         self.memory.append(("call", event))
@@ -668,8 +753,13 @@ class Executor:
             if mnemonic == "mov":
                 result = values[0]
                 record.copy = register(sources[0]) is not None
+                low = [f"r{n}" for n in range(8)]
                 if immediate(sources[0]) is not None:
                     self.flags = ("nz", result)
+                    record.constant = True
+                elif destination in low and register(sources[0]) in low:
+                    # a low-register `mov` assembles as `adds rd, rm, #0`
+                    self.flags = ("cmn", result, 0)
             elif mnemonic in ("add", "sub"):
                 sign = 1 if mnemonic == "add" else -1
                 result = add(values[0], values[1], sign)
@@ -725,6 +815,7 @@ class Executor:
                 self.records.append(record)
                 return None
             address, reads = self.memory_operand(operands[1], text)
+            self.check_address(address, width, text)
             record.address, record.width = address, width
             if mnemonic.startswith("ldr"):
                 record.kind, record.reads, record.writes = "load", reads, {subject}
@@ -758,8 +849,9 @@ class Executor:
             loaded = {}
             for n, name in enumerate(names):
                 address = add(start, 4 * n)
+                self.check_address(address, 4, text, multiple=True)
                 if storing:
-                    self.store(4, address, regs[name])
+                    self.store(4, address, regs[name], saved=mnemonic == "push")
                 else:
                     loaded[name] = self.load(4, False, address, text)[0]
             if writeback:
@@ -820,12 +912,12 @@ class Executor:
 
 # ---------------------------------------------------------------- comparison
 
-def explore(name, function, signatures, label):
+def explore(name, function, signatures, label, layout):
     paths, pending = [], [[]]
     while pending:
         decisions = pending.pop()
         try:
-            path = Executor(name, function, signatures, label).run(decisions)
+            path = Executor(name, function, signatures, label, layout).run(decisions)
         except NeedDecision:
             pending += [decisions + [False], decisions + [True]]
             continue
@@ -835,9 +927,9 @@ def explore(name, function, signatures, label):
     return paths
 
 
-def replay(name, function, signatures, label, decisions):
+def replay(name, function, signatures, label, decisions, layout):
     try:
-        return Executor(name, function, signatures, label).run(decisions)
+        return Executor(name, function, signatures, label, layout).run(decisions)
     except NeedDecision:
         raise SemanticError(f"{name}: the stripped compile branches where the real one does not")
 
@@ -864,34 +956,74 @@ def dead(records, position, destination):
 
 
 def read_modify_write_store(records, position, address):
-    """the position of the `strb` this load belongs to, or None"""
+    """the position of the `strb` this dead load belongs to, or None.
+
+    agbcc computes a volatile byte store's value before the read-modify-write
+    load; the only instructions it leaves between that load and the `strb`
+    are immediate `mov`s (its own value, or a later store's hoisted constant
+    in 08050D50) and register copies or literal loads that write a register
+    the `strb` reads (08122C6C copies the address).  Anything else in
+    between - arithmetic, another memory access, a call or a branch - means
+    the load was not emitted by the store.
+    """
+    between = []
     for later in range(position + 1, len(records)):
         record = records[later]
-        if record.kind in ("alu", "literal"):
-            continue
-        if record.kind == "store" and record.width == 1 and record.address == address:
+        if record.kind == "store":
+            if record.width != 1 or record.address != address:
+                return None
+            if any(not step.constant and not record.reads >= step.writes for step in between):
+                return None
             return later
-        return None
+        if not (record.kind == "literal" or record.copy or record.constant):
+            return None
+        between.append(record)
     return None
 
 
 def chained_reread(records, position, pinned_address):
-    tracked, stores = {next(iter(records[position].writes))}, 0
+    """is this load the re-read of `a = (b = v)` with volatile `b`?
+
+    The forwarding `strb` to the same byte must be the immediately preceding
+    memory access, with only register arithmetic in between, and the value
+    must reach (through register copies) the next store, which is an `strb`
+    to a pinned byte; apart from that store's own read-modify-write load no
+    memory access, call or branch may intervene, and the value is used
+    nowhere else.
+    """
+    load = records[position]
+    earlier = position - 1
+    while earlier >= 0 and records[earlier].kind in ("alu", "literal"):
+        earlier -= 1
+    if earlier < 0 or records[earlier].kind != "store" or records[earlier].width != 1 or \
+            records[earlier].address != load.address:
+        return False
+    tracked, store, loads = set(load.writes), None, []
     for record in records[position + 1:]:
-        if record.reads & tracked:
-            if record.copy and record.reads <= tracked:
+        if store is None:
+            if record.kind == "store":
+                if record.width != 1 or record.value_register not in tracked or \
+                        not pinned_address(record.address) or \
+                        (record.reads - {record.value_register}) & tracked or \
+                        any(address != record.address for address in loads) or len(loads) > 1:
+                    return False
+                store = record
+                continue
+            if record.kind == "load" and not record.reads & tracked:
+                loads.append(record.address)
+            elif record.kind not in ("alu", "literal"):
+                return False
+            elif record.reads & tracked and not (record.copy and record.reads <= tracked):
+                return False
+            elif record.copy and record.reads & tracked:
                 tracked |= record.writes
                 continue
-            if record.kind == "store" and record.width == 1 and record.value_register in tracked \
-                    and pinned_address(record.address) and \
-                    not (record.reads - {record.value_register}) & tracked:
-                stores += 1
-                continue
+        elif record.reads & tracked:
             return False
         tracked -= record.writes
         if not tracked:
             break
-    return stores > 0
+    return store is not None
 
 
 def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned):
@@ -903,7 +1035,7 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
         offset = object_offset(address, symbol, size)
         return f"{symbol}+{offset:#x}" if offset is not None else show(address)
 
-    paths = explore(name, real_function, signatures, "real")
+    paths = explore(name, real_function, signatures, "real", (symbol, size))
     read_modify_write, chained = set(), set()
     for number, path in enumerate(paths, 1):
         records = path.records
@@ -924,7 +1056,8 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                     if store is None:
                         raise SemanticError(
                             f"{name}: {describe(record)} is a dead load of {where(record.address)} "
-                            "that is not directly followed by a store to the same byte; only the "
+                            "that is not directly followed by a store to the same byte (only immediate "
+                            "moves and the store's own operand copies may sit between them); only the "
                             "read-modify-write load of a byte store is the qualifier's documented effect")
                     explained_stores.add(store)
                     read_modify_write.add(record.index)
@@ -944,7 +1077,7 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                 raise SemanticError(f"{name}: {describe(record)} stores to {where(record.address)} "
                                     "without the read-modify-write load of a volatile byte store")
         # 1. the stripped compile behaves the same on this path
-        other = replay(name, stripped_function, signatures, "stripped", path.decisions)
+        other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size))
         if other.conditions != path.conditions:
             raise SemanticError(f"{name}: the real and stripped compiles branch on different "
                                 f"conditions (path {number})")
@@ -979,6 +1112,8 @@ def show_event(event):
         target = event[1] if isinstance(event[1], str) else show(event[1][1]) if event[1][0] == "via" \
             else str(event[1])
         return f"call {target}({', '.join(show(a) for a in event[2])})"
+    if event[0] == "escape":
+        return "frame escape {" + ", ".join(f"{offset:+#x}: {show(value)}" for offset, _, value in event[1]) + "}"
     return "return" + (f" {show(event[1])}" if len(event) > 1 else "")
 
 
@@ -1006,7 +1141,8 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration)
         for mnemonic, operands, _ in function[0]:
             if mnemonic == "bl" and operands:
                 names.add(operands[0])
-    signatures = {name: function_signature(preprocessed, name) for name in names}
+    scope = file_scope(preprocessed)
+    signatures = {name: function_signature(scope, name) for name in names}
     return [(name,) + compare_function(name, real[name], stripped[name], signatures, symbol, size, pinned)
             for name in sorted(real)]
 

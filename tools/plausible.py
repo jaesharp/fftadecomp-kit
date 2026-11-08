@@ -27,7 +27,7 @@ GBA I/O register window:
     /* plausible: hardware register, volatile is required here */
     *(volatile u16 *)0x04000000 = v;
 
-Proposed (kit#90, pending maintainer decision): volatile RAM is allowed only
+Allowlisted volatile RAM (kit#90): volatile RAM is allowed only
 for objects on the maintainer's volatile allow list (tools/volatile_allow.json),
 and only inside the one listed header's anonymous `extern struct { ... }
 symbol;` declaration, which must equal the pinned text, as qualifiers of
@@ -399,6 +399,18 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                         finding(reference.start(), f"allowlisted volatile {symbol} may only be "
                                 "used as `symbol.member`: its address or whole object would "
                                 "carry the qualifier to other memory")
+                arrays = dict(re.findall(r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]",
+                                         entry["declaration"]))
+                for reference in references:
+                    access = re.match(r"\s*\.\s*([A-Za-z_]\w*)\s*\[([^\]]*)\]", joined[reference.end():])
+                    if access is None or access[1] not in arrays:
+                        continue
+                    index = access[2].strip()
+                    if not re.fullmatch(r"0[xX][0-9A-Fa-f]+|[0-9]+", index) or \
+                            int(index, 0) >= int(arrays[access[1]], 0):
+                        finding(reference.start(), f"`{symbol}.{access[1]}[{index}]` must use an "
+                                f"integer literal below {arrays[access[1]]}: another index could "
+                                "reach a volatile member without its qualifier")
             continue
         if relpath != header:
             for reference in references:

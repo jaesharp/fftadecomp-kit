@@ -273,7 +273,8 @@ def allowlisted_volatile_semantics(root, address, args=None, runner=None):
         args = argparse.Namespace(cc=DEFAULT_CC, cpp=DEFAULT_CPP, assembler=DEFAULT_AS,
                                   objcopy=DEFAULT_OBJCOPY, linker=DEFAULT_LD, flags=DEFAULT_FLAGS)
     if runner is None:
-        runner = Runner(DEFAULT_CC, "Ubuntu", DEFAULT_WSL_PATH, root=str(root))
+        runner = Runner(DEFAULT_CC, "Ubuntu", DEFAULT_WSL_PATH, root=str(root),
+                        timeout=SIGNED_REPLAY_TIMEOUT)
     sources = sorted(Path(root, "src").rglob(f"{address:08X}.c"))
     if len(sources) != 1:
         raise ValueError("the semantic check needs exactly one addressed source")
@@ -4851,7 +4852,8 @@ def main():
     if plausible and volatile_records:
         try:
             volatile_records += allowlisted_volatile_semantics(ROOT, addr, args, runner)
-        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError,
+                RecursionError, RuntimeError, subprocess.SubprocessError) as error:
             findings = [f"allowlisted volatile semantic check: {error}"]
             plausible = False
     if source_fingerprint(ROOT, addr) != fingerprint:

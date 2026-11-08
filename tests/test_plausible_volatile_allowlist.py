@@ -288,6 +288,21 @@ class VolatileAllowlistTests(unittest.TestCase):
                 self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
                                             relpath="src/08028C34.c"), [])
 
+    def test_array_member_subscripts_stay_in_bounds(self):
+        # review repros 08000002/08000003: a subscript past an array member
+        # reaches a volatile byte without its qualifier
+        for statement in (SYMBOL + ".unknown_02[0x3A] = a;", SYMBOL + ".unknown_02[58] = a;",
+                          SYMBOL + ".unknown_02[-1] = a;", SYMBOL + ".unknown_02[i] = a;",
+                          SYMBOL + ".unknown_02[0x30 + 0xA] = a;", "x = " + SYMBOL + ".unknown_02[0x40];"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
+                                                               relpath="src/08028C34.c"))
+        for statement in (SYMBOL + ".unknown_02[0] = a;", SYMBOL + ".unknown_02[0x39] = a;",
+                          "x = " + SYMBOL + ".unknown_02[57];"):
+            with self.subTest(statement=statement):
+                self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
+                                            relpath="src/08028C34.c"), [])
+
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
                                 ("src/08028C34.c", "#undef u8\n"),
