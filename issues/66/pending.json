@@ -578,66 +578,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "dbb96235a7457a2ea7bd489cf3977091e4bd4e5e59cb50ca90d375bed387667a",
-        "acknowledged_cursor": 6715016373,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "dbb96235a7457a2ea7bd489cf3977091e4bd4e5e59cb50ca90d375bed387667a",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0809915C\",\"who\":\"sol-0809915C-3777\",\"note\":\"Bounded plausible C matching of complete function using existing native compiler only. No tooling changes.\"}",
-          "created_at": "2026-11-08T00:24:53Z",
-          "id": 6715016373,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:24:53Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "7516c14c449ae31bc3638ec0557af1de4d11b0d33ea81f12a1b9ac370707c254",
-        "result": {
-          "address": "0x0809915C",
-          "claim_id": 6715016373,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6715016373,
-          "status": "accepted",
-          "who": "sol-0809915C-3777"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "4badabca625de87335b0094872593fd52cefba1f8875c62ba41106c86fd2c078",
-        "acknowledged_cursor": 6715126052,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4badabca625de87335b0094872593fd52cefba1f8875c62ba41106c86fd2c078",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809915C\",\"who\":\"sol-0809915C-3777\",\"claim_id\":6715016373,\"reason\":\"Three natural C forms did not improve historical172/174 best; retained form differs in two address calculations, otherforms short. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
-          "created_at": "2026-11-08T00:36:10Z",
-          "id": 6715126052,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:36:10Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f92f10cd2e0dae4c1bec03122ceec9f2790eb45a21e7011feb87ec28f24374de",
-        "result": {
-          "address": "0x0809915C",
-          "claim_id": 6715016373,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6715126052,
-          "status": "accepted",
-          "who": "sol-0809915C-3777"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c9af28490d5eda456aa59bdcebeb22fb35ce2b86c111a5a9c40942632bbb1cf8",
         "acknowledged_cursor": 6715067206,
         "body_provenance": "acceptance-time",
@@ -693,66 +633,6 @@
           "request_id": 6715133481,
           "status": "accepted",
           "who": "sol-0805F708-3777"
-        }
-      }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "b6096e969d4427cff889feca8cd450be0535473d9930a741ad41c8ecc0198c61",
-        "acknowledged_cursor": 6715074143,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "b6096e969d4427cff889feca8cd450be0535473d9930a741ad41c8ecc0198c61",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08028434\",\"who\":\"sol-08028434-3777\",\"note\":\"Bounded plausible C matching using existing native compiler only. No tooling changes.\"}",
-          "created_at": "2026-11-08T00:30:52Z",
-          "id": 6715074143,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:30:52Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "102d755d948b7aa3221570451c1748fac4da0fce0b1dd73b3106db6167e36ef7",
-        "result": {
-          "address": "0x08028434",
-          "claim_id": 6715074143,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6715074143,
-          "status": "accepted",
-          "who": "sol-08028434-3777"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "55a4ef88087f133f4c4c8cbd653be8b2107fb424608b34c4f432162444256d63",
-        "acknowledged_cursor": 6715133481,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "55a4ef88087f133f4c4c8cbd653be8b2107fb424608b34c4f432162444256d63",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08028434\",\"who\":\"sol-08028434-3777\",\"claim_id\":6715074143,\"reason\":\"Four plausible native forms still reverse two independent setter argument moves;104/106 aligned bytes. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
-          "created_at": "2026-11-08T00:36:33Z",
-          "id": 6715129767,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:36:33Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "dafa080747a76e4e0d3b3702aefa9ef608a740267398d93c30f9a4a6f92fd32c",
-        "result": {
-          "address": "0x08028434",
-          "claim_id": 6715074143,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6715129767,
-          "status": "accepted",
-          "who": "sol-08028434-3777"
         }
       }
     }
