@@ -639,8 +639,11 @@ def verify(data, address, rom, mapping, index, objects, manifest=None, *, bindin
             bindings['calls'] != sorted(proof['calls'] + proof['runtime_calls']):
         raise ValueError('owner bindings do not cover every exact reached external call')
     ordinary.update(data=bindings['data'],functions=bindings['functions'])
-    if selector == local_calls.SCHEDULER_ENTRY:
-        import scheduler_entry_profile as scheduler_entry
+    if selector in (local_calls.SCHEDULER_ENTRY, local_calls.SCHEDULER_MANAGER_FIELD):
+        if selector == local_calls.SCHEDULER_MANAGER_FIELD:
+            import scheduler_manager_field_profile as scheduler_entry
+        else:
+            import scheduler_entry_profile as scheduler_entry
         scheduler_entry.check_bindings(proof['buffers']['conditional_local_calls'], bindings)
     if selector == shadow_matrix.SELECTOR:
         # The closed original-binding adapter has authenticated memcpy to this

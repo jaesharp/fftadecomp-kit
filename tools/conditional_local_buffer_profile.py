@@ -26,6 +26,7 @@ SCHEDULER_PAYLOAD8 = 'conditional-scheduler-descriptor-payload8-calls-v1'
 SCHEDULER_HALFWORD_PAYLOAD = 'conditional-scheduler-halfword-output-payload-v1'
 SCHEDULER_TWO_PAYLOAD = 'conditional-scheduler-two-payload-calls-v1'
 SCHEDULER_ENTRY = 'conditional-scheduler-entry-descriptor-calls-v1'
+SCHEDULER_MANAGER_FIELD = 'conditional-scheduler-indirect-manager-v1'
 PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8, SCHEDULER_HALFWORD_PAYLOAD: 4, SCHEDULER_TWO_PAYLOAD: (4, 8)}
 STATE = 'conditional-local-state-iterator-v1'
 OUTPUT = 'conditional-local-output-word-call-v1'
@@ -42,6 +43,7 @@ SCHEMAS = {
     SCHEDULER_HALFWORD_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-halfword-output-payload-v1',
     SCHEDULER_TWO_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-two-payload-calls-v1',
     SCHEDULER_ENTRY: 'elf-symbol-thumb-conditional-scheduler-entry-descriptor-calls-v1',
+    SCHEDULER_MANAGER_FIELD: 'elf-symbol-thumb-conditional-scheduler-indirect-manager-v1',
     STATE: 'elf-symbol-thumb-conditional-local-state-iterator-v1',
     OUTPUT: 'elf-symbol-thumb-conditional-local-output-word-call-v1',
 }
@@ -113,8 +115,11 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             self.predicates = predicates.close(self, set(calls.values()) - {0x08005B6C})
             dependencies = (0x08005B6C, 0x08005954)
             runtime_names = ('_call_via_r2', '_call_via_r3')
-        elif self.policy == SCHEDULER_ENTRY:
-            import scheduler_entry_profile as entry
+        elif self.policy in (SCHEDULER_ENTRY, SCHEDULER_MANAGER_FIELD):
+            if self.policy == SCHEDULER_MANAGER_FIELD:
+                import scheduler_manager_field_profile as entry
+            else:
+                import scheduler_entry_profile as entry
             self.scheduler_entry = entry.bind(data, address, ins, edges, calls)
             dependencies = self.scheduler_entry['dependencies']
             runtime_names = ('_call_via_r2', '_call_via_r3')
@@ -168,8 +173,11 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         if self.policy == SCHEDULER_PROJECTED:
             import scheduler_projected_outputs_profile as projected
             return projected.check_call(self, address, aliases, stack, slots, site=site)
-        if self.policy == SCHEDULER_ENTRY:
-            import scheduler_entry_profile as entry
+        if self.policy in (SCHEDULER_ENTRY, SCHEDULER_MANAGER_FIELD):
+            if self.policy == SCHEDULER_MANAGER_FIELD:
+                import scheduler_manager_field_profile as entry
+            else:
+                import scheduler_entry_profile as entry
             return entry.check_call(self, address, aliases, stack, slots, site=site)
         if self.policy == SCHEDULER_TWO_PAYLOAD:
             import scheduler_two_payload_profile as two
@@ -251,8 +259,11 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         if self.policy == SCHEDULER_PROJECTED:
             import scheduler_projected_outputs_profile as projected
             return projected.manifest(self)
-        if self.policy == SCHEDULER_ENTRY:
-            import scheduler_entry_profile as entry
+        if self.policy in (SCHEDULER_ENTRY, SCHEDULER_MANAGER_FIELD):
+            if self.policy == SCHEDULER_MANAGER_FIELD:
+                import scheduler_manager_field_profile as entry
+            else:
+                import scheduler_entry_profile as entry
             return entry.manifest(self)
         if self.policy == SCHEDULER_TWO_PAYLOAD:
             import scheduler_two_payload_profile as two

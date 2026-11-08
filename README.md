@@ -2512,3 +2512,14 @@ explicit conditional premises. In particular, the scheduler and callback may
 access caller storage only through the bounded descriptor, not through the
 recorded outgoing pointer words or preserved-register aliases. The report does
 not prove callback effects, physical nonaliasing or unconditional termination.
+
+### Indirect scheduler manager field
+
+The explicit `conditional-scheduler-indirect-manager-v1` owner profile accepts one
+direct call to the pinned `08005954` entry when R0 is reached by a typed named
+literal followed by exactly two zero-offset word loads. It retains the 28-byte
+word-aligned descriptor, separate outgoing parent word, protected frame and
+nonretention checks. Both pointer-storage words must be readable, aligned and
+separate from caller stack storage; the final manager must satisfy the existing
+scheduler contract. Those are explicit conditions, not inferred memory facts.
+The existing scheduler-entry selector and default policies are unchanged.
