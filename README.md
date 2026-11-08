@@ -840,6 +840,30 @@ stores are not alias-analysed; ROM inspection shows two 16-bit stores at R2+0
 most that four-byte word, accesses no other private or saved word, returns
 compatibly and retains no local pointer.
 
+Issue #82's scheduler callers pass a descriptor whose second word points at a
+separate local parameter block. They have a sibling opt-in profile:
+
+```sh
+python tools/match.py --root ../fftadecomp 080DF9AC --owner-runtime-profile conditional-scheduler-descriptor-payload-calls-v1
+```
+
+It keeps every scheduler check above and admits exactly one local pointer word:
+descriptor+4, addressing the payload. The private frame must hold exactly the
+descriptor and one adjacent nonempty payload, in either order. The observation
+records `payload_offset` and `payload_frame_bytes` with
+`payload_extent: remaining-private-frame`: the extent is an upper bound equal to
+the rest of the private frame, not the payload type's size, and every byte of it
+is checked as private. Payload initialization is not checked. Any other pointer word, payload placement,
+extra argument alias or interleaved saved word is refused, and the descriptor
+profile still refuses these callers. The pinned scheduler body copies the
+descriptor into its own frame, not the allocation, before one synchronous
+phase-0 callback call. The callback's payload read bound, the payload's
+initialization (padding is representation only) and the callback not retaining
+the payload pointer are listed premises, not proofs.
+Callee-saved register aliases to the descriptor or payload are admitted and
+recorded, as in the descriptor profile; the read-through-descriptor+4 premise
+covers them.
+
 ### Named data literals
 
 For a known external object address, add an explicit mapping to the decomp
