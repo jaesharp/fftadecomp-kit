@@ -45,6 +45,7 @@ import software_float_profile as software_float
 import function_thunk_profile as function_thunk
 import empty_body_profile as empty_body
 import stack_pointer_compare_profile as sp_compare
+import plausible as plausibility
 import signal
 from contextvars import ContextVar
 from rompath import rom_path
@@ -4799,6 +4800,7 @@ def main():
             findings = [f"plausibility checker failed: {error}"]
 
     plausible = not findings
+    volatile_records = plausibility.allowlisted_volatile_uses(ROOT, addr) if plausible else []
     if source_fingerprint(ROOT, addr) != fingerprint:
         sys.exit("source or headers changed during verification; re-run match.py")
     if empty_profile and (mapping_snapshot(ROOT) != mapping or
@@ -4892,6 +4894,8 @@ def main():
     print(f"bytes   {'identical' if identical else 'DIFFER'}")
     print(f"source  {'plausible' if plausible else 'IMPLAUSIBLE'}"
           + ("" if plausible or hand_asm_allowed else " (not on the allow list)"))
+    for record in volatile_records:
+        print(f"volatile {record.removeprefix('* allowlisted volatile:')}")
     print(f"verdict {verdict}\n")
     if findings:
         print("plausibility findings:")
@@ -5063,6 +5067,8 @@ def main():
             f.write(f"* compiled : `{got_body.hex()}`\n")
             f.write(f"* source plausibility: "
                     f"{'plausible' if plausible else 'IMPLAUSIBLE'}\n")
+            for record in volatile_records:
+                f.write(f"{record}\n")
             f.write(f"* hand-asm allow list: "
                     f"{'listed (' + str(hand_asm_allowed.get('reason', 'no reason recorded')) + ')' if hand_asm_allowed else 'not listed'}\n\n")
             f.write(f"**{verdict}** - {same_bytes}/{len(want)} bytes\n")

@@ -26,6 +26,12 @@ GBA I/O register window:
 
     /* plausible: hardware register, volatile is required here */
     *(volatile u16 *)0x04000000 = v;
+
+Volatile RAM is allowed only for objects on the maintainer's volatile allow
+list (tools/volatile_allow.json), and only inside the one listed header's
+anonymous `extern struct { ... } symbol;` declaration, as qualifiers of
+listed scalar member types, while config/data_symbols.json maps the symbol to
+the listed address.  Source files never qualify.
 """
 
 import argparse
@@ -220,6 +226,129 @@ def hardware_volatile_offsets(text, code, data_symbols):
     return allowed
 
 
+def volatile_allow_path():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "volatile_allow.json")
+
+
+def volatile_allow_entries():
+    """the maintainer's volatile allow list; unreadable or malformed is empty"""
+    try:
+        doc = json.loads(Path(volatile_allow_path()).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    entries = doc.get("entries") if isinstance(doc, dict) else None
+    return entries if isinstance(entries, list) else []
+
+
+def active_volatile_entries(data_symbols, entries):
+    """entries whose symbol the data map binds to exactly the listed address"""
+    active = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        symbol, address, header, types = (entry.get("symbol"), entry.get("address"),
+                                          entry.get("header"), entry.get("member_types"))
+        if not (isinstance(symbol, str) and re.fullmatch(r"[A-Za-z_]\w*", symbol) and
+                isinstance(address, str) and isinstance(header, str) and
+                isinstance(types, list) and types and
+                all(isinstance(t, str) and re.fullmatch(r"[A-Za-z_]\w*", t) for t in types)):
+            continue
+        mapped = data_symbols.get(symbol)
+        try:
+            if int(mapped, 0) != int(address, 0):
+                continue
+        except (TypeError, ValueError):
+            continue
+        active.append(entry)
+    return active
+
+
+def allowlisted_volatile(code, relpath, data_symbols, entries):
+    """(exempt volatile offsets, findings) for the volatile allow list.
+
+    Only the listed header may hold the listed object's declaration, which must
+    be one file-scope anonymous `extern struct { ... } symbol;`.  Inside its
+    braces, `volatile` may only begin a member `volatile T name;` or
+    `volatile T name : N;` with T a listed member type, never a pointer or
+    array, and the braces hold no nested, tagged or parenthesized types, so
+    the qualifier cannot reach any other object.
+    Other headers may not name the symbol (a macro could hide a use), and
+    typeof is refused while the entry is active, since it would copy the
+    qualifier onto locals.
+    """
+    allowed, findings = set(), []
+
+    def finding(offset, message):
+        findings.append((code.count("\n", 0, offset) + 1, "volatile-allowlist", "error", message))
+
+    for entry in active_volatile_entries(data_symbols, entries):
+        symbol, header = entry["symbol"], entry["header"]
+        for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", code):
+            finding(typeof.start(), f"typeof while {symbol} is an allowlisted volatile "
+                    "object: it would copy the qualifier onto other objects")
+        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", code))
+        if relpath is None or not relpath.endswith(".h"):
+            continue
+        if relpath != header:
+            for reference in references:
+                finding(reference.start(), f"{symbol} is declared volatile only in {header}; "
+                        "other headers may not name it")
+            continue
+        declarations = list(re.finditer(
+            r"(?m)^[ \t]*extern\s+struct\s*\{(?P<body>[^{}]*)\}\s*" + re.escape(symbol) +
+            r"\s*;", code))
+        if len(declarations) != 1 or len(references) != 1 or \
+                not declarations[0].start() <= references[0].start() < declarations[0].end() or \
+                re.search(r"\\\r?\n", code):
+            for reference in references or [None]:
+                finding(reference.start() if reference else 0,
+                        f"{header} must declare {symbol} exactly once as a file-scope "
+                        f"`extern struct {{ ... }} {symbol};` and name it nowhere else")
+            continue
+        body = declarations[0]
+        if re.search(r"\b(?:struct|union|enum|typedef|extern|static)\b|[#()\[\]=]",
+                     re.sub(r"\[\s*(?:0x[0-9A-Fa-f]+|[0-9]+)\s*\]", "", body["body"])):
+            finding(body.start(), f"the {symbol} declaration may only hold plain members")
+            continue
+        types = "|".join(re.escape(t) for t in entry["member_types"])
+        member = re.compile(r"volatile\s+(?:" + types + r")\s+[A-Za-z_]\w*"
+                            r"(?:\s*:\s*[0-9]+)?\s*;")
+        for qualifier in re.finditer(r"\bvolatile\b", body["body"]):
+            offset = body.start("body") + qualifier.start()
+            prefix = code[body.start("body"):offset]
+            if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
+                allowed.add(offset)
+    return allowed, findings
+
+
+def allowlisted_volatile_uses(root, address, entries=None):
+    """report records for allowlisted volatile objects the addressed source uses.
+
+    A use is the source naming the symbol without declaring it itself: the
+    only declaration it can then compile against is the listed header's.
+    """
+    root = Path(root)
+    try:
+        data_symbols = json.loads((root / "config" / "data_symbols.json").read_text())
+    except (OSError, ValueError):
+        data_symbols = {}
+    if not isinstance(data_symbols, dict):
+        data_symbols = {}
+    entries = volatile_allow_entries() if entries is None else entries
+    sources = sorted((root / "src").rglob(f"{address:08X}.c"))
+    records = []
+    for entry in active_volatile_entries(data_symbols, entries):
+        symbol = re.escape(entry["symbol"])
+        for source in sources:
+            code = strip_comments_and_strings(source.read_text(encoding="utf-8", errors="replace"))
+            if re.search(r"\b" + symbol + r"\b", code) and \
+                    not re.search(r"\bextern\b(?:[^;{}]|\{[^{}]*\})*\b" + symbol + r"\b", code):
+                records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
+                               f"`{entry['address']}` declared in `{entry['header']}`")
+                break
+    return records
+
+
 def inert_control_flow(text):
     """find `if (c) X; else X;` - identical arms, so the test means nothing.
 
@@ -315,16 +444,22 @@ def statement_macro_tails(code):
     return tails
 
 
-def check_text(text, origin="", data_symbols=None):
-    """returns list of findings: (line, rule, severity, message)"""
+def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None):
+    """returns list of findings: (line, rule, severity, message)
+
+    relpath is the file's path relative to the project root; only the header
+    an allowlisted volatile object names can be exempted, so None never is.
+    """
     code = strip_comments_and_strings(text)
     macro_tails = statement_macro_tails(code)
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
+    listed_qualifiers, findings = allowlisted_volatile(
+        code, relpath, data_symbols or {},
+        volatile_allow_entries() if volatile_allow is None else volatile_allow)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
-    findings = []
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
-            if rid == "volatile" and m.start() in hardware_qualifiers:
+            if rid == "volatile" and m.start() in hardware_qualifiers | listed_qualifiers:
                 continue
             if rid == "dead-code" and m.start() in macro_tails:
                 continue
@@ -353,6 +488,7 @@ def check_file(path):
     except OSError as e:
         return [(0, "unreadable", "error", str(e))]
     data_symbols = {}
+    relpath = None
     for parent in Path(path).resolve().parents:
         mapping = parent / "config" / "data_symbols.json"
         if mapping.is_file():
@@ -362,8 +498,9 @@ def check_file(path):
                     data_symbols = value
             except (OSError, ValueError):
                 pass
+            relpath = Path(path).resolve().relative_to(parent).as_posix()
             break
-    return check_text(text, os.path.basename(path), data_symbols)
+    return check_text(text, os.path.basename(path), data_symbols, relpath)
 
 
 def asm_allow_path():

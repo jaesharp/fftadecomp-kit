@@ -1588,6 +1588,31 @@ window by `config/data_symbols.json`. Such a pointer may only be used for
 member access; retargeting, shadowing and escapes remain rejected. A comment
 alone cannot permit volatile RAM or local variables, asm or steering pragmas.
 
+Volatile RAM is otherwise allowed only for an object on the maintainer's
+`tools/volatile_allow.json` (agents never edit it). An entry names a symbol,
+its address, one header and the member types that may be volatile. Only that
+header may declare the object, exactly once, as a file-scope anonymous
+`extern struct { ... } symbol;`; inside the braces `volatile` may only begin a
+plain listed-type member (`volatile u8 name;` or `volatile u8 name : 8;`), and
+the declaration holds no nested, tagged or parenthesized types, so the
+qualifier reaches no other object. The exemption applies only while
+`config/data_symbols.json` maps the symbol to the listed address. Volatile in
+any `src/` file, elsewhere in the header, in another header, or on another
+object still fails; other headers may not name the symbol, and `typeof` is
+refused everywhere while an entry is active. The single listed object is
+`g_control_flags_03000940` (`0x03000940`, `include/control_flags.h`, `u8`),
+whose byte stores carry a dead load of the same byte throughout the ROM and on
+no other RAM (issue #90).
+
+When the addressed source names a listed symbol without declaring it, the
+match report records `* allowlisted volatile: ...` for it, and saved reports
+are refused unless those records equal a fresh recomputation. The premise is
+that the listed declaration is the original program's; the byte comparison,
+linking and every other check are unchanged. The kit does not bound the
+struct's size: the layout's extent is reviewed with the header.
+
+Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py`.
+
 It handles the compiler stage as `cc -> .s`, so it works with a classic cc1
 (GCC 2.9 / agbcc), with modern gcc and with clang:
 
