@@ -670,7 +670,35 @@
           "who": "sol-08142D34-3781"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a34632d1143310baaee9e8e6539341fd7e7e0122df08d3e67b6f68c5e4b72f12",
+        "acknowledged_cursor": 6715250306,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a34632d1143310baaee9e8e6539341fd7e7e0122df08d3e67b6f68c5e4b72f12",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08142D34\",\"who\":\"sol-08142D34-3781\",\"claim_id\":6715156455,\"reason\":\"Six failed native forms plus one diagnostic leave216/220 raw equal bytes and inconsistent stack alias join. Native acceptance not reached; fully stopped.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
+          "created_at": "2026-11-08T00:49:14Z",
+          "id": 6715250306,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:49:14Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "cac757214c90ad0b292dc10b5acae5e6ba8ef6088117860bb7d822c5fe32c1ce",
+        "result": {
+          "address": "0x08142D34",
+          "claim_id": 6715156455,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715250306,
+          "status": "accepted",
+          "who": "sol-08142D34-3781"
+        }
+      }
     },
     {
       "claim": {
