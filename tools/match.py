@@ -3379,8 +3379,9 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
     stack_arguments = buffer_proof is not None and buffer_proof.stack_arguments
     from named_data_buffer_profile import (GuardedAliasBufferProof,
         ConditionalThunkSelectiveScratchBufferProof)
+    from known_list_query_continuation_profile import KnownListQueryContinuationProof
     guarded_live_aliases = type(buffer_proof) in (GuardedAliasBufferProof,
-        ConditionalThunkSelectiveScratchBufferProof)
+        ConditionalThunkSelectiveScratchBufferProof, KnownListQueryContinuationProof)
     caller_clobbered = CALLER_CLOBBERED
     pending = [address]
     path_states = None
@@ -3591,6 +3592,8 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                 aliases = root_return_aliases(buffer_proof, data, address, current, aliases)
                 from direct_halfword_output_buffer_profile import root_return_aliases as direct_output_return_aliases
                 aliases = direct_output_return_aliases(buffer_proof, data, address, current, aliases)
+                from known_list_query_continuation_profile import root_return_aliases as query_return_aliases
+                aliases = query_return_aliases(buffer_proof, data, address, current, aliases)
                 if aliases.keys() - {ARM_REG_R12}:
                     raise ValueError("local stack pointer escapes through a return register")
             returns.add(current)
@@ -4260,6 +4263,7 @@ def main():
                                                       "conditional-two-word-tree-callback-closure-v1",
                                                       "conditional-known-query-native-closure-v1",
                                                       "conditional-known-list-query-closure-v1",
+                                                      "conditional-known-list-query-continuation-v1",
                                                       "bounded-buffer-discarded-return-scratch-v1",
                                                       "bounded-buffer-bios-sqrt-scratch-v1",
                                                       "bounded-buffer-bios-fill-source-v1",
