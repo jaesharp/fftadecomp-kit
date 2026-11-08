@@ -22,10 +22,11 @@ symbolically along every path, and the check requires
    function, the same return value.  Memory is modelled as ordinary memory
    for both compiles, so this says the qualifier changed nothing that the
    program computes.  When a stack address escapes (a call argument or a
-   stored value), the frame's contents relative to that pointer join the
-   behaviour;
+   stored value), every local frame byte, with the stores applied in order,
+   joins the behaviour; a call reads only its prototype's argument registers;
 2. every access to the object to be `symbol + constant` inside it; variable
-   offsets, out-of-object offsets and multi-register transfers fail closed;
+   offsets, out-of-object offsets, multi-register transfers and the
+   object's address reaching a call argument or a stored value fail closed;
 3. every load of the object in the real compile to be one of
    * a read-modify-write load: an `ldrb` of a pinned byte whose destination
      is overwritten before any use, followed by its `strb` to the same byte
@@ -42,8 +43,10 @@ symbolically along every path, and the check requires
    `ldrb`/`strb` self-assignment, `sym.x = sym.x` or `sym.x |= 0`).
 
 plausible.py makes the paired store a volatile lvalue: a pinned byte can be
-reached only through its member, since array subscripts must be in-bounds
-literals and the object's address never escapes.
+reached only through its member, since array members take only in-bounds
+literal subscripts and no member's address may be taken.  This check alone
+cannot tell `(void)sym.x; *(sym.array + k) = v;` from `sym.x = v;`; they
+compile identically.
 
 A planted read therefore either vanishes from the stripped compile, so the
 real compile has a load the rules cannot explain, or it stays, which shows
@@ -196,6 +199,18 @@ def contains(expression, atom):
     if expression[0] == "lin":
         return any(contains(term, atom) for term, _ in expression[2])
     return any(contains(part, atom) for part in expression[1:])
+
+
+def carries(value, atom):
+    """does value compute with atom as an address?  A load's value is the
+    memory's content, not its address, so loads are not searched."""
+    if value == atom:
+        return True
+    if not isinstance(value, tuple) or value[0] == "load":
+        return False
+    if value[0] == "lin":
+        return any(carries(term, atom) for term, _ in value[2])
+    return any(carries(part, atom) for part in value[1:])
 
 
 def linear(expression):
@@ -531,7 +546,8 @@ class Executor:
             self.fail(text, f"the access at {self.symbol}{offset:+#x} lies outside the object")
 
     def fail(self, record_text, message):
-        raise SemanticError(f"{self.label} compile of {self.name}: {message} at `{record_text}`")
+        where = f" at `{record_text}`" if record_text else ""
+        raise SemanticError(f"{self.label} compile of {self.name}: {message}{where}")
 
     def value(self, operand, text):
         name = register(operand)
@@ -652,11 +668,14 @@ class Executor:
     def escape(self, values, text):
         """the frame becomes visible to other code through a pointer in values.
 
-        Its contents at that moment join the trace, relative to the escaping
-        pointer, so two compiles cannot hand over different stack data; from
-        then on stack stores are observable and calls may change the frame.
+        The contents of every local (non-saved) frame byte at that moment
+        join the trace, relative to the first escaping pointer, with the
+        stores applied byte by byte in program order; each escape takes a
+        new snapshot.  So two compiles cannot hand over different stack data,
+        on either side of the pointer.  From then on stack stores are
+        observable and calls may change the frame.
         """
-        pointers = [value for value in values if contains(value, SP)]
+        pointers = [value for value in values if carries(value, SP)]
         if not pointers:
             return
         for pointer in pointers:
@@ -665,20 +684,30 @@ class Executor:
         if self.frame_base is None:
             self.frame_base = min(signed32(linear(pointer)[0]) for pointer in pointers)
         self.escaped = True
-        latest = {}
+        frame = {}
         for entry in self.memory:
-            if entry[0] == "store" and is_stack(entry[2]) and not entry[5]:
-                offset = signed32(linear(entry[2])[0])
-                if offset >= self.frame_base:
-                    latest[offset] = (entry[1], entry[3])
-        self.trace.append(("escape", tuple((offset - self.frame_base,) + latest[offset]
-                                           for offset in sorted(latest))))
+            if entry[0] != "store" or not is_stack(entry[2]) or entry[5]:
+                continue
+            offset, width, value = signed32(linear(entry[2])[0]), entry[1], entry[3]
+            if offset >= 0:
+                continue
+            for byte in range(width):
+                if width == 1:
+                    part = value
+                elif isinstance(value, int):
+                    part = (value >> (8 * byte)) & 0xFF
+                else:
+                    part = ("byte", byte, value)
+                frame[offset + byte - self.frame_base] = part
+        self.trace.append(("escape", tuple(sorted(frame.items()))))
 
-    def store(self, width, address, value, saved=False):
+    def store(self, width, address, value, saved=False, text=""):
         value = truncate(value, width * 8)
+        if carries(value, ("sym", self.symbol)):
+            self.fail(text, f"the address of {self.symbol} is stored to memory")
         event = None
         if not is_stack(address):
-            self.escape([value], "")
+            self.escape([value], text)
         if not is_stack(address) or self.escaped:
             event = len(self.trace)
             self.trace.append(("store", width, self.observed(address), value))
@@ -693,6 +722,11 @@ class Executor:
         arguments = [self.regs[f"r{n}"] for n in range(min(count, 4))]
         for n in range(4, count):
             arguments.append(self.load(4, False, add(self.regs["sp"], 4 * (n - 4)), text)[0])
+        # only the argument registers the prototype names are read
+        record.reads = {f"r{n}" for n in range(min(count, 4))} | \
+            (record.reads - {"r0", "r1", "r2", "r3"})
+        if any(carries(argument, ("sym", self.symbol)) for argument in arguments):
+            self.fail(text, f"the address of {self.symbol} is passed to a call")
         self.escape(arguments, text)
         event = len(self.trace)
         self.trace.append(("call", target, tuple(arguments)))
@@ -827,7 +861,7 @@ class Executor:
                 value = truncate(regs[subject], width * 8)
                 record.self_assignment = isinstance(value, tuple) and value[0] == "load" and \
                     value == self.current(width, address)
-                record.value = self.store(width, address, regs[subject])
+                record.value = self.store(width, address, regs[subject], text=text)
             self.records.append(record)
             return None
         if mnemonic in ("push", "stmia", "stm", "pop", "ldmia", "ldm"):
@@ -851,7 +885,7 @@ class Executor:
                 address = add(start, 4 * n)
                 self.check_address(address, 4, text, multiple=True)
                 if storing:
-                    self.store(4, address, regs[name], saved=mnemonic == "push")
+                    self.store(4, address, regs[name], saved=mnemonic == "push", text=text)
                 else:
                     loaded[name] = self.load(4, False, address, text)[0]
             if writeback:
@@ -1113,7 +1147,7 @@ def show_event(event):
             else str(event[1])
         return f"call {target}({', '.join(show(a) for a in event[2])})"
     if event[0] == "escape":
-        return "frame escape {" + ", ".join(f"{offset:+#x}: {show(value)}" for offset, _, value in event[1]) + "}"
+        return "frame escape {" + ", ".join(f"{offset:+#x}: {show(value)}" for offset, value in event[1]) + "}"
     return "return" + (f" {show(event[1])}" if len(event) > 1 else "")
 
 

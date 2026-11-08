@@ -216,6 +216,41 @@ class SemanticDiffTests(unittest.TestCase):
                 self.refused(frame(1, escape), frame(2, escape), "differ in observable behaviour")
         self.assertTrue(semantics.contains(semantics.add(semantics.SP, -4), semantics.SP))
 
+    def test_escape_snapshot_keeps_store_order_and_the_whole_frame(self):
+        # round-2 repro: overlapping frame stores in opposite orders
+        def overlap(*stores):
+            return assembly("push\t{lr}", "add\tsp, sp, #-4", "mov\tr1, #1", "mov\tr2, #2",
+                            *stores, "mov\tr0, sp", "bl\tfunc_0802A2C0", "add\tsp, sp, #4",
+                            "pop\t{r0}", "bx\tr0")
+        self.refused(overlap("strb\tr1, [sp, #1]", "str\tr2, [sp]"),
+                     overlap("str\tr2, [sp]", "strb\tr1, [sp, #1]"), "differ in observable behaviour")
+        # round-2 repro: a slot below the escaping pointer differs
+        def below(value):
+            return assembly("push\t{lr}", "add\tsp, sp, #-8", f"mov\tr1, #{value}", "str\tr1, [sp]",
+                            "add\tr0, sp, #4", "bl\tfunc_0802A2C0", "add\tsp, sp, #8", "pop\t{r0}",
+                            "bx\tr0")
+        self.assertEqual(compare(below(1), below(1))[0][1], 1)
+        self.refused(below(1), below(2), "differ in observable behaviour")
+
+    def test_object_address_may_not_reach_a_call_or_memory(self):
+        passed = assembly("push\t{lr}", "ldr\tr0, .L3", "bl\tfunc_0802A2C0", "pop\t{r0}", "bx\tr0")
+        self.refused(passed, passed, "is passed to a call")
+        stored = assembly("ldr\tr0, .L3", "add\tr1, r0, #2", "str\tr1, [r0, #4]", "bx\tlr")
+        self.refused(stored, stored, "is stored to memory")
+
+    def test_calls_read_only_their_argument_registers(self):
+        # round-2: `sym.unknown_3C = a; k(a)` with `void k(int)`: the dead
+        # load's register r1 is not an argument of k
+        real = assembly("push\t{lr}", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr1, [r2]",
+                        "strb\tr0, [r2]", "bl\tk", "pop\t{r0}", "bx\tr0")
+        stripped = real.replace("ldrb\tr1, [r2]\n\t", "")
+        one = "void func_08028C34(int a);\nextern void k(int);\n"
+        self.assertEqual(compare(real, stripped, one)[0][1:], (1, [3], []))
+        # with `void k(int, int)` r1 is read, so the load is not dead
+        two = "void func_08028C34(int a);\nextern void k(int, int);\n"
+        with self.assertRaises(semantics.SemanticError):
+            compare(real, stripped, two)
+
     def test_low_register_move_sets_the_flags(self):
         moved = assembly("mov\tr1, r0", "beq\t.L9", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr3, [r2]",
                          "mov\tr3, #1", "strb\tr3, [r2]", ".L9:", "bx\tlr")
@@ -301,9 +336,9 @@ class CompiledSemanticTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.directory.cleanup()
 
-    def check(self, body, parameters="void"):
+    def check(self, body, parameters="void", prelude=""):
         (self.root / "src" / "08028C34.c").write_text(
-            '#include "control_flags.h"\nextern void func_0802A2C0(u8, u8, u8, u8);\n'
+            '#include "control_flags.h"\nextern void func_0802A2C0(u8, u8, u8, u8);\n' + prelude +
             f"void func_08028C34({parameters})\n{{\n" + body + "\n}\n")
         return match.allowlisted_volatile_semantics(self.root, 0x08028C34)
 
@@ -352,6 +387,9 @@ class CompiledSemanticTests(unittest.TestCase):
                 self.assertIn(reason, str(caught.exception))
         (record,) = self.check(f"a = a * b + 7; {s}.unknown_3C = a;", "int a, int b")
         self.assertIn("read-modify-write loads at [7]", record)
+        # round 2: a call reads only the argument registers its prototype names
+        (record,) = self.check(f"{s}.unknown_3C = a; k(b);", "int a, int b", "extern void k(int);\n")
+        self.assertTrue(record.startswith("* allowlisted volatile semantics: "), record)
 
 
 if __name__ == "__main__":

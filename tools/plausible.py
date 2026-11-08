@@ -399,18 +399,30 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                         finding(reference.start(), f"allowlisted volatile {symbol} may only be "
                                 "used as `symbol.member`: its address or whole object would "
                                 "carry the qualifier to other memory")
+                # Provenance: a pinned byte must only be reachable through its
+                # own volatile member.  An array member may only be written
+                # `symbol.array[literal]` inside its bounds (no decay, pointer
+                # arithmetic, `k[array]` or `(symbol.array)[k]`), and no member's
+                # address may be taken.
                 arrays = dict(re.findall(r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]",
                                          entry["declaration"]))
                 for reference in references:
-                    access = re.match(r"\s*\.\s*([A-Za-z_]\w*)\s*\[([^\]]*)\]", joined[reference.end():])
+                    before = reference.start()
+                    while before and (joined[before - 1].isspace() or joined[before - 1] == "("):
+                        before -= 1
+                    if before and joined[before - 1] == "&" and (before < 2 or joined[before - 2] != "&"):
+                        finding(reference.start(), f"the address of a {symbol} member may not be taken: "
+                                "a pointer could reach a volatile member without its qualifier")
+                    access = re.match(r"\s*\.\s*([A-Za-z_]\w*)", joined[reference.end():])
                     if access is None or access[1] not in arrays:
                         continue
-                    index = access[2].strip()
-                    if not re.fullmatch(r"0[xX][0-9A-Fa-f]+|[0-9]+", index) or \
-                            int(index, 0) >= int(arrays[access[1]], 0):
-                        finding(reference.start(), f"`{symbol}.{access[1]}[{index}]` must use an "
-                                f"integer literal below {arrays[access[1]]}: another index could "
-                                "reach a volatile member without its qualifier")
+                    subscript = re.match(r"\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]",
+                                         joined[reference.end() + access.end():])
+                    if subscript is None or int(subscript[1], 0) >= int(arrays[access[1]], 0):
+                        finding(reference.start(), f"`{symbol}.{access[1]}` may only be used as "
+                                f"`{symbol}.{access[1]}[literal]` with a literal below "
+                                f"{arrays[access[1]]}: anything else could reach a volatile member "
+                                "without its qualifier")
             continue
         if relpath != header:
             for reference in references:

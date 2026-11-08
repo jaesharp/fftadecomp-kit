@@ -140,9 +140,9 @@ class VolatileAllowlistTests(unittest.TestCase):
                                          relpath="src/08028C34.c"))
         self.assertEqual(self.rules("void f(void) { if (a && " + SYMBOL + ".unknown_3C) g(); }\n",
                                     relpath="src/08028C34.c"), [])
-        # A non-volatile member's address is an ordinary unqualified pointer.
-        self.assertEqual(self.rules("void f(void) { p = &" + SYMBOL + ".unknown_02[4]; }\n",
-                                    relpath="src/08028C34.c"), [])
+        # No member's address may be taken: it could reach a volatile byte.
+        self.assertIn("volatile-allowlist", self.rules("void f(void) { p = &" + SYMBOL + ".unknown_02[4]; }\n",
+                                                       relpath="src/08028C34.c"))
         # A source declaring the symbol itself never sees the volatile declaration.
         self.assertEqual(self.rules("extern u16 " + SYMBOL + ";\nvoid f(void) { p = &" +
                                     SYMBOL + "; }\n", relpath="src/0800337C.c",
@@ -302,6 +302,25 @@ class VolatileAllowlistTests(unittest.TestCase):
             with self.subTest(statement=statement):
                 self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
                                             relpath="src/08028C34.c"), [])
+
+    def test_pinned_bytes_are_reached_only_through_their_members(self):
+        # round-2 repros (08000011-08000018, 08000031-08000033)
+        for statement in ("*(" + SYMBOL + ".unknown_02 + 0x3A) = a;",
+                          "(" + SYMBOL + ".unknown_02)[0x3A] = a;",
+                          "0x3A[" + SYMBOL + ".unknown_02] = a;",
+                          "*(&" + SYMBOL + ".unknown_3E - 2) = a;",
+                          "((u8 *)&" + SYMBOL + ".display)[0x3C] = a;",
+                          "*(" + SYMBOL + ".unknown_02 - 1) = a;",
+                          "{ u8 *p = " + SYMBOL + ".unknown_02; p[0x3A] = a; }",
+                          "*(u8 *)((u32)&" + SYMBOL + ".unknown_3E - 2) = a;",
+                          "memcpy(&" + SYMBOL + ".display, src, 0x4E);",
+                          "k(*(" + SYMBOL + ".unknown_02 + 0x3A));",
+                          "p = & (" + SYMBOL + ".unknown_3C);"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
+                                                               relpath="src/08028C34.c"))
+        self.assertEqual(self.rules("void f(void) { if (a && " + SYMBOL + ".unknown_02[1]) "
+                                    + SYMBOL + ".unknown_02[0x39 ] = a; }\n", relpath="src/08028C34.c"), [])
 
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),

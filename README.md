@@ -1615,10 +1615,12 @@ replacement names the symbol; and any `#include` that resolves outside
 `include/` or to a non-header under `src/`, which the sweep would never lint.
 Other headers may not name the symbol, and every
 use must be `symbol.member`, so neither its address nor the whole object reaches pointer
-arithmetic, a macro or a copy. A subscript of one of the object's array
-members must be an integer literal inside the array
-(`symbol.unknown_02[0x3A]` or `[-1]` would reach a volatile byte without its
-qualifier). The only exemption is a file with its own
+arithmetic, a macro or a copy. Pinned bytes must be reachable only
+through their own members. An array member may only be written
+`symbol.array[literal]` with the literal inside its bounds, so decay, pointer
+arithmetic, `k[symbol.array]`, `(symbol.array)[k]`, `[0x3A]` past the end and
+`[-1]` are all refused. No member's address may be taken (`&symbol.member`,
+`(u8 *)&symbol.display`, `memcpy(&symbol.display, ...)`). The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
 declaration hidden behind `#if` exempts nothing. The single
@@ -1641,12 +1643,15 @@ symbolically along every path, and the check requires:
   values in the same order, the same calls with the same arguments, the same
   branch conditions and, for a non-void function, the same return value.
   When a stack address escapes (as a call argument or a value stored to
-  memory), the frame's contents at that moment, relative to the escaping
-  pointer, are part of the behaviour too;
+  memory), every local frame byte at that moment, with the stores applied in
+  program order, is part of the behaviour too, relative to the first
+  escaping pointer and re-snapshotted at each escape. A call reads only the
+  argument registers its file-scope prototype names;
 * every access to the object to be `symbol + constant` inside it: an
   address that adds a variable term (`(&sym)[n].x`, a variable subscript),
   lies outside the object or comes from a multi-register transfer fails
-  closed;
+  closed, as does the object's address reaching a call argument or a stored
+  value;
 * every load of the object in the real compile to be one of:
   - a **read-modify-write load**: an `ldrb` of a pinned byte whose
     destination is overwritten before any use, followed by its `strb` to the
@@ -1666,10 +1671,13 @@ symbolically along every path, and the check requires:
 * no store to write back the value just loaded from the same byte (an
   `ldrb`/`strb` self-assignment).
 
-The plausibility rules guarantee that the store paired with a read-modify-write
-load is a volatile lvalue: a pinned byte can only be reached through its own
-member, because array subscripts must stay in bounds, the object's address
-never escapes, and variable offsets fail closed here.
+The plausibility rules make the store paired with a read-modify-write load a
+volatile lvalue. A pinned byte can only be reached through its own member,
+because array members take only in-bounds literal subscripts, no member's
+address is taken, and the object's address never reaches a call or memory.
+This matters because the semantic check alone cannot tell a planted read
+followed by an aliased store (`(void)sym.x; *(sym.unknown_02 + 0x3A) = a;`)
+from `sym.x = a;`: both compile to the same instructions.
 
 A planted read either vanishes from the stripped compile, which leaves a load
 the rules cannot explain, or stays, which shows the qualifier did not produce
@@ -1704,6 +1712,12 @@ has these gaps:
   optimise differently. Examples are reading a flag twice
   (`if (x) ...; if (x) ...`), spin loops and repeated stores. Such functions
   cannot use the allowlist.
+* Variable subscripts into the object (`symbol.unknown_02[i]`) are always
+  refused. None of the 173 parked and matched sources that reference the
+  block uses one. A rough ROM scan finds a register-offset access through a
+  block base in about 5 of the 373 functions of 2 KiB or less that load the
+  block's address (080917F8, 080D38B4, 080EEB50, 080EFD50, 08112AEC). Those
+  would need another member spelling or cannot use the allowlist.
 * It is order-sensitive. Stores, calls and object loads must happen in the
   same order in both compiles, and volatile accesses are ordering barriers
   that the stripped compile may schedule across. A function whose stripped
