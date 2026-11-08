@@ -978,7 +978,8 @@ be exactly the iterator call and the two function literals in pool order, with
 no data or switches. The iterator, scalar adapter, getter and canonical thunks
 are checked as for the 28-byte profile. That profile's contract is unchanged.
 
-In the zero and entry-R0 forms no private provenance reaches the callback. Its
+In the zero and entry-R0 forms no private address is passed to the callback as
+an argument. Its
 identity is pinned, but its effects stay opaque under the same compatible
 returning ABI and noninterference premises as the 28-byte profile. In the
 private-state form the callback receives a private-frame address. It must be the
@@ -990,8 +991,16 @@ returning callback, modulo 2^32. The adapter's no-private-provenance premise is
 replaced for that word, not asserted satisfied. Cursor-store validity and
 nonoverlap and list liveness remain explicit conditions; no iteration bound is
 assumed and termination is unproved. The root frame is fixed by the exact byte
-template rather than the frame prover. A matched root's index instruction count
-must be the refined count (for example 15 for `08099A48`, 13 for `0809A6EC`).
+template rather than the frame prover.
+
+The profile requires the **refined** instruction count for the root in both
+`config/functions.json` and `symbols/functions.txt`: 17 for the 44-byte form,
+15 for the 40-byte form and 13 for the 36-byte form. This is the
+reachable-instruction count reported by `analyze.refine_function`, which
+excludes the literal pool. The analyzer's raw rows count pool halfwords as
+instructions (22, 20 and 18). With today's index only `08099CDC` reaches the
+proof; `08099D08`, `08099A48` and `0809A6EC` fail closed with `exact complete
+owner/count` until the matching decomp commit corrects their rows.
 
 
 ### Named data literals

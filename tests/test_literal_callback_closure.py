@@ -201,6 +201,31 @@ class LiteralClosureTests(unittest.TestCase):
     def test_even_literal_refuses(self):
         values=fixture();body=bytearray(values['data']);struct.pack_into('<I',body,36,S);values['data']=bytes(body)
         rom=bytearray(values['rom']);rom[A-match.ROM_BASE:A-match.ROM_BASE+len(body)]=body;values['rom']=bytes(rom)
+        with self.assertRaisesRegex(ValueError,'odd Thumb pointers'):owner.verify(**values)
+
+    def test_opaque_form_owner_loads_and_bytes(self):
+        # entry-object loads from the R2 owner pointer; null from entry R0.
+        for form,offset,value,error in (('entry-object',16,0x6900,'aligned incoming object word load'),
+                                        ('entry-object',16,0x6911,'aligned incoming object word load'),
+                                        ('entry-object',16,0x8A10,'aligned incoming object word load'),
+                                        ('entry-object',6,0x3140,'natural root form'),
+                                        ('entry-object',12,0x9001,'natural root form'),
+                                        ('null',12,0x6910,'aligned incoming object word load'),
+                                        ('null',12,0x6901,'aligned incoming object word load'),
+                                        ('null',6,0x2101,'natural root form'),
+                                        ('null',10,0x9202,'natural root form')):
+            with self.subTest(form=form,offset=offset,value=hex(value)),self.assertRaisesRegex(ValueError,error):
+                owner.verify(**fixture(form,changes={(A,offset):value}))
+
+    def test_private_state_requires_adapter_context_R4(self):
+        r5={(C,0):0xB520,(C,2):0x1C0D,(C,8):0x6829,(C,10):0x686A,(C,16):0xBC20}
+        manifest,_=owner.verify(**fixture('null',changes=r5))
+        self.assertEqual(manifest['proof']['literal_callback_closure']['adapter']['descriptor_register'],5)
+        with self.assertRaisesRegex(ValueError,'adapter descriptor in R4'):owner.verify(**fixture(changes=r5))
+
+    def test_missing_callback_index_row_refuses(self):
+        values=fixture('null');rows=[row for row in json.loads(values['mapping']) if int(row['rom'],16)!=X]
+        values['mapping']=json.dumps(rows).encode()
         with self.assertRaises(ValueError):owner.verify(**values)
 
     def test_exact_policy_and_immutable_input_contract(self):
