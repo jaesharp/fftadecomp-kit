@@ -303,6 +303,21 @@ class VolatileAllowlistTests(unittest.TestCase):
                                 (HEADER, "#define struct union\n" + DECLARATION)):
             with self.subTest(relpath=relpath, source=source):
                 self.assertIn("volatile-allowlist", self.rules(source, relpath=relpath))
+        guarded = dict(ENTRY, guard="CONTROL_FLAGS_H")
+        for source in ("#define CONTROL_FLAGS_H\n", "#undef CONTROL_FLAGS_H\n"):
+            with self.subTest(source=source):
+                self.assertIn("volatile-allowlist", self.rules(
+                    source, relpath="src/08028C34.c", entries=(guarded,)))
+        self.assertEqual(plausible.volatile_allow_entries()[0]["guard"], "CONTROL_FLAGS_H")
+        header = "#ifndef CONTROL_FLAGS_H\n#define CONTROL_FLAGS_H\n" + DECLARATION + "#endif\n"
+        self.assertEqual(self.rules(header, entries=(guarded,)), [])
+        for source in (header.replace("#define CONTROL_FLAGS_H", "#define CONTROL_FLAGS_H 1"),
+                       header + "#undef CONTROL_FLAGS_H\n",
+                       header + "#define CONTROL_FLAGS_H\n"):
+            with self.subTest(source=source):
+                self.assertIn("volatile-allowlist", self.rules(source, entries=(guarded,)))
+        self.assertIn("volatile-allowlist", self.rules(
+            "#define CONTROL_FLAGS_H\n", relpath="include/other.h", entries=(guarded,)))
         self.assertEqual(self.rules("#define FLAG_MASK 0x40\n", relpath="src/a.c"), [])
         self.assertEqual(self.rules("#define u8 u32\n", relpath="src/a.c", mapping={}), [])
 

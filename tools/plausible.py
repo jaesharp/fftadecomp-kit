@@ -313,12 +313,15 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
 
     While the entry is active, every linted file is scanned with line splices
     joined as cpp joins them, and refuses: form feed, vertical tab and lone
-    carriage return; statements that only read `symbol.member`; #include
+    carriage return; statements that only read `symbol.member` (best effort:
+    other spellings of a dead read or a self-assignment are not detected, a
+    documented residual risk limited to the pinned bit-fields); #include
     outside include/ and src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
     can build a directive or name the scan cannot see); typeof (it would copy
     the qualifier onto locals); #line, linemarkers, #import, #include_next
     and computed #include (they hide or fake dependencies); #define/#undef of
-    any identifier of the pinned declaration; and any #define whose
+    any identifier of the pinned declaration or the entry's include guard;
+    and any #define whose
     replacement names the symbol.  Other headers may not name the symbol, and
     every use must be immediate member access `symbol.member`, so neither its
     address nor the whole object can reach pointer arithmetic, a macro
@@ -359,10 +362,18 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
         for include in re.finditer(r"(?m)^[ \t]*#[ \t]*include\b(?![ \t]*[\"<])", raw):
             finding(include.start(), f"computed #include is refused while {symbol} is allowlisted")
         names = {token for token in pinned if re.fullmatch(r"[A-Za-z_]\w*", token)}
-        for directive in re.finditer(
-                r"(?m)^[ \t]*#[ \t]*(?P<kind>define|undef)[ \t]+(?P<name>[A-Za-z_]\w*)(?P<rest>[^\n]*)",
-                joined):
-            if directive["name"] in names:
+        if isinstance(entry.get("guard"), str):
+            names.add(entry["guard"])
+        directives = list(re.finditer(
+            r"(?m)^[ \t]*#[ \t]*(?P<kind>define|undef)[ \t]+(?P<name>[A-Za-z_]\w*)(?P<rest>[^\n]*)",
+            joined))
+        # The listed header itself defines its guard once, with no replacement.
+        guard_definitions = [d for d in directives if d["name"] == entry.get("guard")]
+        own_guard = (relpath == header and len(guard_definitions) == 1 and
+                     guard_definitions[0]["kind"] == "define" and
+                     not guard_definitions[0]["rest"].strip())
+        for directive in directives:
+            if directive["name"] in names and not (own_guard and directive["name"] == entry["guard"]):
                 finding(directive.start(), f"`{directive['name']}` is part of the pinned {symbol} "
                         "declaration and may not be redefined while it is allowlisted")
             if directive["kind"] == "define" and re.search(r"\b" + re.escape(symbol) + r"\b",

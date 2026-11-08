@@ -1609,12 +1609,13 @@ spaces or tabs, then a newline) and refuses: form feeds, vertical tabs and
 lone carriage returns (cpp treats them as whitespace around directives); token pasting (`##`), digraphs
 and trigraphs; `typeof`; `#line`, linemarkers, `#import`, `#include_next` and
 computed `#include`; `#define`/`#undef` of any identifier of the pinned
-declaration (`u8`, member names, `struct`, ...); and any `#define` whose
+declaration (`u8`, member names, `struct`, ...) or the entry's include
+guard; and any `#define` whose
 replacement names the symbol; and any `#include` that resolves outside
 `include/` or to a non-header under `src/`, which the sweep would never lint.
 Other headers may not name the symbol, a statement may not consist only of
-a read of `symbol.member` (with or without casts such as `(void)`), since it
-would only plant a load, and every use must be `symbol.member`, so neither its address nor the whole object reaches pointer
+a read of `symbol.member` (with or without casts such as `(void)`), and every
+use must be `symbol.member`, so neither its address nor the whole object reaches pointer
 arithmetic, a macro or a copy. The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
@@ -1631,6 +1632,16 @@ header's SHA-256, and saved reports are refused unless those records equal a
 fresh recomputation. The premise is that the pinned declaration is the
 original program's; the byte comparison, linking and every other check are
 unchanged.
+
+**Residual risk (accepted in this draft):** the bare-read rule is best
+effort. A source can still plant a dead load of a pinned byte through other
+spellings (`(sym.x, 0);`, an unused local, `c ? sym.x : 0;`, `!sym.x;`, ...)
+or fake a load/store pair with a self-assignment (`sym.x |= 0;`), and such a
+plant can shift the scheduling of unrelated code. The qualifier still reaches
+only the pinned bit-fields. Closing this by construction would need a
+semantic check: recompile with `volatile` stripped from the pinned header and
+require the only difference to be an `ldrb` of byte X directly before each
+`strb` to byte X.
 
 Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py`.
 

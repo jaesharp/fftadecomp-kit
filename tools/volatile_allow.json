@@ -10,6 +10,7 @@
         "u8"
       ],
       "declaration": "extern struct { u16 display; u8 unknown_02[0x3A]; volatile u8 unknown_3C : 8; volatile u8 unknown_3D : 8; u8 unknown_3E; u8 unknown_3F; volatile u8 unknown_40 : 8; volatile u8 unknown_41 : 8; u8 unknown_42; volatile u8 unknown_43 : 8; u8 unknown_44[6]; volatile u8 unknown_4A : 8; volatile u8 unknown_4B : 8; volatile u8 unknown_4C : 8; volatile u8 unknown_4D : 8; } g_control_flags_03000940;",
+      "guard": "CONTROL_FLAGS_H",
       "evidence": "https://github.com/shubshub/fftadecomp-kit/issues/90",
       "reason": "every byte store to the IWRAM control block is preceded by a dead load of the same byte, in 122 unmatched functions across unrelated modules and on no other RAM"
     }
