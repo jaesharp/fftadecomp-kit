@@ -395,6 +395,21 @@ class VolatileAllowlistTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertEqual(self.rules(source, relpath="src/08000001.c"), [])
 
+    def test_provenance_rules_bind_only_users_of_the_object(self):
+        # A source that neither names the symbol nor includes the header keeps
+        # ordinary C: function-pointer casts, struct casts, `&` and __extension__.
+        other = ("typedef void (*Fn)(void);\n"
+                 "void f(int a, int b) { ((void (*)(void))a)(); x = (struct { int y; } *)0; "
+                 "p = &(0, q); x = __extension__ a; y = a & b; }\n")
+        self.assertEqual(self.rules(other, relpath="src/08011EBC.c", closure=({"src/08011EBC.c"}, [])), [])
+        self.assertEqual(self.rules(other, relpath="src/08011EBC.c"), [])
+        # The same text in a user of the object is still refused.
+        self.assertIn("volatile-allowlist", self.rules(
+            '#include "control_flags.h"\n' + other, relpath="src/08028C34.c",
+            closure=({"src/08028C34.c", HEADER}, [])))
+        self.assertIn("volatile-allowlist", self.rules(
+            other + "void g(void) { " + SYMBOL + ".unknown_3C = 1; }\n", relpath="src/08028C34.c"))
+
     def test_round_six_extension_and_parenthesised_address_of(self):
         for statement in ("p = &(0, " + SYMBOL + ".unknown_3E);", "p = &(c ? " + SYMBOL + ".unknown_3E : x);",
                           "k(*(u16 *)&(0, " + SYMBOL + ".unknown_02[0x39]));",
