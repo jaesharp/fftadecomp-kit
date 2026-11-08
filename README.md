@@ -732,9 +732,14 @@ records `payload_offset` and `payload_frame_bytes` with
 the rest of the private frame, not the payload type's size, and every byte of it
 is checked as private. Payload initialization is not checked. Any other pointer word, payload placement,
 extra argument alias or interleaved saved word is refused, and the descriptor
-profile still refuses these callers. The callback's payload read bound, the
-payload's initialization (padding is representation only) and nonuse of the
-pointer copied into the allocation after return are listed premises, not proofs.
+profile still refuses these callers. The pinned scheduler body copies the
+descriptor into its own frame, not the allocation, before one synchronous
+phase-0 callback call. The callback's payload read bound, the payload's
+initialization (padding is representation only) and the callback not retaining
+the payload pointer are listed premises, not proofs.
+Callee-saved register aliases to the descriptor or payload are admitted and
+recorded, as in the descriptor profile; the read-through-descriptor+4 premise
+covers them.
 
 ### Named data literals
 

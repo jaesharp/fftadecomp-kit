@@ -25,7 +25,7 @@ def proof(policy, calls):
     return result
 
 
-FRAME = 'private frame holding the complete descriptor'
+FRAME = 'contiguous private frame from SP holding the complete aligned descriptor'
 ADJACENT = 'exactly the descriptor and one adjacent nonempty payload'
 POINTER = r'one descriptor\+4 word addressing the payload'
 SCHEDULER_BODY, ALLOCATOR_BODY = bytes(range(60)), bytes(range(206))
@@ -145,11 +145,19 @@ class ConditionalLocalBufferTests(unittest.TestCase):
                  ({R0+2: -56}, [LOCAL]*10+[SAVED]*4, {-52: -28, -36: -40}, POINTER),  # second pointer word
                  ({R0+2: -54}, [LOCAL]*10+[SAVED]*4, {-50: -26}, FRAME),            # unaligned descriptor
                  ({R0+2: -40}, [LOCAL]*10+[SAVED]*4, {-36: -56}, FRAME),            # descriptor overflows frame
-                 ({R0+2: -16}, [SAVED]*4, {-12: -16}, FRAME))                       # no private words
+                 ({R0+2: -16}, [SAVED]*4, {-12: -16}, FRAME),                       # no private words
+                 ({R0+2: 4}, [LOCAL]*10+[SAVED]*4, {8: -56}, FRAME),                # positive offset
+                 ({R0+2: -60}, [LOCAL]*10+[SAVED]*4+[LOCAL], {-56: -32}, FRAME))    # private word above saved
         for aliases, stack, slots, reason in cases:
             with self.subTest(aliases=aliases, slots=slots), self.assertRaisesRegex(ValueError, reason):
                 proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C}).check_call(
                     0x08005B6C, aliases, stack, slots, site=100)
+
+    def test_scheduler_payload_refuses_differing_frames_at_one_site(self):
+        p = proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C})
+        p.check_call(0x08005B6C, {R0+2: -56}, [LOCAL]*10+[SAVED]*4, {-52: -28}, site=100)
+        with self.assertRaisesRegex(ValueError, 'differs across incoming paths'):
+            p.check_call(0x08005B6C, {R0+2: -60}, [LOCAL]*11+[SAVED]*4, {-56: -32}, site=100)
 
     def test_descriptor_only_scheduler_still_refuses_payload_word(self):
         with self.assertRaises(ValueError):

@@ -115,11 +115,13 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             local = [index for index, word in enumerate(stack) if word[2]]
             first, end = (offset-base)//4, len(local)
             require(offset % 4 == 0 and local == list(range(end)) and 0 <= first and first+7 <= end,
-                    'scheduler payload contract requires a private frame holding the complete descriptor')
-            payload = ((base, offset-base) if first and first+7 == end else
-                       (offset+28, 4*end+base-offset-28) if not first and first+7 < end else None)
-            require(payload is not None,
-                    'scheduler payload contract requires a frame of exactly the descriptor and one adjacent nonempty payload')
+                    'scheduler payload contract requires a contiguous private frame from SP holding the complete aligned descriptor')
+            if first == 0 and end > 7:
+                payload = (offset+28, 4*end+base-offset-28)
+            elif first > 0 and first+7 == end:
+                payload = (base, offset-base)
+            else:
+                require(False, 'scheduler payload contract requires a frame of exactly the descriptor and one adjacent nonempty payload')
             # Exactly one pointer word, descriptor+4, addressing the payload start.
             require(slots == {offset+4: payload[0]},
                     'scheduler payload contract requires one descriptor+4 word addressing the payload')
@@ -168,8 +170,12 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                      '(an upper bound, not the payload type size). Payload initialization is not checked. The callback reads '
                      'the payload only through that word, only within that extent and only before the scheduler call '
                      'returns; caller-initialized members are values and padding bytes are representation only. '
-                     'The copied pointer word in the allocation is not dereferenced after return; the payload size within '
-                     'that bound, its initialization and the callback read bound are premises, not proofs.')]
+                     'The pinned scheduler body copies the descriptor into its own frame, not the allocation, and makes '
+                     'one synchronous phase-0 callback call; the callback copies payload values instead of retaining the '
+                     'pointer. The payload size within '
+                     'that bound, its initialization and the callback read bound are premises, not proofs. Callee-saved '
+                     'register aliases to the descriptor or payload are admitted and recorded, as in the descriptor '
+                     'profile; the read-through-descriptor+4 premise covers them.')]
                    if self.policy == SCHEDULER_PAYLOAD else []),
             actual_callback_effects_proved=False, nonescape_proved=False, termination_proved=False,
             source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
