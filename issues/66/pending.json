@@ -98,66 +98,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "7f22501f49b36042fde3805e036ea4bab10dfb7cd8be0744e1b3edf50dba0044",
-        "acknowledged_cursor": 6714764525,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "7f22501f49b36042fde3805e036ea4bab10dfb7cd8be0744e1b3edf50dba0044",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080C8570\",\"who\":\"sol-080C8570-3773\",\"note\":\"Bounded plausible C matching using existing native compiler. Address-specific executor only; no tooling changes.\"}",
-          "created_at": "2026-11-07T23:59:53Z",
-          "id": 6714762700,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:59:53Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "8450d767d5b1f0800330a6596c76348823ded2d39cecabc7e99b19a41e34f474",
-        "result": {
-          "address": "0x080C8570",
-          "claim_id": 6714762700,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714762700,
-          "status": "accepted",
-          "who": "sol-080C8570-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "18c85db63a68e92e79adf9123682adbf42b93f51556a0d6b2aa28b4efee7e247",
-        "acknowledged_cursor": 6714941061,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "18c85db63a68e92e79adf9123682adbf42b93f51556a0d6b2aa28b4efee7e247",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C8570\",\"who\":\"sol-080C8570-3773\",\"claim_id\":6714762700,\"reason\":\"Native MATCH exit0, plausible complete1204B/501I exact. Frozen continuation proof preserves original seven failures and separately counted diagnostics. Fully stopped; source/report/full FUNC retained.\",\"unmatchable\":false,\"tried\":\"\"}",
-          "created_at": "2026-11-08T00:17:18Z",
-          "id": 6714941061,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:17:18Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "3b959efe5b5d5b0f1fc643a1270c0e537fe0a86dc1234c5fe1eef8d63f690e82",
-        "result": {
-          "address": "0x080C8570",
-          "claim_id": 6714762700,
-          "code": 0,
-          "message": "release accepted",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714941061,
-          "status": "accepted",
-          "who": "sol-080C8570-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "7971169678346f473d51c5603a629ffb1bca09cbec3f528d50123be33a19b598",
         "acknowledged_cursor": 6714764525,
         "body_provenance": "acceptance-time",
