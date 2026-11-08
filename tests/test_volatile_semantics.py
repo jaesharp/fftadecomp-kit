@@ -34,7 +34,7 @@ def assembly(*body, name="func_08028C34"):
 
 def compare(real, stripped, preprocessed=PREPROCESSED):
     """the stripped-compile rules alone (the perturbation has its own tests)"""
-    return semantics.compare_compiles(real, stripped, preprocessed, SYMBOL, DECLARATION)
+    return semantics._compare_compiles(real, stripped, preprocessed, SYMBOL, DECLARATION)
 
 
 class SemanticDiffTests(unittest.TestCase):

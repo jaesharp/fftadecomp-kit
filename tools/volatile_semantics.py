@@ -164,7 +164,16 @@ def perturbed_declaration(declaration):
     its own name, which follows the permutation; an access computed any
     other way stays put, at a slot that now belongs to a different member.
     """
+    # The self-check below models the layout in Python.  That is sound only
+    # while every pinned member has the identical declaration
+    # `volatile u8 name : 8` (members() enforces byte-sized volatile
+    # members), so swapping names cannot change any offset agbcc assigns.
+    # If the allow list ever admits differing pinned member types, add a
+    # self-check against a compiled layout instead.
     layout, size = members(declaration)
+    if len({" ".join(tokens).replace(name, "NAME") for tokens, name, _, _, qualified in layout
+            if qualified}) > 1:
+        raise SemanticError("pinned members must share one declaration form to be permuted")
     slots = [index for index, (_, _, _, _, qualified) in enumerate(layout) if qualified]
     if len(slots) < 2:
         raise SemanticError("at least two pinned bytes are needed to permute them")
@@ -1337,11 +1346,11 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
     qualifier's documented effect, or reaches a pinned byte other than
     through its member.
     """
-    return compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
+    return _compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
                             perturbed_assembly)
 
 
-def compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
+def _compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
                      perturbed_assembly=None):
     """compare(), with the perturbation optional so tests can exercise the other rules"""
     size, pinned = object_layout(declaration)
