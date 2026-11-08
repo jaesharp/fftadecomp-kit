@@ -249,6 +249,50 @@ class VolatileAllowlistTests(unittest.TestCase):
             finally:
                 outside.unlink()
 
+    def test_form_feed_vertical_tab_and_lone_carriage_return_are_refused(self):
+        grow = "unknown_3C big[0x1000]; u8 dummy\n"
+        tail = '#include "control_flags.h"\nvoid f(void) { ' + SYMBOL + '.big[0x400] = 1; }\n'
+        cases = {"ff": "#define\f" + grow + tail, "ff2": "\f#define " + grow + tail,
+                 "vt": "#\vdefine " + grow + tail, "midline": "int y; \v#define " + grow + tail,
+                 "cr": "int x;\r#define " + grow.rstrip("\n") + '\r#include "control_flags.h"\n' +
+                       "void f(void) { " + SYMBOL + ".big[0x400] = 1; }\n"}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("config", "src", "include", "out"):
+                (root / name).mkdir()
+            (root / "config" / "data_symbols.json").write_text(json.dumps(MAPPING))
+            (root / HEADER).write_text(plausible.volatile_allow_entries()[0]["declaration"] + "\n")
+            evil = root / "out" / "evil.h"
+            evil.write_text("#define unknown_3C big[0x1000]; u8 dummy\n")
+            cases["esc"] = '\f#include "' + str(evil) + '"\n' + tail
+            source = root / "src" / "08028C34.c"
+            for name, text in cases.items():
+                source.write_bytes(text.encode())
+                with self.subTest(name=name):
+                    self.assertIn("volatile-allowlist",
+                                  [rule for _, rule, _, _ in plausible.check_file(source)])
+                    self.assertIn("volatile-allowlist", self.rules(text, relpath="src/08028C34.c"))
+            source.write_bytes(('#include "control_flags.h"\r\n' + ACCESS.replace("\n", "\r\n")).encode())
+            self.assertEqual(plausible.check_file(source), [])
+        self.assertEqual(self.rules("\f#define X 1\n", relpath="src/a.c", mapping={}), [])
+
+    def test_statements_that_only_read_a_member_are_refused(self):
+        for statement in (SYMBOL + ".unknown_3C;", "(void)" + SYMBOL + ".unknown_3D;",
+                          "(void)(" + SYMBOL + ".unknown_3D);", "(" + SYMBOL + ".unknown_3D);",
+                          "(u8)" + SYMBOL + ".unknown_3C;", "if (c) " + SYMBOL + ".unknown_3C;",
+                          "while (c) " + SYMBOL + ".unknown_3C;", "else " + SYMBOL + ".unknown_3C;",
+                          "case 1: " + SYMBOL + ".unknown_3C;", "do " + SYMBOL + ".unknown_3C;"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules(
+                    "void f(void) { " + statement + " }\n", relpath="src/08028C34.c"))
+        for statement in ("x = " + SYMBOL + ".unknown_3C;", "f(a, " + SYMBOL + ".unknown_3C);",
+                          "x = (u8)" + SYMBOL + ".unknown_3C;", "return " + SYMBOL + ".unknown_3C;",
+                          "if (" + SYMBOL + ".unknown_3C) g();", SYMBOL + ".unknown_3C = 1;",
+                          "x = c ? " + SYMBOL + ".unknown_3C : 0;", "g(" + SYMBOL + ".unknown_3C);"):
+            with self.subTest(statement=statement):
+                self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
+                                            relpath="src/08028C34.c"), [])
+
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
                                 ("src/08028C34.c", "#undef u8\n"),

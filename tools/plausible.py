@@ -299,7 +299,8 @@ def active_volatile_entries(data_symbols, entries):
     return active
 
 
-def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closure=None):
+def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closure=None,
+                         untranslated=None):
     """(exempt volatile offsets, findings) for the volatile allow list.
 
     Only the listed header may hold the listed object's declaration, and its
@@ -311,8 +312,9 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
     object.
 
     While the entry is active, every linted file is scanned with line splices
-    joined as cpp joins them, and refuses: #include outside include/ and
-    src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
+    joined as cpp joins them, and refuses: form feed, vertical tab and lone
+    carriage return; statements that only read `symbol.member`; #include
+    outside include/ and src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
     can build a directive or name the scan cannot see); typeof (it would copy
     the qualifier onto locals); #line, linemarkers, #import, #include_next
     and computed #include (they hide or fake dependencies); #define/#undef of
@@ -342,6 +344,11 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                 list(re.finditer(r"\?\?[=/'()!<>\-]", text if text is not None else code)):
             finding(match.start(), f"{lexical[1]} are refused while {symbol} is an "
                     "allowlisted volatile object: they can spell what the scan cannot see")
+        for control in re.finditer(r"[\f\v]|\r(?!\n)", untranslated if untranslated is not None
+                                   else text if text is not None else code):
+            finding(control.start(), f"form feed, vertical tab and lone carriage return are "
+                    f"refused while {symbol} is allowlisted: cpp treats them as whitespace "
+                    "where the directive scans do not")
         for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", joined):
             finding(typeof.start(), f"typeof while {symbol} is an allowlisted volatile "
                     "object: it would copy the qualifier onto other objects")
@@ -365,6 +372,10 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             finding(0, f"#include of `{escape}` leaves include/ and src/*.h, which are the "
                     f"only linted inputs, while {symbol} is allowlisted")
         references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", joined))
+        for reference in references:
+            if bare_member_read(joined, reference):
+                finding(reference.start(), f"a statement that only reads {symbol}.member "
+                        "plants a load the program has no use for")
         if relpath is None or not relpath.endswith(".h"):
             # A file's own declaration exempts it only when it provably cannot
             # see the listed one: the header is outside its include closure.
@@ -410,6 +421,46 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
                 allowed.add(offset)
     return allowed, findings
+
+
+def bare_member_read(code, reference):
+    """is this `symbol.member` the whole of an expression statement?
+
+    Accepts surrounding parentheses and casts such as `(void)`, and statement
+    positions after `;`, braces, labels, `else`, `do` or the condition of
+    `if`/`while`/`for`/`switch`.  Such a statement only reads the member, so
+    with a volatile member it exists to plant a load.
+    """
+    member = re.match(r"\s*\.\s*[A-Za-z_]\w*((?:\s*\))*)\s*;", code[reference.end():])
+    if member is None:
+        return False
+    closing, opening, index = member[1].count(")"), 0, reference.start()
+    while True:
+        while index and code[index - 1].isspace():
+            index -= 1
+        if index and code[index - 1] == "(":
+            opening += 1
+            index -= 1
+            continue
+        if not index or code[index - 1] != ")":
+            break
+        depth, start = 0, index - 1
+        while start >= 0:
+            depth += {")": 1, "(": -1}.get(code[start], 0)
+            if depth == 0:
+                break
+            start -= 1
+        if start < 0:
+            return False
+        if re.search(r"\b(?:if|while|for|switch)\s*$", code[:start]):
+            return opening == closing
+        if not re.fullmatch(r"\s*[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*\**\s*",
+                            code[start + 1:index - 1]):
+            return False
+        index = start
+    return opening == closing and (
+        not index or code[index - 1] in ";{}:" or
+        re.search(r"\b(?:else|do)\s*$", code[:index]) is not None)
 
 
 def strip_comments_and_strings_keep_strings(text):
@@ -587,7 +638,7 @@ def statement_macro_tails(code):
 
 
 def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None,
-               closure=None):
+               closure=None, untranslated=None):
     """returns list of findings: (line, rule, severity, message)
 
     relpath is the file's path relative to the project root; only the header
@@ -600,7 +651,8 @@ def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
     listed_qualifiers, findings = allowlisted_volatile(
         code, relpath, data_symbols or {},
-        volatile_allow_entries() if volatile_allow is None else volatile_allow, text, closure)
+        volatile_allow_entries() if volatile_allow is None else volatile_allow, text, closure,
+        untranslated)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
@@ -629,7 +681,9 @@ def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=
 
 def check_file(path):
     try:
-        text = open(path, encoding="utf-8", errors="replace").read()
+        with open(path, encoding="utf-8", errors="replace", newline="") as source:
+            untranslated = source.read()
+        text = untranslated.replace("\r\n", "\n").replace("\r", "\n")
     except OSError as e:
         return [(0, "unreadable", "error", str(e))]
     data_symbols = {}
@@ -657,7 +711,8 @@ def check_file(path):
             except OSError:
                 closure = None
             break
-    return check_text(text, os.path.basename(path), data_symbols, relpath, closure=closure)
+    return check_text(text, os.path.basename(path), data_symbols, relpath, closure=closure,
+                      untranslated=untranslated)
 
 
 def asm_allow_path():
