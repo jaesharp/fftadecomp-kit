@@ -966,9 +966,9 @@ nonretention remain explicit premises. Existing selectors retain their guards.
 ### Typed-literal two-word callback closures
 
 `conditional-two-word-callback-closure-v1` admits only the 28-byte caller whose
-closure callback word comes from a parameter. Callers of the same `080C7CC0`
-list iterator that store a **function literal** in that word have a separate
-opt-in selector:
+closure callback word comes from a parameter. Callers of a listed callback
+iterator that store a **function literal** in that word have a separate opt-in
+selector:
 
 ```sh
 python tools/match.py --root ../fftadecomp 08099CDC --owner-runtime-profile conditional-two-word-literal-callback-closure-v1
@@ -979,8 +979,47 @@ iterator BL and the two typed literals (callback, then adapter) may vary.
 Descriptor word zero is the constant zero (36 bytes), the entry R0 value
 (40 bytes), or the address of a private two-word state (44 bytes). Bindings must
 be exactly the iterator call and the two function literals in pool order, with
-no data or switches. The iterator, scalar adapter, getter and canonical thunks
-are checked as for the 28-byte profile. That profile's contract is unchanged.
+no data or switches. The iterator, adapter, getter and canonical thunks are
+checked as follows. The 28-byte profile's contract is unchanged.
+
+The iterator call must reach one entry of a closed table, `ITERATORS`. Each
+entry pins the complete body by size, refined count and SHA-256, and the
+structure is re-derived from the bytes. R1 (adapter) and R2 (descriptor) are
+copied into callee-saved registers that nothing else writes. The only call goes
+through the adapter register's canonical thunk, with R0 = current node and
+R1 = descriptor. The body has no stores, and it reads exactly the entry's words
+from the list object and the current node. The report records the iterator
+address, kind, registers, reads and thunk.
+
+| iterator | walk | reads | adapter thunk |
+| --- | --- | --- | --- |
+| `080C7CC0` | singly linked list | list+4, node+8 | `_call_via_r6` |
+| `080C7D18` | parent-linked binary tree, in order, node+12 first | list+8, node+8/+12/+16 | `_call_via_r7` |
+| `080C7D70` | same tree, node+16 first | list+8, node+8/+12/+16 | `_call_via_r7` |
+
+All three are read-only and call the adapter with the current nonnull node and
+the original descriptor. An adapter result of zero stops the walk. No iteration
+bound is assumed; termination is unproved.
+
+There are two kinds of adapter.
+
+* A 22-byte scalar adapter must pass `two-word-scalar-callback-adapter-inventory-v1`
+  unchanged.
+* A **framed two-output adapter** must be an entry of the closed table
+  `FRAMED_ADAPTERS`. This extends the adapter rules. Today the only entry is
+  `0809AC00` with getter `080C7B78`.
+
+Both the framed adapter and its getter are pinned byte for byte, and their
+effect is interpreted. The adapter reserves an eight-byte private local area
+and passes its two word addresses to the getter. The getter stores node word 4
+and node word 0 there, and writes nothing else. The adapter then passes the
+first local word and descriptor word zero to the descriptor word-four target
+through `_call_via_r2`, and returns that target's R0. The report states its
+premises:
+
+* the node is nonnull with readable words 0 and 4;
+* the local area is a valid private frame, and the out-pointers stay inside it;
+* the getter and the target use the returning ABI.
 
 In the zero and entry-R0 forms no private address is passed to the callback as
 an argument. Its
@@ -1004,7 +1043,9 @@ reachable-instruction count reported by `analyze.refine_function`, which
 excludes the literal pool. The analyzer's raw rows count pool halfwords as
 instructions (22, 20 and 18). With today's index only `08099CDC` reaches the
 proof; `08099D08`, `08099A48` and `0809A6EC` fail closed with `exact complete
-owner/count` until the matching decomp commit corrects their rows.
+owner/count` until the matching decomp commit corrects their rows. The six
+tree-walk closures `08099D60`, `08099D8C`, `08099DB8`, `08099DE4`, `08099E10`
+and `08099E3C` need the same correction (17).
 
 
 ### Named data literals
