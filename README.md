@@ -256,6 +256,14 @@ duplicate report destinations remain serialized. Decompilation mode verifies
 history, tracked-file restrictions, fresh ROM matches, plausibility and reports.
 Use `--check-only` to run the gate without publishing.
 
+On fork-capable hosts, `--worker-processes N` instead runs complete verification
+in 1 through 64 separate processes, including saved-report replay. This is
+opt-in, requires a single-threaded caller and `--jobs 1`, and applies only to
+game verification (`status.py --verify` or the game push gate). Duplicate
+destinations stay in one sequential group; results and errors retain source
+order. Every original check still runs, and worker failures stop publication.
+The default sequential and existing thread modes are unchanged.
+
 For changes to this toolkit checkout:
 
 ```sh

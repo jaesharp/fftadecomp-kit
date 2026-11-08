@@ -119,7 +119,7 @@ def badge_base(repo):
     return f"https://raw.githubusercontent.com/{m.group(1)}/{m.group(2)}/badges"
 
 
-def check_matches(root, badge="", jobs=1):
+def check_matches(root, badge="", jobs=1, worker_processes=0):
     log("[3/5] every function in src/ really matches, and the block agrees")
     cmd = [sys.executable, os.path.join(KIT, "status.py"),
            "--root", root, "--check", "--verify"]
@@ -127,6 +127,8 @@ def check_matches(root, badge="", jobs=1):
         cmd += ["--badge-base", badge]
     if jobs != 1:
         cmd += ["--jobs", str(jobs)]
+    if worker_processes:
+        cmd += ["--worker-processes", str(worker_processes)]
     code, out = run(cmd, cwd=root)
     if code != 0:
         log("    FAIL  the progress block is stale or a source does not match.")
@@ -441,6 +443,8 @@ def main():
     ap.add_argument("--branch", default=DEFAULT_BRANCH)
     ap.add_argument("--jobs", type=int, choices=range(1, 65), default=1, metavar="N",
                     help="forward N concurrent source checks to status (1..64; default: 1)")
+    ap.add_argument("--worker-processes", type=int, choices=range(1, 65), metavar="N",
+                    help="verify in N forked processes (game mode, --jobs 1 only)")
     ap.add_argument("--check-only", action="store_true",
                     help="run every check but push nothing")
     ap.add_argument("--working-tree", action="store_true",
@@ -453,6 +457,9 @@ def main():
                          "other check still runs. Never "
                          "use this for ordinary work - rebase instead.")
     args = ap.parse_args()
+    if args.worker_processes and (args.kit or args.jobs != 1):
+        ap.error("--worker-processes requires game mode and --jobs 1")
+    process_options = {"worker_processes": args.worker_processes} if args.worker_processes else {}
 
     repo = os.path.abspath(args.repo or (KIT_ROOT if args.kit else DEFAULT_REPO))
     if args.kit and os.path.realpath(repo) != KIT_ROOT:
@@ -485,7 +492,7 @@ def main():
         os.environ["FFTA_ROM"] = os.path.join(tree, "baserom.bin")
     try:
         checks += (check_kit_tools(repo),) if args.kit else (
-            check_matches(tree, badge_base(repo), jobs=args.jobs),
+            check_matches(tree, badge_base(repo), jobs=args.jobs, **process_options),
             check_plausible(tree),
             check_reports(tree),
         )

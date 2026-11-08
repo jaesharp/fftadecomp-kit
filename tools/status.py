@@ -28,15 +28,16 @@ img.shields.io/endpoint?url=... .
 """
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from contextlib import nullcontext
 import json
+import multiprocessing
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
-from threading import Lock
+from threading import Lock, active_count
 from match_evidence import (report_matches, compiler_flags,
                             SWITCH_U16_SCALAR_SCHEMA, SWITCH_U16_SCALAR_SELECTOR)
 import inert_spin_profile as inert_spin
@@ -181,9 +182,41 @@ def late_mapping(root, address, entries):
     return end - address, mode
 
 
-def collect(root, verify, quiet=False, write_reports=False, jobs=1):
+def _initialize_process(check_source):
+    # The explicit fork context inherits this invocation's closed checker.
+    # Only children receive it; concurrent parent invocations share no state.
+    global _process_check_source
+    _process_check_source = check_source
+
+
+def _check_process_group(group):
+    return [(index, _process_check_source(path)) for index, path in group]
+
+
+def _process_results(paths, check_source, workers):
+    # A group owns one report destination, including duplicate source names.
+    groups = {}
+    for index, path in enumerate(paths):
+        groups.setdefault(path.stem.upper(), []).append((index, path))
+    with ProcessPoolExecutor(max_workers=workers,
+                             mp_context=multiprocessing.get_context("fork"),
+                             initializer=_initialize_process,
+                             initargs=(check_source,)) as executor:
+        indexed = [item for group in executor.map(_check_process_group, groups.values())
+                   for item in group]
+    return [result for _, result in sorted(indexed)]
+
+
+def collect(root, verify, quiet=False, write_reports=False, jobs=1, worker_processes=0):
     if not 1 <= jobs <= 64:
         raise ValueError("jobs must be between 1 and 64")
+    if not 0 <= worker_processes <= 64:
+        raise ValueError("worker_processes must be between 0 and 64")
+    if worker_processes:
+        if not verify or jobs != 1:
+            raise ValueError("worker processes require verify and jobs=1")
+        if "fork" not in multiprocessing.get_all_start_methods() or active_count() != 1:
+            raise ValueError("worker processes require fork and a single-threaded caller")
     cfg = os.path.join(root, "config", "functions.json")
     if not os.path.exists(cfg):
         sys.exit(f"no {cfg} - run analyze first")
@@ -401,7 +434,10 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1):
 
     verified_bodies = []
     with ThreadPoolExecutor(max_workers=jobs) if verify and jobs > 1 else nullcontext() as executor:
-        results = executor.map(check_locked_source, paths) if executor else map(check_source, paths)
+        if worker_processes:
+            results = _process_results(paths, check_source, worker_processes)
+        else:
+            results = executor.map(check_locked_source, paths) if executor else map(check_source, paths)
         # map yields source order even when subprocesses finish out of order.
         for source_f, source_b, source_problems, source_bodies in results:
             matched_f += source_f
@@ -490,6 +526,8 @@ def main():
                     help="recompile every src/*.c instead of trusting the reports")
     ap.add_argument("--jobs", type=int, choices=range(1, 65), default=1, metavar="N",
                     help="verify up to N sources concurrently (1..64; default: 1)")
+    ap.add_argument("--worker-processes", type=int, choices=range(1, 65), metavar="N",
+                    help="verify in N forked processes; requires --verify and --jobs 1")
     ap.add_argument("--write", action="store_true",
                     help="update status files; with --verify, regenerate match reports too")
     ap.add_argument("--check", action="store_true")
@@ -506,9 +544,10 @@ def main():
     args = ap.parse_args()
 
     root = repo_root(args.root)
+    process_options = {"worker_processes": args.worker_processes} if args.worker_processes else {}
     tf, mf, tb, mb, problems, late_f, late_b = collect(
         root, args.verify, write_reports=args.verify and args.write and not args.check,
-        jobs=args.jobs)
+        jobs=args.jobs, **process_options)
     badge_base = None if args.static_badges else (
         args.badge_base or os.environ.get("FFTA_BADGE_BASE")
         or badge_base_from_remote(root))
