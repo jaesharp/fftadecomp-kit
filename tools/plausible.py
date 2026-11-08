@@ -404,7 +404,12 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
         if relpath is None or not relpath.endswith(".h"):
             # A file's own declaration exempts it only when it provably cannot
             # see the listed one: the header is outside its include closure.
-            if not (declares_symbol(joined, symbol) and inside is not None and header not in inside):
+            # The provenance rules bind users of the object only: files that
+            # name the symbol or reach the listed header.  Other sources cannot
+            # see the qualifier, and the rules would refuse ordinary C there.
+            uses = (inside is not None and header in inside) or bool(references)
+            if uses and not (declares_symbol(joined, symbol) and inside is not None
+                             and header not in inside):
                 for reference in references:
                     if not re.match(r"\s*\.\s*[A-Za-z_]", joined[reference.end():]):
                         finding(reference.start(), f"allowlisted volatile {symbol} may only be "
@@ -419,7 +424,7 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                 # applies them to the preprocessed text): in a file that uses
                 # the object, no macro may expand to `&` or to any identifier
                 # of the pinned declaration.
-                if (inside is not None and header in inside) or references:
+                if uses:
                     for directive in directives:
                         if directive["kind"] == "define" and user_macro(directive["rest"], names):
                             finding(directive.start(), f"a macro in a {symbol} user may not expand "
