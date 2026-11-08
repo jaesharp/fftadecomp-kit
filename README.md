@@ -2161,6 +2161,17 @@ termination. A data-only owner API cannot select this source profile.
 
 ### Two incoming words with canonical integer calls
 
+`--owner-runtime-profile canonical-integer-two-words-aligned-data-source-v1`
+adds a separate, explicit transport for the same two incoming word contract
+when the original assembler emits exactly one external two-byte Thumb NOP.
+Both original and linked ELF must have the canonical four-byte section alignment,
+an unchanged complete function, and no symbol or relocation owning the tail.
+The tail remains outside the indexed function and byte comparison. Genuine
+zero-addend named data identities and the existing CFG, frame, runtime and
+incoming-read checks remain mandatory. This does not grant data accessibility,
+contents, extent, or physical stack separation. The existing selectors retain
+their previous alignment boundaries.
+
 `--owner-runtime-profile canonical-integer-two-words-data-source-v1` is an explicit
 source selector for a complete original relocatable function with compiler-emitted
 canonical integer calls and zero-addend named data literals. The existing closed
