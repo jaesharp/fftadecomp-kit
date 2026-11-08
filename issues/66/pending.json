@@ -638,66 +638,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "4718ace40898e36397c4e05017f84fa4dc18a3073f0e81aef0fb1d11201fd6a8",
-        "acknowledged_cursor": 6715028042,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "4718ace40898e36397c4e05017f84fa4dc18a3073f0e81aef0fb1d11201fd6a8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08097504\",\"who\":\"sol-08097504-3777\",\"note\":\"Bounded plausible C matching of complete function using existing native compiler only. No tooling changes.\"}",
-          "created_at": "2026-11-08T00:26:05Z",
-          "id": 6715028042,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:26:05Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "2a2dc5798d40bc802426f9b2ed40c3c79f18a6f68715b7e53ec88f9ba5d9cd1a",
-        "result": {
-          "address": "0x08097504",
-          "claim_id": 6715028042,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6715028042,
-          "status": "accepted",
-          "who": "sol-08097504-3777"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5cddb131e0f187bfe769247450c1d710c91e70af3962436995597ae94255726b",
-        "acknowledged_cursor": 6715105978,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5cddb131e0f187bfe769247450c1d710c91e70af3962436995597ae94255726b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08097504\",\"who\":\"sol-08097504-3777\",\"claim_id\":6715028042,\"reason\":\"Two fresh native attempts retain plausible214B with212/214 identical bytes; CMP2/BLT vs CMP1/BLE remains. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; signed lower-bound natural controls\"}",
-          "created_at": "2026-11-08T00:34:06Z",
-          "id": 6715105978,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:34:06Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "fd3d8a32bf828a86e8466516521616fe02f4f0386fb383830867c88d7aca58cc",
-        "result": {
-          "address": "0x08097504",
-          "claim_id": 6715028042,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6715105978,
-          "status": "accepted",
-          "who": "sol-08097504-3777"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c9af28490d5eda456aa59bdcebeb22fb35ce2b86c111a5a9c40942632bbb1cf8",
         "acknowledged_cursor": 6715067206,
         "body_provenance": "acceptance-time",
