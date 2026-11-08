@@ -767,6 +767,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "089f28c301d0746fcf7d1a0122237442aef138c6d595fbf8dd01850a0702c27a",
+        "acknowledged_cursor": 6715084984,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "089f28c301d0746fcf7d1a0122237442aef138c6d595fbf8dd01850a0702c27a",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x080D499C\",\"who\":\"Team2-native148\",\"note\":\"First native admission of unchanged original96B under tested explicit local matrix copy/frame policy; frozen original retained.\"}",
+          "created_at": "2026-11-08T00:31:58Z",
+          "id": 6715084984,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:31:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "9025ddcf133b931c597d06df7caf8d5318a3baef16f49c46a0ade10321cf27fb",
+        "result": {
+          "address": "0x080D499C",
+          "claim_id": 6715084984,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 18360463,
+          "request_id": 6715084984,
+          "status": "accepted",
+          "who": "Team2-native148"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
