@@ -23,7 +23,12 @@ symbolically along every path, and the check requires
    for both compiles, so this says the qualifier changed nothing that the
    program computes.  When a stack address escapes (a call argument or a
    stored value), every local frame byte, with the stores applied in order,
-   joins the behaviour; a call reads only its prototype's argument registers;
+   joins the behaviour (incoming-argument slots included).  Every callee
+   needs a file-scope prototype with a fixed list of one-word arguments;
+   no prototype, `()`, `...`, indirect calls and wider arguments fail
+   closed.  A call reads only the argument registers its prototype names
+   when that prototype comes from include/; a prototype the source supplies
+   could lie, so then all of r0-r3 count as read;
 2. every access to the object to be `symbol + constant` inside it; variable
    offsets, out-of-object offsets, multi-register transfers and the
    object's address reaching a call argument or a stored value fail closed;
@@ -44,7 +49,9 @@ symbolically along every path, and the check requires
 
 plausible.py makes the paired store a volatile lvalue: a pinned byte can be
 reached only through its member, since array members take only in-bounds
-literal subscripts and no member's address may be taken.  This check alone
+literal subscripts and no member's address may be taken.  compare() repeats
+those token rules (plausible.member_provenance) on the preprocessed text, so
+macros cannot spell around them.  This check alone
 cannot tell `(void)sym.x; *(sym.array + k) = v;` from `sym.x = v;`; they
 compile identically.
 
@@ -154,9 +161,18 @@ def strip_pinned_volatile(preprocessed, declaration):
     return preprocessed[:start] + body + preprocessed[end:]
 
 
+SCALAR_TYPES = {"u8", "s8", "u16", "s16", "u32", "s32", "vu8", "vs8", "vu16", "vs16", "vu32",
+                "vs32", "bool8", "bool16", "bool32", "int", "char", "short", "long", "unsigned",
+                "signed", "float"}
+QUALIFIERS = {"const", "volatile", "register", "extern", "static", "inline", "__inline__"}
+
+
 def file_scope(preprocessed):
-    """the preprocessed text with linemarkers dropped and every brace body folded to `;`"""
-    text = re.sub(r"(?m)^[ \t]*#.*$", " ", preprocessed)
+    """file-scope text: brace bodies folded to `;`, each linemarker replaced by
+    a `@<file>@;` marker so a declaration's origin can be recovered"""
+    text = re.sub(r'(?m)^[ \t]*#[ \t]*[0-9]+[ \t]+"([^"\n]*)".*$',
+                  lambda match: "@" + match[1].replace("@", "") + "@;", preprocessed)
+    text = re.sub(r"(?m)^[ \t]*#.*$", " ", text)
     while True:
         folded = re.sub(r"\{[^{}]*\}", ";", text)
         if folded == text:
@@ -164,28 +180,54 @@ def file_scope(preprocessed):
         text = folded
 
 
-def function_signature(scope, name):
-    """(returns a value, parameter count or None) from the file-scope declarations.
+def argument_words(declaration):
+    """argument words of one parameter or return type, or None if not one word"""
+    tokens = [t for t in re.findall(r"[A-Za-z_]\w*|\*|\S", declaration) if t not in QUALIFIERS]
+    if "*" in tokens:
+        return 1 if "(" not in tokens and "[" not in tokens else None
+    names = [t for t in tokens if re.fullmatch(r"[A-Za-z_]\w*", t)]
+    types = [t for t in names if t in SCALAR_TYPES]
+    if not types or types.count("long") > 1 or len(names) - len(types) > 1:
+        return None
+    return 1
 
-    Every file-scope declaration or definition of the name must agree; a
-    name with none is unknown (all four argument registers are compared).
+
+def function_signature(scope, name):
+    """(returns a value, argument words or None, prototype from include/) for a name.
+
+    Every file-scope declaration or definition must agree.  The argument
+    count is None (unknown) without a prototype, for `()` or `...`; a
+    parameter or return value that is not a scalar or pointer of one word
+    fails closed.  The prototype is trusted only when every declaration
+    comes from a header under include/.
     """
-    found = set()
+    found, origins = set(), set()
     for match in re.finditer(r"(?:^|;)([^;]*?)\b" + re.escape(name) + r"\s*\(([^;]*?)\)\s*(?=;)", scope):
         prefix, parameters = match[1], match[2].strip()
         if "(" in parameters or ")" in parameters or "(" in prefix:
             raise SemanticError(f"the declaration of {name} is too complex to read its signature")
-        returns = re.sub(r"\b(?:extern|static|inline|__inline__|const)\b", " ", prefix).split() != ["void"]
+        marker = list(re.finditer(r"@([^@]*)@;", scope[:match.start() + 1]))
+        origins.add(marker[-1][1] if marker else "")
+        prefix = re.sub(r"@[^@]*@", " ", prefix)
+        returns = prefix.split() and [t for t in prefix.split() if t not in QUALIFIERS] != ["void"]
+        if returns and argument_words(prefix) is None:
+            raise SemanticError(f"{name} returns a value that is not one scalar or pointer word")
         if parameters == "void":
             arity = 0
         elif not parameters or "..." in parameters:
             arity = None
         else:
-            arity = parameters.count(",") + 1
-        found.add((returns, arity))
+            words = [argument_words(parameter) for parameter in parameters.split(",")]
+            if None in words:
+                raise SemanticError(f"a parameter of {name} is not one scalar or pointer word")
+            arity = sum(words)
+        found.add((bool(returns), arity))
     if len(found) > 1:
         raise SemanticError(f"the file-scope declarations of {name} disagree")
-    return found.pop() if found else (True, None)
+    if not found:
+        return True, None, False
+    returns, arity = found.pop()
+    return returns, arity, all(origin.startswith("include/") for origin in origins)
 
 
 # ---------------------------------------------------------------- expressions
@@ -431,6 +473,7 @@ class Record:
         self.reads, self.writes = set(reads), set(writes)
         self.address = self.width = self.value_register = None
         self.signed = self.forwarded = self.copy = self.constant = self.self_assignment = False
+        self.guarded = set()
         self.__dict__.update(fields)
 
 
@@ -689,8 +732,6 @@ class Executor:
             if entry[0] != "store" or not is_stack(entry[2]) or entry[5]:
                 continue
             offset, width, value = signed32(linear(entry[2])[0]), entry[1], entry[3]
-            if offset >= 0:
-                continue
             for byte in range(width):
                 if width == 1:
                     part = value
@@ -715,16 +756,25 @@ class Executor:
         return value
 
     def call(self, target, text, record):
-        returns, arity = self.signatures.get(target if isinstance(target, str) else None, (True, None))
         if isinstance(target, str) and target in RUNTIME_ARITY:
-            arity = RUNTIME_ARITY[target]
-        count = 4 if arity is None else arity
+            count, trusted = RUNTIME_ARITY[target], True
+        elif isinstance(target, tuple) and target[0] == "swi":
+            count, trusted = 4, False        # BIOS calls take r0-r3 only
+        elif isinstance(target, str) and self.signatures.get(target, (None, None))[1] is not None:
+            _, count, trusted = self.signatures[target]
+        else:
+            self.fail(text, "the callee has no prototype with a fixed argument list, so its "
+                      "arguments cannot be compared")
         arguments = [self.regs[f"r{n}"] for n in range(min(count, 4))]
         for n in range(4, count):
             arguments.append(self.load(4, False, add(self.regs["sp"], 4 * (n - 4)), text)[0])
-        # only the argument registers the prototype names are read
-        record.reads = {f"r{n}" for n in range(min(count, 4))} | \
-            (record.reads - {"r0", "r1", "r2", "r3"})
+        # A call reads the argument registers its prototype names.  A prototype
+        # the source itself supplies is not trusted to be honest: a dead load
+        # into an unnamed argument register could be a hidden argument, so
+        # then every argument register counts as read.
+        named = {f"r{n}" for n in range(min(count, 4))}
+        record.guarded = set() if trusted else {"r0", "r1", "r2", "r3"} - named
+        record.reads = named | record.guarded | (record.reads - {"r0", "r1", "r2", "r3"})
         if any(carries(argument, ("sym", self.symbol)) for argument in arguments):
             self.fail(text, f"the address of {self.symbol} is passed to a call")
         self.escape(arguments, text)
@@ -738,7 +788,7 @@ class Executor:
         self.records.append(record)
 
     def finish(self, text, record):
-        returns, _ = self.signatures.get(self.name, (True, None))
+        returns = self.signatures.get(self.name, (True,))[0]
         if self.regs["sp"] != SP:
             self.fail(text, "the stack is not balanced at return")
         self.trace.append(("return",) + ((self.regs["r0"],) if returns else ()))
@@ -981,7 +1031,11 @@ def object_offset(address, symbol, size):
 
 
 def dead(records, position, destination):
+    """True if overwritten before any use, False if used, or the call record
+    whose source-supplied prototype leaves the register's use unknown"""
     for record in records[position + 1:]:
+        if destination in record.guarded:
+            return record
         if destination in record.reads:
             return False
         if destination in record.writes:
@@ -1085,7 +1139,14 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                 continue
             destination = next(iter(record.writes))
             if record.width == 1 and not record.signed and pinned_address(record.address):
-                if dead(records, position, destination):
+                verdict = dead(records, position, destination)
+                if isinstance(verdict, Record):
+                    raise SemanticError(
+                        f"{name}: {describe(record)} loads {where(record.address)} into "
+                        f"{destination}, which {describe(verdict)} might take as an argument its "
+                        "prototype does not name; only a prototype from a header under include/ "
+                        "is trusted to list every argument")
+                if verdict:
                     store = read_modify_write_store(records, position, record.address)
                     if store is None:
                         raise SemanticError(
@@ -1164,6 +1225,10 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration)
     the stripped one by anything but the qualifier's documented effect.
     """
     size, pinned = object_layout(declaration)
+    from plausible import member_provenance, strip_comments_and_strings
+    for _, message in member_provenance(strip_comments_and_strings(preprocessed),
+                                        {"symbol": symbol, "declaration": declaration}):
+        raise SemanticError(f"after preprocessing: {message}")
     real, real_outside = parse_assembly(real_assembly)
     stripped, stripped_outside = parse_assembly(stripped_assembly)
     if sorted(real) != sorted(stripped):

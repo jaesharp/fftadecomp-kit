@@ -322,6 +322,31 @@ class VolatileAllowlistTests(unittest.TestCase):
         self.assertEqual(self.rules("void f(void) { if (a && " + SYMBOL + ".unknown_02[1]) "
                                     + SYMBOL + ".unknown_02[0x39 ] = a; }\n", relpath="src/08028C34.c"), [])
 
+    def test_round_three_macro_operator_and_literal_spellings(self):
+        include = '#include "control_flags.h"\n'
+        closure = ({"src/08028C34.c", HEADER}, [])
+        for source in (include + "#define ARR unknown_02\nvoid f(void) { *(" + SYMBOL + ".ARR + 0x3A) = a; }\n",
+                       include + "#define AT &\nvoid f(void) { p = AT " + SYMBOL + ".display; }\n",
+                       include + "#define ADDR(x) &x\nvoid f(void) { p = ADDR(" + SYMBOL + ".display); }\n",
+                       include + "#define MASK(x) ((x) & 1)\nvoid f(void) { a = 1; }\n",
+                       include + "#define BYTE u8\nvoid f(void) { a = 1; }\n"):
+            with self.subTest(source=source):
+                self.assertIn("volatile-allowlist", self.rules(source, relpath="src/08028C34.c",
+                                                               closure=closure))
+        # a file that does not use the object keeps its macros
+        self.assertEqual(self.rules("#define MASK(x) ((x) & 1)\nvoid f(void) { a = 1; }\n",
+                                    relpath="src/08037428.c", closure=({"src/08037428.c"}, [])), [])
+        for statement in ("k(a &&&" + SYMBOL + ".display);", SYMBOL + ".unknown_02[0100] = a;",
+                          SYMBOL + ".unknown_02[0x3Au] = a;", "k((u32)&" + SYMBOL + ".unknown_3E);"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
+                                                               relpath="src/08028C34.c"))
+        for statement in (SYMBOL + ".unknown_02[010] = a;", "k(a & " + SYMBOL + ".unknown_3C);",
+                          "k(a && " + SYMBOL + ".unknown_3C);", "x = b[1] & " + SYMBOL + ".unknown_3D;"):
+            with self.subTest(statement=statement):
+                self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
+                                            relpath="src/08028C34.c"), [])
+
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
                                 ("src/08028C34.c", "#undef u8\n"),

@@ -1619,8 +1619,16 @@ arithmetic, a macro or a copy. Pinned bytes must be reachable only
 through their own members. An array member may only be written
 `symbol.array[literal]` with the literal inside its bounds, so decay, pointer
 arithmetic, `k[symbol.array]`, `(symbol.array)[k]`, `[0x3A]` past the end and
-`[-1]` are all refused. No member's address may be taken (`&symbol.member`,
-`(u8 *)&symbol.display`, `memcpy(&symbol.display, ...)`). The only exemption is a file with its own
+`[-1]` are all refused. Decimal, octal and hex literals are read as C reads
+them. No member's address may be taken with a unary `&` (`&symbol.member`,
+`(u8 *)&symbol.display`, `a &&&symbol.display`,
+`memcpy(&symbol.display, ...)`), while a binary `a & symbol.x` is fine. An
+`&` after a group of only identifiers and `*`, which may be a cast, counts as
+unary, so a redundant `(a) & symbol.x` is refused. These member checks run on
+C tokens. match.py repeats them on the preprocessed text, so a macro cannot
+spell the member or the `&`. As defence in depth, a file that uses the object
+may not define a macro whose replacement contains `&` or any identifier of
+the pinned declaration. The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
 declaration hidden behind `#if` exempts nothing. The single
@@ -1645,8 +1653,17 @@ symbolically along every path, and the check requires:
   When a stack address escapes (as a call argument or a value stored to
   memory), every local frame byte at that moment, with the stores applied in
   program order, is part of the behaviour too, relative to the first
-  escaping pointer and re-snapshotted at each escape. A call reads only the
-  argument registers its file-scope prototype names;
+  escaping pointer and re-snapshotted at each escape. That includes slots
+  in the incoming-argument area. Every callee needs a file-scope prototype
+  with a fixed argument list. A callee with no prototype, `()` or `...`
+  fails closed, and so does an indirect call. Every parameter and return
+  value must be one scalar or pointer word, so `long long`, `double` and
+  struct-by-value fail closed. The arguments, stack words included, are
+  compared by that count. A dead load into an argument register the
+  prototype does not name is accepted only when every declaration of the
+  callee comes from a header under `include/`. A prototype the source
+  supplies itself could lie and let the qualifier's load pass a hidden
+  argument;
 * every access to the object to be `symbol + constant` inside it: an
   address that adds a variable term (`(&sym)[n].x`, a variable subscript),
   lies outside the object or comes from a multi-register transfer fails
@@ -1690,9 +1707,10 @@ out-of-bounds subscript store, which is not adjacent to its store;
 `g(sym.x - sym.x)` and `sym.y = sym.x` long after `sym.x` was stored, which
 add a read; and `sym.x |= 0;`, `sym.x = sym.x;`, `sym.x ^= 0;` and
 `sym.x &= 0xFF;`, which are self-assignments. Code the executor does not
-model fails closed with a reason: ARM code, computed jumps, loops whose exit
-depends on unknown values, more than 256 paths, and prototypes that are
-missing, inconsistent or too complex to read at file scope. Because the
+model fails closed with a reason: ARM code, computed jumps, indirect calls,
+loops whose exit depends on unknown values, more than 256 paths, and
+prototypes that are missing, `()`, variadic, inconsistent, not one word per
+parameter, or too complex to read at file scope. Because the
 check sees every spelling, the earlier syntactic rule against statements
 that only read `symbol.member` is gone.
 
@@ -1712,6 +1730,13 @@ has these gaps:
   optimise differently. Examples are reading a flag twice
   (`if (x) ...; if (x) ...`), spin loops and repeated stores. Such functions
   cannot use the allowlist.
+* The provenance and prototype rules cost some legitimate spellings:
+  - a user of the object cannot define macros containing `&` or names of
+    the pinned declaration (such as `u8`);
+  - a redundant `(a) & symbol.x` reads as a cast and is refused;
+  - callees need a fixed one-word-per-argument prototype;
+  - a dead load into an unnamed argument register before a call is refused
+    unless the callee's prototype comes from `include/`.
 * Variable subscripts into the object (`symbol.unknown_02[i]`) are always
   refused. None of the 173 parked and matched sources that reference the
   block uses one. A rough ROM scan finds a register-offset access through a

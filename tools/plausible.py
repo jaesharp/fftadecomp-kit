@@ -399,30 +399,21 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                         finding(reference.start(), f"allowlisted volatile {symbol} may only be "
                                 "used as `symbol.member`: its address or whole object would "
                                 "carry the qualifier to other memory")
-                # Provenance: a pinned byte must only be reachable through its
-                # own volatile member.  An array member may only be written
-                # `symbol.array[literal]` inside its bounds (no decay, pointer
-                # arithmetic, `k[array]` or `(symbol.array)[k]`), and no member's
-                # address may be taken.
-                arrays = dict(re.findall(r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]",
-                                         entry["declaration"]))
-                for reference in references:
-                    before = reference.start()
-                    while before and (joined[before - 1].isspace() or joined[before - 1] == "("):
-                        before -= 1
-                    if before and joined[before - 1] == "&" and (before < 2 or joined[before - 2] != "&"):
-                        finding(reference.start(), f"the address of a {symbol} member may not be taken: "
-                                "a pointer could reach a volatile member without its qualifier")
-                    access = re.match(r"\s*\.\s*([A-Za-z_]\w*)", joined[reference.end():])
-                    if access is None or access[1] not in arrays:
-                        continue
-                    subscript = re.match(r"\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]",
-                                         joined[reference.end() + access.end():])
-                    if subscript is None or int(subscript[1], 0) >= int(arrays[access[1]], 0):
-                        finding(reference.start(), f"`{symbol}.{access[1]}` may only be used as "
-                                f"`{symbol}.{access[1]}[literal]` with a literal below "
-                                f"{arrays[access[1]]}: anything else could reach a volatile member "
-                                "without its qualifier")
+                for offset, message in member_provenance(joined, entry):
+                    finding(offset, message)
+                # Defence in depth for the provenance rules (match.py also
+                # applies them to the preprocessed text): in a file that uses
+                # the object, no macro may expand to `&` or to any identifier
+                # of the pinned declaration.
+                if (inside is not None and header in inside) or references:
+                    for directive in directives:
+                        replacement = directive["rest"]
+                        if directive["kind"] != "define":
+                            continue
+                        if "&" in replacement or \
+                                set(re.findall(r"[A-Za-z_]\w*", replacement)) & names:
+                            finding(directive.start(), f"a macro in a {symbol} user may not expand "
+                                    "to `&` or to a name of the pinned declaration")
             continue
         if relpath != header:
             for reference in references:
@@ -459,6 +450,76 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
                 allowed.add(offset)
     return allowed, findings
+
+
+C_TOKEN = re.compile(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+[uUlL]*|[0-9]+[uUlL]*|->|\+\+|--|<<=|>>=|<<|>>|"
+                     r"<=|>=|==|!=|&&|\|\||[-+*/%&|^]=|\S")
+UNARY_CONTEXT = {"(", ",", "=", ";", "{", "}", "[", "?", ":", "return", "&&", "||", "!", "~",
+                 "+", "-", "*", "/", "%", "&", "|", "^", "<", ">", "<=", ">=", "==", "!=",
+                 "<<", ">>", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
+                 "case", "sizeof"}
+
+
+def integer_literal(token):
+    """the value of a plain decimal, octal or hex literal, else None"""
+    if re.fullmatch(r"0[xX][0-9A-Fa-f]+", token):
+        return int(token, 16)
+    if re.fullmatch(r"0[0-7]*", token):
+        return int(token, 8)
+    if re.fullmatch(r"[1-9][0-9]*", token):
+        return int(token)
+    return None
+
+
+def cast_before(tokens, close):
+    """does tokens[close], a `)`, end a group that could be a cast?
+
+    A group of only identifiers and `*` may be a type name, so an `&`
+    after it is treated as unary (this also refuses a redundant `(a) & x`).
+    """
+    if tokens[close][0] != ")":
+        return False
+    index = close - 1
+    while index >= 0 and (tokens[index][0] == "*" or re.fullmatch(r"[A-Za-z_]\w*", tokens[index][0])):
+        index -= 1
+    return index >= 0 and tokens[index][0] == "(" and index < close - 1
+
+
+def member_provenance(code, entry):
+    """[(offset, message)] for uses that could reach a volatile byte without its member.
+
+    Works on C tokens, so it applies equally to a source and to its
+    preprocessed text.  An array member of the object may only be written
+    `symbol.array[literal]` with the literal inside the array (no decay,
+    pointer arithmetic, `k[array]` or `(symbol.array)[k]`), and no member's
+    address may be taken with a unary `&`.
+    """
+    symbol = entry["symbol"]
+    arrays = {name: integer_literal(size) for name, size in re.findall(
+        r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]", entry["declaration"])}
+    tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
+    findings = []
+    for index, (token, offset) in enumerate(tokens):
+        if token != symbol:
+            continue
+        before = index - 1
+        while before >= 0 and tokens[before][0] == "(":
+            before -= 1
+        if before >= 0 and tokens[before][0] == "&" and \
+                (before == 0 or tokens[before - 1][0] in UNARY_CONTEXT or cast_before(tokens, before - 1)):
+            findings.append((offset, f"the address of a {symbol} member may not be taken: "
+                             "a pointer could reach a volatile member without its qualifier"))
+        after = [t for t, _ in tokens[index + 1:index + 6]]
+        if after[:1] != ["."] or len(after) < 2 or after[1] not in arrays:
+            continue
+        member = after[1]
+        value = integer_literal(after[3]) if len(after) >= 5 and after[2] == "[" and after[4] == "]" \
+            else None
+        if value is None or value >= arrays[member]:
+            findings.append((offset, f"`{symbol}.{member}` may only be used as `{symbol}.{member}"
+                             f"[literal]` with a literal below {arrays[member]}: anything else could "
+                             "reach a volatile member without its qualifier"))
+    return findings
 
 
 def strip_comments_and_strings_keep_strings(text):

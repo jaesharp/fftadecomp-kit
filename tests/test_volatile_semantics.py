@@ -244,12 +244,56 @@ class SemanticDiffTests(unittest.TestCase):
         real = assembly("push\t{lr}", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr1, [r2]",
                         "strb\tr0, [r2]", "bl\tk", "pop\t{r0}", "bx\tr0")
         stripped = real.replace("ldrb\tr1, [r2]\n\t", "")
-        one = "void func_08028C34(int a);\nextern void k(int);\n"
+        one = '# 1 "include/k.h"\nextern void k(int);\n# 2 "src/08028C34.c"\nvoid func_08028C34(int a);\n'
         self.assertEqual(compare(real, stripped, one)[0][1:], (1, [3], []))
         # with `void k(int, int)` r1 is read, so the load is not dead
-        two = "void func_08028C34(int a);\nextern void k(int, int);\n"
+        two = '# 1 "include/k.h"\nextern void k(int, int);\n# 2 "src/08028C34.c"\nvoid func_08028C34(int a);\n'
         with self.assertRaises(semantics.SemanticError):
             compare(real, stripped, two)
+        # round 3: a prototype the source itself supplies is not trusted; the
+        # dead load could feed a hidden argument, so r1 counts as read
+        local = "void func_08028C34(int a);\nextern void k(int);\n"
+        with self.assertRaises(semantics.SemanticError):
+            compare(real, stripped, local)
+
+    def test_round_three_snapshot_prototype_and_word_gaps(self):
+        # S1: an escape into the incoming-argument area (offset >= 0)
+        def incoming(value):
+            return assembly("push\t{lr}", f"mov\tr1, #{value}", "str\tr1, [sp, #4]", "add\tr0, sp, #4",
+                            "bl\tfunc_0802A2C0", "pop\t{r0}", "bx\tr0")
+        self.assertEqual(compare(incoming(1), incoming(1))[0][1], 1)
+        self.refused(incoming(1), incoming(2), "differ in observable behaviour")
+        # S2: no prototype, `()` and variadic callees fail closed
+        def stacked(value):
+            return assembly("push\t{lr}", "add\tsp, sp, #-4", f"mov\tr1, #{value}", "str\tr1, [sp]",
+                            "bl\tk", "add\tsp, sp, #4", "pop\t{r0}", "bx\tr0")
+        for prototype in ("", "extern void k();\n", "extern void k(int, ...);\n"):
+            with self.subTest(prototype=prototype), self.assertRaises(semantics.SemanticError) as caught:
+                compare(stacked(1), stacked(1), "void func_08028C34(void);\n" + prototype)
+            self.assertIn("no prototype with a fixed argument list", str(caught.exception))
+        five = "void func_08028C34(void);\nextern void k(int, int, int, int, int);\n"
+        with self.assertRaises(semantics.SemanticError):
+            compare(stacked(1), stacked(2), five)
+        # S3: a two-word parameter cannot be counted as one argument register
+        call = assembly("push\t{lr}", "mov\tr0, #0", "mov\tr1, #1", "bl\tk", "pop\t{r0}", "bx\tr0")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            compare(call, call, "void func_08028C34(void);\nextern void k(long long);\n")
+        self.assertIn("not one scalar or pointer word", str(caught.exception))
+
+    def test_member_provenance_is_checked_after_preprocessing(self):
+        # round 3 (a1): a macro spells the array member
+        preprocessed = PREPROCESSED + "void f(int a) { *(" + SYMBOL + ".unknown_02 + 0x3A) = a; }\n"
+        same = assembly("bx\tlr")
+        self.refused_with(same, same, preprocessed, "after preprocessing")
+        taken = PREPROCESSED + "void f(void) { k(1 &&&" + SYMBOL + ".display); }\n"
+        self.refused_with(same, same, taken, "may not be taken")
+        bitwise = PREPROCESSED + "void f(int a) { k(a & " + SYMBOL + ".unknown_3C); }\n"
+        self.assertEqual(compare(same, same, bitwise)[0][1], 1)
+
+    def refused_with(self, real, stripped, preprocessed, reason):
+        with self.assertRaises(semantics.SemanticError) as caught:
+            compare(real, stripped, preprocessed)
+        self.assertIn(reason, str(caught.exception))
 
     def test_low_register_move_sets_the_flags(self):
         moved = assembly("mov\tr1, r0", "beq\t.L9", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr3, [r2]",
@@ -263,9 +307,13 @@ class SemanticDiffTests(unittest.TestCase):
         scope = semantics.file_scope("extern void g(int);\nint f(u8 a, int b)\n{ if (x) { y(1, 2); } }\n"
                                      "void h(void);\n")
         self.assertEqual([semantics.function_signature(scope, name) for name in ("g", "f", "h", "y")],
-                         [(False, 1), (True, 2), (False, 0), (True, None)])
-        with self.assertRaises(semantics.SemanticError):
-            semantics.function_signature(semantics.file_scope("void g(int);\nint g(int, int);\n"), "g")
+                         [(False, 1, False), (True, 2, False), (False, 0, False), (True, None, False)])
+        header = semantics.file_scope('# 1 "include/h.h"\nvoid h(u8 *p, s16 x);\n# 4 "src/a.c"\n')
+        self.assertEqual(semantics.function_signature(header, "h"), (False, 2, True))
+        for broken in ("void g(int);\nint g(int, int);\n", "void g(long long);\n", "void g(double);\n",
+                       "void g(struct S s);\n", "long long g(void);\n"):
+            with self.subTest(declaration=broken), self.assertRaises(semantics.SemanticError):
+                semantics.function_signature(semantics.file_scope(broken), "g")
 
     def test_unmodelled_code_fails_closed(self):
         loop = assembly("ldr\tr1, .L3", "add\tr1, r1, #60", ".L9:", "ldrb\tr2, [r1]", "mov\tr2, #1",
@@ -363,7 +411,7 @@ class CompiledSemanticTests(unittest.TestCase):
                               (f"{s}.unknown_3C;", "dead load"),
                               (f"(void){s}.unknown_3C;", "dead load"),
                               (f"!{s}.unknown_3C;", "dead load"),
-                              (f"{s}.unknown_02[0x3A] = 1;", "without the read-modify-write load")):
+                              (f"{s}.unknown_02[0x3A] = 1;", "may only be used as")):
             with self.subTest(plant=plant):
                 with self.assertRaises(semantics.SemanticError) as caught:
                     self.check(plant + tail)
@@ -372,12 +420,12 @@ class CompiledSemanticTests(unittest.TestCase):
     def test_review_repros_are_refused(self):
         s = SYMBOL
         for name, parameters, body, reason in (
-                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "combines"),
+                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "may not be taken"),
                 ("08000002", "int a, int b",
-                 f"(void){s}.unknown_3C; a = a * b + 7; {s}.unknown_02[0x3A] = a;", "dead load"),
+                 f"(void){s}.unknown_3C; a = a * b + 7; {s}.unknown_02[0x3A] = a;", "may only be used as"),
                 ("08000003", "int a, int b, int c",
                  f"(void){s}.unknown_43; a = (a * b + 7) ^ (c << 3); b = a * c; {s}.unknown_44[-1] = b;",
-                 "dead load"),
+                 "may only be used as"),
                 ("08000004", "int a, int b, int c, int d",
                  f"{s}.unknown_3C = a; {s}.display = b * c + d * a + (b ^ d) * c; "
                  f"{s}.unknown_3D = {s}.unknown_3C;", "the qualifier added a read")):
@@ -387,9 +435,21 @@ class CompiledSemanticTests(unittest.TestCase):
                 self.assertIn(reason, str(caught.exception))
         (record,) = self.check(f"a = a * b + 7; {s}.unknown_3C = a;", "int a, int b")
         self.assertIn("read-modify-write loads at [7]", record)
-        # round 2: a call reads only the argument registers its prototype names
-        (record,) = self.check(f"{s}.unknown_3C = a; k(b);", "int a, int b", "extern void k(int);\n")
+        # round 3 (a1, a2, a2b): macros that spell the member or the `&`
+        for prelude in ("#define ARR unknown_02\n", "#define AT &\n", "#define ADDR(x) &x\n"):
+            body = {"#define ARR unknown_02\n": f"*({s}.ARR + 0x3A) = a;",
+                    "#define AT &\n": f"((u8 *)AT {s}.display)[0x3C] = a;",
+                    "#define ADDR(x) &x\n": f"*(ADDR({s}.unknown_3E) - 2) = a;"}[prelude]
+            with self.subTest(prelude=prelude), self.assertRaises(semantics.SemanticError) as caught:
+                self.check(f"a = a * b + 7; (void){s}.unknown_3C; " + body, "int a, int b", prelude)
+            self.assertIn("after preprocessing", str(caught.exception))
+        # round 2: a call reads only the argument registers its prototype
+        # names, when that prototype comes from a shared header
+        (self.root / "include" / "k.h").write_text("extern void k(int);\n")
+        (record,) = self.check(f"{s}.unknown_3C = a; k(b);", "int a, int b", '#include "k.h"\n')
         self.assertTrue(record.startswith("* allowlisted volatile semantics: "), record)
+        with self.assertRaises(semantics.SemanticError):
+            self.check(f"{s}.unknown_3C = a; k(b);", "int a, int b", "extern void k(int);\n")
 
 
 if __name__ == "__main__":
