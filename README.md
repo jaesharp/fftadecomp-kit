@@ -900,6 +900,18 @@ field. The existing payload profile still accepts only +4; neither profile
 permits a second pointer word or infers callback effects, initialization or
 allocation separation from the field offset.
 
+`conditional-scheduler-halfword-output-payload-v1` composes the complete indexed
+`0801E6F0` two-halfword output leaf with one later scheduler call. The bounded
+private frame contains a leading payload, a 28-byte descriptor and a trailing
+four-byte output pair. The descriptor+4 pointer addresses only the leading
+payload; the output pair is excluded from that extent. The proof authenticates
+the leaf's complete body, named loads and ordered formal stores, rejects writes
+outside those private halfwords, and retains actual returned aliases such as R1.
+Every observed alias state at the scheduler is recorded. Named source halfwords
+remain conditionally readable with unknown values. Payload initialization,
+physical access, allocation separation, callback read bounds and synchronous
+nonretention remain explicit premises. Existing selectors retain their guards.
+
 
 ### Named data literals
 

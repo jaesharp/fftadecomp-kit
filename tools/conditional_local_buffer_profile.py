@@ -19,7 +19,8 @@ SCHEDULER_BRANCH = 'conditional-scheduler-branch-descriptor-calls-v1'
 SCHEDULER_GUARDED = 'conditional-scheduler-guarded-descriptor-calls-v1'
 SCHEDULER_PAYLOAD = 'conditional-scheduler-descriptor-payload-calls-v1'
 SCHEDULER_PAYLOAD8 = 'conditional-scheduler-descriptor-payload8-calls-v1'
-PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8}
+SCHEDULER_HALFWORD_PAYLOAD = 'conditional-scheduler-halfword-output-payload-v1'
+PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8, SCHEDULER_HALFWORD_PAYLOAD: 4}
 STATE = 'conditional-local-state-iterator-v1'
 OUTPUT = 'conditional-local-output-word-call-v1'
 SCHEMAS = {
@@ -28,6 +29,7 @@ SCHEMAS = {
     SCHEDULER_GUARDED: 'elf-symbol-thumb-conditional-scheduler-guarded-descriptor-calls-v1',
     SCHEDULER_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload-calls-v1',
     SCHEDULER_PAYLOAD8: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload8-calls-v1',
+    SCHEDULER_HALFWORD_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-halfword-output-payload-v1',
     STATE: 'elf-symbol-thumb-conditional-local-state-iterator-v1',
     OUTPUT: 'elf-symbol-thumb-conditional-local-output-word-call-v1',
 }
@@ -72,7 +74,12 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                 'local-buffer contracts exclude local BL and switches')
         self.root, self.calls = (address, bytes(data)), dict(calls)
         self.environment = environment_fingerprint()
-        if self.policy == SCHEDULER_BRANCH:
+        if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
+            import scheduler_halfword_payload_profile as halfword
+            self.halfword_payload = halfword.bind(self, edges, calls)
+            dependencies = (0x08005B6C, 0x08005954)
+            runtime_names = ('_call_via_r2', '_call_via_r3')
+        elif self.policy == SCHEDULER_BRANCH:
             import scheduler_branch_profile as branch
             self.branch_calls = branch.bind(self, edges, calls)
             dependencies = (0x08005B6C, 0x08005954)
@@ -130,6 +137,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
     def check_call(self, address, aliases, stack, slots=None, *, constants=None, site=None, words=None):
         require(self.calls.get(site) == address and not words,
                 'local-buffer call differs from its authenticated interface')
+        if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
+            import scheduler_halfword_payload_profile as halfword
+            return halfword.check_call(self, address, aliases, stack, slots, site=site)
         if self.policy == SCHEDULER_BRANCH and address != 0x08005B6C:
             require(address in self.branch_calls['ordinary_targets'] and not aliases and not slots,
                     'ordinary branch calls exclude every live local alias and pointer word')
@@ -201,6 +211,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         return {}
 
     def contract_manifest(self):
+        if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
+            import scheduler_halfword_payload_profile as halfword
+            return halfword.manifest(self)
         require(set(self.observations) == set(self.calls), 'every conditional local-buffer call must be observed')
         return dict(schema=SCHEMAS[self.policy], runtime_dependencies=self.runtime_dependencies,
             environment=self.environment,
