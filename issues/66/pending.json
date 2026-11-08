@@ -666,7 +666,35 @@
           "who": "sol-0805F708-3777"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "8f2a009888e13bf04607eb8c5beee129bf81a3098eba67d17f14f3a8b4bd7f3e",
+        "acknowledged_cursor": 6715133481,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "8f2a009888e13bf04607eb8c5beee129bf81a3098eba67d17f14f3a8b4bd7f3e",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0805F708\",\"who\":\"sol-0805F708-3777\",\"claim_id\":6715067206,\"reason\":\"Four native forms remain106B with two independent setter argument moves reversed. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural argument/local forms\"}",
+          "created_at": "2026-11-08T00:36:58Z",
+          "id": 6715133481,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:36:58Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "dafa080747a76e4e0d3b3702aefa9ef608a740267398d93c30f9a4a6f92fd32c",
+        "result": {
+          "address": "0x0805F708",
+          "claim_id": 6715067206,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715133481,
+          "status": "accepted",
+          "who": "sol-0805F708-3777"
+        }
+      }
     },
     {
       "claim": {
@@ -698,7 +726,35 @@
           "who": "sol-08028434-3777"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "55a4ef88087f133f4c4c8cbd653be8b2107fb424608b34c4f432162444256d63",
+        "acknowledged_cursor": 6715133481,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "55a4ef88087f133f4c4c8cbd653be8b2107fb424608b34c4f432162444256d63",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08028434\",\"who\":\"sol-08028434-3777\",\"claim_id\":6715074143,\"reason\":\"Four plausible native forms still reverse two independent setter argument moves;104/106 aligned bytes. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
+          "created_at": "2026-11-08T00:36:33Z",
+          "id": 6715129767,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:36:33Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "dafa080747a76e4e0d3b3702aefa9ef608a740267398d93c30f9a4a6f92fd32c",
+        "result": {
+          "address": "0x08028434",
+          "claim_id": 6715074143,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715129767,
+          "status": "accepted",
+          "who": "sol-08028434-3777"
+        }
+      }
     }
   ],
   "issue": 66,
