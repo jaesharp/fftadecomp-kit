@@ -877,11 +877,14 @@ caller's outgoing word at SP. That word must be private and hold no tracked
 local pointer, and the descriptor must lie wholly above it. The manager in R0
 must come from one straight-line `ldr r0,[pc,#k]; ldr r0,[r0]` pair, and the
 literal must carry exactly one typed named-data relocation with addend 0.
-Every other outgoing alias or pointer word is refused. The report records the
-entry, its pinned bodies, the manager literal and the outgoing word. Its
-premises are those of the descriptor profile plus a valid manager word separate
-from the caller frame, and, for direct calls, the scheduler reading the parent
-only through that word. Existing scheduler selectors retain their
+The descriptor must be word-aligned for either entry, because the scheduler
+copies it with LDM. Every other outgoing alias or pointer word is refused. The
+report records the entry, its pinned bodies, the manager literal and the
+outgoing word. Its premises are those of the descriptor profile plus a valid
+manager word separate from the caller frame, a parent that is NULL or a valid
+scheduler node addressing no caller stack word (the scheduler stores through
+it), and, for direct calls, the scheduler reading the parent only through the
+outgoing word. Existing scheduler selectors retain their
 `func_08005B6C`-only guards.
 
 Issue #81's single local result word passed to an indexed callee has its own
