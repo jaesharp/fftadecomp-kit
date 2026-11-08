@@ -257,6 +257,25 @@ def compile_object(runner, workspace, args, root, address, source, thumb=True, r
     return object_data, text_data, image
 
 
+def callee_definition(root, name, address):
+    """(returns, argument words) of func_<addr>'s own matched definition in src/, or None"""
+    found = re.fullmatch(r"func_([0-9A-F]{8})", name)
+    if found is None or int(found[1], 16) == address:
+        return None
+    sources = sorted(Path(root, "src").rglob(f"{found[1]}.c"))
+    if len(sources) != 1:
+        return None
+    try:
+        text = plausibility.strip_comments_and_strings(sources[0].read_text(encoding="utf-8"))
+        definition = re.search(r"\b" + name + r"\s*\([^;{}]*\)\s*\{", text)
+        if definition is None:
+            return None
+        scope = volatile_semantics.file_scope(text[:definition.end() - 1] + ";")
+        return volatile_semantics.function_signature(scope, name)
+    except (OSError, UnicodeDecodeError, ValueError):
+        return None
+
+
 def allowlisted_volatile_semantics(root, address, args=None, runner=None):
     """report records of the kit#90 semantic check, one per allowlisted object used.
 
@@ -289,7 +308,8 @@ def allowlisted_volatile_semantics(root, address, args=None, runner=None):
             compile_object(runner, workspace, args, str(root), address, source,
                            rewrite=lambda text: volatile_semantics.strip_pinned_volatile(text, declaration))
             stripped = runner.read_binary(f"{workspace}/f.s").decode("utf-8")
-            results = volatile_semantics.compare(real, stripped, preprocessed, entry["symbol"], declaration)
+            results = volatile_semantics.compare(real, stripped, preprocessed, entry["symbol"], declaration,
+                                                 lambda name: callee_definition(root, name, address))
             records.append(volatile_semantics.record(entry["symbol"], results))
     return records
 

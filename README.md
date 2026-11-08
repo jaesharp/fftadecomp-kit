@@ -1620,15 +1620,21 @@ through their own members. An array member may only be written
 `symbol.array[literal]` with the literal inside its bounds, so decay, pointer
 arithmetic, `k[symbol.array]`, `(symbol.array)[k]`, `[0x3A]` past the end and
 `[-1]` are all refused. Decimal, octal and hex literals are read as C reads
-them. No member's address may be taken with a unary `&` (`&symbol.member`,
-`(u8 *)&symbol.display`, `a &&&symbol.display`,
-`memcpy(&symbol.display, ...)`), while a binary `a & symbol.x` is fine. An
-`&` after a group of only identifiers and `*`, which may be a cast, counts as
-unary, so a redundant `(a) & symbol.x` is refused. These member checks run on
-C tokens. match.py repeats them on the preprocessed text, so a macro cannot
-spell the member or the `&`. As defence in depth, a file that uses the object
-may not define a macro whose replacement contains `&` or any identifier of
-the pinned declaration. The only exemption is a file with its own
+them. No `&` may precede the symbol, through any number of `(`, whether it
+is unary or binary. That rules out every way of taking a member's address
+(`&symbol.member`, `(u8 *)&symbol.display`, `__extension__ &symbol.x`,
+`memcpy(&symbol.display, ...)`), and a bitwise AND must put the member first
+(`symbol.x & a`, not `a & symbol.x`). A file that uses the object may not
+contain a cast or type name with a struct or union body, or an abstract
+`(*)` declarator, since either can reinterpret the object. These member
+checks run on C tokens. match.py repeats them on the preprocessed text, so a
+macro cannot spell the member or the `&`. As defence in depth, neither a
+file that uses the object nor any header in its include closure (other than
+the listed one) may define a macro whose replacement contains `&` or any
+identifier of the pinned declaration. While an entry is active, no
+object-like macro may contain `#`, so a macro cannot forge a linemarker or
+directive (`#define H #` then `H 1 "include/x.h"`). In a function-like macro
+`#` can only stringize a parameter. The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
 declaration hidden behind `#if` exempts nothing. The single
@@ -1660,10 +1666,13 @@ symbolically along every path, and the check requires:
   value must be one scalar or pointer word, so `long long`, `double` and
   struct-by-value fail closed. The arguments, stack words included, are
   compared by that count. A dead load into an argument register the
-  prototype does not name is accepted only when every declaration of the
-  callee comes from a header under `include/`. A prototype the source
-  supplies itself could lie and let the qualifier's load pass a hidden
-  argument;
+  prototype does not name is accepted only when the prototype agrees with
+  the callee's own matched definition (`src/<addr>.c` for `func_<addr>`):
+  same return kind, same argument words. That definition was compiled
+  byte-identical to the ROM, so it names every register the callee reads.
+  Any other prototype, whether written in the source or added to a header,
+  could lie and let the qualifier's load pass a hidden argument, so then
+  r0-r3 all count as read. Header origin is not trusted;
 * every access to the object to be `symbol + constant` inside it: an
   address that adds a variable term (`(&sym)[n].x`, a variable subscript),
   lies outside the object or comes from a multi-register transfer fails
@@ -1733,10 +1742,14 @@ has these gaps:
 * The provenance and prototype rules cost some legitimate spellings:
   - a user of the object cannot define macros containing `&` or names of
     the pinned declaration (such as `u8`);
-  - a redundant `(a) & symbol.x` reads as a cast and is refused;
+  - `a & symbol.x` must be spelled `symbol.x & a`;
+  - users cannot cast through struct or union bodies or `(*)` declarators,
+    which also refuses function-pointer prototypes such as
+    `void (*)(void)` in such a file;
   - callees need a fixed one-word-per-argument prototype;
   - a dead load into an unnamed argument register before a call is refused
-    unless the callee's prototype comes from `include/`.
+    unless the callee has a matched definition in `src/` that agrees with
+    the prototype (an unmatched callee always counts as reading r0-r3).
 * Variable subscripts into the object (`symbol.unknown_02[i]`) are always
   refused. None of the 173 parked and matched sources that reference the
   block uses one. A rough ROM scan finds a register-offset access through a

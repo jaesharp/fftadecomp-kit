@@ -4,6 +4,7 @@ import sys
 import tempfile
 from pathlib import Path
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
@@ -341,11 +342,47 @@ class VolatileAllowlistTests(unittest.TestCase):
             with self.subTest(statement=statement):
                 self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
                                                                relpath="src/08028C34.c"))
-        for statement in (SYMBOL + ".unknown_02[010] = a;", "k(a & " + SYMBOL + ".unknown_3C);",
-                          "k(a && " + SYMBOL + ".unknown_3C);", "x = b[1] & " + SYMBOL + ".unknown_3D;"):
+        for statement in (SYMBOL + ".unknown_02[010] = a;", "k(" + SYMBOL + ".unknown_3C & a);",
+                          "x = " + SYMBOL + ".unknown_3D & b[1];"):
             with self.subTest(statement=statement):
                 self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
                                             relpath="src/08028C34.c"), [])
+
+    def test_round_four_ampersands_casts_forged_lines_and_header_macros(self):
+        # any `&` before the symbol, binary included (write `symbol.x & a`)
+        for statement in ("k(a & " + SYMBOL + ".unknown_3C);", "k(a &&&" + SYMBOL + ".unknown_3C);",
+                          "p = __extension__ &" + SYMBOL + ".unknown_3E;",
+                          "(*(u8 (*)[0x4E])&" + SYMBOL + ".display)[0x3C] = a;",
+                          "((struct { u8 unknown_00[0x3C]; u8 x; } *)&" + SYMBOL + ".display)->x = a;",
+                          "q = (struct { u8 b[2]; } *)p; x = " + SYMBOL + ".unknown_3C;",
+                          "f = (void (*)(void))p; x = " + SYMBOL + ".unknown_3C;"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
+                                                               relpath="src/08028C34.c"))
+        # a forged linemarker through a macro (c5)
+        for source in ("#define H #\nH 1 \"include/fake.h\"\n", "#define H #define\n",
+                       "#define H x # y\n"):
+            with self.subTest(source=source):
+                self.assertIn("volatile-allowlist", self.rules(source, relpath="src/08000001.c", mapping=MAPPING))
+        for source in ("#define STR(x) \"(\" #x \")\"\n", "#define S(x) #x\n"):
+            with self.subTest(source=source):
+                self.assertEqual(self.rules(source, relpath="src/a.c"), [])
+        self.assertEqual(self.rules("void f(void) { k(a && " + SYMBOL + ".unknown_3C); }\n",
+                                    relpath="src/08028C34.c"), [])
+        # a header in a user's include closure may not define such macros (c4)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            (root / "src").mkdir()
+            (root / "include").mkdir()
+            (root / "config" / "data_symbols.json").write_text(json.dumps(MAPPING))
+            (root / HEADER).write_text(DECLARATION)
+            (root / "src" / "m.h").write_text("#define ARR unknown_02\n")
+            source = root / "src" / "08028C34.c"
+            source.write_text('#include "control_flags.h"\n#include "m.h"\n' + ACCESS)
+            with mock.patch.object(plausible, "volatile_allow_entries", return_value=[ENTRY]):
+                findings = plausible.check_file(source)
+            self.assertTrue(any("m.h" in message for _, _, _, message in findings), findings)
 
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),

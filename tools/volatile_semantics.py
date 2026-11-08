@@ -27,8 +27,8 @@ symbolically along every path, and the check requires
    needs a file-scope prototype with a fixed list of one-word arguments;
    no prototype, `()`, `...`, indirect calls and wider arguments fail
    closed.  A call reads only the argument registers its prototype names
-   when that prototype comes from include/; a prototype the source supplies
-   could lie, so then all of r0-r3 count as read;
+   when that prototype agrees with the callee's own matched definition in
+   src/; any other prototype could lie, so then all of r0-r3 count as read;
 2. every access to the object to be `symbol + constant` inside it; variable
    offsets, out-of-object offsets, multi-register transfers and the
    object's address reaching a call argument or a stored value fail closed;
@@ -49,7 +49,7 @@ symbolically along every path, and the check requires
 
 plausible.py makes the paired store a volatile lvalue: a pinned byte can be
 reached only through its member, since array members take only in-bounds
-literal subscripts and no member's address may be taken.  compare() repeats
+literal subscripts and no `&` may precede the symbol.  compare() repeats
 those token rules (plausible.member_provenance) on the preprocessed text, so
 macros cannot spell around them.  This check alone
 cannot tell `(void)sym.x; *(sym.array + k) = v;` from `sym.x = v;`; they
@@ -168,11 +168,8 @@ QUALIFIERS = {"const", "volatile", "register", "extern", "static", "inline", "__
 
 
 def file_scope(preprocessed):
-    """file-scope text: brace bodies folded to `;`, each linemarker replaced by
-    a `@<file>@;` marker so a declaration's origin can be recovered"""
-    text = re.sub(r'(?m)^[ \t]*#[ \t]*[0-9]+[ \t]+"([^"\n]*)".*$',
-                  lambda match: "@" + match[1].replace("@", "") + "@;", preprocessed)
-    text = re.sub(r"(?m)^[ \t]*#.*$", " ", text)
+    """file-scope text: directives and linemarkers dropped, brace bodies folded to `;`"""
+    text = re.sub(r"(?m)^[ \t]*#.*$", ";", preprocessed)
     while True:
         folded = re.sub(r"\{[^{}]*\}", ";", text)
         if folded == text:
@@ -193,22 +190,18 @@ def argument_words(declaration):
 
 
 def function_signature(scope, name):
-    """(returns a value, argument words or None, prototype from include/) for a name.
+    """(returns a value, argument words or None) for a name.
 
     Every file-scope declaration or definition must agree.  The argument
     count is None (unknown) without a prototype, for `()` or `...`; a
     parameter or return value that is not a scalar or pointer of one word
-    fails closed.  The prototype is trusted only when every declaration
-    comes from a header under include/.
+    fails closed.
     """
-    found, origins = set(), set()
+    found = set()
     for match in re.finditer(r"(?:^|;)([^;]*?)\b" + re.escape(name) + r"\s*\(([^;]*?)\)\s*(?=;)", scope):
         prefix, parameters = match[1], match[2].strip()
         if "(" in parameters or ")" in parameters or "(" in prefix:
             raise SemanticError(f"the declaration of {name} is too complex to read its signature")
-        marker = list(re.finditer(r"@([^@]*)@;", scope[:match.start() + 1]))
-        origins.add(marker[-1][1] if marker else "")
-        prefix = re.sub(r"@[^@]*@", " ", prefix)
         returns = prefix.split() and [t for t in prefix.split() if t not in QUALIFIERS] != ["void"]
         if returns and argument_words(prefix) is None:
             raise SemanticError(f"{name} returns a value that is not one scalar or pointer word")
@@ -224,10 +217,7 @@ def function_signature(scope, name):
         found.add((bool(returns), arity))
     if len(found) > 1:
         raise SemanticError(f"the file-scope declarations of {name} disagree")
-    if not found:
-        return True, None, False
-    returns, arity = found.pop()
-    return returns, arity, all(origin.startswith("include/") for origin in origins)
+    return found.pop() if found else (True, None)
 
 
 # ---------------------------------------------------------------- expressions
@@ -567,10 +557,11 @@ def evaluate(code, flags):
 class Executor:
     """symbolic execution of one agbcc Thumb function along one path"""
 
-    def __init__(self, name, function, signatures, label, layout):
+    def __init__(self, name, function, signatures, label, layout, definitions=None):
         self.name, self.label = name, label
         self.instructions, self.labels, self.pools = function
         self.signatures = signatures
+        self.definitions = definitions or {}
         self.symbol, self.size = layout
 
     def check_address(self, address, width, text, multiple=False):
@@ -761,17 +752,19 @@ class Executor:
         elif isinstance(target, tuple) and target[0] == "swi":
             count, trusted = 4, False        # BIOS calls take r0-r3 only
         elif isinstance(target, str) and self.signatures.get(target, (None, None))[1] is not None:
-            _, count, trusted = self.signatures[target]
+            count = self.signatures[target][1]
+            trusted = self.definitions.get(target) == self.signatures[target]
         else:
             self.fail(text, "the callee has no prototype with a fixed argument list, so its "
                       "arguments cannot be compared")
         arguments = [self.regs[f"r{n}"] for n in range(min(count, 4))]
         for n in range(4, count):
             arguments.append(self.load(4, False, add(self.regs["sp"], 4 * (n - 4)), text)[0])
-        # A call reads the argument registers its prototype names.  A prototype
-        # the source itself supplies is not trusted to be honest: a dead load
-        # into an unnamed argument register could be a hidden argument, so
-        # then every argument register counts as read.
+        # A call reads the argument registers its prototype names only when
+        # that prototype agrees with the callee's own matched definition in
+        # src/: any other prototype could lie, and a dead load into an
+        # unnamed argument register could then be a hidden argument, so every
+        # argument register counts as read.
         named = {f"r{n}" for n in range(min(count, 4))}
         record.guarded = set() if trusted else {"r0", "r1", "r2", "r3"} - named
         record.reads = named | record.guarded | (record.reads - {"r0", "r1", "r2", "r3"})
@@ -996,12 +989,12 @@ class Executor:
 
 # ---------------------------------------------------------------- comparison
 
-def explore(name, function, signatures, label, layout):
+def explore(name, function, signatures, label, layout, definitions=None):
     paths, pending = [], [[]]
     while pending:
         decisions = pending.pop()
         try:
-            path = Executor(name, function, signatures, label, layout).run(decisions)
+            path = Executor(name, function, signatures, label, layout, definitions).run(decisions)
         except NeedDecision:
             pending += [decisions + [False], decisions + [True]]
             continue
@@ -1011,9 +1004,9 @@ def explore(name, function, signatures, label, layout):
     return paths
 
 
-def replay(name, function, signatures, label, decisions, layout):
+def replay(name, function, signatures, label, decisions, layout, definitions=None):
     try:
-        return Executor(name, function, signatures, label, layout).run(decisions)
+        return Executor(name, function, signatures, label, layout, definitions).run(decisions)
     except NeedDecision:
         raise SemanticError(f"{name}: the stripped compile branches where the real one does not")
 
@@ -1114,7 +1107,8 @@ def chained_reread(records, position, pinned_address):
     return store is not None
 
 
-def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned):
+def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned,
+                     definitions=None):
     def pinned_address(address):
         offset = object_offset(address, symbol, size)
         return offset in pinned
@@ -1123,7 +1117,7 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
         offset = object_offset(address, symbol, size)
         return f"{symbol}+{offset:#x}" if offset is not None else show(address)
 
-    paths = explore(name, real_function, signatures, "real", (symbol, size))
+    paths = explore(name, real_function, signatures, "real", (symbol, size), definitions)
     read_modify_write, chained = set(), set()
     for number, path in enumerate(paths, 1):
         records = path.records
@@ -1144,8 +1138,8 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                     raise SemanticError(
                         f"{name}: {describe(record)} loads {where(record.address)} into "
                         f"{destination}, which {describe(verdict)} might take as an argument its "
-                        "prototype does not name; only a prototype from a header under include/ "
-                        "is trusted to list every argument")
+                        "prototype does not name; only a prototype that agrees with the callee's "
+                        "matched definition in src/ is trusted to list every argument")
                 if verdict:
                     store = read_modify_write_store(records, position, record.address)
                     if store is None:
@@ -1172,7 +1166,8 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                 raise SemanticError(f"{name}: {describe(record)} stores to {where(record.address)} "
                                     "without the read-modify-write load of a volatile byte store")
         # 1. the stripped compile behaves the same on this path
-        other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size))
+        other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size),
+                       definitions)
         if other.conditions != path.conditions:
             raise SemanticError(f"{name}: the real and stripped compiles branch on different "
                                 f"conditions (path {number})")
@@ -1218,8 +1213,12 @@ def normalised(lines):
             for line in lines]
 
 
-def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration):
+def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration, definition=None):
     """[(function, paths, read-modify-write instructions, chained re-reads)].
+
+    definition(name) gives a callee's (returns, words) from its own matched
+    source, or None; only a prototype that agrees with it is trusted to name
+    every argument register the callee reads.
 
     Raises SemanticError with the reason when the real compile differs from
     the stripped one by anything but the qualifier's documented effect.
@@ -1242,7 +1241,14 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration)
                 names.add(operands[0])
     scope = file_scope(preprocessed)
     signatures = {name: function_signature(scope, name) for name in names}
-    return [(name,) + compare_function(name, real[name], stripped[name], signatures, symbol, size, pinned)
+    definitions = {}
+    if definition is not None:
+        for callee in names - set(real):
+            found = definition(callee)
+            if found is not None:
+                definitions[callee] = found
+    return [(name,) + compare_function(name, real[name], stripped[name], signatures, symbol, size, pinned,
+                                       definitions)
             for name in sorted(real)]
 
 

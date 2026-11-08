@@ -303,7 +303,7 @@ def active_volatile_entries(data_symbols, entries):
 
 
 def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closure=None,
-                         untranslated=None):
+                         untranslated=None, tree=None):
     """(exempt volatile offsets, findings) for the volatile allow list.
 
     Only the listed header may hold the listed object's declaration, and its
@@ -386,6 +386,9 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             if directive["kind"] == "define" and re.search(r"\b" + re.escape(symbol) + r"\b",
                                                            directive["rest"]):
                 finding(directive.start(), f"a macro may not expand to allowlisted volatile {symbol}")
+            if directive["kind"] == "define" and forges_directive(directive["rest"]):
+                finding(directive.start(), f"a macro may not expand to `#` while {symbol} is "
+                        "allowlisted: it could forge a linemarker or directive")
         for escape in outside:
             finding(0, f"#include of `{escape}` leaves include/ and src/*.h, which are the "
                     f"only linted inputs, while {symbol} is allowlisted")
@@ -407,13 +410,24 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                 # of the pinned declaration.
                 if (inside is not None and header in inside) or references:
                     for directive in directives:
-                        replacement = directive["rest"]
-                        if directive["kind"] != "define":
-                            continue
-                        if "&" in replacement or \
-                                set(re.findall(r"[A-Za-z_]\w*", replacement)) & names:
+                        if directive["kind"] == "define" and user_macro(directive["rest"], names):
                             finding(directive.start(), f"a macro in a {symbol} user may not expand "
                                     "to `&` or to a name of the pinned declaration")
+                    # ... nor may any header it includes (other than the listed one)
+                    for included in sorted(inside or ()):
+                        if included in (relpath, header) or tree is None:
+                            continue
+                        try:
+                            other = strip_comments_and_strings(join_splices(
+                                (Path(tree) / included).read_text(encoding="utf-8", errors="replace")))
+                        except OSError:
+                            finding(0, f"cannot read {included}, which a {symbol} user includes")
+                            continue
+                        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*([^\n]*)",
+                                                     other):
+                            if user_macro(directive[1], names):
+                                finding(0, f"{included}, included by a {symbol} user, defines a macro "
+                                        "that expands to `&` or to a name of the pinned declaration")
             continue
         if relpath != header:
             for reference in references:
@@ -454,12 +468,6 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
 
 C_TOKEN = re.compile(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+[uUlL]*|[0-9]+[uUlL]*|->|\+\+|--|<<=|>>=|<<|>>|"
                      r"<=|>=|==|!=|&&|\|\||[-+*/%&|^]=|\S")
-UNARY_CONTEXT = {"(", ",", "=", ";", "{", "}", "[", "?", ":", "return", "&&", "||", "!", "~",
-                 "+", "-", "*", "/", "%", "&", "|", "^", "<", ">", "<=", ">=", "==", "!=",
-                 "<<", ">>", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
-                 "case", "sizeof"}
-
-
 def integer_literal(token):
     """the value of a plain decimal, octal or hex literal, else None"""
     if re.fullmatch(r"0[xX][0-9A-Fa-f]+", token):
@@ -471,18 +479,28 @@ def integer_literal(token):
     return None
 
 
-def cast_before(tokens, close):
-    """does tokens[close], a `)`, end a group that could be a cast?
+def user_macro(rest, names):
+    """does a #define's parameters-and-replacement text expand to `&` or a pinned name?"""
+    return "&" in rest or bool(set(re.findall(r"[A-Za-z_]\w*", macro_replacement(rest))) & names)
 
-    A group of only identifiers and `*` may be a type name, so an `&`
-    after it is treated as unary (this also refuses a redundant `(a) & x`).
+
+def macro_replacement(rest):
+    """the replacement list of a #define, given the text after its name"""
+    if rest.startswith("("):
+        close = rest.find(")")
+        return rest[close + 1:] if close >= 0 else ""
+    return rest
+
+
+def forges_directive(rest):
+    """`#` in an object-like replacement.
+
+    Such a macro can put a bare `#` at the start of a line and forge a
+    linemarker or directive (`#define H #` then `H 1 "include/x.h"`).  In a
+    function-like macro `#` must stringize a parameter, so it always yields
+    a string literal, never a bare `#`.
     """
-    if tokens[close][0] != ")":
-        return False
-    index = close - 1
-    while index >= 0 and (tokens[index][0] == "*" or re.fullmatch(r"[A-Za-z_]\w*", tokens[index][0])):
-        index -= 1
-    return index >= 0 and tokens[index][0] == "(" and index < close - 1
+    return not rest.startswith("(") and "#" in rest
 
 
 def member_provenance(code, entry):
@@ -491,24 +509,44 @@ def member_provenance(code, entry):
     Works on C tokens, so it applies equally to a source and to its
     preprocessed text.  An array member of the object may only be written
     `symbol.array[literal]` with the literal inside the array (no decay,
-    pointer arithmetic, `k[array]` or `(symbol.array)[k]`), and no member's
-    address may be taken with a unary `&`.
+    pointer arithmetic, `k[array]` or `(symbol.array)[k]`).  No `&` may
+    precede the symbol (through any `(`), unary or binary, so no member's
+    address can be taken however it is spelt; write `symbol.x & a`.  Casts
+    and type names that hold a struct or union body or an abstract `(*)`
+    declarator are refused, since they can reinterpret the object.
     """
     symbol = entry["symbol"]
     arrays = {name: integer_literal(size) for name, size in re.findall(
         r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]", entry["declaration"])}
     tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
     findings = []
+    qualifiers = {"const", "volatile", "__extension__", "signed", "unsigned"}
+    for index, (token, offset) in enumerate(tokens):
+        if token != "(":
+            continue
+        after = index + 1
+        while after < len(tokens) and tokens[after][0] in qualifiers:
+            after += 1
+        rest = [t for t, _ in tokens[after:after + 3]]
+        if rest[:1] in (["struct"], ["union"]) and ("{" in rest[1:3]):
+            findings.append((offset, f"a type name with a struct or union body may not appear in a "
+                             f"{symbol} user: it can reinterpret the object"))
+        if rest[:1] == ["*"]:
+            close = after + 1
+            while close < len(tokens) and tokens[close][0] in qualifiers:
+                close += 1
+            if close < len(tokens) and tokens[close][0] == ")":
+                findings.append((offset, f"an abstract `(*)` declarator may not appear in a {symbol} "
+                                 "user: it can reinterpret the object"))
     for index, (token, offset) in enumerate(tokens):
         if token != symbol:
             continue
         before = index - 1
         while before >= 0 and tokens[before][0] == "(":
             before -= 1
-        if before >= 0 and tokens[before][0] == "&" and \
-                (before == 0 or tokens[before - 1][0] in UNARY_CONTEXT or cast_before(tokens, before - 1)):
-            findings.append((offset, f"the address of a {symbol} member may not be taken: "
-                             "a pointer could reach a volatile member without its qualifier"))
+        if before >= 0 and tokens[before][0] == "&":
+            findings.append((offset, f"no `&` may precede {symbol} (write `{symbol}.x & a`): "
+                             "a member's address could reach a volatile byte without its qualifier"))
         after = [t for t, _ in tokens[index + 1:index + 6]]
         if after[:1] != ["."] or len(after) < 2 or after[1] not in arrays:
             continue
@@ -708,7 +746,7 @@ def statement_macro_tails(code):
 
 
 def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None,
-               closure=None, untranslated=None):
+               closure=None, untranslated=None, tree=None):
     """returns list of findings: (line, rule, severity, message)
 
     relpath is the file's path relative to the project root; only the header
@@ -722,7 +760,7 @@ def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=
     listed_qualifiers, findings = allowlisted_volatile(
         code, relpath, data_symbols or {},
         volatile_allow_entries() if volatile_allow is None else volatile_allow, text, closure,
-        untranslated)
+        untranslated, tree)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
@@ -757,7 +795,7 @@ def check_file(path):
     except OSError as e:
         return [(0, "unreadable", "error", str(e))]
     data_symbols = {}
-    relpath = closure = None
+    relpath = closure = tree = None
     for parent in Path(path).resolve().parents:
         mapping = parent / "config" / "data_symbols.json"
         if mapping.is_file():
@@ -782,7 +820,7 @@ def check_file(path):
                 closure = None
             break
     return check_text(text, os.path.basename(path), data_symbols, relpath, closure=closure,
-                      untranslated=untranslated)
+                      untranslated=untranslated, tree=tree)
 
 
 def asm_allow_path():
