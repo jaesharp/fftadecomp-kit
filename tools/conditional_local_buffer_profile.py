@@ -19,6 +19,7 @@ SCHEDULER_BRANCH = 'conditional-scheduler-branch-descriptor-calls-v1'
 SCHEDULER_FOLLOWING = 'conditional-scheduler-following-call-v1'
 SCHEDULER_WIDE = 'conditional-scheduler-eight-target-branches-v1'
 SCHEDULER_LOOP = 'conditional-scheduler-u16-counted-loop-v1'
+SCHEDULER_PROJECTED = 'conditional-scheduler-projected-outputs-v1'
 SCHEDULER_GUARDED = 'conditional-scheduler-guarded-descriptor-calls-v1'
 SCHEDULER_PAYLOAD = 'conditional-scheduler-descriptor-payload-calls-v1'
 SCHEDULER_PAYLOAD8 = 'conditional-scheduler-descriptor-payload8-calls-v1'
@@ -28,6 +29,7 @@ PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8, SCHEDULER_HALFWOR
 STATE = 'conditional-local-state-iterator-v1'
 OUTPUT = 'conditional-local-output-word-call-v1'
 SCHEMAS = {
+    SCHEDULER_PROJECTED: 'elf-symbol-thumb-conditional-scheduler-projected-outputs-v1',
     SCHEDULER: 'elf-symbol-thumb-conditional-scheduler-descriptor-calls-v1',
     SCHEDULER_BRANCH: 'elf-symbol-thumb-conditional-scheduler-branch-descriptor-calls-v1',
     SCHEDULER_WIDE: 'elf-symbol-thumb-conditional-scheduler-eight-target-branches-v1',
@@ -68,7 +70,7 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         super().__init__(rom, mapping, index, objects)
         self.policy = policy
         self.observations = {}
-        if policy in (SCHEDULER_GUARDED, SCHEDULER_WIDE):
+        if policy in (SCHEDULER_GUARDED, SCHEDULER_WIDE, SCHEDULER_PROJECTED):
             # Eight authenticated helpers plus two scheduler bodies and two thunks.
             self.dependency_budget = 12
 
@@ -82,7 +84,12 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                 'local-buffer contracts exclude local BL and switches')
         self.root, self.calls = (address, bytes(data)), dict(calls)
         self.environment = environment_fingerprint()
-        if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
+        if self.policy == SCHEDULER_PROJECTED:
+            import scheduler_projected_outputs_profile as projected
+            self.projected_outputs = projected.bind(self, edges, calls)
+            dependencies = (0x08005B6C, 0x08005954)
+            runtime_names = ('_call_via_r2', '_call_via_r3')
+        elif self.policy == SCHEDULER_HALFWORD_PAYLOAD:
             import scheduler_halfword_payload_profile as halfword
             self.halfword_payload = halfword.bind(self, edges, calls)
             dependencies = (0x08005B6C, 0x08005954)
@@ -150,6 +157,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
     def check_call(self, address, aliases, stack, slots=None, *, constants=None, site=None, words=None):
         require(self.calls.get(site) == address and not words,
                 'local-buffer call differs from its authenticated interface')
+        if self.policy == SCHEDULER_PROJECTED:
+            import scheduler_projected_outputs_profile as projected
+            return projected.check_call(self, address, aliases, stack, slots, site=site)
         if self.policy == SCHEDULER_TWO_PAYLOAD:
             import scheduler_two_payload_profile as two
             return two.check_call(self, address, aliases, stack, slots, site=site)
@@ -227,6 +237,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         return {}
 
     def contract_manifest(self):
+        if self.policy == SCHEDULER_PROJECTED:
+            import scheduler_projected_outputs_profile as projected
+            return projected.manifest(self)
         if self.policy == SCHEDULER_TWO_PAYLOAD:
             import scheduler_two_payload_profile as two
             return two.manifest(self)

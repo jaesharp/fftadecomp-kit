@@ -2426,3 +2426,27 @@ allocation separation, physical access, protected-frame preservation and no
 retained descriptor pointer remain explicit premises across iterations. No
 callback effect, memory permission, actual count, or unconditional termination
 claim follows. Existing acyclic scheduler selectors retain their strict guards.
+
+### Conditional coordinate outputs before a scheduler call
+
+`--owner-runtime-profile conditional-scheduler-projected-outputs-v1` composes
+four complete indexed helpers before one scheduler call: ordered object-byte
+reads and two halfword outputs, a read-only indexed table lookup, three world
+coordinate outputs, and two screen coordinate outputs. Complete helper bytes,
+CFGs, named identities, local frames and returned pointer origins are checked.
+A separate scalar-immediate-add opt-in accepts only an already scalar origin;
+existing three-output policies retain their default instruction boundary.
+
+The caller must have the exact bounded private layout and straight-line call
+order. A stale R2 pointer survives the first helper until the actual table
+helper overwrites it before observation. Both outgoing pointer words remain
+tracked through the screen helper and scheduler; they are never erased as
+unused arguments. Every helper output is checked against its private halfword
+bound and the protected saved words.
+
+Physical readability, initialized named halfwords, table access, allocator
+separation, scheduler/callback frame preservation and nonretention remain
+explicit conditional premises. In particular, the scheduler and callback may
+access caller storage only through the bounded descriptor, not through the
+recorded outgoing pointer words or preserved-register aliases. The report does
+not prove callback effects, physical nonaliasing or unconditional termination.

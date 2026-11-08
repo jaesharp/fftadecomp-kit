@@ -15,9 +15,12 @@ WRAPPER = (0x080DBD78, 40, '3eced7f8086ea739f791ef2b21b30d4d24996d64f8966dd25cdf
 LEAF = (0x0801C9F0, 30, '41a3e247dcf7449dada0677577f7a46bf3b3cd9f7c3038134748fd2e516c0cd5')
 
 
-def prove_leaf_origins(instructions, edges, address, data):
+def prove_leaf_origins(instructions, edges, address, data, *, scalar_immediate_add=False):
     """Prove writes and retained pointer origins without numeric input assumptions."""
+    if type(scalar_immediate_add) is not bool:
+        raise ValueError('scalar immediate addition opt-in must be Boolean')
     scalar = ('scalar',)
+    scalar_additions = []
     values = {n: ('entry', n) for n in range(13)}
     values.update({0: scalar, 1: scalar, 2: scalar, 3: ('formal', 3),
                    14: ('entry-lr',)})
@@ -61,6 +64,11 @@ def prove_leaf_origins(instructions, edges, address, data):
             if values[source] != scalar:
                 raise ValueError('three-output leaf cannot shift a pointer or saved origin')
             values[destination] = scalar
+        elif scalar_immediate_add and code & 0xF800 == 0x3000:
+            destination = (code >> 8) & 7
+            if values[destination] != scalar:
+                raise ValueError('three-output scalar addition cannot observe a pointer or saved origin')
+            scalar_additions.append([site, destination, code & 255])
         elif code & 0xF800 == 0x8000:
             source, base, offset = code & 7, (code >> 3) & 7, 2 * ((code >> 6) & 31)
             if values[source] != scalar or offset or values[base] not in (
@@ -83,6 +91,9 @@ def prove_leaf_origins(instructions, edges, address, data):
             any(values[n] != scalar for n in (1, 2)):
         raise ValueError('three-output leaf reads, writes or return origins differ')
     return dict(schema=SCHEMA, incoming_pointer_reads=reads, formal_writes=writes,
+        **({'scalar_immediate_additions': scalar_additions,
+            'scalar_immediate_addition_policy': 'explicit-origin-preserving-u32-add-v1'}
+           if scalar_immediate_add else {}),
         return_entry_origins=[[3, 3], [12, 12]], preserved='r4-r11,sp,entry-lr',
         caller_bounds_proved=False, numeric_equivalence_claim=False,
         physical_nonalias_claim=False)
