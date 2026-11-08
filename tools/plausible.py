@@ -248,9 +248,20 @@ def declaration_tokens(code):
 
 
 def declares_symbol(code, symbol):
-    """a file that declares the symbol itself cannot also see the volatile one"""
-    return re.search(r"\bextern\b(?:[^;{}]|\{[^{}]*\})*\b" + re.escape(symbol) + r"\b",
-                     code) is not None
+    """a file-scope `extern` declarator of the symbol in this file.
+
+    Such a file cannot also see the listed volatile declaration (the types
+    would conflict), so it is not a user of it.  Only a depth-0 `extern`
+    whose declarator list names the symbol outside any parentheses counts;
+    a parameter name in a prototype does not.
+    """
+    declarator = re.compile(r"extern\b(?:[^;{}()]|\{[^{}]*\})*?\b" + re.escape(symbol) +
+                            r"\s*[;,=\[]")
+    for keyword in re.finditer(r"\bextern\b", code):
+        prefix = code[:keyword.start()]
+        if prefix.count("{") == prefix.count("}") and declarator.match(code, keyword.start()):
+            return True
+    return False
 
 
 def active_volatile_entries(data_symbols, entries):
@@ -278,7 +289,7 @@ def active_volatile_entries(data_symbols, entries):
     return active
 
 
-def allowlisted_volatile(code, relpath, data_symbols, entries):
+def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
     """(exempt volatile offsets, findings) for the volatile allow list.
 
     Only the listed header may hold the listed object's declaration, and its
@@ -287,46 +298,68 @@ def allowlisted_volatile(code, relpath, data_symbols, entries):
     may only begin a bit-field member `volatile T name : N;` with T a listed
     member type.  Bit-fields have no address, and the braces hold no nested,
     tagged or parenthesized types, so the qualifier cannot reach any other
-    object.  While the entry is active, in every file: other headers may not
-    name the symbol (a macro could hide a use), a file that does not declare
-    the symbol itself may not take its address (pointer arithmetic would
-    carry the qualifier elsewhere), typeof is
-    refused (it would copy the qualifier onto locals), and no identifier of
-    the pinned declaration may be #defined or #undefined (that would change
-    what the pinned text declares).
+    object.
+
+    While the entry is active, every linted file is scanned with line splices
+    joined, and refuses: token pasting, digraph and trigraph spellings (they
+    can build a directive or name the scan cannot see); typeof (it would copy
+    the qualifier onto locals); #line, linemarkers, #import, #include_next
+    and computed #include (they hide or fake dependencies); #define/#undef of
+    any identifier of the pinned declaration; and any #define whose
+    replacement names the symbol.  Other headers may not name the symbol, and
+    in a file that does not declare it itself every use must be immediate
+    member access `symbol.member`, so neither its address nor the whole
+    object can reach pointer arithmetic, a macro argument or a copy.
     """
     allowed, findings = set(), []
 
     def finding(offset, message):
-        findings.append((code.count("\n", 0, offset) + 1, "volatile-allowlist", "error", message))
+        findings.append((code.count("\n", 0, min(offset, len(code))) + 1,
+                         "volatile-allowlist", "error", message))
 
     joined = re.sub(r"\\\r?\n", "", code)
+    raw = re.sub(r"\\\r?\n", "", strip_comments_and_strings_keep_strings(text if text is not None else code))
     for entry in active_volatile_entries(data_symbols, entries):
         symbol, header = entry["symbol"], entry["header"]
         pinned = declaration_tokens(entry["declaration"])
-        for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", code):
+        lexical = (r"##|%:|\?\?[=/'()!<>\-]", "token pasting, digraphs and trigraphs")
+        for match in re.finditer(lexical[0], joined):
+            finding(match.start(), f"{lexical[1]} are refused while {symbol} is an "
+                    "allowlisted volatile object: they can spell what the scan cannot see")
+        for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", joined):
             finding(typeof.start(), f"typeof while {symbol} is an allowlisted volatile "
                     "object: it would copy the qualifier onto other objects")
-        own = declares_symbol(code, symbol)
-        for address in re.finditer(r"(?<!&)&(?!&)(?:\s|\()*" + re.escape(symbol) + r"\b", code):
-            if own:
-                break
-            finding(address.start(), f"the address of allowlisted volatile {symbol} may not "
-                    "be taken: pointer arithmetic would carry the qualifier to other memory")
+        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*(?:line\b|[0-9]|import\b|include_next\b)",
+                                     joined):
+            finding(directive.start(), f"#line, linemarkers, #import and #include_next are "
+                    f"refused while {symbol} is allowlisted: they hide or fake dependencies")
+        for include in re.finditer(r"(?m)^[ \t]*#[ \t]*include\b(?![ \t]*[\"<])", raw):
+            finding(include.start(), f"computed #include is refused while {symbol} is allowlisted")
         names = {token for token in pinned if re.fullmatch(r"[A-Za-z_]\w*", token)}
-        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*(?:define|undef)[ \t]+([A-Za-z_]\w*)", joined):
-            if directive[1] in names:
-                finding(min(directive.start(), len(code)),
-                        f"`{directive[1]}` is part of the pinned {symbol} declaration and "
-                        "may not be redefined while it is allowlisted")
-        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", code))
+        for directive in re.finditer(
+                r"(?m)^[ \t]*#[ \t]*(?P<kind>define|undef)[ \t]+(?P<name>[A-Za-z_]\w*)(?P<rest>[^\n]*)",
+                joined):
+            if directive["name"] in names:
+                finding(directive.start(), f"`{directive['name']}` is part of the pinned {symbol} "
+                        "declaration and may not be redefined while it is allowlisted")
+            if directive["kind"] == "define" and re.search(r"\b" + re.escape(symbol) + r"\b",
+                                                           directive["rest"]):
+                finding(directive.start(), f"a macro may not expand to allowlisted volatile {symbol}")
+        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", joined))
         if relpath is None or not relpath.endswith(".h"):
+            if not declares_symbol(joined, symbol):
+                for reference in references:
+                    if not re.match(r"\s*\.\s*[A-Za-z_]", joined[reference.end():]):
+                        finding(reference.start(), f"allowlisted volatile {symbol} may only be "
+                                "used as `symbol.member`: its address or whole object would "
+                                "carry the qualifier to other memory")
             continue
         if relpath != header:
             for reference in references:
                 finding(reference.start(), f"{symbol} is declared volatile only in {header}; "
                         "other headers may not name it")
             continue
+        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", code))
         declarations = list(re.finditer(
             r"(?m)^[ \t]*extern\s+struct\s*\{(?P<body>[^{}]*)\}\s*" + re.escape(symbol) +
             r"\s*;", code))
@@ -358,13 +391,50 @@ def allowlisted_volatile(code, relpath, data_symbols, entries):
     return allowed, findings
 
 
+def strip_comments_and_strings_keep_strings(text):
+    """comments blanked, string and character literals kept (for #include)"""
+    code = strip_comments_and_strings(text)
+    out = list(code)
+    for literal in re.finditer(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'', text):
+        if code[literal.start()] == " " and not code[literal.start():literal.end()].strip():
+            out[literal.start():literal.end()] = text[literal.start():literal.end()]
+    return "".join(out)
+
+
+def include_closure(root, source):
+    """root-relative paths of every file a source can #include, transitively.
+
+    Quoted names resolve against the including file's directory, then
+    include/; angled names against include/ only (the tools run cpp with
+    -nostdinc -I include).  Computed includes are refused while an entry is
+    active, so this over-approximates the preprocessor's dependencies.
+    """
+    root = Path(root).resolve()
+    seen, pending = set(), [Path(source).resolve()]
+    while pending:
+        path = pending.pop()
+        if path in seen:
+            continue
+        seen.add(path)
+        text = re.sub(r"\\\r?\n", "", strip_comments_and_strings_keep_strings(
+            path.read_text(encoding="utf-8", errors="replace")))
+        for include in re.finditer(r'(?m)^[ \t]*#[ \t]*include[ \t]*(?:"([^"\n]+)"|<([^>\n]+)>)', text):
+            name = include[1] or include[2]
+            candidates = ([path.parent / name] if include[1] else []) + [root / "include" / name]
+            for candidate in candidates:
+                if candidate.is_file():
+                    pending.append(candidate.resolve())
+                    break
+    return {path.relative_to(root).as_posix() for path in seen if root in path.parents}
+
+
 def allowlisted_volatile_uses(root, address, entries=None):
     """report records for allowlisted volatile objects the addressed source uses.
 
-    A use is the source naming the symbol without declaring it itself: the
-    only declaration it can then compile against is the listed header's.
-    Each record binds the header's current SHA-256; an unreadable header
-    raises OSError, which callers treat as a failure.
+    A use is the source reaching the listed header through its include
+    closure, or naming the symbol without declaring it itself.  Each record
+    binds the header's current SHA-256; an unreadable header raises OSError,
+    which callers treat as a failure.
     """
     root = Path(root)
     try:
@@ -379,8 +449,10 @@ def allowlisted_volatile_uses(root, address, entries=None):
     for entry in active_volatile_entries(data_symbols, entries):
         symbol = re.escape(entry["symbol"])
         for source in sources:
-            code = strip_comments_and_strings(source.read_text(encoding="utf-8", errors="replace"))
-            if re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
+            code = re.sub(r"\\\r?\n", "", strip_comments_and_strings(
+                source.read_text(encoding="utf-8", errors="replace")))
+            if entry["header"] in include_closure(root, source) or \
+                    re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
                 digest = hashlib.sha256((root / entry["header"]).read_bytes()).hexdigest()
                 records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
                                f"`{entry['address']}` declared in `{entry['header']}` "
@@ -495,7 +567,7 @@ def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
     listed_qualifiers, findings = allowlisted_volatile(
         code, relpath, data_symbols or {},
-        volatile_allow_entries() if volatile_allow is None else volatile_allow)
+        volatile_allow_entries() if volatile_allow is None else volatile_allow, text)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):

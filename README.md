@@ -1603,16 +1603,23 @@ the symbol to the listed address, and only to the header at its listed project
 path or to a replay's byte copy directly under `build/<capture>/`.
 
 Volatile in any `src/` file, elsewhere in the header, in another header, or on
-another object still fails. While an entry is active, in every linted file:
-other headers may not name the symbol; a file that does not declare the symbol
-itself may not take its address (pointer arithmetic would carry the
-qualifier); `typeof` is refused; and no identifier of the pinned declaration
-(`u8`, member names, `struct`, ...) may be `#define`d or `#undef`ed. The single
+another object still fails. While an entry is active, every linted file is
+scanned with line splices joined and refuses: token pasting (`##`), digraphs
+and trigraphs; `typeof`; `#line`, linemarkers, `#import`, `#include_next` and
+computed `#include`; `#define`/`#undef` of any identifier of the pinned
+declaration (`u8`, member names, `struct`, ...); and any `#define` whose
+replacement names the symbol. Other headers may not name the symbol, and in a
+file without its own file-scope `extern` declarator of the symbol (a
+parameter name does not count) every use must be `symbol.member`, so neither
+its address nor the whole object reaches pointer arithmetic, a macro or a
+copy. The single
 listed object is `g_control_flags_03000940` (`0x03000940`,
 `include/control_flags.h`, `u8`), whose byte stores carry a dead load of the
 same byte throughout the ROM and on no other RAM.
 
-When the addressed source names a listed symbol without declaring it, the
+When the addressed source reaches the listed header through its include
+closure (an over-approximation of the preprocessor's dependencies, since
+computed includes are refused), or names the symbol without declaring it, the
 match report records `* allowlisted volatile: ...` for it, including the
 header's SHA-256, and saved reports are refused unless those records equal a
 fresh recomputation. The premise is that the pinned declaration is the

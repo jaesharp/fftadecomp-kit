@@ -131,16 +131,47 @@ class VolatileAllowlistTests(unittest.TestCase):
     def test_address_and_pointer_arithmetic_are_refused_in_users(self):
         for statement in ("(&" + SYMBOL + ")[1].unknown_3C = 1;",
                           "*((u8 *)&" + SYMBOL + " + 0x100) = 1;",
-                          "p = & ( " + SYMBOL + " );", "p = &" + SYMBOL + ".unknown_02[4];"):
+                          "p = & ( " + SYMBOL + " );", "copy = " + SYMBOL + ";",
+                          "escape(" + SYMBOL + ");", "(" + SYMBOL + ").unknown_3C = 1;"):
             with self.subTest(statement=statement):
                 self.assertIn("volatile-allowlist",
                               self.rules("void f(void) { " + statement + " }\n",
                                          relpath="src/08028C34.c"))
         self.assertEqual(self.rules("void f(void) { if (a && " + SYMBOL + ".unknown_3C) g(); }\n",
                                     relpath="src/08028C34.c"), [])
+        # A non-volatile member's address is an ordinary unqualified pointer.
+        self.assertEqual(self.rules("void f(void) { p = &" + SYMBOL + ".unknown_02[4]; }\n",
+                                    relpath="src/08028C34.c"), [])
         # A source declaring the symbol itself never sees the volatile declaration.
         self.assertEqual(self.rules("extern u16 " + SYMBOL + ";\nvoid f(void) { p = &" +
                                     SYMBOL + "; }\n", relpath="src/0800337C.c"), [])
+
+    def test_second_review_bypasses_are_refused(self):
+        include = '#include "control_flags.h"\n'
+        for name, source in (
+                ("macro alias", include + "#define CF " + SYMBOL + "\nvoid f(void) { (&CF)[1].unknown_3C = 1; }\n"),
+                ("macro alias member", include + "#define CF " + SYMBOL + ".unknown_3C\nvoid f(void) { CF = 1; }\n"),
+                ("pasted name", include + "#define CAT(a, b) a##b\nvoid f(void) { (&CAT(g_control_flags_, 03000940))[1].unknown_3C = 1; }\n"),
+                ("digraph paste", include + "#define CAT(a, b) a%:%:b\n"),
+                ("parameter name", include + "extern void g(int " + SYMBOL + ");\nvoid f(void) { (&" + SYMBOL + ")[1].unknown_3C = 1; }\n"),
+                ("prototype pointer", include + "extern void g(u8 *" + SYMBOL + ", int);\nvoid f(void) { p = &" + SYMBOL + "; }\n"),
+                ("spliced address", include + "void f(void) { (&\\\n" + SYMBOL + ")[1].unknown_3C = 1; }\n"),
+                ("pasted typeof", include + "#define TY __type##of__\nvoid f(void) { TY(" + SYMBOL + ".unknown_3C) l; }\n"),
+                ("spliced typeof", include + "void f(void) { type\\\nof(" + SYMBOL + ".unknown_3C) l; }\n"),
+                ("digraph define", "%:define u8 int\n" + include),
+                ("trigraph define", "??=define u8 int\n" + include),
+                ("trigraph splice", "#define u8 ??/\nint\n" + include),
+                ("comment define", "#/*\n*/define u8 int\n" + include),
+                ("line directive", "#line 1 \"include/control_flags.h\"\n"),
+                ("linemarker", "# 1 \"include/control_flags.h\"\n"),
+                ("import", '#import "control_flags.h"\n'),
+                ("include_next", '#include_next "control_flags.h"\n'),
+                ("computed include", "#define H \"control_flags.h\"\n#include H\n")):
+            with self.subTest(name=name):
+                self.assertIn("volatile-allowlist", self.rules(source, relpath="src/08028C34.c"))
+        self.assertEqual(self.rules(include + "extern void g(int " + SYMBOL + "_count);\n" + ACCESS,
+                                    relpath="src/08028C34.c"), [])
+        self.assertEqual(self.rules("#define CAT(a, b) a##b\n", relpath="src/a.c", mapping={}), [])
 
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
@@ -209,6 +240,11 @@ class VolatileAllowlistTests(unittest.TestCase):
             self.assertEqual(uses(ACCESS), [record()])
             self.assertNotEqual(record(), first)
             self.assertEqual(uses("/* " + SYMBOL + " */ void f(void) {}\n"), [])
+            self.assertEqual(uses('#include "control_flags.h"\nvoid f(void) {}\n'), [record()])
+            (root / "include" / "wrapper.h").write_text('#include <control_flags.h>\n')
+            self.assertEqual(uses('#include "wrapper.h"\nvoid f(void) {}\n'), [record()])
+            self.assertEqual(uses('/* #include "wrapper.h" */\nvoid f(void) {}\n'), [])
+            self.assertEqual(uses("extern void g(int " + SYMBOL + ");\n" + ACCESS), [record()])
             self.assertEqual(uses("extern u16 " + SYMBOL + ";\n" + ACCESS), [])
             self.assertEqual(uses("extern struct { u8 a; } " + SYMBOL + ";\n" + ACCESS), [])
             self.assertEqual(uses(ACCESS, entries=()), [])
