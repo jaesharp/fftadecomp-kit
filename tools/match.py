@@ -4275,6 +4275,7 @@ def main():
                                                       "static-callback-local-output-word-return-r7-v1",
                                                       "standalone-local-output-word-return-v1",
                                                       "local-rom-halfword-table-v1",
+                                                      "local-shadow-halfword-matrix-v1",
             "entry-recursive-ordinary-call-v1",
                                                       "mutable-four-local-index-three-call-native-v1",
                                                       "protected-descriptor-word-v1",

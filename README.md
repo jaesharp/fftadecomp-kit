@@ -1616,6 +1616,24 @@ data point does not grant extent or readability. Reports retain these
 conditions; the checker proves the ordered copy, protected saves and local
 read under them. Existing selectors retain their guards.
 
+`--owner-runtime-profile local-shadow-halfword-matrix-v1` admits the closed
+96-byte owner that initializes eight local halfwords from a named RAM point,
+copies the resulting sixteen bytes into a four-by-two local matrix, and
+returns one signed halfword. The complete 98-byte copy helper and both exact
+instruction counts are required. Only the genuine original compiler `memcpy`
+relocation and canonical zero-addend data relocation are transported; this
+does not install a global runtime alias.
+
+This relation retains arbitrary source values and requires independent valid
+low-byte row/column bounds (`row < 4`, `column < 2`), aligned live stack access
+over `[-56,0)`, readable source halfwords, source/frame/code separation and
+noninterference. Protected saved words, all four word-copy iterations, the
+signed indexed read and the real return are checked on one ordered byte state.
+The expired pointer left in R3 remains explicit and grants no later access.
+Physical permissions, actual entry SP and historical C/ABI compatibility remain
+conditions. Reports bind the original ELF, current source, mappings and proof
+producers; ordinary selectors retain their original refusals.
+
 `--owner-runtime-profile restoring-owner-acyclic-v1` selects
 `elf-symbol-thumb-acyclic-stack-alias-v1`. It preserves distinct stack, alias,
 constant and return-provenance states at joins, with a fixed limit of 4096
