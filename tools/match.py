@@ -4281,6 +4281,7 @@ def main():
                                                       "bounded-buffer-conditional-thunks-selective-scratch-v1",
                                                       "conditional-two-word-callback-closure-v1",
                                                       "conditional-two-word-tree-callback-closure-v1",
+                                                      "conditional-two-word-literal-callback-closure-v1",
                                                       "conditional-known-query-native-closure-v1",
                                                       "conditional-known-list-query-closure-v1",
                                                       "conditional-known-list-query-continuation-v1",

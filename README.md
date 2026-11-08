@@ -940,6 +940,40 @@ remain conditionally readable with unknown values. Payload initialization,
 physical access, allocation separation, callback read bounds and synchronous
 nonretention remain explicit premises. Existing selectors retain their guards.
 
+### Typed-literal two-word callback closures
+
+`conditional-two-word-callback-closure-v1` admits only the 28-byte caller whose
+closure callback word comes from a parameter. Callers of the same `080C7CC0`
+list iterator that store a **function literal** in that word have a separate
+opt-in selector:
+
+```sh
+python tools/match.py --root ../fftadecomp 08099CDC --owner-runtime-profile conditional-two-word-literal-callback-closure-v1
+```
+
+Three exact root forms are accepted. Only the aligned owner word load, the
+iterator BL and the two typed literals (callback, then adapter) may vary.
+Descriptor word zero is the constant zero (36 bytes), the entry R0 value
+(40 bytes), or the address of a private two-word state (44 bytes). Bindings must
+be exactly the iterator call and the two function literals in pool order, with
+no data or switches. The iterator, scalar adapter, getter and canonical thunks
+are checked as for the 28-byte profile. That profile's contract is unchanged.
+
+In the zero and entry-R0 forms no private provenance reaches the callback. Its
+identity is pinned, but its effects stay opaque under the same compatible
+returning ABI and noninterference premises as the 28-byte profile. In the
+private-state form the callback receives a private-frame address. It must be the
+pinned complete `0809AC20` body, and its effects are interpreted: it reads and
+writes only the two state words, increments word zero, and stores the getter
+word through the word-four cursor before advancing it by four. The root's
+read-back of state word zero after the call is reported as zero plus one per
+returning callback, modulo 2^32. The adapter's no-private-provenance premise is
+replaced for that word, not asserted satisfied. Cursor-store validity and
+nonoverlap and list liveness remain explicit conditions; no iteration bound is
+assumed and termination is unproved. The root frame is fixed by the exact byte
+template rather than the frame prover. A matched root's index instruction count
+must be the refined count (for example 15 for `08099A48`, 13 for `0809A6EC`).
+
 
 ### Named data literals
 
