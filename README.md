@@ -900,6 +900,17 @@ field. The existing payload profile still accepts only +4; neither profile
 permits a second pointer word or infers callback effects, initialization or
 allocation separation from the field offset.
 
+`conditional-scheduler-two-payload-calls-v1` admits one authenticated scheduler
+call with two local pointer words at descriptor offsets +4 and +8. The complete
+28-byte descriptor and two distinct, nonempty aligned payload intervals must
+partition a contiguous private frame of at most 256 bytes. Pointer provenance,
+all private bounds, protected saved words and preserved-register aliases remain
+checked; other outgoing aliases or pointer words refuse. Recorded payload bounds
+are frame upper bounds, not type sizes or initialization facts. Physical access,
+allocator separation, callback read bounds, lifetime and nonretention remain
+explicit conditions. Unknown bitfield representation bytes are not promoted to
+initialized values. Existing single-payload profiles retain their guards.
+
 `conditional-scheduler-halfword-output-payload-v1` composes the complete indexed
 `0801E6F0` two-halfword output leaf with one later scheduler call. The bounded
 private frame contains a leading payload, a 28-byte descriptor and a trailing

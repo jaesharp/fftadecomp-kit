@@ -20,7 +20,8 @@ SCHEDULER_GUARDED = 'conditional-scheduler-guarded-descriptor-calls-v1'
 SCHEDULER_PAYLOAD = 'conditional-scheduler-descriptor-payload-calls-v1'
 SCHEDULER_PAYLOAD8 = 'conditional-scheduler-descriptor-payload8-calls-v1'
 SCHEDULER_HALFWORD_PAYLOAD = 'conditional-scheduler-halfword-output-payload-v1'
-PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8, SCHEDULER_HALFWORD_PAYLOAD: 4}
+SCHEDULER_TWO_PAYLOAD = 'conditional-scheduler-two-payload-calls-v1'
+PAYLOAD_FIELDS = {SCHEDULER_PAYLOAD: 4, SCHEDULER_PAYLOAD8: 8, SCHEDULER_HALFWORD_PAYLOAD: 4, SCHEDULER_TWO_PAYLOAD: (4, 8)}
 STATE = 'conditional-local-state-iterator-v1'
 OUTPUT = 'conditional-local-output-word-call-v1'
 SCHEMAS = {
@@ -30,6 +31,7 @@ SCHEMAS = {
     SCHEDULER_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload-calls-v1',
     SCHEDULER_PAYLOAD8: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload8-calls-v1',
     SCHEDULER_HALFWORD_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-halfword-output-payload-v1',
+    SCHEDULER_TWO_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-two-payload-calls-v1',
     STATE: 'elf-symbol-thumb-conditional-local-state-iterator-v1',
     OUTPUT: 'elf-symbol-thumb-conditional-local-output-word-call-v1',
 }
@@ -137,6 +139,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
     def check_call(self, address, aliases, stack, slots=None, *, constants=None, site=None, words=None):
         require(self.calls.get(site) == address and not words,
                 'local-buffer call differs from its authenticated interface')
+        if self.policy == SCHEDULER_TWO_PAYLOAD:
+            import scheduler_two_payload_profile as two
+            return two.check_call(self, address, aliases, stack, slots, site=site)
         if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
             import scheduler_halfword_payload_profile as halfword
             return halfword.check_call(self, address, aliases, stack, slots, site=site)
@@ -211,6 +216,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         return {}
 
     def contract_manifest(self):
+        if self.policy == SCHEDULER_TWO_PAYLOAD:
+            import scheduler_two_payload_profile as two
+            return two.manifest(self)
         if self.policy == SCHEDULER_HALFWORD_PAYLOAD:
             import scheduler_halfword_payload_profile as halfword
             return halfword.manifest(self)
