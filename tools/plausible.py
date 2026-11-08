@@ -412,6 +412,9 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                                 "carry the qualifier to other memory")
                 for offset, message in member_provenance(joined, entry):
                     finding(offset, message)
+                for extension in re.finditer(r"\b__extension__\b", joined):
+                    finding(extension.start(), f"`__extension__` may not appear in a {symbol} user: "
+                            "it admits lvalue forms that reach a member's address")
                 # Defence in depth for the provenance rules (match.py also
                 # applies them to the preprocessed text): in a file that uses
                 # the object, no macro may expand to `&` or to any identifier
@@ -511,6 +514,30 @@ def forges_directive(rest):
     return not rest.startswith("(") and "#" in rest
 
 
+def whole_object_uses(code, symbol):
+    """[(offset, message)] for every occurrence of symbol not written `symbol . member`.
+
+    The one exception is the pinned declaration's own `} symbol ;`, which a
+    preprocessed source contains exactly once.  This refuses whole-object
+    sizeof, __alignof__, copies and address-taking on preprocessed text,
+    where a macro can no longer hide them.
+    """
+    tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
+    findings, declarations = [], 0
+    for index, (token, offset) in enumerate(tokens):
+        if token != symbol:
+            continue
+        after = [t for t, _ in tokens[index + 1:index + 3]]
+        if after[:1] == ["."] and len(after) == 2 and re.fullmatch(r"[A-Za-z_]\w*", after[1]):
+            continue
+        if index and tokens[index - 1][0] == "}" and after[:1] == [";"] and not declarations:
+            declarations += 1
+            continue
+        findings.append((offset, f"{symbol} may only be used as `{symbol}.member`: the whole object "
+                         "(its size, alignment, address or a copy) depends on the pinned layout"))
+    return findings
+
+
 def member_provenance(code, entry):
     """[(offset, message)] for uses that could reach a volatile byte without its member.
 
@@ -528,6 +555,19 @@ def member_provenance(code, entry):
         r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]", entry["declaration"])}
     tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
     findings = []
+    # `&( ... symbol ... )`: a parenthesised operand of `&` holding the symbol
+    # (a comma or conditional lvalue) takes a member's address.
+    for index, (token, offset) in enumerate(tokens[:-1]):
+        if token != "&" or tokens[index + 1][0] != "(":
+            continue
+        depth, close = 0, index + 1
+        while close < len(tokens):
+            depth += {"(": 1, ")": -1}.get(tokens[close][0], 0)
+            if depth == 0:
+                break
+            close += 1
+        if any(t == symbol for t, _ in tokens[index + 2:close]):
+            findings.append((offset, f"`&(...)` around {symbol} may not take a member's address"))
     qualifiers = {"const", "volatile", "__extension__", "signed", "unsigned"}
     for index, (token, offset) in enumerate(tokens):
         if token != "(":

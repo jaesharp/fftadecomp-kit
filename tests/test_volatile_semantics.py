@@ -33,7 +33,8 @@ def assembly(*body, name="func_08028C34"):
 
 
 def compare(real, stripped, preprocessed=PREPROCESSED):
-    return semantics.compare(real, stripped, preprocessed, SYMBOL, DECLARATION)
+    """the stripped-compile rules alone (the perturbation has its own tests)"""
+    return semantics.compare_compiles(real, stripped, preprocessed, SYMBOL, DECLARATION)
 
 
 class SemanticDiffTests(unittest.TestCase):
@@ -254,15 +255,23 @@ class SemanticDiffTests(unittest.TestCase):
         self.assertEqual(compare(overwritten, overwritten.replace("ldrb\tr1, [r2]\n\t", ""), one)[0][1:],
                          (1, [3], []))
 
-    def test_layout_perturbation_moves_only_the_pinned_bytes(self):
+    def test_layout_perturbation_permutes_only_the_pinned_bytes(self):
         text, mapping, size = semantics.perturbed_declaration(DECLARATION)
-        self.assertEqual(mapping, {0x3C: 0x100, 0x3D: 0x101})
-        self.assertEqual(size, 0x102)
+        self.assertEqual(mapping, {0x3C: 0x3D, 0x3D: 0x3C})
+        self.assertEqual(size, semantics.object_layout(DECLARATION)[0])
         layout, _ = semantics.members(text)
         offsets = {name: offset for _, name, offset, _, _ in layout}
         self.assertEqual((offsets["display"], offsets["unknown_02"]), (0, 2))
+        # the shipped entry: a derangement that is not order-preserving,
+        # with the size and every other member unchanged
+        shipped = plausible.volatile_allow_entries()[0]["declaration"]
+        _, moved, moved_size = semantics.perturbed_declaration(shipped)
+        self.assertTrue(all(moved[x] != x for x in moved))
+        self.assertNotEqual(sorted(moved, key=moved.get), sorted(moved))
+        self.assertEqual(moved_size, semantics.object_layout(shipped)[0])
         preprocessed = "int x;\n" + DECLARATION + "\nvoid f(void);\n"
-        self.assertIn("__perturbed_vacated_2", semantics.perturb_pinned(preprocessed, DECLARATION))
+        self.assertIn("volatile u8 unknown_3D : 8; volatile u8 unknown_3C",
+                      semantics.perturb_pinned(preprocessed, DECLARATION))
 
     def perturbed(self, real, perturbed, stripped=None):
         return semantics.compare(real, stripped or real.replace("ldrb\tr2, [r1]\n\t", ""), PREPROCESSED,
@@ -270,21 +279,40 @@ class SemanticDiffTests(unittest.TestCase):
 
     def test_accesses_must_follow_the_layout_perturbation(self):
         # sym.unknown_3C = 1 through its member: the perturbed compile
-        # addresses the moved byte at +0x100
+        # addresses the permuted byte at +0x3D
         real = assembly("ldr\tr1, .L3", "add\tr1, r1, #60", "ldrb\tr2, [r1]", "mov\tr2, #1",
                         "strb\tr2, [r1]", "bx\tlr")
-        moved = assembly("ldr\tr1, .L3", "mov\tr3, #128", "lsl\tr3, r3, #1", "add\tr1, r1, r3",
-                         "ldrb\tr2, [r1]", "mov\tr2, #1", "strb\tr2, [r1]", "bx\tlr")
+        moved = real.replace("#60", "#61")
         self.assertEqual(self.perturbed(real, moved)[0][1:], (1, [2], []))
-        # round 5 (e1, e2) and every alias: the access was computed from
-        # another member, so it stays at +0x3C (now padding) when they move
+        # every alias (round 5 e1/e2, round 6 s1): computed from another
+        # member or sizeof, so it has the same address in both compiles
         with self.assertRaises(semantics.SemanticError) as caught:
             self.perturbed(real, real)
         self.assertIn("does not follow its member", str(caught.exception))
-        # an access that lands on a moved offset without being one
-        stray = moved.replace("add\tr1, r1, r3", "add\tr1, r1, r3\n\tsub\tr1, r1, #1")
+        # a perturbed access somewhere else entirely
         with self.assertRaises(semantics.SemanticError):
-            self.perturbed(real, stray)
+            self.perturbed(real, real.replace("#60", "#62"))
+
+    def test_wide_accesses_may_not_overlap_a_pinned_byte(self):
+        # round 6 (t2, t2b): `*(u16 *)&(0, sym.unknown_02[0x39])` reads +0x3B..+0x3C
+        for access in ("ldrh\tr0, [r1, #59]", "ldr\tr0, [r1, #58]", "strh\tr0, [r1, #60]"):
+            wide = assembly("ldr\tr1, .L3", access, "bx\tlr")
+            with self.subTest(access=access), self.assertRaises(semantics.SemanticError) as caught:
+                compare(wide, wide)
+            self.assertIn("overlaps a pinned byte", str(caught.exception))
+        clear = assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #56]", "bx\tlr")
+        self.assertEqual(compare(clear, clear)[0][1], 1)
+
+    def test_whole_object_uses_are_refused_after_preprocessing(self):
+        same = assembly("bx\tlr")
+        for spelling in ("x = sizeof(" + SYMBOL + ");", "x = __alignof__(" + SYMBOL + ");",
+                         "copy = " + SYMBOL + ";", "p[sizeof " + SYMBOL + " > 0x100 ? 1 : 2] = a;",
+                         "p = &(0, " + SYMBOL + ".unknown_3E);"):
+            with self.subTest(spelling=spelling):
+                self.refused_with(same, same, PREPROCESSED + DECLARATION + "\nvoid f(void) { " + spelling + " }\n",
+                                  "after preprocessing")
+        # the pinned declaration itself is the one allowed bare occurrence
+        self.assertEqual(compare(same, same, PREPROCESSED + DECLARATION + "\n")[0][1], 1)
 
     def test_round_three_snapshot_prototype_and_word_gaps(self):
         # S1: an escape into the incoming-argument area (offset >= 0)
@@ -452,7 +480,7 @@ class CompiledSemanticTests(unittest.TestCase):
     def test_review_repros_are_refused(self):
         s = SYMBOL
         for name, parameters, body, reason in (
-                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "no `&` may precede"),
+                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "after preprocessing"),
                 ("08000002", "int a, int b",
                  f"(void){s}.unknown_3C; a = a * b + 7; {s}.unknown_02[0x3A] = a;", "may only be used as"),
                 ("08000003", "int a, int b, int c",
@@ -499,7 +527,15 @@ class CompiledSemanticTests(unittest.TestCase):
             with self.subTest(spelling=spelling), self.assertRaises(semantics.SemanticError) as caught:
                 self.check(f"u8 *p; a = a * b + 7; {spelling} (void){s}.unknown_3C; p[-2] = a;",
                            "int a, int b")
-            self.assertIn("does not follow its member", str(caught.exception))
+            self.assertRegex(str(caught.exception), "does not follow its member|after preprocessing")
+        # round 6 (s1, t2, t2b)
+        for body, parameters in (
+                (f"u8 *p; a = a * b + 7; p = &(0, {s}.unknown_3E); (void){s}.unknown_3C; "
+                 f"p[sizeof({s}) > 0x100 ? 0xC2 : -2] = a;", "int a, int b"),
+                (f"k(*(u16 *)&(0, {s}.unknown_02[0x39]));", "int a"),
+                (f"k(*(unsigned *)&(0, {s}.unknown_3E));", "int a")):
+            with self.subTest(body=body), self.assertRaises(semantics.SemanticError):
+                self.check(body, parameters, "extern void k(int);\n")
         (record,) = self.check(f"{s}.unknown_3C = 1;", "void")
         self.assertIn("a compile with the pinned bytes moved follows every pinned access", record)
 

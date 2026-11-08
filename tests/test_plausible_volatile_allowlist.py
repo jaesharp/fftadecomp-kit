@@ -395,6 +395,16 @@ class VolatileAllowlistTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertEqual(self.rules(source, relpath="src/08000001.c"), [])
 
+    def test_round_six_extension_and_parenthesised_address_of(self):
+        for statement in ("p = &(0, " + SYMBOL + ".unknown_3E);", "p = &(c ? " + SYMBOL + ".unknown_3E : x);",
+                          "k(*(u16 *)&(0, " + SYMBOL + ".unknown_02[0x39]));",
+                          "x = __extension__ " + SYMBOL + ".unknown_3C;"):
+            with self.subTest(statement=statement):
+                self.assertIn("volatile-allowlist", self.rules("void f(void) { " + statement + " }\n",
+                                                               relpath="src/08028C34.c"))
+        self.assertEqual(self.rules("void f(void) { x = (" + SYMBOL + ".unknown_3C & a); }\n",
+                                    relpath="src/08028C34.c"), [])
+
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
                                 ("src/08028C34.c", "#undef u8\n"),

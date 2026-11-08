@@ -1700,23 +1700,32 @@ symbolically along every path, and the check requires:
 **Provenance by layout perturbation.** The real and stripped compiles alone
 cannot tell `(void)sym.x; *(sym.unknown_02 + 0x3A) = a;` from `sym.x = a;`,
 because both compile to the same instructions. So match.py compiles the
-source a third time with the pinned declaration rewritten:
-
-* each volatile bit-field is replaced in place by a padding byte and
-  declared again, in order, from offset 0x100 on, past the end of the object;
-* every other member keeps its offset.
+source a third time with the pinned declaration rewritten: the pinned
+bit-fields swap places among their own slots. Their names are rotated by half
+their number, a derangement that does not preserve order. Every other member,
+the object's size and its alignment stay exactly the same, so nothing a
+source can compute from the layout changes between the two compiles: another
+member's address, `sizeof` and `__alignof__` all keep their values.
 
 A bit-field has no address, so a pinned byte can only be reached through its
-own name, which follows the move. An access computed any other way keeps its
-old offset and lands on the padding: from another member, from the base, or
-through a cast, macro, comma lvalue or `__extension__`. Because 0x100 lies
-past the object, arithmetic on other members cannot coincide with a moved
-byte. On every path, the real compile's trace, branch conditions and object
-accesses, with each pinned offset X mapped to its moved offset P(X), must
-equal the perturbed compile's. The security argument rests on this
-compiler-enforced check. The lexical rules above (array subscripts, `&`,
-casts, macros) are cheap defence in depth: with them switched off, every
-aliasing repro from the reviews is still refused by the perturbation.
+own name, which follows the permutation. An access computed any other way has
+the same address in both compiles and so cannot follow the move. That covers
+accesses from another member, from the base, or through a cast, macro, comma
+lvalue, `__extension__` or a size-dependent index. On every path, the real
+compile's trace, branch conditions and object accesses, with each pinned
+offset X mapped to its permuted offset P(X), must equal the perturbed
+compile's. In both compiles any access wider than a byte that overlaps a
+pinned byte is refused, so only a byte access exactly at a pinned offset can
+touch one.
+
+The security argument rests on these compiler-enforced checks. On the
+preprocessed text, the check also refuses every occurrence of the symbol
+that is not `symbol.member`, apart from the pinned declaration itself. It
+refuses the plausibility `&` and subscript rules there too. The lexical
+rules (array subscripts, `&`, `&(...)` around the symbol, `__extension__` in
+users, casts and macros) are cheap defence in depth. With the lexical passes
+switched off, every aliasing repro from six review rounds is still refused
+by the permutation or the overlap rule.
 
 A planted read either vanishes from the stripped compile, which leaves a load
 the rules cannot explain, or stays, which shows the qualifier did not produce
@@ -1763,11 +1772,11 @@ has these gaps:
   - a dead load into an argument register is refused unless that register
     is overwritten before the next call, whatever the callee's prototype
     says.
-* The layout perturbation refuses anything that depends on where the pinned
-  bytes are, not only aliases. Examples are a computed offset that happens
-  to equal a member's, and the object's size. Those are false refusals. It
-  assumes agbcc places a full-width byte bit-field exactly as the layout
-  computes; a perturbed layout that comes out differently fails closed.
+* The permutation refuses any access to a pinned byte that is not made
+  through its member's name. A computed offset that happens to equal a
+  member's is a false refusal. The check assumes agbcc places a full-width
+  byte bit-field exactly as the layout computes. It needs at least two
+  pinned bytes, and fails closed otherwise.
 * Variable subscripts into the object (`symbol.unknown_02[i]`) are always
   refused. None of the 173 parked and matched sources that reference the
   block uses one. A rough ROM scan finds a register-offset access through a
