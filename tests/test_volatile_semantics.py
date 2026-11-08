@@ -21,6 +21,10 @@ SYMBOL = "g_control_flags_03000940"
 DECLARATION = ("extern struct { u16 display; u8 unknown_02[0x3A]; volatile u8 unknown_3C : 8; "
                "volatile u8 unknown_3D : 8; } " + SYMBOL + ";")
 PREPROCESSED = "void func_08028C34(void);\nextern void func_0802A2C0(int);\n"
+# a mixed declaration: two volatile halfwords and two volatile bytes
+DECLARATION16 = ("extern struct { u16 display; volatile u16 bg0cnt : 16; volatile u16 bg1cnt : 16; "
+                 "u8 unknown_06[0x34]; volatile u8 unknown_3A : 8; volatile u8 unknown_3B : 8; } "
+                 + SYMBOL + ";")
 
 
 def assembly(*body, name="func_08028C34"):
@@ -45,11 +49,19 @@ class SemanticDiffTests(unittest.TestCase):
 
     def test_layout_of_the_pinned_declaration(self):
         self.assertEqual(semantics.object_layout(DECLARATION), (0x3E, {0x3C, 0x3D}))
+        # the shipped entry: halfwords +0x02..+0x39 (BG0CNT..BG3Y_H) and the
+        # bytes of +0x3A..+0x4E that the ROM stores (not MOSAIC's high
+        # byte, the unused 0x0400004E or BLDY's high byte)
         shipped = plausible.volatile_allow_entries()[0]["declaration"]
-        self.assertEqual(semantics.object_layout(shipped)[1],
-                         {0x3C, 0x3D, 0x40, 0x41, 0x43, 0x4A, 0x4B, 0x4C, 0x4D})
+        self.assertEqual(semantics.pinned_members(shipped),
+                         (0x50, {**{offset: 2 for offset in range(0x02, 0x3A, 2)},
+                                 **{offset: 1 for offset in list(range(0x3A, 0x47)) + list(range(0x4A, 0x4F))}}))
+        self.assertEqual(semantics.pinned_members(DECLARATION16),
+                         (0x3C, {0x02: 2, 0x04: 2, 0x3A: 1, 0x3B: 1}))
         for broken in (DECLARATION.replace(": 8", ": 4"), DECLARATION.replace("u16", "float"),
-                       DECLARATION.replace("volatile u8 unknown_3D : 8", "volatile u16 unknown_3D : 16")):
+                       DECLARATION.replace("volatile u8 unknown_3D : 8", "volatile u32 unknown_3D : 32"),
+                       DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt : 8"),
+                       DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt[1]")):
             with self.subTest(declaration=broken), self.assertRaises(semantics.SemanticError):
                 semantics.object_layout(broken)
 
@@ -303,6 +315,131 @@ class SemanticDiffTests(unittest.TestCase):
         clear = assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #56]", "bx\tlr")
         self.assertEqual(compare(clear, clear)[0][1], 1)
 
+    def compare16(self, real, stripped, perturbed=None):
+        return semantics._compare_compiles(real, stripped, PREPROCESSED, SYMBOL, DECLARATION16, perturbed)
+
+    def test_halfword_read_modify_write_is_accepted(self):
+        # `sym.bg1cnt = 0x1F08;`: agbcc's dead ldrh before the strh
+        real = assembly("ldr\tr1, .L3", "ldr\tr0, .L3+4", "ldrh\tr2, [r1, #4]", "strh\tr0, [r1, #4]",
+                        "bx\tlr").replace(f".word\t{SYMBOL}\n", f".word\t{SYMBOL}\n\t.word\t0x1F08\n")
+        stripped = real.replace("ldrh\tr2, [r1, #4]\n\t", "")
+        self.assertEqual(self.compare16(real, stripped)[0][1:], (1, [2], []))
+        self.assertIn("read-modify-write loads at [3]",
+                      semantics.record(SYMBOL, self.compare16(real, stripped)))
+        # `sym.bg1cnt += 1`: the used load is the stripped compile's counterpart
+        increment = assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #4]", "add\tr0, r0, #1",
+                             "ldrh\tr2, [r1, #4]", "strh\tr0, [r1, #4]", "bx\tlr")
+        self.assertEqual(self.compare16(increment, increment.replace("ldrh\tr2, [r1, #4]\n\t", ""))[0][1:],
+                         (1, [3], []))
+        # agbcc builds a halfword constant after the dead load (`sym.bg1cnt =
+        # 0x100`); arithmetic on anything but constants may not sit there
+        built = assembly("ldr\tr1, .L3", "ldrh\tr2, [r1, #4]", "mov\tr0, #128", "lsl\tr0, r0, #1",
+                         "strh\tr0, [r1, #4]", "bx\tlr")
+        self.assertEqual(self.compare16(built, built.replace("ldrh\tr2, [r1, #4]\n\t", ""))[0][1:],
+                         (1, [1], []))
+        computed = built.replace("mov\tr0, #128\n\tlsl\tr0, r0, #1", "lsl\tr0, r0, #1")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.compare16(computed, computed.replace("ldrh\tr2, [r1, #4]\n\t", ""))
+        self.assertIn("not directly followed by a store", str(caught.exception))
+        # a dead ldrh with no strh of the same halfword is a planted read
+        for name, planted in (
+                ("alone", assembly("ldr\tr1, .L3", "ldrh\tr2, [r1, #4]", "bx\tlr")),
+                ("other halfword", assembly("ldr\tr1, .L3", "ldrh\tr2, [r1, #4]", "mov\tr0, #1",
+                                            "strh\tr0, [r1, #2]", "bx\tlr")),
+                ("byte store", assembly("ldr\tr1, .L3", "add\tr1, r1, #58", "ldrh\tr2, [r1, #-54]",
+                                        "mov\tr0, #1", "strb\tr0, [r1]", "bx\tlr"))):
+            with self.subTest(plant=name), self.assertRaises(semantics.SemanticError):
+                self.compare16(planted, planted.replace("ldrh\tr2, [r1, #4]\n\t", ""))
+        # a halfword store without its dead load, and a self-assignment
+        bare = assembly("ldr\tr1, .L3", "mov\tr0, #1", "strh\tr0, [r1, #4]", "bx\tlr")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.compare16(bare, bare)
+        self.assertIn("without the read-modify-write load", str(caught.exception))
+        self_assign = assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #4]", "ldrh\tr2, [r1, #4]",
+                               "strh\tr0, [r1, #4]", "bx\tlr")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.compare16(self_assign, assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #4]",
+                                                 "strh\tr0, [r1, #4]", "bx\tlr"))
+        self.assertIn("self-assignment", str(caught.exception))
+
+    def test_halfword_chained_assignment_re_read(self):
+        # `sym.bg0cnt = (sym.bg1cnt = 0);` re-reads +0x04 at its own width
+        real = assembly("ldr\tr1, .L3", "ldrh\tr0, [r1, #4]", "mov\tr2, #0", "strh\tr2, [r1, #4]",
+                        "ldrh\tr0, [r1, #4]", "ldrh\tr3, [r1, #2]", "strh\tr0, [r1, #2]", "bx\tlr")
+        stripped = assembly("ldr\tr1, .L3", "mov\tr2, #0", "strh\tr2, [r1, #4]", "strh\tr2, [r1, #2]",
+                            "bx\tlr")
+        self.assertEqual(self.compare16(real, stripped)[0][1:], (1, [1, 5], [4]))
+        # a byte re-read of the halfword is not the chained shape
+        narrow = real.replace("ldrh\tr0, [r1, #4]\n\tldrh\tr3", "ldrb\tr0, [r1, #4]\n\tldrh\tr3")
+        self.assertNotEqual(narrow, real)
+        with self.assertRaises(semantics.SemanticError):
+            self.compare16(narrow, stripped)
+
+    def test_halfword_members_follow_their_own_permutation(self):
+        text, mapping, size = semantics.perturbed_declaration(DECLARATION16)
+        # bytes swap with bytes and halfwords with halfwords, nothing else moves
+        self.assertEqual(mapping, {0x02: 0x04, 0x04: 0x02, 0x3A: 0x3B, 0x3B: 0x3A})
+        self.assertEqual(size, 0x3C)
+        self.assertIn("volatile u16 bg1cnt : 16; volatile u16 bg0cnt : 16; u8 unknown_06 [ 0x34 ]; "
+                      "volatile u8 unknown_3B : 8; volatile u8 unknown_3A : 8;", text)
+        real = assembly("ldr\tr1, .L3", "ldrh\tr2, [r1, #4]", "mov\tr2, #1", "strh\tr2, [r1, #4]",
+                        "bx\tlr")
+        stripped = real.replace("ldrh\tr2, [r1, #4]\n\t", "")
+        self.assertEqual(self.compare16(real, stripped, real.replace("#4]", "#2]"))[0][1:], (1, [1], []))
+        # an access to +0x04 computed without bg1cnt's name stays put
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.compare16(real, stripped, real)
+        self.assertIn("does not follow its member", str(caught.exception))
+        # a lone member of its form cannot be permuted, so it is refused
+        lone = DECLARATION16.replace("volatile u16 bg1cnt : 16", "u16 bg1cnt")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            semantics.perturbed_declaration(lone)
+        self.assertIn("at least two pinned members of the form", str(caught.exception))
+        # the shipped entry: every member moves within its width class
+        shipped = plausible.volatile_allow_entries()[0]["declaration"]
+        _, widths = semantics.pinned_members(shipped)
+        _, moved, _ = semantics.perturbed_declaration(shipped)
+        self.assertEqual(sorted(moved), sorted(widths))
+        self.assertTrue(all(moved[x] != x and widths[moved[x]] == widths[x] for x in moved))
+
+    def test_accesses_overlapping_a_halfword_member_are_refused(self):
+        # a byte of a pinned halfword, a halfword over a byte pair, a word
+        # over two halfwords, a misaligned halfword and a signed halfword
+        # store spanning display and bg0cnt
+        for access in ("ldrb\tr0, [r1, #5]", "ldrb\tr0, [r1, #2]", "strb\tr0, [r1, #4]",
+                       "ldr\tr0, [r1, #4]", "str\tr0, [r1, #0]", "ldrh\tr0, [r1, #3]",
+                       "ldrh\tr0, [r1, #58]", "strh\tr0, [r1, #1]"):
+            wide = assembly("ldr\tr1, .L3", access, "bx\tlr")
+            with self.subTest(access=access), self.assertRaises(semantics.SemanticError) as caught:
+                self.compare16(wide, wide)
+            self.assertIn("overlaps a pinned byte", str(caught.exception))
+        # the unpinned neighbours stay ordinary memory
+        for access in ("ldrh\tr0, [r1, #0]", "ldr\tr0, [r1, #8]", "ldrh\tr0, [r1, #56]"):
+            clear = assembly("ldr\tr1, .L3", access, "bx\tlr")
+            self.assertEqual(self.compare16(clear, clear)[0][1], 1)
+
+    def test_mixed_byte_and_halfword_function(self):
+        # `sym.bg0cnt = v; sym.unknown_3A = 0x10; sym.display |= 0x4000;`
+        real = assembly("ldr\tr1, .L3", "ldrh\tr2, [r1, #2]", "strh\tr0, [r1, #2]",
+                        "add\tr3, r1, #0", "add\tr3, r3, #58", "ldrb\tr2, [r3]", "mov\tr2, #16",
+                        "strb\tr2, [r3]", "ldrh\tr2, [r1]", "mov\tr3, #128", "lsl\tr3, r3, #7",
+                        "orr\tr2, r2, r3", "strh\tr2, [r1]", "bx\tlr")
+        stripped = assembly("ldr\tr1, .L3", "strh\tr0, [r1, #2]", "add\tr3, r1, #0",
+                            "add\tr3, r3, #58", "mov\tr2, #16", "strb\tr2, [r3]", "ldrh\tr2, [r1]",
+                            "mov\tr3, #128", "lsl\tr3, r3, #7", "orr\tr2, r2, r3", "strh\tr2, [r1]",
+                            "bx\tlr")
+        perturbed = real.replace("#2]", "#4]").replace("#58", "#59")
+        self.assertEqual(self.compare16(real, stripped, perturbed)[0][1:], (1, [1, 5], []))
+        # moving only one width class is not the permutation
+        for wrong in (real.replace("#2]", "#4]"), real.replace("#58", "#59")):
+            with self.subTest(perturbed=wrong), self.assertRaises(semantics.SemanticError):
+                self.compare16(real, stripped, wrong)
+        # the halfword's read-modify-write load does not cover the byte store
+        borrowed = real.replace("ldrb\tr2, [r3]\n\t", "")
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.compare16(borrowed, stripped)
+        self.assertIn("without the read-modify-write load", str(caught.exception))
+
     def test_whole_object_uses_are_refused_after_preprocessing(self):
         same = assembly("bx\tlr")
         for spelling in ("x = sizeof(" + SYMBOL + ");", "x = __alignof__(" + SYMBOL + ");",
@@ -460,26 +597,26 @@ class CompiledSemanticTests(unittest.TestCase):
 
     def test_recovered_bodies_pass(self):
         s = SYMBOL
-        for body in (f"{s}.unknown_43 = 0x13; {s}.unknown_3D = 0x10; {s}.unknown_41 = 8; "
-                     f"{s}.unknown_3C = 0xE0; {s}.unknown_40 = 0x20; {s}.display |= 0x4000; "
+        for body in (f"{s}.winin_hi = 0x13; {s}.win1h_hi = 0x10; {s}.win1v_hi = 8; "
+                     f"{s}.win1h_lo = 0xE0; {s}.win1v_lo = 0x20; {s}.display |= 0x4000; "
                      "func_0802A2C0(2, 2, 0x1A, 6);",
-                     f"{s}.unknown_4A = ({s}.unknown_4B = 0); {s}.unknown_4C = ({s}.unknown_4D = 0);"):
+                     f"{s}.bldcnt_lo = ({s}.bldcnt_hi = 0); {s}.bldalpha_lo = ({s}.bldalpha_hi = 0);"):
             with self.subTest(body=body):
                 (record,) = self.check(body)
                 self.assertTrue(record.startswith("* allowlisted volatile semantics: "), record)
 
     def test_plants_are_refused(self):
-        s, tail = SYMBOL, f" {SYMBOL}.unknown_3D = 1;"
-        for plant, reason in ((f"({s}.unknown_3C, 0);", "dead load"),
-                              (f"{s}.unknown_3C |= 0;", "self-assignment"),
-                              (f"{s}.unknown_3C = {s}.unknown_3C;", "self-assignment"),
-                              (f"{{ u8 unused = {s}.unknown_3C; }}", "dead load"),
-                              (f"if ({s}.unknown_3C) ;", "dead load"),
-                              (f"func_0802A2C0(0 * {s}.unknown_3C, 0, 0, 0);", "dead load"),
-                              (f"{s}.unknown_3C;", "dead load"),
-                              (f"(void){s}.unknown_3C;", "dead load"),
-                              (f"!{s}.unknown_3C;", "dead load"),
-                              (f"{s}.unknown_02[0x3A] = 1;", "may only be used as")):
+        s, tail = SYMBOL, f" {SYMBOL}.win1h_hi = 1;"
+        for plant, reason in ((f"({s}.win1h_lo, 0);", "dead load"),
+                              (f"{s}.win1h_lo |= 0;", "self-assignment"),
+                              (f"{s}.win1h_lo = {s}.win1h_lo;", "self-assignment"),
+                              (f"{{ u8 unused = {s}.win1h_lo; }}", "dead load"),
+                              (f"if ({s}.win1h_lo) ;", "dead load"),
+                              (f"func_0802A2C0(0 * {s}.win1h_lo, 0, 0, 0);", "dead load"),
+                              (f"{s}.win1h_lo;", "dead load"),
+                              (f"(void){s}.win1h_lo;", "dead load"),
+                              (f"!{s}.win1h_lo;", "dead load"),
+                              (f"{s}.unknown_48[2] = 1;", "may only be used as")):
             with self.subTest(plant=plant):
                 with self.assertRaises(semantics.SemanticError) as caught:
                     self.check(plant + tail)
@@ -488,35 +625,35 @@ class CompiledSemanticTests(unittest.TestCase):
     def test_review_repros_are_refused(self):
         s = SYMBOL
         for name, parameters, body, reason in (
-                ("p1", "int n, int a", f"(void)(&{s})[n].unknown_3C;", "after preprocessing"),
+                ("p1", "int n, int a", f"(void)(&{s})[n].bldcnt_lo;", "after preprocessing"),
                 ("08000002", "int a, int b",
-                 f"(void){s}.unknown_3C; a = a * b + 7; {s}.unknown_02[0x3A] = a;", "may only be used as"),
+                 f"(void){s}.bldcnt_lo; a = a * b + 7; {s}.unknown_48[2] = a;", "may only be used as"),
                 ("08000003", "int a, int b, int c",
-                 f"(void){s}.unknown_43; a = (a * b + 7) ^ (c << 3); b = a * c; {s}.unknown_44[-1] = b;",
+                 f"(void){s}.mosaic_lo; a = (a * b + 7) ^ (c << 3); b = a * c; {s}.unknown_48[-2] = b;",
                  "may only be used as"),
                 ("08000004", "int a, int b, int c, int d",
-                 f"{s}.unknown_3C = a; {s}.display = b * c + d * a + (b ^ d) * c; "
-                 f"{s}.unknown_3D = {s}.unknown_3C;", "the qualifier added a read")):
+                 f"{s}.bldcnt_lo = a; {s}.display = b * c + d * a + (b ^ d) * c; "
+                 f"{s}.bldcnt_hi = {s}.bldcnt_lo;", "the qualifier added a read")):
             with self.subTest(repro=name):
                 with self.assertRaises(semantics.SemanticError) as caught:
                     self.check(body, parameters)
                 self.assertIn(reason, str(caught.exception))
-        (record,) = self.check(f"a = a * b + 7; {s}.unknown_3C = a;", "int a, int b")
+        (record,) = self.check(f"a = a * b + 7; {s}.bldcnt_lo = a;", "int a, int b")
         self.assertIn("read-modify-write loads at [7]", record)
         # round 3 (a1, a2, a2b): macros that spell the member or the `&`
-        for prelude in ("#define ARR unknown_02\n", "#define AT &\n", "#define ADDR(x) &x\n"):
-            body = {"#define ARR unknown_02\n": f"*({s}.ARR + 0x3A) = a;",
-                    "#define AT &\n": f"((u8 *)AT {s}.display)[0x3C] = a;",
-                    "#define ADDR(x) &x\n": f"*(ADDR({s}.unknown_3E) - 2) = a;"}[prelude]
+        for prelude in ("#define ARR unknown_48\n", "#define AT &\n", "#define ADDR(x) &x\n"):
+            body = {"#define ARR unknown_48\n": f"*({s}.ARR + 2) = a;",
+                    "#define AT &\n": f"((u8 *)AT {s}.display)[0x4A] = a;",
+                    "#define ADDR(x) &x\n": f"*(ADDR({s}.bldy_hi) - 5) = a;"}[prelude]
             with self.subTest(prelude=prelude), self.assertRaises(semantics.SemanticError) as caught:
-                self.check(f"a = a * b + 7; (void){s}.unknown_3C; " + body, "int a, int b", prelude)
+                self.check(f"a = a * b + 7; (void){s}.bldcnt_lo; " + body, "int a, int b", prelude)
             self.assertIn("after preprocessing", str(caught.exception))
         # round 4 (c1, c2, c3): casts and __extension__ around `&`
-        for body in (f"(*(u8 (*)[0x4E])&{s}.display)[0x3C] = a;",
-                     f"{{ u8 *p = __extension__ &{s}.unknown_3E; p[-2] = a; }}",
-                     f"((struct {{ u8 unknown_00[0x3C]; u8 x; }} *)&{s}.display)->x = a;"):
+        for body in (f"(*(u8 (*)[0x50])&{s}.display)[0x4A] = a;",
+                     f"{{ u8 *p = __extension__ &{s}.bldy_hi; p[-5] = a; }}",
+                     f"((struct {{ u8 unknown_00[0x4A]; u8 x; }} *)&{s}.display)->x = a;"):
             with self.subTest(body=body), self.assertRaises(semantics.SemanticError) as caught:
-                self.check(f"a = a * b + 7; (void){s}.unknown_3C; " + body, "int a, int b")
+                self.check(f"a = a * b + 7; (void){s}.bldcnt_lo; " + body, "int a, int b")
             self.assertIn("after preprocessing", str(caught.exception))
         # round 5 (d1): a callee's prototype, even one its own source
         # "agrees" with through `#define A a, int b, int c`, is not trusted
@@ -525,27 +662,75 @@ class CompiledSemanticTests(unittest.TestCase):
                           "void func_0802AAAA(int A)\n{\n    func_0802BBBB(a, b, c);\n}\n")
         try:
             with self.assertRaises(semantics.SemanticError) as caught:
-                self.check(f"{s}.unknown_3C = a; func_0802AAAA(a);", "int a",
+                self.check(f"{s}.bldcnt_lo = a; func_0802AAAA(a);", "int a",
                            "extern void func_0802AAAA(int);\n")
             self.assertIn("might take as an argument", str(caught.exception))
         finally:
             callee.unlink()
         # round 5 (e1, e2): address-of through __extension__ or a comma lvalue
-        for spelling in (f"p = & __extension__ {s}.unknown_3E;", f"p = &(0, {s}.unknown_3E);"):
+        for spelling in (f"p = & __extension__ {s}.bldy_hi;", f"p = &(0, {s}.bldy_hi);"):
             with self.subTest(spelling=spelling), self.assertRaises(semantics.SemanticError) as caught:
-                self.check(f"u8 *p; a = a * b + 7; {spelling} (void){s}.unknown_3C; p[-2] = a;",
+                self.check(f"u8 *p; a = a * b + 7; {spelling} (void){s}.bldcnt_lo; p[-5] = a;",
                            "int a, int b")
             self.assertRegex(str(caught.exception), "does not follow its member|after preprocessing")
         # round 6 (s1, t2, t2b)
         for body, parameters in (
-                (f"u8 *p; a = a * b + 7; p = &(0, {s}.unknown_3E); (void){s}.unknown_3C; "
-                 f"p[sizeof({s}) > 0x100 ? 0xC2 : -2] = a;", "int a, int b"),
-                (f"k(*(u16 *)&(0, {s}.unknown_02[0x39]));", "int a"),
-                (f"k(*(unsigned *)&(0, {s}.unknown_3E));", "int a")):
+                (f"u8 *p; a = a * b + 7; p = &(0, {s}.bldy_hi); (void){s}.bldcnt_lo; "
+                 f"p[sizeof({s}) > 0x100 ? 0xC2 : -5] = a;", "int a, int b"),
+                (f"k(*(u16 *)&(0, {s}.unknown_48[1]));", "int a"),
+                (f"k(*(unsigned *)&(0, {s}.mosaic_hi));", "int a")):
             with self.subTest(body=body), self.assertRaises(semantics.SemanticError):
                 self.check(body, parameters, "extern void k(int);\n")
-        (record,) = self.check(f"{s}.unknown_3C = 1;", "void")
+        (record,) = self.check(f"{s}.bldcnt_lo = 1;", "void")
         self.assertIn("a compile with the pinned bytes moved follows every pinned access", record)
+
+    def test_halfword_members_through_agbcc(self):
+        s, tail = SYMBOL, f" {SYMBOL}.bg0vofs = 1;"
+        for body, parameters, loads in (
+                (f"{s}.bg0hofs = a; {s}.bg0vofs = b; {s}.bldalpha_lo = 0x10; {s}.bg2pa = 0x100;",
+                 "int a, int b", 4),
+                (f"{s}.bg1hofs += 1; {s}.win0h_hi = 0;", "void", 2),
+                (f"{s}.bg0hofs = a + 1; {s}.bg2pa = -a; {s}.bg0vofs = a << 3; {s}.bg1hofs = 0xFFFF; "
+                 f"{s}.bg2pb = 0xF000; {s}.bldy_lo = b * 3;", "int a, int b", 6),
+                (f"{s}.bg0cnt = ({s}.bg1cnt = 0);", "void", 2)):
+            with self.subTest(body=body):
+                (record,) = self.check(body, parameters)
+                self.assertEqual(record.split("read-modify-write loads at [")[1].split("]")[0].count(",") + 1,
+                                 loads, record)
+        (record,) = self.check(f"{s}.bg0cnt = ({s}.bg1cnt = 0);")
+        self.assertNotIn("chained re-reads at []", record)
+        for plant, reason in ((f"(void){s}.bg0cnt;", "dead load"),
+                              (f"{s}.bg0cnt |= 0;", "self-assignment"),
+                              (f"{s}.bg0cnt = {s}.bg0cnt;", "self-assignment"),
+                              (f"if ({s}.bg3y_h) ;", "dead load"),
+                              (f"{s}.unknown_48[2] = {s}.bg0cnt;", "may only be used as")):
+            with self.subTest(plant=plant):
+                with self.assertRaises(semantics.SemanticError) as caught:
+                    self.check(plant + tail)
+                self.assertIn(reason, str(caught.exception))
+
+    def test_compiled_layout_equals_the_modelled_layout(self):
+        """agbcc places every pinned member where pinned_members() says"""
+        import re
+        import subprocess
+        declaration = plausible.volatile_allow_entries()[0]["declaration"]
+        layout, size = semantics.members(declaration)
+        names = [name for _, name, _, _, qualified in layout if qualified]
+        source = ("typedef unsigned char u8;\ntypedef unsigned short u16;\n" + declaration +
+                  "\nint size(void) { return sizeof(" + SYMBOL + "); }\n" +
+                  "".join(f"int l_{name}(void) {{ return {SYMBOL}.{name}; }}\n" for name in names))
+        output = subprocess.run([os.path.expandvars(match.DEFAULT_CC), "-mthumb-interwork", "-O2"],
+                                input=source, capture_output=True, text=True, check=True).stdout
+        compiled = {}
+        for found in re.finditer(r"^l_(\w+):\n(.*?)\.size", output, re.S | re.M):
+            body = found[2]
+            added = re.search(r"add\tr\d, r\d, #(\d+)", body)
+            load = re.search(r"ldr(b|h)\tr\d, \[r\d(?:, #(\d+))?\]", body)
+            compiled[found[1]] = (int(added[1]) if added else 0) + int(load[2] or 0), \
+                {"b": 1, "h": 2}[load[1]]
+        self.assertEqual(compiled, {name: (offset, width) for _, name, offset, width, qualified in layout
+                                    if qualified})
+        self.assertIn(f"mov\tr0, #{size}", output)
 
 
 if __name__ == "__main__":

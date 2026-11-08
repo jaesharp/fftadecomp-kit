@@ -1651,8 +1651,9 @@ member types that may be volatile and the object's complete declaration. Only
 that header may declare the object, exactly once, as a file-scope anonymous
 `extern struct { ... } symbol;` whose tokens equal the pinned declaration, so
 any change to the layout needs a maintainer edit of the list. Inside the
-braces `volatile` may only begin a listed-type bit-field member
-(`volatile u8 name : 8;`): bit-fields have no address, and the declaration
+braces `volatile` may only begin a full-width bit-field member of a listed
+type (`volatile u8 name : 8;` or `volatile u16 name : 16;`; any other width,
+or a type the kit has no width for, is refused): bit-fields have no address, and the declaration
 holds no nested, tagged or parenthesized types, so the qualifier reaches no
 other object. The exemption applies only while `config/data_symbols.json` maps
 the symbol to the listed address, and only to the header at its listed project
@@ -1674,7 +1675,7 @@ use must be `symbol.member`, so neither its address nor the whole object reaches
 arithmetic, a macro or a copy. Pinned bytes must be reachable only
 through their own members. An array member may only be written
 `symbol.array[literal]` with the literal inside its bounds, so decay, pointer
-arithmetic, `k[symbol.array]`, `(symbol.array)[k]`, `[0x3A]` past the end and
+arithmetic, `k[symbol.array]`, `(symbol.array)[k]`, `[2]` past the end and
 `[-1]` are all refused. Decimal, octal and hex literals are read as C reads
 them. No `&` may precede the symbol, through any number of `(`, whether it
 is unary or binary. That rules out every way of taking a member's address
@@ -1697,8 +1698,12 @@ file-scope `extern` declarator of the symbol (a parameter name does not
 count) whose include closure does not reach the listed header, so a
 declaration hidden behind `#if` exempts nothing. The single
 listed object is `g_control_flags_03000940` (`0x03000940`,
-`include/control_flags.h`, `u8`), whose byte stores carry a dead load of the
-same byte throughout the ROM and on no other RAM.
+`include/control_flags.h`, `u8` and `u16`), the game's RAM image of the LCD
+registers: `08000718` DMAs `0x03000942` to `0x04000008` (BG0CNT) as 39
+halfwords, so its members are named after the registers they shadow. Every
+halfword store to `+0x02..+0x39` and every byte store to `+0x3A..+0x4E`
+carries a dead load of the same member throughout the ROM and on no other
+RAM; the DISPCNT copy at `+0x00` has plain stores and stays non-volatile.
 
 When the addressed source reaches the listed header through its include
 closure (an over-approximation of the preprocessor's dependencies, since
@@ -1735,44 +1740,54 @@ symbolically along every path, and the check requires:
   closed, as does the object's address reaching a call argument or a stored
   value;
 * every load of the object in the real compile to be one of:
-  - a **read-modify-write load**: an `ldrb` of a pinned byte whose
-    destination is overwritten before any use, followed by its `strb` to the
-    same byte with nothing in between but immediate `mov`s and copies or
-    literal loads into the store's own operand registers. agbcc computes the
-    stored value before the load, and 08028C34, 08050D50, 08050DA0 and
-    08122C6C show exactly this shape;
-  - a **chained re-read** for `a = (b = v)`: an `ldrb` of the byte whose
-    `strb` is the immediately preceding memory access, with only register
-    arithmetic in between, whose value reaches, through copies only, the next
-    store, an `strb` to a pinned byte. Only that store's own read-modify-write
-    load may intervene, and the value is used nowhere else (08122C6C);
+  - a **read-modify-write load**: an unsigned load of a pinned member at its
+    offset and width (`ldrb` of a byte, `ldrh` of a halfword) whose
+    destination is overwritten before any use, followed by its store of the
+    same width to the same member with nothing in between but constant
+    materialisation (immediate `mov`s, and arithmetic on known constants such
+    as `mov #128; lsl #1` for a halfword `0x100`) and copies or literal loads
+    into the store's own operand registers. agbcc computes any other stored
+    value before the load, and 08028C34, 08050D50, 08050DA0, 08122C6C (bytes)
+    and 080034B8, 080032F8 (halfwords) show exactly this shape;
+  - a **chained re-read** for `a = (b = v)`: a load of the member, at its
+    width, whose store is the immediately preceding memory access, with only
+    register arithmetic in between, whose value reaches, through copies only,
+    the next store, a store to a pinned member at that member's width. Only
+    that store's own read-modify-write load may intervene, and the value is
+    used nowhere else (08122C6C);
   - a **counterpart**: matched in order to the stripped compile's loads of
     the object, with the same address and width;
-* every store overlapping a pinned byte to be an `strb` of exactly that byte
-  with its own read-modify-write load;
-* no store to write back the value just loaded from the same byte (an
-  `ldrb`/`strb` self-assignment).
+* every access overlapping a pinned member to be exactly that member, at its
+  offset and width (a byte of a halfword, a halfword over two bytes and a
+  word over two halfwords are refused), and every such store to carry its
+  own read-modify-write load;
+* no store to write back the value just loaded from the same member (an
+  `ldrb`/`strb` or `ldrh`/`strh` self-assignment).
 
 **Provenance by layout perturbation.** The real and stripped compiles alone
 cannot tell `(void)sym.x; *(sym.unknown_02 + 0x3A) = a;` from `sym.x = a;`,
 because both compile to the same instructions. So match.py compiles the
 source a third time with the pinned declaration rewritten: the pinned
-bit-fields swap places among their own slots. Their names are rotated by half
-their number, a derangement that does not preserve order. Every other member,
+bit-fields swap places among their own slots, within each declaration form
+(bytes with bytes, halfwords with halfwords). Within a form the names are
+rotated by half their number, a derangement that does not preserve order.
+Because only members whose declarations are identical apart from the name
+trade places, the rewrite cannot change any offset agbcc assigns, whatever
+its layout rules. Every other member,
 the object's size and its alignment stay exactly the same, so nothing a
 source can compute from the layout changes between the two compiles: another
 member's address, `sizeof` and `__alignof__` all keep their values.
 
-A bit-field has no address, so a pinned byte can only be reached through its
-own name, which follows the permutation. An access computed any other way has
+A bit-field has no address, so a pinned member can only be reached through
+its own name, which follows the permutation. An access computed any other way has
 the same address in both compiles and so cannot follow the move. That covers
 accesses from another member, from the base, or through a cast, macro, comma
 lvalue, `__extension__` or a size-dependent index. On every path, the real
 compile's trace, branch conditions and object accesses, with each pinned
 offset X mapped to its permuted offset P(X), must equal the perturbed
-compile's. In both compiles any access wider than a byte that overlaps a
-pinned byte is refused, so only a byte access exactly at a pinned offset can
-touch one.
+compile's. In both compiles any access that overlaps a pinned member without
+being exactly it is refused, so only an access of the member's own offset
+and width can touch one.
 
 The security argument rests on these compiler-enforced checks. On the
 preprocessed text, the check also refuses every occurrence of the symbol
@@ -1824,8 +1839,8 @@ has these gaps:
 
 * It refuses legitimate volatile semantics that an ordinary declaration would
   optimise differently. Examples are reading a flag twice
-  (`if (x) ...; if (x) ...`), spin loops and repeated stores. Such functions
-  cannot use the allowlist.
+  (`if (x) ...; if (x) ...`), spin loops and repeated stores
+  (`x &= 0xF0; x |= v;`, 080D4DA0). Such functions cannot use the allowlist.
 * The provenance and prototype rules cost some legitimate spellings:
   - a user of the object cannot define macros containing `&` or names of
     the pinned declaration (such as `u8`);
@@ -1837,12 +1852,16 @@ has these gaps:
   - a dead load into an argument register is refused unless that register
     is overwritten before the next call, whatever the callee's prototype
     says.
-* The permutation refuses any access to a pinned byte that is not made
+* The permutation refuses any access to a pinned member that is not made
   through its member's name. A computed offset that happens to equal a
-  member's is a false refusal. The check assumes agbcc places a full-width
-  byte bit-field exactly as the layout computes. It needs at least two
-  pinned bytes, and fails closed otherwise.
-* Variable subscripts into the object (`symbol.unknown_02[i]`) are always
+  member's is a false refusal. The check assumes agbcc places full-width
+  byte and halfword bit-fields exactly as the layout computes (an agbcc test
+  compares the shipped declaration's compiled offsets with the model). It
+  needs at least two pinned members of each declaration form, and fails
+  closed otherwise. The object's address cannot be taken, so code that
+  passes the block's address on (the `08000718` DMA source) cannot use the
+  declaration.
+* Variable subscripts into the object (`symbol.unknown_48[i]`) are always
   refused. None of the 173 parked and matched sources that reference the
   block uses one. A rough ROM scan finds a register-offset access through a
   block base in about 5 of the 373 functions of 2 KiB or less that load the
