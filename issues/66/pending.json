@@ -578,66 +578,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "05d2f3247b45ef5753b2d374ae52e5bc517d4cf9ce13a4b19ddaedd01e589be9",
-        "acknowledged_cursor": 6715144034,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "05d2f3247b45ef5753b2d374ae52e5bc517d4cf9ce13a4b19ddaedd01e589be9",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08042774\",\"who\":\"sol-08042774-3781\",\"note\":\"Plausible C matching only, complete function, existing native compiler. No tooling changes.\"}",
-          "created_at": "2026-11-08T00:38:06Z",
-          "id": 6715144034,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:38:06Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ffe67e3bbd829d3f7fa26dcbacd176d2ce3d1bdbda8a887874aa2d3f3cb813e7",
-        "result": {
-          "address": "0x08042774",
-          "claim_id": 6715144034,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6715144034,
-          "status": "accepted",
-          "who": "sol-08042774-3781"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "5df00c3337be718ab6ac41a9515583702f690a692e05bcbcf08fd9b1c3d5438b",
-        "acknowledged_cursor": 6715257115,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "5df00c3337be718ab6ac41a9515583702f690a692e05bcbcf08fd9b1c3d5438b",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08042774\",\"who\":\"sol-08042774-3781\",\"claim_id\":6715144034,\"reason\":\"Seven native forms improved to407/411 aligned instructions but four down-page field-load/literal-order instructions remain. Fully stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
-          "created_at": "2026-11-08T00:49:44Z",
-          "id": 6715255060,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:49:44Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a00375f9f8a6878eac2d76e3829b223af3c0d413f0c2cc061dc7e1fd1c0bd5ef",
-        "result": {
-          "address": "0x08042774",
-          "claim_id": 6715144034,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6715255060,
-          "status": "accepted",
-          "who": "sol-08042774-3781"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "a922cbba00fc15224b94e1994d1021e783f68603afa63779d918d970786bc17b",
         "acknowledged_cursor": 6715150173,
         "body_provenance": "acceptance-time",
@@ -693,66 +633,6 @@
           "request_id": 6715257115,
           "status": "accepted",
           "who": "sol-0803CEF8-3781"
-        }
-      }
-    },
-    {
-      "claim": {
-        "acceptance_body_sha256": "e721467b65b3ae0677b610dd349fe3e633c43500a1deab0dcf5fd5f220a46f39",
-        "acknowledged_cursor": 6715156455,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e721467b65b3ae0677b610dd349fe3e633c43500a1deab0dcf5fd5f220a46f39",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08142D34\",\"who\":\"sol-08142D34-3781\",\"note\":\"Plausible C matching only, complete function, existing native compiler. No tooling changes.\"}",
-          "created_at": "2026-11-08T00:39:23Z",
-          "id": 6715156455,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:39:23Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "e273c10661a47de5dd55e17b2c346d54b2577f3c977a9b960e45c213c7ed7fdd",
-        "result": {
-          "address": "0x08142D34",
-          "claim_id": 6715156455,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6715156455,
-          "status": "accepted",
-          "who": "sol-08142D34-3781"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "a34632d1143310baaee9e8e6539341fd7e7e0122df08d3e67b6f68c5e4b72f12",
-        "acknowledged_cursor": 6715250306,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "a34632d1143310baaee9e8e6539341fd7e7e0122df08d3e67b6f68c5e4b72f12",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08142D34\",\"who\":\"sol-08142D34-3781\",\"claim_id\":6715156455,\"reason\":\"Six failed native forms plus one diagnostic leave216/220 raw equal bytes and inconsistent stack alias join. Native acceptance not reached; fully stopped.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
-          "created_at": "2026-11-08T00:49:14Z",
-          "id": 6715250306,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:49:14Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "cac757214c90ad0b292dc10b5acae5e6ba8ef6088117860bb7d822c5fe32c1ce",
-        "result": {
-          "address": "0x08142D34",
-          "claim_id": 6715156455,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6715250306,
-          "status": "accepted",
-          "who": "sol-08142D34-3781"
         }
       }
     },
