@@ -868,6 +868,22 @@ fact refuses. This option is separate from the eight-target profile. Both keep
 physical access, protected-frame preservation, synchronous lifetime,
 allocation separation, callback effects and termination as explicit conditions.
 
+`conditional-scheduler-entry-descriptor-calls-v1` admits the same single
+28-byte descriptor call through one of two other entries in a closed table,
+never `func_08005B6C`. `func_08121B8C` (44 bytes, pinned SHA-256) takes the
+descriptor in R2 and forwards it with its pool manager to `func_08005954`. A
+direct `func_08005954` call takes the descriptor in R3 and the parent in the
+caller's outgoing word at SP. That word must be private and hold no tracked
+local pointer, and the descriptor must lie wholly above it. The manager in R0
+must come from one straight-line `ldr r0,[pc,#k]; ldr r0,[r0]` pair, and the
+literal must carry exactly one typed named-data relocation with addend 0.
+Every other outgoing alias or pointer word is refused. The report records the
+entry, its pinned bodies, the manager literal and the outgoing word. Its
+premises are those of the descriptor profile plus a valid manager word separate
+from the caller frame, and, for direct calls, the scheduler reading the parent
+only through that word. Existing scheduler selectors retain their
+`func_08005B6C`-only guards.
+
 Issue #81's single local result word passed to an indexed callee has its own
 opt-in profile:
 
