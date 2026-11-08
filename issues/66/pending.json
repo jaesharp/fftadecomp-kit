@@ -126,7 +126,35 @@
           "who": "sol-080C8570-3773"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "18c85db63a68e92e79adf9123682adbf42b93f51556a0d6b2aa28b4efee7e247",
+        "acknowledged_cursor": 6714941061,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "18c85db63a68e92e79adf9123682adbf42b93f51556a0d6b2aa28b4efee7e247",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080C8570\",\"who\":\"sol-080C8570-3773\",\"claim_id\":6714762700,\"reason\":\"Native MATCH exit0, plausible complete1204B/501I exact. Frozen continuation proof preserves original seven failures and separately counted diagnostics. Fully stopped; source/report/full FUNC retained.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-08T00:17:18Z",
+          "id": 6714941061,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:17:18Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "3b959efe5b5d5b0f1fc643a1270c0e537fe0a86dc1234c5fe1eef8d63f690e82",
+        "result": {
+          "address": "0x080C8570",
+          "claim_id": 6714762700,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6714941061,
+          "status": "accepted",
+          "who": "sol-080C8570-3773"
+        }
+      }
     },
     {
       "claim": {
