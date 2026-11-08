@@ -2,8 +2,8 @@
 
 These are conditional ABI/effect contracts, not inferred callback effects.
 In particular a length argument does not prove a write bound, the scheduler
-copy does not prove nonescape, and an indexed output callee's ROM stores are not a
-verified write bound. Defaults retain the ordinary buffer verifier.
+copy does not prove nonescape, and the indexed output callee's stores are not
+alias-analysed. Defaults retain the ordinary buffer verifier.
 """
 import hashlib
 from pathlib import Path
@@ -34,8 +34,8 @@ DEPENDENCIES = {
     0x08098BB0: (112, '4b56b7d9e7ba587ee64a6d4da1eb3b51b2e6eb7cfcb989a8534fa86a7602c3cc'),
     0x080799C0: (1748, '5b5e3ab0c848c2b722884b1bd6c337ed967e70c9f04745a093e5ba516a1974de'),
 }
-# Indexed callees whose R2 is one caller-owned result word (issue #81).
-OUTPUT_CALLEES = (0x080799C0,)
+# The one indexed callee whose R2 is a caller-owned result word (issue #81).
+OUTPUT_CALLEE = 0x080799C0
 
 
 def require(condition, message):
@@ -66,9 +66,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             dependencies = (0x08005B6C, 0x08005954)
             runtime_names = ('_call_via_r2', '_call_via_r3')
         elif self.policy == OUTPUT:
-            require(len(calls) == 1 and set(calls.values()) <= set(OUTPUT_CALLEES),
+            require(len(calls) == 1 and set(calls.values()) == {OUTPUT_CALLEE},
                     'output-word contract requires one actual indexed output-word call')
-            dependencies = tuple(calls.values())
+            dependencies = (OUTPUT_CALLEE,)
             runtime_names = ()
         else:
             require(len(data) == 60 and calls == {address+14: 0x0814224C, address+32: 0x080C7CC0}
@@ -131,6 +131,8 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             self.access(byte, 1, stack)
         observation = dict(site=site, target=address, local_offset=offset, bytes=width,
                            aliases=sorted(aliases.items()), pointer_words=sorted((slots or {}).items()))
+        if self.policy == OUTPUT:
+            observation['observed_store_bytes'] = 2  # ROM inspection only; see assumptions.
         require(site not in self.observations or self.observations[site] == observation,
                 'local-buffer contract differs across incoming paths')
         self.observations[site] = observation
@@ -150,9 +152,9 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                  'descriptor and ambient original R9 pointer are exposed to the callback; copying does not prove nonescape.'
                  if self.policy == SCHEDULER else
                  'The indexed output callee writes at most the single four-byte local result word through R2 and '
-                 'accesses no other private/saved caller word. Its ROM body identity is checked, but its '
-                 'result stores are not a verified write bound and the word\'s value after the call is conditional; '
-                 'R0/R1 carry no caller-frame pointer.'
+                 'accesses no other private/saved caller word. Its body identity is checked, but its stores are '
+                 'not alias-analysed; ROM inspection shows two 16-bit stores at R2+0 (0x0807A046, 0x0807A05C). '
+                 'The word\'s value after the call is conditional; R0/R1 carry no caller-frame pointer.'
                  if self.policy == OUTPUT else
                  'The installed initial callback initializes exactly the four state bytes without accessing other '
                  'private/saved words. Constant n=4 is an interface argument, not a proof of callback behavior. '

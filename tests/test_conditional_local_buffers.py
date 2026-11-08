@@ -1,7 +1,9 @@
 """The opt-in contracts preserve frame bounds and expose their assumptions."""
+import hashlib
 from pathlib import Path
 import sys
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
@@ -20,6 +22,22 @@ def proof(policy, calls):
     result.policy, result.calls, result.observations = policy, calls, {}
     result.runtime_dependencies = []
     result.environment = {}
+    return result
+
+
+def bound_output(calls, body, pinned):
+    """Run the real OUTPUT bind_root with only ROM/index access stubbed."""
+    result = object.__new__(local.ConditionalLocalBufferProof)
+    result.policy, result.rom, result.entries = local.OUTPUT, b'', []
+    result.mapping = result.index = b''
+    result.dependencies, result.records, result.identities = {}, {}, {}
+    result.span = lambda target: body
+    with mock.patch.dict(local.DEPENDENCIES, {local.OUTPUT_CALLEE: pinned}), \
+            mock.patch.object(local.named, 'validate_owner'), \
+            mock.patch.object(local.graph, 'graph', return_value=({}, None, {}, dict(calls), {})), \
+            mock.patch.object(owner, 'refine'), \
+            mock.patch('known_query_native_closure_profile.environment_fingerprint', return_value={}):
+        result.bind_root(b'', 0x08080EB8, calls)
     return result
 
 
@@ -72,14 +90,19 @@ class ConditionalLocalBufferTests(unittest.TestCase):
         manifest = p.contract_manifest()
         self.assertFalse(manifest['actual_callback_effects_proved'])
         self.assertFalse(manifest['nonescape_proved'])
-        self.assertIn('not a verified write bound', ' '.join(manifest['assumptions']))
+        self.assertIn('not alias-analysed', ' '.join(manifest['assumptions']))
         self.assertEqual(manifest['observations'][0]['bytes'], 4)
+        self.assertEqual(manifest['observations'][0]['observed_store_bytes'], 2)
 
     def test_output_word_rejects_offsets_outside_its_local_word(self):
         for offset in (-20, -14, -12, -4, 0):
             with self.subTest(offset=offset), self.assertRaises(ValueError):
                 proof(local.OUTPUT, {100: 0x080799C0}).check_call(
                     0x080799C0, {R0+2: offset}, [LOCAL]+[SAVED]*3, site=100)
+        # The alias and count checks pass here; only the local-word check refuses.
+        with self.assertRaisesRegex(ValueError, 'outside allocated local words'):
+            proof(local.OUTPUT, {100: 0x080799C0}).check_call(
+                0x080799C0, {R0+2: -16}, [SAVED, LOCAL, SAVED, SAVED], site=100)
 
     def test_output_word_rejects_extra_aliases_slots_and_wider_frames(self):
         for aliases, stack, slots in (({R0+2: -16, R0: -16}, [LOCAL]+[SAVED]*3, None),
@@ -102,6 +125,31 @@ class ConditionalLocalBufferTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             p.check_indirect_target(local.thunk.ALIASES['_call_via_r2'], {}, (), site=100)
 
+    def test_output_word_bind_root_accepts_one_pinned_callee(self):
+        body = bytes(range(256))*6 + bytes(212)
+        p = bound_output({100: 0x080799C0}, body, (1748, hashlib.sha256(body).hexdigest()))
+        self.assertEqual(p.dependencies, {0x080799C0: body})
+        self.assertEqual(p.records[0x080799C0]['bytes'], 1748)
+        self.assertEqual(p.runtime_dependencies, [])
+
+    def test_output_word_bind_root_rejects_call_shape(self):
+        body = bytes(1748)
+        pinned = (1748, hashlib.sha256(body).hexdigest())
+        for calls in ({100: 0x080799C0, 120: 0x080799C0}, {100: 0x0808CBDC},
+                      {100: 0x080799C0, 120: 0x0808CBDC}, {}):
+            with self.subTest(calls=calls), self.assertRaisesRegex(ValueError, 'one actual indexed output-word call'):
+                bound_output(calls, body, pinned)
+
+    def test_output_word_bind_root_rejects_callee_identity(self):
+        body = bytes(range(256))*6 + bytes(212)
+        flipped = bytearray(body)
+        flipped[100] ^= 1
+        short = body[:-2]
+        for actual, pinned in ((bytes(flipped), (1748, hashlib.sha256(body).hexdigest())),
+                               (short, (1748, hashlib.sha256(short).hexdigest()))):
+            with self.subTest(size=len(actual)), self.assertRaisesRegex(ValueError, 'dependency identity differs'):
+                bound_output({100: 0x080799C0}, actual, pinned)
+
     def test_unauthenticated_site_and_unobserved_call_refused(self):
         p = proof(local.SCHEDULER, {100: 0x08005B6C})
         with self.assertRaises(ValueError):
@@ -121,6 +169,13 @@ class ConditionalLocalBufferTests(unittest.TestCase):
             self.assertIn(policy, named.SELECTORS)
             self.assertEqual(owner.selector_for_report(f'* verification: `{schema}`'), policy)
         self.assertFalse(named.conditional_thunk_replay(None))
+
+    def test_selectors_are_registered_with_dispatch_and_cli(self):
+        self.assertEqual(named.LOCAL_CALL_SELECTORS, local.SELECTORS)
+        source = (Path(match.__file__).read_text(encoding='utf-8'))
+        line, = [row for row in source.splitlines() if '"--owner-runtime-profile", choices=(' in row]
+        for policy in local.SELECTORS:
+            self.assertIn(f'"{policy}"', line)
 
 
 if __name__ == '__main__':
