@@ -239,7 +239,7 @@ class StatusParallelTests(unittest.TestCase):
                     contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()), \
                     self.assertRaisesRegex(SystemExit, "no status markers"):
                 status.main()
-            collect.assert_called_once_with(str(self.root), True, write_reports=False, jobs=expected)
+            collect.assert_called_once_with(str(self.root), True, write_reports=False, jobs=expected, progress={})
 
     def test_both_clis_reject_jobs_outside_bounds_before_io(self):
         for module in (status, push):
