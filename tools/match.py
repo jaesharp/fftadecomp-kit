@@ -4280,6 +4280,7 @@ def main():
                                                       "bounded-buffer-nested-halfword-output-v1",
                                                       "bounded-buffer-direct-halfword-output-v1",
                                                       "bounded-buffer-three-halfword-output-v1",
+                                                      "bounded-buffer-named-three-halfword-output-v1",
                                                       "bounded-buffer-three-output-dynamic-division-v1",
                                                       "bounded-buffer-root-guarded-switch-v1",
                                                       "static-callback-buffer-v1",
