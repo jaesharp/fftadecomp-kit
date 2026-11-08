@@ -1805,7 +1805,16 @@ The match report records `* allowlisted volatile: ...` for each such object,
 with the header's SHA-256, and `* allowlisted volatile semantics: ...`, which
 lists the paths and the instructions explained as read-modify-write loads and
 chained re-reads. Saved reports are refused unless both records equal a fresh
-recomputation, which recompiles both versions. The premise is that the pinned
+recomputation, which recompiles both versions. match.py runs both checks
+once, before any profile selector, so they apply on every path. That
+includes the selectors that write their own reports, such as the owner,
+addressed and signed runtimes, private float, palette and switch constants.
+A failing check makes the source IMPLAUSIBLE and the selector never runs.
+Every report puts the records directly after its
+`* source plausibility: plausible` line. If a selector's report has no such
+line, the report and any `--emit` output are removed and no MATCH is
+printed. `report_matches` compares the records centrally and gives each
+profile validator the report without them. The premise is that the pinned
 declaration is the original program's. The byte comparison, linking and
 every other check are unchanged.
 

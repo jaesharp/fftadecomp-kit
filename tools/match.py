@@ -20,7 +20,9 @@ instruction the compiler decided differently.
 """
 
 import argparse
+import contextlib
 import hashlib
+import io
 import json
 import os
 import platform
@@ -74,7 +76,7 @@ from match_evidence import (BUFFER_SCHEMA, BUFFER_SUMMARY, CALL_SUMMARY, DATA_SC
                             STACK_SUMMARY, data_snapshot, mapping_fingerprint,
                             function_address_fingerprint, function_address_manifest,
                             mapping_snapshot, source_fingerprint, source_paths, report_rom_path,
-                            verify_dependencies)
+                            verify_dependencies, carry_volatile_records)
 
 try:
     from capstone import (Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_MODE_THUMB,
@@ -296,6 +298,79 @@ def allowlisted_volatile_semantics(root, address, args=None, runner=None):
                                                  perturbed)
             records.append(volatile_semantics.record(entry["symbol"], results, perturbed=True))
     return records
+
+
+VOLATILE_CHECK_ERRORS = (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError,
+                         RecursionError, RuntimeError, subprocess.SubprocessError)
+
+
+def allowlisted_volatile_check(root, address, args):
+    """(records, finding, source SHA-256) for a source, before any selector runs.
+
+    main() calls this once, ahead of every selector-specific path, so the uses
+    record and the semantic check run for every profile.  `finding` is None when
+    the source uses no allowlisted object or both checks pass; otherwise it is
+    the plausibility finding that makes the source IMPLAUSIBLE on every path.
+    """
+    try:
+        records = plausibility.allowlisted_volatile_uses(root, address)
+        if not records:
+            return [], None, None
+        source = source_fingerprint(root, address)
+    except VOLATILE_CHECK_ERRORS as error:
+        return [], f"allowlisted volatile record failed: {error}", None
+    runner = Runner(args.cc, args.wsl, args.wsl_path, root=str(root), timeout=SIGNED_REPLAY_TIMEOUT)
+    try:
+        records += allowlisted_volatile_semantics(root, address, args, runner)
+    except VOLATILE_CHECK_ERRORS as error:
+        return [], f"allowlisted volatile semantic check: {error}", source
+    return records, None, source
+
+
+def issue_with_volatile_records(issue, root, address, args, records, source):
+    """run a selector's own report writer and carry the volatile records into its report.
+
+    The selector's output is held back until its report carries `records`
+    (match_evidence.carry_volatile_records) and the source is unchanged since
+    the check; if either fails, the report and any emitted bytes it just wrote
+    are removed and no MATCH verdict is printed.
+    """
+    root = Path(root)
+    if not records:
+        return issue(root, address, args)
+    if args.label:
+        sys.exit("allowlisted volatile records need the unlabelled report")
+    report = root / "docs" / "match" / f"{address:08X}.md"
+    emitted = (root / args.emit).resolve() if args.emit else None
+    captured = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(captured):
+            status = issue(root, address, args)
+    except BaseException:
+        sys.stdout.write(captured.getvalue())
+        raise
+    output = captured.getvalue().splitlines()
+    try:
+        if status != 0:
+            raise ValueError("the selector did not verify the source")
+        verdicts = [index for index, line in enumerate(output) if line.startswith("verdict ")]
+        if len(verdicts) != 1 or output[verdicts[0]] != "verdict MATCH - byte identical":
+            raise ValueError("the selector printed no single MATCH verdict")
+        if not args.no_write:
+            text = report.read_bytes().decode("utf-8")
+            report.write_bytes(carry_volatile_records(text, records).encode("utf-8"))
+        if source_fingerprint(root, address) != source:
+            raise ValueError("source or headers changed during verification; re-run match.py")
+    except (OSError, ValueError, UnicodeError) as error:
+        if not args.no_write and status == 0:
+            report.unlink(missing_ok=True)
+        if emitted is not None and status == 0:
+            emitted.unlink(missing_ok=True)
+        sys.exit(f"allowlisted volatile records not carried: {error}")
+    lines = [f"volatile{record.removeprefix('* allowlisted volatile').removeprefix(':')}"
+             for record in records]
+    print("\n".join(output[:verdicts[0]] + lines + output[verdicts[0]:]))
+    return status
 
 
 def elf_image(object_data):
@@ -4402,12 +4477,22 @@ def main():
             (args.cc, args.cpp, args.assembler, args.objcopy, args.linker, args.flags) !=
             (DEFAULT_CC, DEFAULT_CPP, DEFAULT_AS, DEFAULT_OBJCOPY, DEFAULT_LD, DEFAULT_FLAGS)):
         sys.exit("framed unsigned quotient excludes other selectors and requires the fixed Thumb toolchain")
+    # an allowlisted volatile object is checked once, here, ahead of every
+    # selector: the selectors below write their own reports
+    volatile_records, volatile_finding, volatile_source = allowlisted_volatile_check(ROOT, addr, args)
+
+    def selector_issue(issue):
+        if volatile_finding:
+            sys.exit(f"source    IMPLAUSIBLE\nverdict NOT VERIFIED - the selector was not run\n\n"
+                     f"plausibility findings:\n  {volatile_finding}")
+        return issue_with_volatile_records(issue, ROOT, addr, args, volatile_records, volatile_source)
+
     if args.unsigned_runtime_profile is not None:
-        return unsigned_divmod.issue(Path(ROOT), addr, args)
+        return selector_issue(unsigned_divmod.issue)
     if args.addressed_signed_runtime_profile is not None:
-        return addressed_signed_runtime.issue(Path(ROOT), addr, args)
+        return selector_issue(addressed_signed_runtime.issue)
     if args.signed_runtime_profile is not None:
-        return signed_divmod.issue(Path(ROOT), addr, args)
+        return selector_issue(signed_divmod.issue)
     if args.signed_quotient_profile is not None and (
             args.mode != "thumb" or args.control_flow_profile != "ordinary" or
             args.software_double_profile or args.software_double_remainder_profile or
@@ -4415,16 +4500,16 @@ def main():
         sys.exit("framed signed quotient excludes other selectors and requires Thumb mode")
     if args.owner_runtime_profile == "conditional-palette-source-compilation-v1":
         from palette_source_admission_profile import issue
-        return issue(Path(ROOT), addr, args)
+        return selector_issue(issue)
     if args.owner_runtime_profile:
         if args.owner_runtime_profile in ("private-float-unpack-pack-v1", "private-float-extension-v1", "private-float-comparison-v1", "private-double-comparison-v1", "private-float-scalar-conversion-v1", "private-double-scalar-conversion-v1", "private-double-unpack-pack-v1", "private-double-truncation-v1", "private-double-scalar-pack-v1", "private-scalar-division-byte-locals-v1", "private-float-selected-record-v1", "private-double-inline-division-v1", "private-double-selected-record-v1", "private-float-inline-division-v1", "private-float-unsigned-conversion-v1"):
             from private_float_pack_admission_profile import issue
-            return issue(Path(ROOT), addr, args)
+            return selector_issue(issue)
         import owner_admission_profile
-        return owner_admission_profile.issue(Path(ROOT), addr, args)
+        return selector_issue(owner_admission_profile.issue)
     if args.switch_profile is not None:
         from switch_constants_profile import issue
-        return issue(Path(ROOT), addr, args)
+        return selector_issue(issue)
     # one file per function, grouped into folders by module - the folder is
     # evidence, not decoration, so look for the source rather than assuming it
     # sits at the top of src/
@@ -4846,21 +4931,13 @@ def main():
             findings = [f"plausibility checker failed: {error}"]
 
     plausible = not findings
-    volatile_records = []
-    if plausible:
-        try:
-            volatile_records = plausibility.allowlisted_volatile_uses(ROOT, addr)
-        except OSError as error:
-            findings = [f"allowlisted volatile record failed: {error}"]
-            plausible = False
-    if plausible and volatile_records:
-        try:
-            volatile_records += allowlisted_volatile_semantics(ROOT, addr, args, runner)
-        except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError,
-                RecursionError, RuntimeError, subprocess.SubprocessError) as error:
-            findings = [f"allowlisted volatile semantic check: {error}"]
-            plausible = False
-    if source_fingerprint(ROOT, addr) != fingerprint:
+    if plausible and volatile_finding:
+        findings = [volatile_finding]
+        plausible = False
+    if not plausible:
+        volatile_records = []
+    if source_fingerprint(ROOT, addr) != fingerprint or \
+            volatile_source is not None and volatile_source != fingerprint:
         sys.exit("source or headers changed during verification; re-run match.py")
     if empty_profile and (mapping_snapshot(ROOT) != mapping or
                           empty_body.index_snapshot(ROOT) != empty_index or report_rom_path(ROOT) != rom_file):
