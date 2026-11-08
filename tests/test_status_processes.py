@@ -161,7 +161,7 @@ class ProcessVerificationTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()), \
                 self.assertRaisesRegex(SystemExit, 'no status markers'):
             status.main()
-        collect.assert_called_once_with(str(self.root), True, write_reports=False, jobs=1, worker_processes=8)
+        collect.assert_called_once_with(str(self.root), True, write_reports=False, jobs=1, progress={}, worker_processes=8)
 
     def test_push_forwards_full_verification_and_reports_process_failure(self):
         with patch.object(push, 'run', return_value=(1, 'worker failed')) as run, \

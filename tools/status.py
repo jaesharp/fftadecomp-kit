@@ -13,6 +13,9 @@ Retains two legacy provisional metrics:
     functions matched / total
     bytes matched / total        (main indexed spans / legacy layout code sizes)
 
+plus a bytes row over the union of main index spans, and matched bytes per
+64 KiB region of that union.  The badges read only the two legacy rows.
+
 Additional verified late-ROM functions and complete-body bytes are reported
 separately, without a guessed denominator or whole-ROM completion percentage.
 
@@ -207,7 +210,9 @@ def _process_results(paths, check_source, workers):
     return [result for _, result in sorted(indexed)]
 
 
-def collect(root, verify, quiet=False, write_reports=False, jobs=1, worker_processes=0):
+def collect(root, verify, quiet=False, write_reports=False, jobs=1, worker_processes=0,
+            *, progress=None):
+    """progress, when a dict, receives index_progress() for the matched functions."""
     if not 1 <= jobs <= 64:
         raise ValueError("jobs must be between 1 and 64")
     if not 0 <= worker_processes <= 64:
@@ -444,6 +449,9 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1, worker_proce
             matched_b += source_b
             problems.extend(source_problems)
             verified_bodies.extend(source_bodies)
+    if progress is not None:
+        progress.update(index_progress(
+            fns, [address for address, _, late in verified_bodies if not late]))
 
     late_f, late_b = 0, 0
     unknown_main_extent = any(size is None and not late for _, size, late in verified_bodies)
@@ -463,6 +471,66 @@ def collect(root, verify, quiet=False, write_reports=False, jobs=1, worker_proce
     return total_fns, matched_f, total_bytes, matched_b, problems, late_f, late_b
 
 
+REGION = 0x10000
+
+
+def merge_spans(spans):
+    """the union of [start, end) spans, as sorted disjoint spans"""
+    merged = []
+    for start, end in sorted(spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged
+
+
+def clipped(merged, lo, hi):
+    return sum(max(0, min(end, hi) - max(start, lo)) for start, end in merged)
+
+
+def index_progress(fns, matched):
+    """union index-span totals below CODE_END, per 64 KiB region and overall.
+
+    fns is config/functions.json; matched holds matched main addresses.
+    """
+    matched = set(matched)
+    entries = [(int(f["rom"], 16), int(f["end"], 16)) for f in fns]
+    code = [span for span in entries if span[0] < CODE_END]
+    done = [span for span in code if span[0] in matched]
+    every, hits = merge_spans(code), merge_spans(done)
+    regions = []
+    for base in range(ROM_BASE, CODE_END, REGION):
+        top = base + REGION
+        regions.append((base, clipped(every, base, top), clipped(hits, base, top),
+                        sum(base <= rom < top for rom, _ in code),
+                        sum(base <= rom < top for rom, _ in done)))
+    return {"total": clipped(every, 0, ROM_END), "matched": clipped(hits, 0, ROM_END),
+            "regions": regions, "late_entries": len(entries) - len(code)}
+
+
+def render_progress(progress):
+    """the index-span row (with its footnote) and the per-region section"""
+    total, done = progress["total"], progress["matched"]
+    frac = done / total if total else 0.0
+    row = (f"| Bytes matched (index span) | {done:,} / {total:,} | "
+           f"**{frac * 100:.2f}%** | `{bar(frac)}` |")
+    note = ("Both byte denominators are provisional. Layout labels undercount\n"
+            "code; index spans can run long or cover code-like data. The true\n"
+            "figure lies between the two byte rows. The index-span row divides\n"
+            "the union of matched entries' spans by the union, overlaps merged,\n"
+            f"of every entry span starting below `0x{CODE_END:08X}`.")
+    rows = []
+    for base, region_total, region_done, count, count_done in progress["regions"]:
+        part = region_done / region_total if region_total else 0.0
+        rows.append(f"0x{base:08X}  {bar(part, 20)}  {part * 100:5.1f}%  "
+                    f"{f'{count_done}/{count}':>9} fns")
+    rows.append(f"0x{CODE_END:08X}+ assets and data; "
+                f"{progress['late_entries']:,} index entries")
+    section = ["Matched bytes per 64 KiB region (of indexed span)", "", "```"] + rows + ["```"]
+    return row, note, section
+
+
 def badge_url(label, percent, badge_base):
     """endpoint badges when the repo is public and a badges branch exists,
     otherwise static ones (which render everywhere, but need a rewrite to
@@ -473,7 +541,8 @@ def badge_url(label, percent, badge_base):
 
 
 def render(total_f, matched_f, total_b, matched_b, problems, prefix="", badge_base=None,
-           *, late_f=0, late_b=0):
+           *, late_f=0, late_b=0, progress=None):
+    """progress, from index_progress(), adds the index-span row and region bars"""
     pf = matched_f / total_f if total_f else 0.0
     pb = matched_b / total_b if total_b else 0.0
     label = f"{prefix} " if prefix else ""
@@ -493,6 +562,11 @@ def render(total_f, matched_f, total_b, matched_b, problems, prefix="", badge_ba
         f"`{bar(pf)}` |",
         f"| Bytes matched | {matched_b:,} / {total_b:,} | **{pb * 100:.2f}%** | "
         f"`{bar(pb)}` |",
+    ]
+    if progress is not None:
+        span_row, span_note, regions = render_progress(progress)
+        lines += [span_row]
+    lines += [
         "",
         f"The function denominator counts {total_f:,} provisional index entries\n"
         f"starting below `0x{CODE_END:08X}`; matched main bytes count indexed spans.\n"
@@ -502,6 +576,10 @@ def render(total_f, matched_f, total_b, matched_b, problems, prefix="", badge_ba
         f"prove code ownership; index spans can be truncated or overlapping.\n"
         f"Generated by `tools/status.py` from `config/functions.json` and the\n"
         f"match reports in `docs/match/`.",
+    ]
+    if progress is not None:
+        lines += ["", span_note, ""] + regions
+    lines += [
         "",
         f"**Legacy credit: {matched_f:,} matched functions and {matched_b:,} indexed bytes.**\n"
         f"Only exact matches are committed - see the rule in *Matching*.",
@@ -545,14 +623,15 @@ def main():
 
     root = repo_root(args.root)
     process_options = {"worker_processes": args.worker_processes} if args.worker_processes else {}
+    progress = {}
     tf, mf, tb, mb, problems, late_f, late_b = collect(
         root, args.verify, write_reports=args.verify and args.write and not args.check,
-        jobs=args.jobs, **process_options)
+        jobs=args.jobs, progress=progress, **process_options)
     badge_base = None if args.static_badges else (
         args.badge_base or os.environ.get("FFTA_BADGE_BASE")
         or badge_base_from_remote(root))
     block, pf, pb = render(tf, mf, tb, mb, problems, args.label_prefix, badge_base,
-                           late_f=late_f, late_b=late_b)
+                           late_f=late_f, late_b=late_b, progress=progress or None)
 
     if args.badges:
         out = os.path.abspath(args.badges)

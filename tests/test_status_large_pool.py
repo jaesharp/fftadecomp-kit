@@ -72,7 +72,7 @@ class LargePoolTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()), \
                 self.assertRaisesRegex(SystemExit,'no status markers'):
             status.main()
-        collect.assert_called_once_with(str(self.root),True,write_reports=False,jobs=64)
+        collect.assert_called_once_with(str(self.root),True,write_reports=False,jobs=64,progress={})
 
     def test_native_gate_64_keeps_snapshot_and_all_checks(self):
         (self.root/'.git').mkdir();archive=self.root/'archive';archive.mkdir()
