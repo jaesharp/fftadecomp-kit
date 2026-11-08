@@ -103,6 +103,28 @@ class VolatileAllowlistTests(unittest.TestCase):
         self.assertEqual(self.rules("void f(void) { " + SYMBOL + ".unknown_3C = 1; }\n",
                                     relpath="src/08028C34.c"), [])
 
+    def test_file_paths_bind_to_the_project_root_or_a_replay_capture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            (root / "config" / "data_symbols.json").write_text(json.dumps(MAPPING))
+
+            def rules(relative):
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(DECLARATION)
+                return [rule for _, rule, _, _ in plausible.check_file(path)]
+
+            self.assertEqual(rules(HEADER), [])
+            self.assertEqual(rules("build/ffta_replay_x/" + HEADER), [])
+            for relative in ("src/control_flags.h", "include/sub/control_flags.h",
+                             "build/" + HEADER, "build/x/src/control_flags.h",
+                             "other/" + HEADER):
+                with self.subTest(relative=relative):
+                    self.assertIn("volatile", rules(relative))
+            (root / "config" / "data_symbols.json").write_text(json.dumps({SYMBOL: "0x03000944"}))
+            self.assertIn("volatile", rules(HEADER))
+
     def test_report_records_only_real_uses(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

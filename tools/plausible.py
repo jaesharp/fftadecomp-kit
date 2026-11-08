@@ -498,7 +498,17 @@ def check_file(path):
                     data_symbols = value
             except (OSError, ValueError):
                 pass
-            relpath = Path(path).resolve().relative_to(parent).as_posix()
+            parts = Path(path).resolve().relative_to(parent).parts
+            # Replays lint byte copies of the project's sources captured under
+            # build/<capture>/; the copy's own layout is the relative path.
+            if len(parts) > 2 and parts[0] == "build":
+                captured = [Path(*parts[index:]).as_posix() for index in range(2, len(parts))]
+                listed = {entry.get("header") for entry in volatile_allow_entries()
+                          if isinstance(entry, dict)}
+                relpath = next((name for name in captured if name in listed),
+                               Path(*parts).as_posix())
+            else:
+                relpath = Path(*parts).as_posix()
             break
     return check_text(text, os.path.basename(path), data_symbols, relpath)
 

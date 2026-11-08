@@ -1596,7 +1596,9 @@ header may declare the object, exactly once, as a file-scope anonymous
 plain listed-type member (`volatile u8 name;` or `volatile u8 name : 8;`), and
 the declaration holds no nested, tagged or parenthesized types, so the
 qualifier reaches no other object. The exemption applies only while
-`config/data_symbols.json` maps the symbol to the listed address. Volatile in
+`config/data_symbols.json` maps the symbol to the listed address, and only to
+the header at its listed project path or to a replay's byte copy of it under
+`build/<capture>/`. Volatile in
 any `src/` file, elsewhere in the header, in another header, or on another
 object still fails; other headers may not name the symbol, and `typeof` is
 refused everywhere while an entry is active. The single listed object is
