@@ -838,6 +838,19 @@ predicate reads require live, defined ordinary memory and valid, nonoverlapping
 stack saves. Actual readability and predicate values are not established.
 The descriptor and payload profiles keep their existing single-call limit.
 
+Phase branches with ordinary calls have a separate
+`conditional-scheduler-branch-descriptor-calls-v1` profile. It authenticates the
+complete caller CFG and ordinary indexed helper bodies, allowing at most two
+static scheduler sites, eight call sites total and four ordinary helper targets.
+Acyclic all-path propagation proves at most one scheduler invocation per root
+path and rejects every call reachable after a scheduler return. Each scheduler
+site retains the exact 28-byte private descriptor checks. Every ordinary call
+must have no tracked local aliases in any register, pointer words or word facts.
+Those ordinary calls retain the existing returning ARM ABI summary: body
+identity does not establish their memory effects or nested execution. Reports
+keep that conditional boundary separate from the read-only predicate proof.
+Existing single-call, predicate and payload profiles keep their own guards.
+
 Issue #81's single local result word passed to an indexed callee has its own
 opt-in profile:
 

@@ -2968,8 +2968,8 @@ class FunctionBufferCallProof(BufferCallProof):
 def _ordinary_call_replay(proof, address=None):
     if proof is None:
         return False
-    from conditional_local_buffer_profile import ConditionalLocalBufferProof, SCHEDULER_GUARDED
-    if type(proof) is ConditionalLocalBufferProof and proof.policy == SCHEDULER_GUARDED:
+    from conditional_local_buffer_profile import ConditionalLocalBufferProof, SCHEDULER_GUARDED, SCHEDULER_BRANCH
+    if type(proof) is ConditionalLocalBufferProof and proof.policy in (SCHEDULER_GUARDED, SCHEDULER_BRANCH):
         return True
     from static_callback_r6_frame_profile import requires_replay
     from named_data_buffer_profile import conditional_thunk_replay
@@ -4270,7 +4270,7 @@ def main():
     ap.add_argument("--root", default=os.environ.get("FFTA_ROOT"),
                     help="decomp repo (default: current directory)")
     ap.add_argument("--palette-closure-bundle", help="canonical independently authenticated palette artifact bundle for first compilation")
-    ap.add_argument("--owner-runtime-profile", choices=("conditional-scheduler-descriptor-calls-v1", "conditional-scheduler-guarded-descriptor-calls-v1", "conditional-scheduler-descriptor-payload-calls-v1", "conditional-scheduler-descriptor-payload8-calls-v1", "conditional-local-state-iterator-v1", "conditional-local-output-word-call-v1", "numeric-data-switch-source-v1", "canonical-integer-scalar-data-source-v1", "canonical-integer-two-words-source-v1", "canonical-integer-three-words-source-v1", "conditional-palette-source-compilation-v1", "canonical-integer-private-locals-data-source-v1", "canonical-integer-six-words-data-source-v1", "canonical-integer-two-words-aligned-data-source-v1", "canonical-integer-two-words-data-source-v1", "canonical-integer-scalar-source-v1", "ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
+    ap.add_argument("--owner-runtime-profile", choices=("conditional-scheduler-descriptor-calls-v1", "conditional-scheduler-branch-descriptor-calls-v1", "conditional-scheduler-guarded-descriptor-calls-v1", "conditional-scheduler-descriptor-payload-calls-v1", "conditional-scheduler-descriptor-payload8-calls-v1", "conditional-local-state-iterator-v1", "conditional-local-output-word-call-v1", "numeric-data-switch-source-v1", "canonical-integer-scalar-data-source-v1", "canonical-integer-two-words-source-v1", "canonical-integer-three-words-source-v1", "conditional-palette-source-compilation-v1", "canonical-integer-private-locals-data-source-v1", "canonical-integer-six-words-data-source-v1", "canonical-integer-two-words-aligned-data-source-v1", "canonical-integer-two-words-data-source-v1", "canonical-integer-scalar-source-v1", "ordinary-multiple-switch-source-v1", "restoring-owner-runtime-v1", "restoring-owner-switch-aligned-v1", "restoring-owner-switch-cycles-function-words-v1",
                                                       "restoring-owner-r3-thunk-switch-v1", "restoring-owner-scalar-switch-v1", "restoring-owner-switch-entry-word-v1", "restoring-owner-switch-entry-two-words-data-v1",
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
