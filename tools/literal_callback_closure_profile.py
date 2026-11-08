@@ -55,6 +55,8 @@ def require(ok, message):
 
 
 def complete(address, size, count, rom, mapping, index):
+    # count is the refined reachable-instruction count (literal pools excluded,
+    # as analyze.refine_function reports); both indexes must carry it.
     data = rom[address-match.ROM_BASE:address-match.ROM_BASE+size]
     owner.validate_span(data, address, rom, mapping, index)
     entries, rows = indices(mapping, index)
@@ -214,8 +216,9 @@ def prove(data, address, rom, mapping, index, *, selector):
     require(len(set(addresses)) == len(addresses), 'literal closure requires distinct complete dependency owners')
     if form['state'] is None:
         require(callback not in STATE_CALLBACKS, 'pinned state callback requires the private-state root form')
-        entry = span_record(callback, int(next(row['end'] for row in index_entries
-                                               if int(row['rom'], 16) == callback), 16), index_entries, rows, rom)
+        end = next((row['end'] for row in index_entries if int(row['rom'], 16) == callback), None)
+        require(end is not None, 'literal closure callback requires its complete indexed span')
+        entry = span_record(callback, int(end, 16), index_entries, rows, rom)
         cbody = rom[callback-match.ROM_BASE:int(entry['end'], 16)-match.ROM_BASE]
         callback_record = dict(address=callback, end=int(entry['end'], 16), instructions=entry['instrs'],
             body_sha256=sha(cbody), effects='opaque',
@@ -224,6 +227,8 @@ def prove(data, address, rom, mapping, index, *, selector):
     else:
         require(callback in STATE_CALLBACKS and adapter_data[-4:] == bytes.fromhex('02bc0847'),
                 'private state requires a pinned state callback and adapter return through R1')
+        require(adapter_proof['descriptor_register'] == 4,
+                'private state requires the adapter descriptor in R4')
         count = STATE_CALLBACKS[callback][0]
         size = len(bytes.fromhex(STATE_CALLBACKS[callback][1]))
         cbody, _, _, ccalls, cpartition = complete(callback, size, count, rom, mapping, index)
