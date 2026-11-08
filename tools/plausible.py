@@ -424,26 +424,25 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                 # applies them to the preprocessed text): in a file that uses
                 # the object, no macro may expand to `&` or to any identifier
                 # of the pinned declaration.
-                if uses:
-                    for directive in directives:
-                        if directive["kind"] == "define" and user_macro(directive["rest"], names):
-                            finding(directive.start(), f"a macro in a {symbol} user may not expand "
-                                    "to `&` or to a name of the pinned declaration")
-                    # ... nor may any header it includes (other than the listed one)
-                    for included in sorted(inside or ()):
-                        if included in (relpath, header) or tree is None:
-                            continue
-                        try:
-                            other = strip_comments_and_strings(join_splices(
-                                (Path(tree) / included).read_text(encoding="utf-8", errors="replace")))
-                        except OSError:
-                            finding(0, f"cannot read {included}, which a {symbol} user includes")
-                            continue
-                        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*([^\n]*)",
-                                                     other):
-                            if user_macro(directive[1], names):
-                                finding(0, f"{included}, included by a {symbol} user, defines a macro "
-                                        "that expands to `&` or to a name of the pinned declaration")
+                for directive in directives:
+                    if directive["kind"] == "define" and user_macro(directive["rest"], names):
+                        finding(directive.start(), f"a macro in a {symbol} user may not expand "
+                                "to `&` or to a name of the pinned declaration")
+                # ... nor may any header it includes (other than the listed one)
+                for included in sorted(inside or ()):
+                    if included in (relpath, header) or tree is None:
+                        continue
+                    try:
+                        other = strip_comments_and_strings(join_splices(
+                            (Path(tree) / included).read_text(encoding="utf-8", errors="replace")))
+                    except OSError:
+                        finding(0, f"cannot read {included}, which a {symbol} user includes")
+                        continue
+                    for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*([^\n]*)",
+                                                 other):
+                        if user_macro(directive[1], names):
+                            finding(0, f"{included}, included by a {symbol} user, defines a macro "
+                                    "that expands to `&` or to a name of the pinned declaration")
             continue
         if relpath != header:
             for reference in references:

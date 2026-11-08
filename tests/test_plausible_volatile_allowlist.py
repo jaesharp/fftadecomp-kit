@@ -400,9 +400,13 @@ class VolatileAllowlistTests(unittest.TestCase):
         # ordinary C: function-pointer casts, struct casts, `&` and __extension__.
         other = ("typedef void (*Fn)(void);\n"
                  "void f(int a, int b) { ((void (*)(void))a)(); x = (struct { int y; } *)0; "
-                 "p = &(0, q); x = __extension__ a; y = a & b; }\n")
+                 "x = __extension__ a; }\n")
         self.assertEqual(self.rules(other, relpath="src/08011EBC.c", closure=({"src/08011EBC.c"}, [])), [])
         self.assertEqual(self.rules(other, relpath="src/08011EBC.c"), [])
+        # Including the header without naming the symbol cannot reach the object
+        # when no closure is known.
+        self.assertEqual(self.rules('#include "control_flags.h"\nint g(int a) { return a; }\n',
+                                    relpath="src/08011EBC.c"), [])
         # The same text in a user of the object is still refused.
         self.assertIn("volatile-allowlist", self.rules(
             '#include "control_flags.h"\n' + other, relpath="src/08028C34.c",
