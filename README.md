@@ -293,6 +293,113 @@ Use `--force` only for an intentional history rewrite. The gate captures the
 remote tip before validation and uses an explicit force-with-lease, so a remote
 change during verification rejects the push rather than being overwritten.
 
+## Reference environment for report replay
+
+Reports from the runtime-bound profiles bind the environment that produced
+them, not only the source and the ROM. These include addressed signed
+runtime, complete-owner, unsigned divmod, palette, and others that embed an
+environment block. Ordinary reports only re-check the compiled bytes. For the
+runtime-bound profiles, replay (`status.py --verify`, and so the publication
+gate) compares these exactly:
+
+* `toolchain`: SHA-256 hashes of the resolved `$HOME/agbcc/gcc/agbcc`, `cpp`
+  (which resolves to `x86_64-linux-gnu-cpp-13`), `arm-none-eabi-as`,
+  `arm-none-eabi-objcopy` and `arm-none-eabi-ld`;
+* `runtime`: the OS, `platform.release()` (the kernel), the machine, the
+  Python version and executable hash, and the capstone version, binding and
+  native-library hashes;
+* for owner-admission profiles, the SHA-256 of the linked `f.elf`, whose
+  layout follows the pinned `arm-none-eabi-ld` (for example its default max
+  page size);
+* the hashes of this toolkit's own tool sources (producer hashes).
+
+A host that differs in any of these refuses otherwise valid reports from
+those profiles, for example with `invalid saved ... report`. The frozen
+`081475A4` lineage also requires the pinned tool hashes before compiling. The
+decomp's committed reports replay with no problems on the reference
+environment below: full `status.py --verify`, decomp `15092737a7`, kit
+`630fde57`. See [#78](https://github.com/shubshub/fftadecomp-kit/issues/78).
+
+Report environment: Ubuntu 24.04 (noble) x86_64, on a VM rather than a
+container, because the kernel string is compared:
+
+| fingerprint | reference package |
+|---|---|
+| kernel `6.17.0-14-generic` | `linux-image-6.17.0-14-generic` (HWE, `6.17.0-14.14~24.04.1`) |
+| Python 3.12.3 | `python3.12-minimal 3.12.3-1ubuntu0.17` |
+| capstone 5.0.3 | PyPI `capstone==5.0.3` (manylinux wheel) |
+| `cpp` | `cpp-13-x86-64-linux-gnu 13.3.0-6ubuntu2~24.04.1` |
+| `arm-none-eabi-*` | `binutils-arm-none-eabi 2.42-1ubuntu1+23` |
+| agbcc | SHA-256 `63deeb6946e16e5add66cc173fcaa925f58ae56983d4d5a4649389bf8a23776f` |
+
+Install the pinned packages, then capstone into a venv over the system
+Python. Noble refuses `pip install --user` (PEP 668), and its own capstone is
+4.x. A venv's `python` is a symlink, so the recorded executable hash is still
+that of `/usr/bin/python3.12`. Run the tools with `~/venv/bin/python`. Hold
+the pinned packages and the HWE metapackages, and disable
+unattended upgrades: a newer `python3.12-minimal` or HWE kernel (GRUB boots
+the newest) silently breaks replay. Superseded builds can leave the main
+archive; `snapshot.ubuntu.com` keeps them.
+
+```sh
+V=3.12.3-1ubuntu0.17
+sudo apt-get install -y linux-image-6.17.0-14-generic \
+    linux-modules-6.17.0-14-generic python3.12-minimal=$V \
+    libpython3.12-minimal=$V python3.12=$V libpython3.12-stdlib=$V \
+    python3.12-venv=$V cpp cpp-13=13.3.0-6ubuntu2~24.04.1 \
+    cpp-13-x86-64-linux-gnu=13.3.0-6ubuntu2~24.04.1 \
+    binutils-arm-none-eabi=2.42-1ubuntu1+23
+readlink -f "$(command -v cpp)"   # expect /usr/bin/x86_64-linux-gnu-cpp-13
+python3.12 -m venv ~/venv && ~/venv/bin/pip install capstone==5.0.3
+sudo apt-mark hold linux-image-6.17.0-14-generic python3.12-minimal \
+    cpp-13-x86-64-linux-gnu binutils-arm-none-eabi \
+    linux-generic-hwe-24.04 linux-image-generic-hwe-24.04
+sudo apt-get purge -y unattended-upgrades
+```
+
+Boot the pinned kernel. If a newer one is installed, set
+`GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 6.17.0-14-generic"`
+in `/etc/default/grub`, then run `sudo update-grub`.
+
+The reference agbcc is **not** what `tools/bootstrap.sh` produces on noble.
+Building with `-g` records the host compiler and the absolute build directory,
+so the binary differs between hosts. It reproduces bit for bit when built in
+Ubuntu 25.10 (questing) from the 2026-10-30 archive snapshot, at
+`/home/user/agbcc`. The build host needs `debootstrap` and `ubuntu-keyring`.
+
+```sh
+SNAP=https://snapshot.ubuntu.com/ubuntu/20261030T000000Z
+sudo debootstrap --variant=buildd questing /srv/questing "$SNAP"
+sudo tee /srv/questing/etc/apt/sources.list >/dev/null <<EOF
+deb $SNAP questing main universe
+deb $SNAP questing-updates main universe
+deb $SNAP questing-security main universe
+EOF
+sudo mount -t proc proc /srv/questing/proc
+sudo chroot /srv/questing env DEBIAN_FRONTEND=noninteractive sh -c '
+    apt-get update && apt-get -y dist-upgrade &&
+    apt-get -y install git build-essential && useradd -m user'
+sudo chroot /srv/questing su - user -c '
+    git clone https://github.com/pret/agbcc.git ~/agbcc &&
+    cd ~/agbcc && git checkout da598c1 && make -C gcc normal -j1 &&
+    echo "63deeb6946e16e5add66cc173fcaa925f58ae56983d4d5a4649389bf8a23776f  gcc/agbcc" |
+    sha256sum -c'
+sudo umount /srv/questing/proc
+```
+
+That chroot provides `gcc-15 15.2.0-4ubuntu4`, `libc6-dev 2.42-0ubuntu3.1`,
+`binutils-x86-64-linux-gnu 2.45-7ubuntu1.2` and `make 4.4.1-2`. The binary
+needs only `libc.so.6` and runs on the noble report host. Install it at
+`$HOME/agbcc/gcc/agbcc` for whichever user runs the tools. Reports record that
+unexpanded string and the binary's hash, so the report host's user name does
+not matter. `/home/user` matters only at build time, because `-g` embeds the
+build directory.
+
+Producer hashes are environment-independent. Every toolkit change that edits
+a tool file invalidates the reports bound to it, on every host, until they
+are regenerated with `status.py --write --verify`. Pair kit bumps with that
+regeneration.
+
 ## Layout it expects
 
 Commands using automatic ROM selection honor a nonempty `FFTA_ROM` first.
