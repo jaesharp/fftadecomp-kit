@@ -26,9 +26,8 @@ symbolically along every path, and the check requires
    joins the behaviour (incoming-argument slots included).  Every callee
    needs a file-scope prototype with a fixed list of one-word arguments;
    no prototype, `()`, `...`, indirect calls and wider arguments fail
-   closed.  A call reads only the argument registers its prototype names
-   when that prototype agrees with the callee's own matched definition in
-   src/; any other prototype could lie, so then all of r0-r3 count as read;
+   closed.  No prototype is trusted to name every register the callee
+   reads, so every call counts as reading r0-r3;
 2. every access to the object to be `symbol + constant` inside it; variable
    offsets, out-of-object offsets, multi-register transfers and the
    object's address reaching a call argument or a stored value fail closed;
@@ -47,13 +46,14 @@ symbolically along every path, and the check requires
 5. no store to write back the value just loaded from the same byte (an
    `ldrb`/`strb` self-assignment, `sym.x = sym.x` or `sym.x |= 0`).
 
-plausible.py makes the paired store a volatile lvalue: a pinned byte can be
-reached only through its member, since array members take only in-bounds
-literal subscripts and no `&` may precede the symbol.  compare() repeats
-those token rules (plausible.member_provenance) on the preprocessed text, so
-macros cannot spell around them.  This check alone
-cannot tell `(void)sym.x; *(sym.array + k) = v;` from `sym.x = v;`; they
-compile identically.
+The real/stripped comparison cannot tell `(void)sym.x; *(sym.array + k) =
+v;` from `sym.x = v;`: they compile identically.  Provenance is therefore
+enforced by the compiler.  A third compile moves every pinned bit-field past
+the object (perturbed_declaration), and perturbation_check requires every
+pinned access to follow the move and every other access to stay.  A
+bit-field has no address, so only its name can reach it.  plausible.py's
+token rules, which compare() repeats on the preprocessed text, are defence
+in depth.
 
 A planted read therefore either vanishes from the stripped compile, so the
 real compile has a load the rules cannot explain, or it stays, which shows
@@ -96,8 +96,11 @@ class SemanticError(ValueError):
 
 # ---------------------------------------------------------------- declaration
 
-def object_layout(declaration):
-    """(object size, {offset of each volatile byte}) of the pinned declaration.
+PERTURBED_BASE = 0x100
+
+
+def members(declaration):
+    """[(member tokens, name, offset, bytes, volatile)] and the object size.
 
     The allow list restricts the declaration to plain members `T name;`,
     `T name[N];`, `T *name;` and full-width bit-fields `volatile T name : W;`
@@ -106,19 +109,19 @@ def object_layout(declaration):
     tokens = declaration_tokens(declaration)
     if tokens[:3] != ["extern", "struct", "{"] or tokens[-3:-2] != ["}"] or tokens[-1] != ";":
         raise SemanticError("pinned declaration is not `extern struct { ... } symbol;`")
-    body, members, current = tokens[3:-3], [], []
+    body, split, current = tokens[3:-3], [], []
     for token in body:
         if token == ";":
-            members.append(current)
+            split.append(current)
             current = []
         else:
             current.append(token)
     if current:
         raise SemanticError("pinned declaration has an unterminated member")
-    offset, align, pinned = 0, 1, set()
-    for member in members:
-        qualified = member[:1] == ["volatile"]
-        member = member[1:] if qualified else member
+    offset, align, layout = 0, 1, []
+    for whole in split:
+        qualified = whole[:1] == ["volatile"]
+        member = whole[1:] if qualified else whole
         if not member or member[0] not in TYPE_SIZES:
             raise SemanticError(f"pinned declaration member `{' '.join(member)}` has an unknown type")
         size, rest = TYPE_SIZES[member[0]], member[1:]
@@ -135,30 +138,85 @@ def object_layout(declaration):
             raise SemanticError(f"pinned declaration member `{' '.join(member)}` is not plain")
         offset = (offset + size - 1) // size * size
         align = max(align, size)
-        if qualified:
-            if size != 1 or count != 1:
-                raise SemanticError("only volatile byte members can be modelled")
-            pinned.add(offset)
+        if qualified and (size != 1 or count != 1):
+            raise SemanticError("only volatile byte members can be modelled")
+        layout.append((whole, rest[0], offset, size * count, qualified))
         offset += size * count
-    return (offset + align - 1) // align * align, pinned
+    return layout, (offset + align - 1) // align * align
 
 
-def strip_pinned_volatile(preprocessed, declaration):
-    """the preprocessed text with `volatile` removed from the pinned declaration only.
+def object_layout(declaration):
+    """(object size, {offset of each volatile byte}) of the pinned declaration"""
+    layout, size = members(declaration)
+    return size, {offset for _, _, offset, _, qualified in layout if qualified}
+
+
+def perturbed_declaration(declaration):
+    """(declaration, {pinned offset: moved offset}, size) with the pinned bytes moved.
+
+    Every volatile bit-field is replaced in place by a plain padding byte
+    and declared again, in order, from PERTURBED_BASE on, past the end of
+    the real object; every other member keeps its offset.  A bit-field has
+    no address, so a pinned byte can only be reached through its own name,
+    which follows the move.  An access computed from another member, from
+    the object's base or through any cast, macro or lvalue extension keeps
+    its old offset and lands on the padding instead.
+    """
+    layout, size = members(declaration)
+    if size > PERTURBED_BASE:
+        raise SemanticError("the pinned object is too large to perturb")
+    kept, moved = [], []
+    for index, (tokens, name, offset, _, qualified) in enumerate(layout):
+        if qualified:
+            kept.append(f"u8 __perturbed_vacated_{index};")
+            moved.append(" ".join(tokens) + ";")
+        else:
+            kept.append(" ".join(tokens) + ";")
+    symbol = declaration_tokens(declaration)[-2]
+    text = ("extern struct { " + " ".join(kept) +
+            f" u8 __perturbed_gap[{PERTURBED_BASE - layout[-1][2] - layout[-1][3]:#x}]; " +
+            " ".join(moved) + " } " + symbol + ";")
+    new_layout, new_size = members(text)
+    old = {name: offset for _, name, offset, _, _ in layout}
+    mapping = {}
+    for _, name, offset, _, qualified in new_layout:
+        if name.startswith("__perturbed_"):
+            continue
+        if qualified:
+            if offset < PERTURBED_BASE:
+                raise SemanticError("the perturbed layout did not move a pinned byte")
+            mapping[old[name]] = offset
+        elif offset != old[name]:
+            raise SemanticError("the perturbed layout moved an unpinned member")
+    return text, mapping, new_size
+
+
+def replace_pinned(preprocessed, declaration, replacement):
+    """the preprocessed text with the pinned declaration's one occurrence rewritten.
 
     The declaration's tokens must occur exactly once (the preprocessor-bypass
     rules in plausible.py keep macros, pasting and computed includes from
-    changing them); otherwise the stripping cannot be trusted.
+    changing them); otherwise the rewrite cannot be trusted.
     """
     pattern = r"\s*".join(r"\b" + re.escape(token) + r"\b" if re.match(r"\w", token)
                           else re.escape(token) for token in declaration_tokens(declaration))
     found = list(re.finditer(pattern, preprocessed))
     if len(found) != 1:
         raise SemanticError(f"the pinned declaration occurs {len(found)} times in the preprocessed "
-                            "source; it must occur exactly once to be stripped")
+                            "source; it must occur exactly once to be rewritten")
     start, end = found[0].span()
-    body = re.sub(r"\bvolatile\b", lambda match: " " * len(match[0]), preprocessed[start:end])
-    return preprocessed[:start] + body + preprocessed[end:]
+    return preprocessed[:start] + replacement(preprocessed[start:end]) + preprocessed[end:]
+
+
+def strip_pinned_volatile(preprocessed, declaration):
+    """the preprocessed text with `volatile` removed from the pinned declaration only"""
+    return replace_pinned(preprocessed, declaration, lambda text: re.sub(
+        r"\bvolatile\b", lambda match: " " * len(match[0]), text))
+
+
+def perturb_pinned(preprocessed, declaration):
+    """the preprocessed text with the pinned declaration replaced by its perturbed form"""
+    return replace_pinned(preprocessed, declaration, lambda text: perturbed_declaration(declaration)[0])
 
 
 SCALAR_TYPES = {"u8", "s8", "u16", "s16", "u32", "s32", "vu8", "vs8", "vu16", "vs16", "vu32",
@@ -557,11 +615,10 @@ def evaluate(code, flags):
 class Executor:
     """symbolic execution of one agbcc Thumb function along one path"""
 
-    def __init__(self, name, function, signatures, label, layout, definitions=None):
+    def __init__(self, name, function, signatures, label, layout):
         self.name, self.label = name, label
         self.instructions, self.labels, self.pools = function
         self.signatures = signatures
-        self.definitions = definitions or {}
         self.symbol, self.size = layout
 
     def check_address(self, address, width, text, multiple=False):
@@ -752,19 +809,17 @@ class Executor:
         elif isinstance(target, tuple) and target[0] == "swi":
             count, trusted = 4, False        # BIOS calls take r0-r3 only
         elif isinstance(target, str) and self.signatures.get(target, (None, None))[1] is not None:
-            count = self.signatures[target][1]
-            trusted = self.definitions.get(target) == self.signatures[target]
+            count, trusted = self.signatures[target][1], False
         else:
             self.fail(text, "the callee has no prototype with a fixed argument list, so its "
                       "arguments cannot be compared")
         arguments = [self.regs[f"r{n}"] for n in range(min(count, 4))]
         for n in range(4, count):
             arguments.append(self.load(4, False, add(self.regs["sp"], 4 * (n - 4)), text)[0])
-        # A call reads the argument registers its prototype names only when
-        # that prototype agrees with the callee's own matched definition in
-        # src/: any other prototype could lie, and a dead load into an
-        # unnamed argument register could then be a hidden argument, so every
-        # argument register counts as read.
+        # No prototype is trusted to name every register the callee reads:
+        # a dead load into an unnamed argument register could be a hidden
+        # argument, so r0-r3 all count as read (only runtime helpers with a
+        # known interface are exact).
         named = {f"r{n}" for n in range(min(count, 4))}
         record.guarded = set() if trusted else {"r0", "r1", "r2", "r3"} - named
         record.reads = named | record.guarded | (record.reads - {"r0", "r1", "r2", "r3"})
@@ -989,12 +1044,12 @@ class Executor:
 
 # ---------------------------------------------------------------- comparison
 
-def explore(name, function, signatures, label, layout, definitions=None):
+def explore(name, function, signatures, label, layout):
     paths, pending = [], [[]]
     while pending:
         decisions = pending.pop()
         try:
-            path = Executor(name, function, signatures, label, layout, definitions).run(decisions)
+            path = Executor(name, function, signatures, label, layout).run(decisions)
         except NeedDecision:
             pending += [decisions + [False], decisions + [True]]
             continue
@@ -1004,9 +1059,9 @@ def explore(name, function, signatures, label, layout, definitions=None):
     return paths
 
 
-def replay(name, function, signatures, label, decisions, layout, definitions=None):
+def replay(name, function, signatures, label, decisions, layout):
     try:
-        return Executor(name, function, signatures, label, layout, definitions).run(decisions)
+        return Executor(name, function, signatures, label, layout).run(decisions)
     except NeedDecision:
         raise SemanticError(f"{name}: the stripped compile branches where the real one does not")
 
@@ -1107,8 +1162,7 @@ def chained_reread(records, position, pinned_address):
     return store is not None
 
 
-def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned,
-                     definitions=None):
+def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned):
     def pinned_address(address):
         offset = object_offset(address, symbol, size)
         return offset in pinned
@@ -1117,7 +1171,7 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
         offset = object_offset(address, symbol, size)
         return f"{symbol}+{offset:#x}" if offset is not None else show(address)
 
-    paths = explore(name, real_function, signatures, "real", (symbol, size), definitions)
+    paths = explore(name, real_function, signatures, "real", (symbol, size))
     read_modify_write, chained = set(), set()
     for number, path in enumerate(paths, 1):
         records = path.records
@@ -1138,8 +1192,8 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                     raise SemanticError(
                         f"{name}: {describe(record)} loads {where(record.address)} into "
                         f"{destination}, which {describe(verdict)} might take as an argument its "
-                        "prototype does not name; only a prototype that agrees with the callee's "
-                        "matched definition in src/ is trusted to list every argument")
+                        "prototype does not name; no prototype is trusted to list every argument, "
+                        "so the load must be overwritten before the call")
                 if verdict:
                     store = read_modify_write_store(records, position, record.address)
                     if store is None:
@@ -1166,8 +1220,7 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                 raise SemanticError(f"{name}: {describe(record)} stores to {where(record.address)} "
                                     "without the read-modify-write load of a volatile byte store")
         # 1. the stripped compile behaves the same on this path
-        other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size),
-                       definitions)
+        other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size))
         if other.conditions != path.conditions:
             raise SemanticError(f"{name}: the real and stripped compiles branch on different "
                                 f"conditions (path {number})")
@@ -1213,15 +1266,72 @@ def normalised(lines):
             for line in lines]
 
 
-def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration, definition=None):
+def remap(expression, atom, mapping):
+    """expression with every `symbol + pinned offset` replaced by its moved offset"""
+    if not isinstance(expression, tuple):
+        return expression
+    if expression[0] == "lin":
+        constant, terms = linear(expression)
+        if terms == {atom: 1} and signed32(constant) in mapping:
+            return make_linear(mapping[signed32(constant)], terms)
+        return make_linear(constant, {remap(term, atom, mapping): c for term, c in terms.items()})
+    if expression == atom and 0 in mapping:
+        return make_linear(mapping[0], {atom: 1})
+    return tuple(remap(part, atom, mapping) if isinstance(part, tuple) else part for part in expression)
+
+
+def object_accesses(records, atom):
+    return [(record.kind, record.width, record.address) for record in records
+            if record.address is not None and contains(record.address, atom)]
+
+
+def perturbation_check(name, real_function, perturbed_function, signatures, symbol, size,
+                       perturbed_size, mapping):
+    """the layout-perturbed compile must follow every pinned access, and only those.
+
+    On every path, the real compile's trace, branch conditions and object
+    accesses, with each pinned offset X mapped to its moved offset P(X),
+    must equal the perturbed compile's.  An access reached through a
+    member's name follows the move; one computed from another member or the
+    base does not, so it stays at X (now padding) or reaches an unmoved
+    member, and the two compiles disagree.  Moved offsets lie past the real
+    object, so no arithmetic on other members can coincide with them.
+    """
+    atom = ("sym", symbol)
+    paths = explore(name, real_function, signatures, "real", (symbol, size))
+    for number, path in enumerate(paths, 1):
+        other = replay(name, perturbed_function, signatures, "layout-perturbed", path.decisions,
+                       (symbol, perturbed_size))
+        mine = [(kind, width, remap(address, atom, mapping))
+                for kind, width, address in object_accesses(path.records, atom)]
+        theirs = object_accesses(other.records, atom)
+        if mine != theirs:
+            index = next((i for i, (a, b) in enumerate(zip(mine, theirs)) if a != b),
+                         min(len(mine), len(theirs)))
+            real_access = object_accesses(path.records, atom)[index] if index < len(mine) else None
+            raise SemanticError(
+                f"{name}: an access to {symbol} does not follow its member when the pinned bytes "
+                f"move (path {number}, access {index + 1}: real "
+                f"{show(real_access[2]) if real_access else 'none'}, perturbed "
+                f"{show(theirs[index][2]) if index < len(theirs) else 'none'}); a pinned byte may "
+                "only be reached through its own member")
+        if [remap(c, atom, mapping) for c in path.conditions] != other.conditions or \
+                [remap(e, atom, mapping) for e in path.trace] != other.trace:
+            raise SemanticError(f"{name}: the layout-perturbed compile behaves differently (path "
+                                f"{number}); the source depends on where the pinned bytes are")
+    return len(paths)
+
+
+def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
+            perturbed_assembly=None):
     """[(function, paths, read-modify-write instructions, chained re-reads)].
 
-    definition(name) gives a callee's (returns, words) from its own matched
-    source, or None; only a prototype that agrees with it is trusted to name
-    every argument register the callee reads.
+    perturbed_assembly is the compile with perturbed_declaration(); when
+    given, every function must pass perturbation_check as well.
 
     Raises SemanticError with the reason when the real compile differs from
-    the stripped one by anything but the qualifier's documented effect.
+    the stripped one by anything but the qualifier's documented effect, or
+    reaches a pinned byte other than through its member.
     """
     size, pinned = object_layout(declaration)
     from plausible import member_provenance, strip_comments_and_strings
@@ -1241,18 +1351,19 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
                 names.add(operands[0])
     scope = file_scope(preprocessed)
     signatures = {name: function_signature(scope, name) for name in names}
-    definitions = {}
-    if definition is not None:
-        for callee in names - set(real):
-            found = definition(callee)
-            if found is not None:
-                definitions[callee] = found
-    return [(name,) + compare_function(name, real[name], stripped[name], signatures, symbol, size, pinned,
-                                       definitions)
+    if perturbed_assembly is not None:
+        _, mapping, perturbed_size = perturbed_declaration(declaration)
+        perturbed, _ = parse_assembly(perturbed_assembly)
+        if sorted(perturbed) != sorted(real):
+            raise SemanticError("the real and layout-perturbed compiles define different functions")
+        for name in sorted(real):
+            perturbation_check(name, real[name], perturbed[name], signatures, symbol, size,
+                               perturbed_size, mapping)
+    return [(name,) + compare_function(name, real[name], stripped[name], signatures, symbol, size, pinned)
             for name in sorted(real)]
 
 
-def record(symbol, results):
+def record(symbol, results, perturbed=False):
     """the report record for a passed semantic check"""
     parts = []
     for name, paths, read_modify_write, chained in results:
@@ -1260,4 +1371,5 @@ def record(symbol, results):
                      f"read-modify-write loads at {list(n + 1 for n in read_modify_write)}, "
                      f"chained re-reads at {list(n + 1 for n in chained)}")
     return (f"* allowlisted volatile semantics: `{symbol}` stripped of volatile compiles to the same "
-            f"behaviour; " + "; ".join(parts))
+            f"behaviour{', and a compile with the pinned bytes moved follows every pinned access' if perturbed else ''}; " +
+            "; ".join(parts))

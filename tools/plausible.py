@@ -354,6 +354,14 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                 list(re.finditer(r"\?\?[=/'()!<>\-]", text if text is not None else code)):
             finding(match.start(), f"{lexical[1]} are refused while {symbol} is an "
                     "allowlisted volatile object: they can spell what the scan cannot see")
+        # `#` only belongs on a directive line; anywhere else (`F(#) pragma`)
+        # it can be pasted into a forged directive or linemarker.
+        for line in re.finditer(r"(?m)^[^\n]*", joined):
+            if line[0].lstrip().startswith("#"):
+                continue
+            for hash_token in re.finditer(r"#", line[0]):
+                finding(line.start() + hash_token.start(), f"`#` outside a directive line is "
+                        f"refused while {symbol} is allowlisted: it could forge a directive")
         for control in re.finditer(r"[\f\v]|\r(?!\n)", untranslated if untranslated is not None
                                    else text if text is not None else code):
             finding(control.start(), f"form feed, vertical tab and lone carriage return are "

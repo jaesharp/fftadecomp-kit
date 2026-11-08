@@ -238,26 +238,53 @@ class SemanticDiffTests(unittest.TestCase):
         stored = assembly("ldr\tr0, .L3", "add\tr1, r0, #2", "str\tr1, [r0, #4]", "bx\tlr")
         self.refused(stored, stored, "is stored to memory")
 
-    def test_calls_read_only_their_argument_registers(self):
-        # round-2: `sym.unknown_3C = a; k(a)` with `void k(int)`: the dead
-        # load's register r1 is not an argument of k
+    def test_calls_count_every_argument_register_as_read(self):
+        # round 5 (d1): no prototype is trusted to name every register the
+        # callee reads; a callee's own source can hide parameters behind a
+        # macro.  A dead load into r1 before `bl k` is refused even with
+        # `void k(int)`; it is accepted once overwritten before the call.
         real = assembly("push\t{lr}", "ldr\tr2, .L3", "add\tr2, r2, #60", "ldrb\tr1, [r2]",
                         "strb\tr0, [r2]", "bl\tk", "pop\t{r0}", "bx\tr0")
         stripped = real.replace("ldrb\tr1, [r2]\n\t", "")
         one = "void func_08028C34(int a);\nextern void k(int);\n"
-        matched = {"k": (False, 1)}.get
-        self.assertEqual(semantics.compare(real, stripped, one, SYMBOL, DECLARATION, matched)[0][1:],
+        with self.assertRaises(semantics.SemanticError) as caught:
+            compare(real, stripped, one)
+        self.assertIn("might take as an argument", str(caught.exception))
+        overwritten = real.replace("strb\tr0, [r2]", "strb\tr0, [r2]\n\tmov\tr1, #0")
+        self.assertEqual(compare(overwritten, overwritten.replace("ldrb\tr1, [r2]\n\t", ""), one)[0][1:],
                          (1, [3], []))
-        # with `void k(int, int)` r1 is read, so the load is not dead
-        two = "void func_08028C34(int a);\nextern void k(int, int);\n"
+
+    def test_layout_perturbation_moves_only_the_pinned_bytes(self):
+        text, mapping, size = semantics.perturbed_declaration(DECLARATION)
+        self.assertEqual(mapping, {0x3C: 0x100, 0x3D: 0x101})
+        self.assertEqual(size, 0x102)
+        layout, _ = semantics.members(text)
+        offsets = {name: offset for _, name, offset, _, _ in layout}
+        self.assertEqual((offsets["display"], offsets["unknown_02"]), (0, 2))
+        preprocessed = "int x;\n" + DECLARATION + "\nvoid f(void);\n"
+        self.assertIn("__perturbed_vacated_2", semantics.perturb_pinned(preprocessed, DECLARATION))
+
+    def perturbed(self, real, perturbed, stripped=None):
+        return semantics.compare(real, stripped or real.replace("ldrb\tr2, [r1]\n\t", ""), PREPROCESSED,
+                                 SYMBOL, DECLARATION, perturbed)
+
+    def test_accesses_must_follow_the_layout_perturbation(self):
+        # sym.unknown_3C = 1 through its member: the perturbed compile
+        # addresses the moved byte at +0x100
+        real = assembly("ldr\tr1, .L3", "add\tr1, r1, #60", "ldrb\tr2, [r1]", "mov\tr2, #1",
+                        "strb\tr2, [r1]", "bx\tlr")
+        moved = assembly("ldr\tr1, .L3", "mov\tr3, #128", "lsl\tr3, r3, #1", "add\tr1, r1, r3",
+                         "ldrb\tr2, [r1]", "mov\tr2, #1", "strb\tr2, [r1]", "bx\tlr")
+        self.assertEqual(self.perturbed(real, moved)[0][1:], (1, [2], []))
+        # round 5 (e1, e2) and every alias: the access was computed from
+        # another member, so it stays at +0x3C (now padding) when they move
+        with self.assertRaises(semantics.SemanticError) as caught:
+            self.perturbed(real, real)
+        self.assertIn("does not follow its member", str(caught.exception))
+        # an access that lands on a moved offset without being one
+        stray = moved.replace("add\tr1, r1, r3", "add\tr1, r1, r3\n\tsub\tr1, r1, #1")
         with self.assertRaises(semantics.SemanticError):
-            semantics.compare(real, stripped, two, SYMBOL, DECLARATION, {"k": (False, 2)}.get)
-        # rounds 3-4: a prototype that does not agree with the callee's own
-        # matched definition (or has none) is not trusted; r1 counts as read
-        for definition in (None, {}.get, {"k": (False, 2)}.get):
-            with self.subTest(definition=definition), self.assertRaises(semantics.SemanticError) as caught:
-                semantics.compare(real, stripped, one, SYMBOL, DECLARATION, definition)
-            self.assertIn("might take as an argument", str(caught.exception))
+            self.perturbed(real, stray)
 
     def test_round_three_snapshot_prototype_and_word_gaps(self):
         # S1: an escape into the incoming-argument area (offset >= 0)
@@ -455,23 +482,26 @@ class CompiledSemanticTests(unittest.TestCase):
             with self.subTest(body=body), self.assertRaises(semantics.SemanticError) as caught:
                 self.check(f"a = a * b + 7; (void){s}.unknown_3C; " + body, "int a, int b")
             self.assertIn("after preprocessing", str(caught.exception))
-        # round 2/4: a call reads only the argument registers its prototype
-        # names, when that prototype agrees with the callee's matched source
-        callee = self.root / "src" / "08000100.c"
-        callee.write_text("void func_08000100(int a)\n{\n}\n")
+        # round 5 (d1): a callee's prototype, even one its own source
+        # "agrees" with through `#define A a, int b, int c`, is not trusted
+        callee = self.root / "src" / "0802AAAA.c"
+        callee.write_text("extern void func_0802BBBB(int, int, int);\n#define A a, int b, int c\n"
+                          "void func_0802AAAA(int A)\n{\n    func_0802BBBB(a, b, c);\n}\n")
         try:
-            prelude = "extern void func_08000100(int);\n"
-            (record,) = self.check(f"{s}.unknown_3C = a; func_08000100(b);", "int a, int b", prelude)
-            self.assertTrue(record.startswith("* allowlisted volatile semantics: "), record)
-            callee.write_text("void func_08000100(int a, int b)\n{\n}\n")
-            with self.assertRaises(semantics.SemanticError):
-                self.check(f"{s}.unknown_3C = a; func_08000100(b);", "int a, int b", prelude)
-            callee.unlink()
-            with self.assertRaises(semantics.SemanticError):
-                self.check(f"{s}.unknown_3C = a; func_08000100(b);", "int a, int b", prelude)
+            with self.assertRaises(semantics.SemanticError) as caught:
+                self.check(f"{s}.unknown_3C = a; func_0802AAAA(a);", "int a",
+                           "extern void func_0802AAAA(int);\n")
+            self.assertIn("might take as an argument", str(caught.exception))
         finally:
-            if callee.exists():
-                callee.unlink()
+            callee.unlink()
+        # round 5 (e1, e2): address-of through __extension__ or a comma lvalue
+        for spelling in (f"p = & __extension__ {s}.unknown_3E;", f"p = &(0, {s}.unknown_3E);"):
+            with self.subTest(spelling=spelling), self.assertRaises(semantics.SemanticError) as caught:
+                self.check(f"u8 *p; a = a * b + 7; {spelling} (void){s}.unknown_3C; p[-2] = a;",
+                           "int a, int b")
+            self.assertIn("does not follow its member", str(caught.exception))
+        (record,) = self.check(f"{s}.unknown_3C = 1;", "void")
+        self.assertIn("a compile with the pinned bytes moved follows every pinned access", record)
 
 
 if __name__ == "__main__":

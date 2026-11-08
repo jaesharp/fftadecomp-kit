@@ -384,6 +384,17 @@ class VolatileAllowlistTests(unittest.TestCase):
                 findings = plausible.check_file(source)
             self.assertTrue(any("m.h" in message for _, _, _, message in findings), findings)
 
+    def test_hash_outside_a_directive_line_is_refused(self):
+        # round 5 (f1): `F(#) pragma ...` pastes a directive together
+        for source in ("#define F(x) x\nF(#) pragma pack(1)\n", "int a; # 1 \"x\"\n",
+                       "void f(void) { k(#x); }\n"):
+            with self.subTest(source=source):
+                self.assertIn("volatile-allowlist", self.rules(source, relpath="src/08000001.c"))
+        for source in ("#define S(x) #x\nconst char *s = \"#\";\nchar c = '#';\n",
+                       "  #  define A 1\n", "#define LONG \\\n  1\n"):
+            with self.subTest(source=source):
+                self.assertEqual(self.rules(source, relpath="src/08000001.c"), [])
+
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),
                                 ("src/08028C34.c", "#undef u8\n"),

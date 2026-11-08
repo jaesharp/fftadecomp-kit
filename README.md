@@ -1632,7 +1632,9 @@ macro cannot spell the member or the `&`. As defence in depth, neither a
 file that uses the object nor any header in its include closure (other than
 the listed one) may define a macro whose replacement contains `&` or any
 identifier of the pinned declaration. While an entry is active, no
-object-like macro may contain `#`, so a macro cannot forge a linemarker or
+object-like macro may contain `#`, and no `#` may appear outside a directive
+line (after joining splices, outside literals, so `F(#) pragma ...` is
+refused). Together these mean a macro cannot forge a linemarker or
 directive (`#define H #` then `H 1 "include/x.h"`). In a function-like macro
 `#` can only stringize a parameter. The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
@@ -1665,14 +1667,12 @@ symbolically along every path, and the check requires:
   fails closed, and so does an indirect call. Every parameter and return
   value must be one scalar or pointer word, so `long long`, `double` and
   struct-by-value fail closed. The arguments, stack words included, are
-  compared by that count. A dead load into an argument register the
-  prototype does not name is accepted only when the prototype agrees with
-  the callee's own matched definition (`src/<addr>.c` for `func_<addr>`):
-  same return kind, same argument words. That definition was compiled
-  byte-identical to the ROM, so it names every register the callee reads.
-  Any other prototype, whether written in the source or added to a header,
-  could lie and let the qualifier's load pass a hidden argument, so then
-  r0-r3 all count as read. Header origin is not trusted;
+  compared by that count. No prototype is trusted to name every register
+  the callee reads: a lying one, or a callee whose own source hides
+  parameters behind a macro, would let the qualifier's dead load pass a
+  hidden argument. So every call counts as reading r0-r3, and a dead load
+  is accepted only if its register is overwritten before the call. Only the
+  libgcc division helpers have an exact interface;
 * every access to the object to be `symbol + constant` inside it: an
   address that adds a variable term (`(&sym)[n].x`, a variable subscript),
   lies outside the object or comes from a multi-register transfer fails
@@ -1697,13 +1697,26 @@ symbolically along every path, and the check requires:
 * no store to write back the value just loaded from the same byte (an
   `ldrb`/`strb` self-assignment).
 
-The plausibility rules make the store paired with a read-modify-write load a
-volatile lvalue. A pinned byte can only be reached through its own member,
-because array members take only in-bounds literal subscripts, no member's
-address is taken, and the object's address never reaches a call or memory.
-This matters because the semantic check alone cannot tell a planted read
-followed by an aliased store (`(void)sym.x; *(sym.unknown_02 + 0x3A) = a;`)
-from `sym.x = a;`: both compile to the same instructions.
+**Provenance by layout perturbation.** The real and stripped compiles alone
+cannot tell `(void)sym.x; *(sym.unknown_02 + 0x3A) = a;` from `sym.x = a;`,
+because both compile to the same instructions. So match.py compiles the
+source a third time with the pinned declaration rewritten:
+
+* each volatile bit-field is replaced in place by a padding byte and
+  declared again, in order, from offset 0x100 on, past the end of the object;
+* every other member keeps its offset.
+
+A bit-field has no address, so a pinned byte can only be reached through its
+own name, which follows the move. An access computed any other way keeps its
+old offset and lands on the padding: from another member, from the base, or
+through a cast, macro, comma lvalue or `__extension__`. Because 0x100 lies
+past the object, arithmetic on other members cannot coincide with a moved
+byte. On every path, the real compile's trace, branch conditions and object
+accesses, with each pinned offset X mapped to its moved offset P(X), must
+equal the perturbed compile's. The security argument rests on this
+compiler-enforced check. The lexical rules above (array subscripts, `&`,
+casts, macros) are cheap defence in depth: with them switched off, every
+aliasing repro from the reviews is still refused by the perturbation.
 
 A planted read either vanishes from the stripped compile, which leaves a load
 the rules cannot explain, or stays, which shows the qualifier did not produce
@@ -1747,9 +1760,14 @@ has these gaps:
     which also refuses function-pointer prototypes such as
     `void (*)(void)` in such a file;
   - callees need a fixed one-word-per-argument prototype;
-  - a dead load into an unnamed argument register before a call is refused
-    unless the callee has a matched definition in `src/` that agrees with
-    the prototype (an unmatched callee always counts as reading r0-r3).
+  - a dead load into an argument register is refused unless that register
+    is overwritten before the next call, whatever the callee's prototype
+    says.
+* The layout perturbation refuses anything that depends on where the pinned
+  bytes are, not only aliases. Examples are a computed offset that happens
+  to equal a member's, and the object's size. Those are false refusals. It
+  assumes agbcc places a full-width byte bit-field exactly as the layout
+  computes; a perturbed layout that comes out differently fails closed.
 * Variable subscripts into the object (`symbol.unknown_02[i]`) are always
   refused. None of the 173 parked and matched sources that reference the
   block uses one. A rough ROM scan finds a register-offset access through a
