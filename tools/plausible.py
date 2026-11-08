@@ -27,14 +27,16 @@ GBA I/O register window:
     /* plausible: hardware register, volatile is required here */
     *(volatile u16 *)0x04000000 = v;
 
-Volatile RAM is allowed only for objects on the maintainer's volatile allow
-list (tools/volatile_allow.json), and only inside the one listed header's
-anonymous `extern struct { ... } symbol;` declaration, as qualifiers of
-listed scalar member types, while config/data_symbols.json maps the symbol to
-the listed address.  Source files never qualify.
+Proposed (kit#90, pending maintainer decision): volatile RAM is allowed only
+for objects on the maintainer's volatile allow list (tools/volatile_allow.json),
+and only inside the one listed header's anonymous `extern struct { ... }
+symbol;` declaration, which must equal the pinned text, as qualifiers of
+bit-field members of listed types, while config/data_symbols.json maps the
+symbol to the listed address.  Source files never qualify.
 """
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -240,16 +242,29 @@ def volatile_allow_entries():
     return entries if isinstance(entries, list) else []
 
 
+def declaration_tokens(code):
+    """C tokens of a declaration, so the pinned text ignores only whitespace"""
+    return re.findall(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+|[0-9]+|\S", code)
+
+
+def declares_symbol(code, symbol):
+    """a file that declares the symbol itself cannot also see the volatile one"""
+    return re.search(r"\bextern\b(?:[^;{}]|\{[^{}]*\})*\b" + re.escape(symbol) + r"\b",
+                     code) is not None
+
+
 def active_volatile_entries(data_symbols, entries):
     """entries whose symbol the data map binds to exactly the listed address"""
     active = []
     for entry in entries:
         if not isinstance(entry, dict):
             continue
-        symbol, address, header, types = (entry.get("symbol"), entry.get("address"),
-                                          entry.get("header"), entry.get("member_types"))
+        symbol, address, header, types, declaration = (
+            entry.get("symbol"), entry.get("address"), entry.get("header"),
+            entry.get("member_types"), entry.get("declaration"))
         if not (isinstance(symbol, str) and re.fullmatch(r"[A-Za-z_]\w*", symbol) and
                 isinstance(address, str) and isinstance(header, str) and
+                isinstance(declaration, str) and
                 isinstance(types, list) and types and
                 all(isinstance(t, str) and re.fullmatch(r"[A-Za-z_]\w*", t) for t in types)):
             continue
@@ -266,26 +281,44 @@ def active_volatile_entries(data_symbols, entries):
 def allowlisted_volatile(code, relpath, data_symbols, entries):
     """(exempt volatile offsets, findings) for the volatile allow list.
 
-    Only the listed header may hold the listed object's declaration, which must
-    be one file-scope anonymous `extern struct { ... } symbol;`.  Inside its
-    braces, `volatile` may only begin a member `volatile T name;` or
-    `volatile T name : N;` with T a listed member type, never a pointer or
-    array, and the braces hold no nested, tagged or parenthesized types, so
-    the qualifier cannot reach any other object.
-    Other headers may not name the symbol (a macro could hide a use), and
-    typeof is refused while the entry is active, since it would copy the
-    qualifier onto locals.
+    Only the listed header may hold the listed object's declaration, and its
+    tokens must equal the entry's pinned `declaration`: one file-scope
+    anonymous `extern struct { ... } symbol;`.  Inside its braces, `volatile`
+    may only begin a bit-field member `volatile T name : N;` with T a listed
+    member type.  Bit-fields have no address, and the braces hold no nested,
+    tagged or parenthesized types, so the qualifier cannot reach any other
+    object.  While the entry is active, in every file: other headers may not
+    name the symbol (a macro could hide a use), a file that does not declare
+    the symbol itself may not take its address (pointer arithmetic would
+    carry the qualifier elsewhere), typeof is
+    refused (it would copy the qualifier onto locals), and no identifier of
+    the pinned declaration may be #defined or #undefined (that would change
+    what the pinned text declares).
     """
     allowed, findings = set(), []
 
     def finding(offset, message):
         findings.append((code.count("\n", 0, offset) + 1, "volatile-allowlist", "error", message))
 
+    joined = re.sub(r"\\\r?\n", "", code)
     for entry in active_volatile_entries(data_symbols, entries):
         symbol, header = entry["symbol"], entry["header"]
+        pinned = declaration_tokens(entry["declaration"])
         for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", code):
             finding(typeof.start(), f"typeof while {symbol} is an allowlisted volatile "
                     "object: it would copy the qualifier onto other objects")
+        own = declares_symbol(code, symbol)
+        for address in re.finditer(r"(?<!&)&(?!&)(?:\s|\()*" + re.escape(symbol) + r"\b", code):
+            if own:
+                break
+            finding(address.start(), f"the address of allowlisted volatile {symbol} may not "
+                    "be taken: pointer arithmetic would carry the qualifier to other memory")
+        names = {token for token in pinned if re.fullmatch(r"[A-Za-z_]\w*", token)}
+        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*(?:define|undef)[ \t]+([A-Za-z_]\w*)", joined):
+            if directive[1] in names:
+                finding(min(directive.start(), len(code)),
+                        f"`{directive[1]}` is part of the pinned {symbol} declaration and "
+                        "may not be redefined while it is allowlisted")
         references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", code))
         if relpath is None or not relpath.endswith(".h"):
             continue
@@ -306,13 +339,17 @@ def allowlisted_volatile(code, relpath, data_symbols, entries):
                         f"`extern struct {{ ... }} {symbol};` and name it nowhere else")
             continue
         body = declarations[0]
+        if declaration_tokens(body[0]) != pinned:
+            finding(body.start(), f"the {symbol} declaration differs from the one pinned in "
+                    "tools/volatile_allow.json; only the maintainer may change it")
+            continue
         if re.search(r"\b(?:struct|union|enum|typedef|extern|static)\b|[#()\[\]=]",
                      re.sub(r"\[\s*(?:0x[0-9A-Fa-f]+|[0-9]+)\s*\]", "", body["body"])):
             finding(body.start(), f"the {symbol} declaration may only hold plain members")
             continue
         types = "|".join(re.escape(t) for t in entry["member_types"])
         member = re.compile(r"volatile\s+(?:" + types + r")\s+[A-Za-z_]\w*"
-                            r"(?:\s*:\s*[0-9]+)?\s*;")
+                            r"\s*:\s*[0-9]+\s*;")
         for qualifier in re.finditer(r"\bvolatile\b", body["body"]):
             offset = body.start("body") + qualifier.start()
             prefix = code[body.start("body"):offset]
@@ -326,6 +363,8 @@ def allowlisted_volatile_uses(root, address, entries=None):
 
     A use is the source naming the symbol without declaring it itself: the
     only declaration it can then compile against is the listed header's.
+    Each record binds the header's current SHA-256; an unreadable header
+    raises OSError, which callers treat as a failure.
     """
     root = Path(root)
     try:
@@ -341,10 +380,11 @@ def allowlisted_volatile_uses(root, address, entries=None):
         symbol = re.escape(entry["symbol"])
         for source in sources:
             code = strip_comments_and_strings(source.read_text(encoding="utf-8", errors="replace"))
-            if re.search(r"\b" + symbol + r"\b", code) and \
-                    not re.search(r"\bextern\b(?:[^;{}]|\{[^{}]*\})*\b" + symbol + r"\b", code):
+            if re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
+                digest = hashlib.sha256((root / entry["header"]).read_bytes()).hexdigest()
                 records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
-                               f"`{entry['address']}` declared in `{entry['header']}`")
+                               f"`{entry['address']}` declared in `{entry['header']}` "
+                               f"(SHA-256 `{digest}`)")
                 break
     return records
 
@@ -502,11 +542,7 @@ def check_file(path):
             # Replays lint byte copies of the project's sources captured under
             # build/<capture>/; the copy's own layout is the relative path.
             if len(parts) > 2 and parts[0] == "build":
-                captured = [Path(*parts[index:]).as_posix() for index in range(2, len(parts))]
-                listed = {entry.get("header") for entry in volatile_allow_entries()
-                          if isinstance(entry, dict)}
-                relpath = next((name for name in captured if name in listed),
-                               Path(*parts).as_posix())
+                relpath = Path(*parts[2:]).as_posix()
             else:
                 relpath = Path(*parts).as_posix()
             break

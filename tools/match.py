@@ -4800,7 +4800,13 @@ def main():
             findings = [f"plausibility checker failed: {error}"]
 
     plausible = not findings
-    volatile_records = plausibility.allowlisted_volatile_uses(ROOT, addr) if plausible else []
+    volatile_records = []
+    if plausible:
+        try:
+            volatile_records = plausibility.allowlisted_volatile_uses(ROOT, addr)
+        except OSError as error:
+            findings = [f"allowlisted volatile record failed: {error}"]
+            plausible = False
     if source_fingerprint(ROOT, addr) != fingerprint:
         sys.exit("source or headers changed during verification; re-run match.py")
     if empty_profile and (mapping_snapshot(ROOT) != mapping or

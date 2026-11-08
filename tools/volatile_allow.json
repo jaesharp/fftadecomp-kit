@@ -1,12 +1,15 @@
 {
-  "_policy": "RAM objects whose volatile qualifier is evidence, not steering: the ROM shows the qualifier's effect on every access to that one object, across unrelated modules, and on no other RAM. An entry permits volatile only on listed member types inside the one anonymous `extern struct { ... } symbol;` declaration in the listed header, and only while config/data_symbols.json maps the symbol to the listed address. Volatile in any source file, on any other object or in any other header still fails. ONLY the repository maintainer may add an entry; agents park the function and cite the evidence instead.",
+  "_policy": "RAM objects whose volatile qualifier is evidence, not steering: the ROM shows the qualifier's effect on every access to that one object, across unrelated modules, and on no other RAM. An entry pins the one anonymous `extern struct { ... } symbol;` declaration in the listed header token for token and permits volatile only on its bit-field members of listed types, and only while config/data_symbols.json maps the symbol to the listed address. Volatile in any source file, on any other object or in any other header still fails. ONLY the repository maintainer may add an entry; agents park the function and cite the evidence instead.",
   "version": 1,
   "entries": [
     {
       "symbol": "g_control_flags_03000940",
       "address": "0x03000940",
       "header": "include/control_flags.h",
-      "member_types": ["u8"],
+      "member_types": [
+        "u8"
+      ],
+      "declaration": "extern struct { u16 display; u8 unknown_02[0x3A]; volatile u8 unknown_3C : 8; volatile u8 unknown_3D : 8; u8 unknown_3E; u8 unknown_3F; volatile u8 unknown_40 : 8; volatile u8 unknown_41 : 8; u8 unknown_42; volatile u8 unknown_43 : 8; u8 unknown_44[6]; volatile u8 unknown_4A : 8; volatile u8 unknown_4B : 8; volatile u8 unknown_4C : 8; volatile u8 unknown_4D : 8; } g_control_flags_03000940;",
       "evidence": "https://github.com/shubshub/fftadecomp-kit/issues/90",
       "reason": "every byte store to the IWRAM control block is preceded by a dead load of the same byte, in 122 unmatched functions across unrelated modules and on no other RAM"
     }

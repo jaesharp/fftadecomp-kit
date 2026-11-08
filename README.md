@@ -1588,30 +1588,36 @@ window by `config/data_symbols.json`. Such a pointer may only be used for
 member access; retargeting, shadowing and escapes remain rejected. A comment
 alone cannot permit volatile RAM or local variables, asm or steering pragmas.
 
-Volatile RAM is otherwise allowed only for an object on the maintainer's
-`tools/volatile_allow.json` (agents never edit it). An entry names a symbol,
-its address, one header and the member types that may be volatile. Only that
-header may declare the object, exactly once, as a file-scope anonymous
-`extern struct { ... } symbol;`; inside the braces `volatile` may only begin a
-plain listed-type member (`volatile u8 name;` or `volatile u8 name : 8;`), and
-the declaration holds no nested, tagged or parenthesized types, so the
-qualifier reaches no other object. The exemption applies only while
-`config/data_symbols.json` maps the symbol to the listed address, and only to
-the header at its listed project path or to a replay's byte copy of it under
-`build/<capture>/`. Volatile in
-any `src/` file, elsewhere in the header, in another header, or on another
-object still fails; other headers may not name the symbol, and `typeof` is
-refused everywhere while an entry is active. The single listed object is
-`g_control_flags_03000940` (`0x03000940`, `include/control_flags.h`, `u8`),
-whose byte stores carry a dead load of the same byte throughout the ROM and on
-no other RAM (issue #90).
+**Proposed (kit#90, pending maintainer decision):** volatile RAM is otherwise
+allowed only for an object on the maintainer's `tools/volatile_allow.json`
+(agents never edit it). An entry names a symbol, its address, one header, the
+member types that may be volatile and the object's complete declaration. Only
+that header may declare the object, exactly once, as a file-scope anonymous
+`extern struct { ... } symbol;` whose tokens equal the pinned declaration, so
+any change to the layout needs a maintainer edit of the list. Inside the
+braces `volatile` may only begin a listed-type bit-field member
+(`volatile u8 name : 8;`): bit-fields have no address, and the declaration
+holds no nested, tagged or parenthesized types, so the qualifier reaches no
+other object. The exemption applies only while `config/data_symbols.json` maps
+the symbol to the listed address, and only to the header at its listed project
+path or to a replay's byte copy directly under `build/<capture>/`.
+
+Volatile in any `src/` file, elsewhere in the header, in another header, or on
+another object still fails. While an entry is active, in every linted file:
+other headers may not name the symbol; a file that does not declare the symbol
+itself may not take its address (pointer arithmetic would carry the
+qualifier); `typeof` is refused; and no identifier of the pinned declaration
+(`u8`, member names, `struct`, ...) may be `#define`d or `#undef`ed. The single
+listed object is `g_control_flags_03000940` (`0x03000940`,
+`include/control_flags.h`, `u8`), whose byte stores carry a dead load of the
+same byte throughout the ROM and on no other RAM.
 
 When the addressed source names a listed symbol without declaring it, the
-match report records `* allowlisted volatile: ...` for it, and saved reports
-are refused unless those records equal a fresh recomputation. The premise is
-that the listed declaration is the original program's; the byte comparison,
-linking and every other check are unchanged. The kit does not bound the
-struct's size: the layout's extent is reviewed with the header.
+match report records `* allowlisted volatile: ...` for it, including the
+header's SHA-256, and saved reports are refused unless those records equal a
+fresh recomputation. The premise is that the pinned declaration is the
+original program's; the byte comparison, linking and every other check are
+unchanged.
 
 Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py`.
 
