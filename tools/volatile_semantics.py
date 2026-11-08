@@ -1,8 +1,9 @@
 """Semantic check for allowlisted volatile objects (kit#90).
 
-An allowlisted declaration (tools/volatile_allow.json) may qualify byte
-bit-fields of one RAM object as volatile, because the ROM shows the
-qualifier's effect: a dead `ldrb` of the byte before every `strb` to it.
+An allowlisted declaration (tools/volatile_allow.json) may qualify byte and
+halfword bit-fields of one RAM object as volatile, because the ROM shows the
+qualifier's effect: a dead `ldrb`/`ldrh` of the member before every
+`strb`/`strh` to it.
 That alone does not stop a source from using the qualifier to plant code: a
 statement such as `(sym.x, 0);`, `if (sym.x) ;`, an unused local or
 `sym.x |= 0;` emits loads under the qualifier that an ordinary declaration
@@ -32,29 +33,37 @@ symbolically along every path, and the check requires
    offsets, out-of-object offsets, multi-register transfers and the
    object's address reaching a call argument or a stored value fail closed;
 3. every load of the object in the real compile to be one of
-   * a read-modify-write load: an `ldrb` of a pinned byte whose destination
-     is overwritten before any use, followed by its `strb` to the same byte
-     with only immediate moves and copies or literal loads into the store's
-     operand registers in between (read_modify_write_store);
-   * a chained re-read for `a = (b = v)`: the forwarding `strb` is the
-     immediately preceding memory access and the value feeds, through copies
-     only, the next store, an `strb` to a pinned byte (chained_reread);
+   * a read-modify-write load: an unsigned load of a pinned member, at its
+     offset and of its width (`ldrb` of a byte, `ldrh` of a halfword), whose
+     destination is overwritten before any use, followed by its store of
+     the same width to the same member with only constant materialisation
+     (immediate moves and arithmetic on known constants) and copies or
+     literal loads into the store's operand registers in between
+     (read_modify_write_store);
+   * a chained re-read for `a = (b = v)`: the forwarding store of the same
+     width to the same member is the immediately preceding memory access
+     and the value feeds, through copies only, the next store, a store to a
+     pinned member of its width (chained_reread);
    * a counterpart of the stripped compile's loads of the object, matched
      in order with the same address and width;
-4. every store overlapping a pinned byte to be an `strb` of exactly that
-   byte with its own read-modify-write load;
-5. no store to write back the value just loaded from the same byte (an
-   `ldrb`/`strb` self-assignment, `sym.x = sym.x` or `sym.x |= 0`).
+4. every access overlapping a pinned member to be exactly that member: its
+   offset and its width (Executor.check_address), and every such store to
+   carry its own read-modify-write load;
+5. no store to write back the value just loaded from the same member (an
+   `ldrb`/`strb` or `ldrh`/`strh` self-assignment, `sym.x = sym.x` or
+   `sym.x |= 0`).
 
 The real/stripped comparison cannot tell `(void)sym.x; *(sym.array + k) =
 v;` from `sym.x = v;`: they compile identically.  Provenance is therefore
 enforced by the compiler.  A third compile permutes the pinned bit-fields
 among their own slots, keeping every other offset, the size and the
-alignment (perturbed_declaration).  perturbation_check requires every pinned
-access to follow the permutation; anything computed another way has the same
-address in both compiles and cannot.  A bit-field has no address, so only
-its name can reach it.  The executor refuses any access wider than a byte
-that overlaps a pinned byte.  compare() also refuses, on the preprocessed
+alignment (perturbed_declaration); members move only among members of the
+identical declaration form, so bytes swap with bytes and halfwords with
+halfwords.  perturbation_check requires every pinned access to follow the
+permutation; anything computed another way has the same address in both
+compiles and cannot.  A bit-field has no address, so only its name can reach
+it.  The executor refuses any access that overlaps a pinned member without
+being exactly that member.  compare() also refuses, on the preprocessed
 text, every occurrence of the symbol that is not `symbol.member`
 (plausible.whole_object_uses) and plausible.py's member rules; those token
 rules are defence in depth.
@@ -67,7 +76,7 @@ code, computed jumps, symbolic loops beyond the path bound, unknown
 instructions - fails closed with a reason.
 
 Known limits (false refusals, never false acceptance of a qualifier
-effect): reading a pinned byte twice where an ordinary declaration would
+effect): reading a pinned member twice where an ordinary declaration would
 reuse the first value (`if (x) ...; if (x) ...`) is refused, as are loops
 whose exit depends on unknown values, stripped compiles that legally reorder
 accesses around a pinned one, and equivalent code that the expression
@@ -84,6 +93,7 @@ MAX_PATHS = 256
 MAX_STEPS = 20000
 MAX_DECISIONS = 32
 RUNTIME_ARITY = {"__divsi3": 2, "__udivsi3": 2, "__modsi3": 2, "__umodsi3": 2}
+PINNED_WIDTHS = (1, 2)      # volatile members the rules model: bytes and halfwords
 TYPE_SIZES = {"u8": 1, "s8": 1, "char": 1, "vu8": 1, "vs8": 1,
               "u16": 2, "s16": 2, "short": 2, "vu16": 2, "vs16": 2,
               "u32": 4, "s32": 4, "int": 4, "long": 4, "vu32": 4, "vs32": 4,
@@ -128,58 +138,72 @@ def members(declaration):
         size, rest = TYPE_SIZES[member[0]], member[1:]
         if rest[:1] == ["*"]:
             size, rest = 4, rest[1:]
-        count = 1
+        count, bit_field = 1, False
         if len(rest) == 4 and rest[1] == "[" and rest[3] == "]":
             count, rest = int(rest[2], 0), rest[:1]
         elif len(rest) == 3 and rest[1] == ":":
             if int(rest[2], 0) != 8 * size:
                 raise SemanticError("only full-width bit-fields can be modelled")
-            rest = rest[:1]
+            rest, bit_field = rest[:1], True
         if len(rest) != 1 or not re.fullmatch(r"[A-Za-z_]\w*", rest[0]):
             raise SemanticError(f"pinned declaration member `{' '.join(member)}` is not plain")
         offset = (offset + size - 1) // size * size
         align = max(align, size)
-        if qualified and (size != 1 or count != 1):
-            raise SemanticError("only volatile byte members can be modelled")
+        if qualified and (size not in PINNED_WIDTHS or not bit_field):
+            raise SemanticError("only volatile byte and halfword bit-fields can be modelled")
         layout.append((whole, rest[0], offset, size * count, qualified))
         offset += size * count
     return layout, (offset + align - 1) // align * align
 
 
 def object_layout(declaration):
-    """(object size, {offset of each volatile byte}) of the pinned declaration"""
+    """(object size, {offset of each volatile member}) of the pinned declaration"""
+    size, pinned = pinned_members(declaration)
+    return size, set(pinned)
+
+
+def pinned_members(declaration):
+    """(object size, {offset of each volatile member: its width in bytes})"""
     layout, size = members(declaration)
-    return size, {offset for _, _, offset, _, qualified in layout if qualified}
+    return size, {offset: width for _, _, offset, width, qualified in layout if qualified}
 
 
 def perturbed_declaration(declaration):
     """(declaration, {pinned offset: new offset}, size) with the pinned names permuted.
 
-    The pinned bit-fields swap places among their own slots: the names are
-    rotated by half their number (a derangement, so every pinned byte moves,
-    and not in order).  Every other member, the object's size and its
-    alignment stay exactly the same, so nothing a source can compute from
-    the layout - another member's address, sizeof, __alignof__ - changes.
-    A bit-field has no address, so a pinned byte can only be reached through
-    its own name, which follows the permutation; an access computed any
-    other way stays put, at a slot that now belongs to a different member.
+    The pinned bit-fields are grouped by declaration form (the member's
+    tokens with its name taken out, so `volatile u8 _ : 8` and `volatile u16
+    _ : 16` are two classes), and within each class they swap places among
+    their own slots: the names are rotated by half the class's number (a
+    derangement, so every pinned member moves, and not in order).  Every
+    other member, the object's size and its alignment stay exactly the same,
+    so nothing a source can compute from the layout - another member's
+    address, sizeof, __alignof__ - changes.  A bit-field has no address, so
+    a pinned member can only be reached through its own name, which follows
+    the permutation; an access computed any other way stays put, at a slot
+    that now belongs to a different member of the same width.
     """
     # The self-check below models the layout in Python.  That is sound only
-    # while every pinned member has the identical declaration
-    # `volatile u8 name : 8` (members() enforces byte-sized volatile
-    # members), so swapping names cannot change any offset agbcc assigns.
-    # If the allow list ever admits differing pinned member types, add a
-    # self-check against a compiled layout instead.
+    # because a name moves only between members whose declarations are
+    # token-for-token identical apart from the name, so the rewrite is a
+    # renaming of identical declarators and cannot change any offset, the
+    # size or the alignment agbcc assigns, whatever its layout rules are.
     layout, size = members(declaration)
-    if len({" ".join(tokens).replace(name, "NAME") for tokens, name, _, _, qualified in layout
-            if qualified}) > 1:
-        raise SemanticError("pinned members must share one declaration form to be permuted")
-    slots = [index for index, (_, _, _, _, qualified) in enumerate(layout) if qualified]
-    if len(slots) < 2:
-        raise SemanticError("at least two pinned bytes are needed to permute them")
-    shift = len(slots) // 2
-    rotated = {slots[(position + shift) % len(slots)]: layout[slot][1]
-               for position, slot in enumerate(slots)}
+    classes = {}
+    for index, (tokens, name, _, _, qualified) in enumerate(layout):
+        if qualified:
+            form = " ".join("NAME" if token == name else token for token in tokens)
+            classes.setdefault(form, []).append(index)
+    if not classes:
+        raise SemanticError("the pinned declaration has no volatile member to permute")
+    rotated = {}
+    for form, slots in sorted(classes.items()):
+        if len(slots) < 2:
+            raise SemanticError(f"at least two pinned members of the form `{form}` are needed to "
+                                "permute them; a lone member could not be told from its slot")
+        shift = len(slots) // 2
+        rotated.update({slots[(position + shift) % len(slots)]: layout[slot][1]
+                        for position, slot in enumerate(slots)})
     parts = []
     for index, (tokens, name, _, _, _) in enumerate(layout):
         if index in rotated:
@@ -193,11 +217,13 @@ def perturbed_declaration(declaration):
     for _, name, offset, _, qualified in new_layout:
         if qualified:
             if offset == old[name]:
-                raise SemanticError("the perturbed layout left a pinned byte in place")
+                raise SemanticError("the perturbed layout left a pinned member in place")
             mapping[old[name]] = offset
         elif offset != old[name]:
             raise SemanticError("the perturbed layout moved an unpinned member")
-    if new_size != size or sorted(mapping) != sorted(mapping.values()):
+    widths = {offset: width for _, _, offset, width, qualified in layout if qualified}
+    if new_size != size or sorted(mapping) != sorted(mapping.values()) or \
+            any(widths[old_offset] != widths[new_offset] for old_offset, new_offset in mapping.items()):
         raise SemanticError("the perturbed layout changed the object")
     return text, mapping, new_size
 
@@ -633,7 +659,8 @@ class Executor:
         self.symbol, self.size, self.pinned = layout
 
     def check_address(self, address, width, text, multiple=False):
-        """fail closed unless an access to the object is `symbol + constant` inside it"""
+        """fail closed unless an access to the object is `symbol + constant` inside it,
+        and an access that overlaps a pinned member is exactly that member"""
         atom = ("sym", self.symbol)
         if not contains(address, atom):
             return
@@ -646,9 +673,11 @@ class Executor:
         offset = signed32(constant)
         if offset < 0 or offset + width > self.size:
             self.fail(text, f"the access at {self.symbol}{offset:+#x} lies outside the object")
-        if width != 1 and any(offset <= byte < offset + width for byte in self.pinned):
-            self.fail(text, f"a {width}-byte access at {self.symbol}{offset:+#x} overlaps a pinned "
-                      "byte; only a byte access through its member may touch one")
+        for start, size in sorted(self.pinned.items()):
+            if start < offset + width and offset < start + size and (start, size) != (offset, width):
+                self.fail(text, f"a {width}-byte access at {self.symbol}{offset:+#x} overlaps a pinned "
+                          f"byte of the {size}-byte member at {self.symbol}{start:+#x}; only an access "
+                          "of exactly that member, through its name, may touch it")
 
     def fail(self, record_text, message):
         where = f" at `{record_text}`" if record_text else ""
@@ -934,6 +963,10 @@ class Executor:
                     b = add(scale(b, -1), 1, -1)
                 result = operation({"bic": "and"}.get(mnemonic, mnemonic), values[0], b)
                 self.flags = ("nz", result)
+            # arithmetic on known constants only (`mov r0, #128; lsl r0, r0, #1`
+            # builds 0x100) is constant materialisation, like an immediate mov
+            record.constant = record.constant or (
+                isinstance(result, int) and all(isinstance(value, int) for value in values))
             regs[destination] = result
             self.records.append(record)
             return None
@@ -1105,22 +1138,24 @@ def dead(records, position, destination):
     return True
 
 
-def read_modify_write_store(records, position, address):
-    """the position of the `strb` this dead load belongs to, or None.
+def read_modify_write_store(records, position, address, width):
+    """the position of the store this dead load belongs to, or None.
 
-    agbcc computes a volatile byte store's value before the read-modify-write
-    load; the only instructions it leaves between that load and the `strb`
-    are immediate `mov`s (its own value, or a later store's hoisted constant
-    in 08050D50) and register copies or literal loads that write a register
-    the `strb` reads (08122C6C copies the address).  Anything else in
-    between - arithmetic, another memory access, a call or a branch - means
-    the load was not emitted by the store.
+    agbcc computes a volatile bit-field store's value before the
+    read-modify-write load; the only instructions it leaves between that
+    load and the `strb`/`strh` are immediate `mov`s and arithmetic on known
+    constants (its own value - `mov #128; lsl #1` for a halfword 0x100 - or
+    a later store's hoisted constant in 08050D50) and register copies or
+    literal loads that write a register the store reads (08122C6C copies
+    the address).  Anything else in between - arithmetic, another memory
+    access, a call or a branch - means the load was not emitted by the
+    store.  The store must have the load's width and address.
     """
     between = []
     for later in range(position + 1, len(records)):
         record = records[later]
         if record.kind == "store":
-            if record.width != 1 or record.address != address:
+            if record.width != width or record.address != address:
                 return None
             if any(not step.constant and not record.reads >= step.writes for step in between):
                 return None
@@ -1131,29 +1166,30 @@ def read_modify_write_store(records, position, address):
     return None
 
 
-def chained_reread(records, position, pinned_address):
+def chained_reread(records, position, pinned_width):
     """is this load the re-read of `a = (b = v)` with volatile `b`?
 
-    The forwarding `strb` to the same byte must be the immediately preceding
-    memory access, with only register arithmetic in between, and the value
-    must reach (through register copies) the next store, which is an `strb`
-    to a pinned byte; apart from that store's own read-modify-write load no
-    memory access, call or branch may intervene, and the value is used
-    nowhere else.
+    The forwarding store of the load's width to the same member must be the
+    immediately preceding memory access, with only register arithmetic in
+    between, and the value must reach (through register copies) the next
+    store, which is a store to a pinned member of that member's width;
+    apart from that store's own read-modify-write load no memory access,
+    call or branch may intervene, and the value is used nowhere else.
+    pinned_width maps an address to its pinned member's width, or None.
     """
     load = records[position]
     earlier = position - 1
     while earlier >= 0 and records[earlier].kind in ("alu", "literal"):
         earlier -= 1
-    if earlier < 0 or records[earlier].kind != "store" or records[earlier].width != 1 or \
+    if earlier < 0 or records[earlier].kind != "store" or records[earlier].width != load.width or \
             records[earlier].address != load.address:
         return False
     tracked, store, loads = set(load.writes), None, []
     for record in records[position + 1:]:
         if store is None:
             if record.kind == "store":
-                if record.width != 1 or record.value_register not in tracked or \
-                        not pinned_address(record.address) or \
+                if record.width != pinned_width(record.address) or \
+                        record.value_register not in tracked or \
                         (record.reads - {record.value_register}) & tracked or \
                         any(address != record.address for address in loads) or len(loads) > 1:
                     return False
@@ -1177,9 +1213,9 @@ def chained_reread(records, position, pinned_address):
 
 
 def compare_function(name, real_function, stripped_function, signatures, symbol, size, pinned):
-    def pinned_address(address):
-        offset = object_offset(address, symbol, size)
-        return offset in pinned
+    def pinned_width(address):
+        """the width of the pinned member that starts at address, or None"""
+        return pinned.get(object_offset(address, symbol, size))
 
     def where(address):
         offset = object_offset(address, symbol, size)
@@ -1191,16 +1227,16 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
         records = path.records
         # 4. a store must not write back the value it read from the same byte
         for record in records:
-            if record.kind == "store" and pinned_address(record.address) and record.self_assignment:
+            if record.kind == "store" and pinned_width(record.address) and record.self_assignment:
                 raise SemanticError(f"{name}: {describe(record)} writes back the value it read "
-                                    f"from {where(record.address)} (an ldrb/strb self-assignment)")
+                                    f"from {where(record.address)} (a load/store self-assignment)")
         # 2. classify every load of the object in the real compile
         counterparts, explained_stores = [], set()
         for position, record in enumerate(records):
             if record.kind != "load" or object_offset(record.address, symbol, size) is None:
                 continue
             destination = next(iter(record.writes))
-            if record.width == 1 and not record.signed and pinned_address(record.address):
+            if record.width == pinned_width(record.address) and not record.signed:
                 verdict = dead(records, position, destination)
                 if isinstance(verdict, Record):
                     raise SemanticError(
@@ -1209,30 +1245,32 @@ def compare_function(name, real_function, stripped_function, signatures, symbol,
                         "prototype does not name; no prototype is trusted to list every argument, "
                         "so the load must be overwritten before the call")
                 if verdict:
-                    store = read_modify_write_store(records, position, record.address)
+                    store = read_modify_write_store(records, position, record.address, record.width)
                     if store is None:
                         raise SemanticError(
                             f"{name}: {describe(record)} is a dead load of {where(record.address)} "
-                            "that is not directly followed by a store to the same byte (only immediate "
-                            "moves and the store's own operand copies may sit between them); only the "
-                            "read-modify-write load of a byte store is the qualifier's documented effect")
+                            "that is not directly followed by a store to the same member (only "
+                            "constants and the store's own operand copies may sit between "
+                            "them); only the read-modify-write load of a member store is the "
+                            "qualifier's documented effect")
                     explained_stores.add(store)
                     read_modify_write.add(record.index)
                     continue
-                if record.forwarded and chained_reread(records, position, pinned_address):
+                if record.forwarded and chained_reread(records, position, pinned_width):
                     chained.add(record.index)
                     continue
             counterparts.append((record.width, record.signed, where(record.address), record))
-        # 3. every store to a pinned byte carries its read-modify-write load
+        # 3. every store to a pinned member carries its read-modify-write load
         for position, record in enumerate(records):
             if record.kind != "store":
                 continue
             offset = object_offset(record.address, symbol, size)
-            if offset is None or not any(offset <= byte < offset + record.width for byte in pinned):
+            if offset is None or not any(start < offset + record.width and offset < start + width
+                                         for start, width in pinned.items()):
                 continue
-            if record.width != 1 or position not in explained_stores:
+            if record.width != pinned.get(offset) or position not in explained_stores:
                 raise SemanticError(f"{name}: {describe(record)} stores to {where(record.address)} "
-                                    "without the read-modify-write load of a volatile byte store")
+                                    "without the read-modify-write load of a volatile member store")
         # 1. the stripped compile behaves the same on this path
         other = replay(name, stripped_function, signatures, "stripped", path.decisions, (symbol, size, pinned))
         if other.conditions != path.conditions:
@@ -1308,8 +1346,9 @@ def perturbation_check(name, real_function, perturbed_function, signatures, symb
     must equal the perturbed compile's.  The permutation keeps every other
     offset, the size and the alignment, so an access computed from anything
     but a pinned member's name has the same address in both compiles; as
-    P(X) != X for every pinned X, it cannot follow the move.  Wider accesses
-    that overlap a pinned byte are refused by the executor in both compiles.
+    P(X) != X for every pinned X, it cannot follow the move.  Accesses that
+    overlap a pinned member without being exactly it are refused by the
+    executor in both compiles, so remapping an access's start is enough.
     """
     atom = ("sym", symbol)
     paths = explore(name, real_function, signatures, "real", (symbol, size, pinned))
@@ -1324,15 +1363,15 @@ def perturbation_check(name, real_function, perturbed_function, signatures, symb
                          min(len(mine), len(theirs)))
             real_access = object_accesses(path.records, atom)[index] if index < len(mine) else None
             raise SemanticError(
-                f"{name}: an access to {symbol} does not follow its member when the pinned bytes "
+                f"{name}: an access to {symbol} does not follow its member when the pinned members "
                 f"move (path {number}, access {index + 1}: real "
                 f"{show(real_access[2]) if real_access else 'none'}, perturbed "
-                f"{show(theirs[index][2]) if index < len(theirs) else 'none'}); a pinned byte may "
-                "only be reached through its own member")
+                f"{show(theirs[index][2]) if index < len(theirs) else 'none'}); a pinned member may "
+                "only be reached through its own name")
         if [remap(c, atom, mapping) for c in path.conditions] != other.conditions or \
                 [remap(e, atom, mapping) for e in path.trace] != other.trace:
             raise SemanticError(f"{name}: the layout-perturbed compile behaves differently (path "
-                                f"{number}); the source depends on where the pinned bytes are")
+                                f"{number}); the source depends on where the pinned members are")
     return len(paths)
 
 
@@ -1341,10 +1380,10 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
 
     The three compiles are the source as written, with `volatile` stripped
     from the pinned declaration (strip_pinned_volatile) and with its pinned
-    bytes permuted (perturb_pinned).  Raises SemanticError with the reason
+    members permuted (perturb_pinned).  Raises SemanticError with the reason
     when the real compile differs from the stripped one by anything but the
-    qualifier's documented effect, or reaches a pinned byte other than
-    through its member.
+    qualifier's documented effect, or reaches a pinned member other than
+    through its name.
     """
     return _compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
                             perturbed_assembly)
@@ -1353,7 +1392,7 @@ def compare(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
 def _compare_compiles(real_assembly, stripped_assembly, preprocessed, symbol, declaration,
                      perturbed_assembly=None):
     """compare(), with the perturbation optional so tests can exercise the other rules"""
-    size, pinned = object_layout(declaration)
+    size, pinned = pinned_members(declaration)
     from plausible import member_provenance, strip_comments_and_strings, whole_object_uses
     code = strip_comments_and_strings(preprocessed)
     for _, message in whole_object_uses(code, symbol) + member_provenance(

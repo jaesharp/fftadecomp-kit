@@ -47,14 +47,14 @@ class VolatileAllowlistTests(unittest.TestCase):
     def test_shipped_allow_list_holds_only_the_issue_entry(self):
         entries = plausible.volatile_allow_entries()
         self.assertEqual([(e["symbol"], e["address"], e["header"], e["member_types"])
-                          for e in entries], [(SYMBOL, "0x03000940", HEADER, ["u8"])])
+                          for e in entries], [(SYMBOL, "0x03000940", HEADER, ["u8", "u16"])])
         tokens = plausible.declaration_tokens(entries[0]["declaration"])
         self.assertEqual(tokens[:3] + tokens[-2:], ["extern", "struct", "{", SYMBOL, ";"])
         qualifiers = [index for index, token in enumerate(tokens) if token == "volatile"]
         self.assertTrue(qualifiers)
         for index in qualifiers:
-            self.assertEqual((tokens[index + 1], tokens[index + 3], tokens[index + 5]),
-                             ("u8", ":", ";"))
+            self.assertIn((tokens[index + 1], tokens[index + 3], tokens[index + 4], tokens[index + 5]),
+                          (("u8", ":", "8", ";"), ("u16", ":", "16", ";")))
 
     def test_wrong_or_missing_address_binding_is_rejected(self):
         for mapping in ({}, {SYMBOL: "0x03000944"}, {SYMBOL: "invalid"}, {"other": "0x03000940"}):
@@ -101,6 +101,29 @@ class VolatileAllowlistTests(unittest.TestCase):
             with self.subTest(member=member):
                 source = DECLARATION.replace("volatile u8 unknown_3D : 8;", member)
                 self.assertIn("volatile", self.rules(source, entries=(pinned(source),)))
+
+    def test_listed_halfword_members_must_be_full_width_bit_fields(self):
+        halfword = DECLARATION.replace("u8 unknown_02[0x3A];",
+                                       "volatile u16 unknown_02 : 16;\n    u8 unknown_04[0x38];")
+        both = dict(pinned(halfword), member_types=["u8", "u16"])
+        self.assertEqual(self.rules(halfword, entries=(both,)), [])
+        # u16 is not listed for this entry
+        self.assertIn("volatile", self.rules(halfword, entries=(pinned(halfword),)))
+        for member in ("volatile u16 unknown_02 : 8;", "volatile u16 unknown_02 : 15;",
+                       "volatile u16 unknown_02 : 32;", "volatile u16 unknown_02;",
+                       "volatile u16 unknown_02[1];"):
+            with self.subTest(member=member):
+                source = halfword.replace("volatile u16 unknown_02 : 16;", member)
+                self.assertIn("volatile", self.rules(source, entries=(dict(both, declaration=pinned(
+                    source)["declaration"]),)))
+        for member, types in (("volatile u8 unknown_3D : 4;", ["u8"]),
+                              ("volatile u8 unknown_3D : 16;", ["u8"]),
+                              ("volatile u32 unknown_3D : 32;", ["u8", "u32"]),
+                              ("volatile int unknown_3D : 32;", ["u8", "int"])):
+            with self.subTest(member=member):
+                source = DECLARATION.replace("volatile u8 unknown_3D : 8;", member)
+                self.assertIn("volatile", self.rules(source, entries=(dict(pinned(source),
+                                                                           member_types=types),)))
 
     def test_declaration_shape_is_exact(self):
         for source in (DECLARATION.replace("extern struct {", "extern volatile struct {"),

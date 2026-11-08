@@ -31,11 +31,11 @@ Allowlisted volatile RAM (kit#90): volatile RAM is allowed only
 for objects on the maintainer's volatile allow list (tools/volatile_allow.json),
 and only inside the one listed header's anonymous `extern struct { ... }
 symbol;` declaration, which must equal the pinned text, as qualifiers of
-bit-field members of listed types, while config/data_symbols.json maps the
-symbol to the listed address.  Source files never qualify.  match.py then
-compiles each user a second time with the qualifier stripped from that
+full-width bit-field members of listed types, while config/data_symbols.json
+maps the symbol to the listed address.  Source files never qualify.  match.py
+then compiles each user a second time with the qualifier stripped from that
 declaration and refuses any difference beyond the documented dead load before
-each byte store (tools/volatile_semantics.py).
+each member store (tools/volatile_semantics.py).
 """
 
 import argparse
@@ -312,7 +312,8 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
     may only begin a bit-field member `volatile T name : N;` with T a listed
     member type.  Bit-fields have no address, and the braces hold no nested,
     tagged or parenthesized types, so the qualifier cannot reach any other
-    object.
+    object.  The bit-field must be full width for its type (`u8 : 8`,
+    `u16 : 16`; BIT_FIELD_WIDTHS), the members the semantic check models.
 
     While the entry is active, every linted file is scanned with line splices
     joined as cpp joins them, and refuses: form feed, vertical tab and lone
@@ -470,17 +471,23 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
                      re.sub(r"\[\s*(?:0x[0-9A-Fa-f]+|[0-9]+)\s*\]", "", body["body"])):
             finding(body.start(), f"the {symbol} declaration may only hold plain members")
             continue
-        types = "|".join(re.escape(t) for t in entry["member_types"])
-        member = re.compile(r"volatile\s+(?:" + types + r")\s+[A-Za-z_]\w*"
-                            r"\s*:\s*[0-9]+\s*;")
+        # A listed type qualifies only a full-width bit-field of a type
+        # whose width the kit knows (`volatile u8 x : 8`, `volatile u16 x :
+        # 16`): the semantic check models exactly those members.
+        types = "|".join(re.escape(t) for t in entry["member_types"] if t in BIT_FIELD_WIDTHS)
+        member = re.compile(r"volatile\s+(?P<type>" + (types or r"(?!)") + r")\s+[A-Za-z_]\w*"
+                            r"\s*:\s*(?P<width>[0-9]+)\s*;")
         for qualifier in re.finditer(r"\bvolatile\b", body["body"]):
             offset = body.start("body") + qualifier.start()
             prefix = code[body.start("body"):offset]
-            if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
+            found = member.match(code, offset)
+            if re.search(r"(?:^|;)\s*$", prefix) and found and \
+                    integer_literal(found["width"]) == BIT_FIELD_WIDTHS[found["type"]]:
                 allowed.add(offset)
     return allowed, findings
 
 
+BIT_FIELD_WIDTHS = {"u8": 8, "s8": 8, "u16": 16, "s16": 16}
 C_TOKEN = re.compile(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+[uUlL]*|[0-9]+[uUlL]*|->|\+\+|--|<<=|>>=|<<|>>|"
                      r"<=|>=|==|!=|&&|\|\||[-+*/%&|^]=|\S")
 def integer_literal(token):
@@ -543,7 +550,7 @@ def whole_object_uses(code, symbol):
 
 
 def member_provenance(code, entry):
-    """[(offset, message)] for uses that could reach a volatile byte without its member.
+    """[(offset, message)] for uses that could reach a volatile member without its name.
 
     Works on C tokens, so it applies equally to a source and to its
     preprocessed text.  An array member of the object may only be written
@@ -598,7 +605,7 @@ def member_provenance(code, entry):
             before -= 1
         if before >= 0 and tokens[before][0] == "&":
             findings.append((offset, f"no `&` may precede {symbol} (write `{symbol}.x & a`): "
-                             "a member's address could reach a volatile byte without its qualifier"))
+                             "a member's address could reach a volatile member without its qualifier"))
         after = [t for t, _ in tokens[index + 1:index + 6]]
         if after[:1] != ["."] or len(after) < 2 or after[1] not in arrays:
             continue
