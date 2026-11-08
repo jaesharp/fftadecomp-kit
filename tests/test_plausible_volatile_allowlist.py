@@ -29,9 +29,10 @@ def pinned(source):
 
 
 class VolatileAllowlistTests(unittest.TestCase):
-    def rules(self, source, relpath=HEADER, mapping=MAPPING, entries=(ENTRY,)):
+    def rules(self, source, relpath=HEADER, mapping=MAPPING, entries=(ENTRY,), closure=None):
         return [rule for _, rule, _, _ in plausible.check_text(
-            source, data_symbols=mapping, relpath=relpath, volatile_allow=list(entries))]
+            source, data_symbols=mapping, relpath=relpath, volatile_allow=list(entries),
+            closure=closure)]
 
     def refused(self, findings):
         self.assertTrue("volatile" in findings or "volatile-allowlist" in findings, findings)
@@ -144,7 +145,14 @@ class VolatileAllowlistTests(unittest.TestCase):
                                     relpath="src/08028C34.c"), [])
         # A source declaring the symbol itself never sees the volatile declaration.
         self.assertEqual(self.rules("extern u16 " + SYMBOL + ";\nvoid f(void) { p = &" +
-                                    SYMBOL + "; }\n", relpath="src/0800337C.c"), [])
+                                    SYMBOL + "; }\n", relpath="src/0800337C.c",
+                                    closure=({"src/0800337C.c"}, [])), [])
+        # ...but only when it provably cannot see the listed declaration.
+        for closure in (None, ({"src/0800337C.c", HEADER}, [])):
+            with self.subTest(closure=closure):
+                self.assertIn("volatile-allowlist", self.rules(
+                    "extern u16 " + SYMBOL + ";\nvoid f(void) { p = &" + SYMBOL + "; }\n",
+                    relpath="src/0800337C.c", closure=closure))
 
     def test_second_review_bypasses_are_refused(self):
         include = '#include "control_flags.h"\n'
@@ -172,6 +180,74 @@ class VolatileAllowlistTests(unittest.TestCase):
         self.assertEqual(self.rules(include + "extern void g(int " + SYMBOL + "_count);\n" + ACCESS,
                                     relpath="src/08028C34.c"), [])
         self.assertEqual(self.rules("#define CAT(a, b) a##b\n", relpath="src/a.c", mapping={}), [])
+
+    def test_whitespace_before_a_splice_newline_still_splices(self):
+        include = '#include "control_flags.h"\n'
+        for name, source in (
+                ("address", include + "void f(int n) { (&g_control_flags_\\ \n03000940 + n)->unknown_3C = 1; }\n"),
+                ("typeof", include + "void f(void) { type\\\t\nof(" + SYMBOL + ".unknown_3C) l; }\n"),
+                ("define", "#define u8 \\ \nint\n" + include),
+                ("directive", "#\\ \ndefine u8 int\n" + include),
+                ("macro", include + "#define CF \\  \n" + SYMBOL + "\n"),
+                ("linemarker", "#\\ \nline 1\n"),
+                ("computed include", "#define H \"control_flags.h\"\n#include \\ \nH\n")):
+            with self.subTest(name=name):
+                self.assertIn("volatile-allowlist", self.rules(source, relpath="src/08028C34.c"))
+        spliced = DECLARATION.replace("u16 display;", "u16 \\ \ndisplay;")
+        self.assertIn("volatile", self.rules(spliced, entries=(pinned(spliced),)))
+
+    def test_guarded_declarations_do_not_exempt_a_header_user(self):
+        include = '#include "control_flags.h"\n'
+        for guard in ("#ifdef NEVER_DEFINED", "#if defined(X)", "#if 1-1", "#if 0"):
+            source = (include + guard + "\nextern char " + SYMBOL + "[1];\n#endif\n"
+                      "void f(int n) { (&" + SYMBOL + " + n)->unknown_3C = 1; }\n")
+            with self.subTest(guard=guard):
+                self.assertIn("volatile-allowlist", self.rules(
+                    source, relpath="src/08028C34.c", closure=({"src/08028C34.c", HEADER}, [])))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("config", "src", "include"):
+                (root / name).mkdir()
+            (root / "config" / "data_symbols.json").write_text(json.dumps(MAPPING))
+            (root / HEADER).write_text(plausible.volatile_allow_entries()[0]["declaration"] + "\n")
+            (root / "include" / "wrapper.h").write_text("#include <control_flags.h>\n")
+            source = root / "src" / "08028C34.c"
+            for text in (include, '#include "wrapper.h"\n'):
+                source.write_text(text + "#ifdef NEVER\nextern int " + SYMBOL + ";\n#endif\n"
+                                  "void f(int n) { (&" + SYMBOL + " + n)->unknown_3C = 1; }\n")
+                with self.subTest(text=text):
+                    self.assertIn("volatile-allowlist",
+                                  [rule for _, rule, _, _ in plausible.check_file(source)])
+            source.write_text("extern u16 " + SYMBOL + ";\nvoid f(void) { p = &" + SYMBOL + "; }\n")
+            self.assertEqual(plausible.check_file(source), [])
+
+    def test_includes_must_stay_inside_linted_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("config", "src", "include", "Parked"):
+                (root / name).mkdir()
+            (root / "config" / "data_symbols.json").write_text(json.dumps(MAPPING))
+            (root / "Parked" / "x.h").write_text("#define u8 int\n")
+            (root / "src" / "helper.c").write_text("int helper;\n")
+            (root / "src" / "local.h").write_text("int local;\n")
+            outside = root.parent / (root.name + "_outside.h")
+            outside.write_text("int outside;\n")
+            source = root / "src" / "08028C34.c"
+            try:
+                for include in ('"../Parked/x.h"', '"' + str(outside) + '"', '"helper.c"',
+                                '<../Parked/x.h>'):
+                    source.write_text("#include " + include + "\nvoid f(void) { g(); }\n")
+                    with self.subTest(include=include):
+                        self.assertIn("volatile-allowlist",
+                                      [rule for _, rule, _, _ in plausible.check_file(source)])
+                source.write_text('#include "local.h"\n#include "../include/control_flags.h"\n'
+                                  "void f(void) { g(); }\n")
+                self.assertEqual(plausible.check_file(source), [])
+                (root / "config" / "data_symbols.json").write_text("{}")
+                source.write_text('#include "../Parked/x.h"\nvoid f(void) { g(); }\n')
+                self.assertEqual(plausible.check_file(source), [])
+            finally:
+                outside.unlink()
 
     def test_declaration_identifiers_cannot_be_redefined(self):
         for relpath, source in (("src/08028C34.c", "#define u8 u8 *\n#include \"control_flags.h\"\n"),

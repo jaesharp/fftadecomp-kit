@@ -1604,15 +1604,19 @@ path or to a replay's byte copy directly under `build/<capture>/`.
 
 Volatile in any `src/` file, elsewhere in the header, in another header, or on
 another object still fails. While an entry is active, every linted file is
-scanned with line splices joined and refuses: token pasting (`##`), digraphs
+scanned with line splices joined as cpp joins them (a backslash, optional
+spaces or tabs, then a newline) and refuses: token pasting (`##`), digraphs
 and trigraphs; `typeof`; `#line`, linemarkers, `#import`, `#include_next` and
 computed `#include`; `#define`/`#undef` of any identifier of the pinned
 declaration (`u8`, member names, `struct`, ...); and any `#define` whose
-replacement names the symbol. Other headers may not name the symbol, and in a
-file without its own file-scope `extern` declarator of the symbol (a
-parameter name does not count) every use must be `symbol.member`, so neither
-its address nor the whole object reaches pointer arithmetic, a macro or a
-copy. The single
+replacement names the symbol; and any `#include` that resolves outside
+`include/` or to a non-header under `src/`, which the sweep would never lint.
+Other headers may not name the symbol, and every use must be
+`symbol.member`, so neither its address nor the whole object reaches pointer
+arithmetic, a macro or a copy. The only exemption is a file with its own
+file-scope `extern` declarator of the symbol (a parameter name does not
+count) whose include closure does not reach the listed header, so a
+declaration hidden behind `#if` exempts nothing. The single
 listed object is `g_control_flags_03000940` (`0x03000940`,
 `include/control_flags.h`, `u8`), whose byte stores carry a dead load of the
 same byte throughout the ROM and on no other RAM.

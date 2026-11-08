@@ -99,6 +99,16 @@ RULES = [
 ]
 
 
+# A backslash, optional horizontal whitespace and a newline: GCC's cpp splices
+# the lines even with the whitespace (it only warns), so every scan must too.
+SPLICE = r"\\[ \t\f\v]*\r?\n"
+
+
+def join_splices(text):
+    """translation phase 2, as the preprocessor does it"""
+    return re.sub(SPLICE, "", text)
+
+
 def strip_comments_and_strings(text):
     """replace comments and string/char literals with spaces, keeping offsets"""
     out = list(text)
@@ -289,7 +299,7 @@ def active_volatile_entries(data_symbols, entries):
     return active
 
 
-def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
+def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closure=None):
     """(exempt volatile offsets, findings) for the volatile allow list.
 
     Only the listed header may hold the listed object's declaration, and its
@@ -301,15 +311,18 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
     object.
 
     While the entry is active, every linted file is scanned with line splices
-    joined, and refuses: token pasting, digraph and trigraph spellings (they
+    joined as cpp joins them, and refuses: #include outside include/ and
+    src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
     can build a directive or name the scan cannot see); typeof (it would copy
     the qualifier onto locals); #line, linemarkers, #import, #include_next
     and computed #include (they hide or fake dependencies); #define/#undef of
     any identifier of the pinned declaration; and any #define whose
     replacement names the symbol.  Other headers may not name the symbol, and
-    in a file that does not declare it itself every use must be immediate
-    member access `symbol.member`, so neither its address nor the whole
-    object can reach pointer arithmetic, a macro argument or a copy.
+    every use must be immediate member access `symbol.member`, so neither its
+    address nor the whole object can reach pointer arithmetic, a macro
+    argument or a copy.  Only a file with its own file-scope declarator whose
+    include closure (closure=(inside, outside)) provably misses the listed
+    header is exempt; without a closure nothing is.
     """
     allowed, findings = set(), []
 
@@ -317,13 +330,16 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
         findings.append((code.count("\n", 0, min(offset, len(code))) + 1,
                          "volatile-allowlist", "error", message))
 
-    joined = re.sub(r"\\\r?\n", "", code)
-    raw = re.sub(r"\\\r?\n", "", strip_comments_and_strings_keep_strings(text if text is not None else code))
+    source = join_splices(text if text is not None else code)
+    joined = strip_comments_and_strings(source)
+    raw = strip_comments_and_strings_keep_strings(source)
+    inside, outside = closure if closure is not None else (None, [])
     for entry in active_volatile_entries(data_symbols, entries):
         symbol, header = entry["symbol"], entry["header"]
         pinned = declaration_tokens(entry["declaration"])
-        lexical = (r"##|%:|\?\?[=/'()!<>\-]", "token pasting, digraphs and trigraphs")
-        for match in re.finditer(lexical[0], joined):
+        lexical = (r"##|%:", "token pasting, digraphs and trigraphs")
+        for match in list(re.finditer(lexical[0], joined)) + \
+                list(re.finditer(r"\?\?[=/'()!<>\-]", text if text is not None else code)):
             finding(match.start(), f"{lexical[1]} are refused while {symbol} is an "
                     "allowlisted volatile object: they can spell what the scan cannot see")
         for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", joined):
@@ -345,9 +361,14 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
             if directive["kind"] == "define" and re.search(r"\b" + re.escape(symbol) + r"\b",
                                                            directive["rest"]):
                 finding(directive.start(), f"a macro may not expand to allowlisted volatile {symbol}")
+        for escape in outside:
+            finding(0, f"#include of `{escape}` leaves include/ and src/*.h, which are the "
+                    f"only linted inputs, while {symbol} is allowlisted")
         references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", joined))
         if relpath is None or not relpath.endswith(".h"):
-            if not declares_symbol(joined, symbol):
+            # A file's own declaration exempts it only when it provably cannot
+            # see the listed one: the header is outside its include closure.
+            if not (declares_symbol(joined, symbol) and inside is not None and header not in inside):
                 for reference in references:
                     if not re.match(r"\s*\.\s*[A-Za-z_]", joined[reference.end():]):
                         finding(reference.start(), f"allowlisted volatile {symbol} may only be "
@@ -365,7 +386,7 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None):
             r"\s*;", code))
         if len(declarations) != 1 or len(references) != 1 or \
                 not declarations[0].start() <= references[0].start() < declarations[0].end() or \
-                re.search(r"\\\r?\n", code):
+                re.search(SPLICE, text if text is not None else code):
             for reference in references or [None]:
                 finding(reference.start() if reference else 0,
                         f"{header} must declare {symbol} exactly once as a file-scope "
@@ -402,7 +423,10 @@ def strip_comments_and_strings_keep_strings(text):
 
 
 def include_closure(root, source):
-    """root-relative paths of every file a source can #include, transitively.
+    """(root-relative paths a source can #include transitively, escapes).
+
+    Escapes are included files that are neither under include/ nor a header
+    under src/, so the plausibility sweep never lints them.
 
     Quoted names resolve against the including file's directory, then
     include/; angled names against include/ only (the tools run cpp with
@@ -410,22 +434,28 @@ def include_closure(root, source):
     active, so this over-approximates the preprocessor's dependencies.
     """
     root = Path(root).resolve()
-    seen, pending = set(), [Path(source).resolve()]
+    start = Path(source).resolve()
+    seen, pending, outside = set(), [start], []
     while pending:
         path = pending.pop()
         if path in seen:
             continue
         seen.add(path)
-        text = re.sub(r"\\\r?\n", "", strip_comments_and_strings_keep_strings(
+        text = strip_comments_and_strings_keep_strings(join_splices(
             path.read_text(encoding="utf-8", errors="replace")))
         for include in re.finditer(r'(?m)^[ \t]*#[ \t]*include[ \t]*(?:"([^"\n]+)"|<([^>\n]+)>)', text):
             name = include[1] or include[2]
             candidates = ([path.parent / name] if include[1] else []) + [root / "include" / name]
             for candidate in candidates:
                 if candidate.is_file():
-                    pending.append(candidate.resolve())
+                    resolved = candidate.resolve()
+                    if not ((root / "include") in resolved.parents or
+                            (root / "src") in resolved.parents and resolved.suffix == ".h"):
+                        outside.append(name)
+                    pending.append(resolved)
                     break
-    return {path.relative_to(root).as_posix() for path in seen if root in path.parents}
+    return ({path.relative_to(root).as_posix() for path in seen if root in path.parents},
+            sorted(set(outside)))
 
 
 def allowlisted_volatile_uses(root, address, entries=None):
@@ -449,9 +479,9 @@ def allowlisted_volatile_uses(root, address, entries=None):
     for entry in active_volatile_entries(data_symbols, entries):
         symbol = re.escape(entry["symbol"])
         for source in sources:
-            code = re.sub(r"\\\r?\n", "", strip_comments_and_strings(
+            code = strip_comments_and_strings(join_splices(
                 source.read_text(encoding="utf-8", errors="replace")))
-            if entry["header"] in include_closure(root, source) or \
+            if entry["header"] in include_closure(root, source)[0] or \
                     re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
                 digest = hashlib.sha256((root / entry["header"]).read_bytes()).hexdigest()
                 records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
@@ -491,7 +521,7 @@ def hardware_polling_bodies(code, hardware_qualifiers):
     qualify. Function bodies, RAM reads, calls and mutable aliases still fail.
     """
     bodies = set()
-    if re.search(r"\\\r?\n", code):
+    if re.search(SPLICE, code):
         return bodies
     definitions = list(re.finditer(
         r"(?m)^[ \t]*#[ \t]*define[ \t]+(?P<name>[A-Za-z_]\w*)[ \t]+"
@@ -520,7 +550,7 @@ def statement_macro_tails(code):
     the body is still scanned for dead code and every other forbidden construct.
     Comments and literals have already been blanked without changing offsets.
     """
-    logical = re.sub(r"\\\r?\n", lambda match: " " * len(match[0]), code)
+    logical = re.sub(SPLICE, lambda match: " " * len(match[0]), code)
     tails = set()
     headers = re.finditer(
         r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*(?:\([^()\r\n]*\))?", logical)
@@ -543,7 +573,7 @@ def statement_macro_tails(code):
         if depth or not logical[opening + 1:closing - 1].strip(" \t\r\n;"):
             continue
         body = code[opening + 1:closing - 1]
-        joined_body = re.sub(r"\\\r?\n", "", body)
+        joined_body = join_splices(body)
         # Do not let a newly accepted wrapper conceal a forbidden token split
         # across physical lines; the ordinary rule scan retains source offsets.
         if any(re.search(pattern, joined_body) and not re.search(pattern, body)
@@ -556,18 +586,21 @@ def statement_macro_tails(code):
     return tails
 
 
-def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None):
+def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None,
+               closure=None):
     """returns list of findings: (line, rule, severity, message)
 
     relpath is the file's path relative to the project root; only the header
     an allowlisted volatile object names can be exempted, so None never is.
+    closure is include_closure() of the file; without it no file is assumed
+    unable to see an allowlisted declaration.
     """
     code = strip_comments_and_strings(text)
     macro_tails = statement_macro_tails(code)
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
     listed_qualifiers, findings = allowlisted_volatile(
         code, relpath, data_symbols or {},
-        volatile_allow_entries() if volatile_allow is None else volatile_allow, text)
+        volatile_allow_entries() if volatile_allow is None else volatile_allow, text, closure)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
@@ -600,7 +633,7 @@ def check_file(path):
     except OSError as e:
         return [(0, "unreadable", "error", str(e))]
     data_symbols = {}
-    relpath = None
+    relpath = closure = None
     for parent in Path(path).resolve().parents:
         mapping = parent / "config" / "data_symbols.json"
         if mapping.is_file():
@@ -613,12 +646,18 @@ def check_file(path):
             parts = Path(path).resolve().relative_to(parent).parts
             # Replays lint byte copies of the project's sources captured under
             # build/<capture>/; the copy's own layout is the relative path.
+            tree = parent
             if len(parts) > 2 and parts[0] == "build":
                 relpath = Path(*parts[2:]).as_posix()
+                tree = parent / "build" / parts[1]
             else:
                 relpath = Path(*parts).as_posix()
+            try:
+                closure = include_closure(tree, path)
+            except OSError:
+                closure = None
             break
-    return check_text(text, os.path.basename(path), data_symbols, relpath)
+    return check_text(text, os.path.basename(path), data_symbols, relpath, closure=closure)
 
 
 def asm_allow_path():
