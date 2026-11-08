@@ -667,6 +667,38 @@
         }
       },
       "release": null
+    },
+    {
+      "claim": {
+        "acceptance_body_sha256": "fb03175cdeba7043b3ed45bfad5bdc1fcb5082da17f0b59a29d7c4e2a1e82f01",
+        "acknowledged_cursor": 6714858520,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "fb03175cdeba7043b3ed45bfad5bdc1fcb5082da17f0b59a29d7c4e2a1e82f01",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x081369B0\",\"who\":\"codex-recovery-081369B0\",\"note\":\"Recover sealed old-checkout C using freshly rebuilt upstream agbcc and current native verifier; no C edits in this validation pass.\"}",
+          "created_at": "2026-11-08T00:09:20Z",
+          "id": 6714858520,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:09:20Z",
+          "user": {
+            "id": 31369,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "155cfa48977eb754fd85d6a396c581793b29a69645678a7cfc4e784ee0bed96a",
+        "result": {
+          "address": "0x081369B0",
+          "claim_id": 6714858520,
+          "code": 0,
+          "message": "claim accepted",
+          "operation": "claim",
+          "owner_id": 31369,
+          "request_id": 6714858520,
+          "status": "accepted",
+          "who": "codex-recovery-081369B0"
+        }
+      },
+      "release": null
     }
   ],
   "issue": 66,
