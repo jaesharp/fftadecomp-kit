@@ -606,7 +606,35 @@
           "who": "sol-080BB370-3777"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "c8f510f282c3237bd268cc287b07ff00661180b8518a416ba1f433e51eb53b78",
+        "acknowledged_cursor": 6715056691,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "c8f510f282c3237bd268cc287b07ff00661180b8518a416ba1f433e51eb53b78",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080BB370\",\"who\":\"sol-080BB370-3777\",\"claim_id\":6714919666,\"reason\":\"Bounded natural C forms remained176B; plausible180B form still differs. Seven failed native calls plus one diagnostic; all work stopped, no MATCH.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; bounded natural C forms\"}",
+          "created_at": "2026-11-08T00:29:04Z",
+          "id": 6715056691,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:29:04Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "1c87899c288866aa7f576c7cc9ba6912a10f7d52d6a2297a5c31dfdc2336f74d",
+        "result": {
+          "address": "0x080BB370",
+          "claim_id": 6714919666,
+          "code": 0,
+          "message": "release accepted; unmatchable evidence requires maintainer review",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715056691,
+          "status": "accepted",
+          "who": "sol-080BB370-3777"
+        }
+      }
     },
     {
       "claim": {
