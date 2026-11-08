@@ -162,66 +162,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "6ed16438e8d8d8a93008b5697a1566348c017796b3d49ad80dcb2a1965cf0d47",
-        "acknowledged_cursor": 6714772972,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6ed16438e8d8d8a93008b5697a1566348c017796b3d49ad80dcb2a1965cf0d47",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08124560\",\"who\":\"sol-08124560-3773\",\"note\":\"Bounded plausible C matching using existing native compiler. Address-specific executor only; no tooling changes.\"}",
-          "created_at": "2026-11-08T00:00:42Z",
-          "id": 6714770770,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:00:42Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5d1493434061c937ebeb56c9d042de33d5ff5f735578a6f4e65800d56b56f318",
-        "result": {
-          "address": "0x08124560",
-          "claim_id": 6714770770,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714770770,
-          "status": "accepted",
-          "who": "sol-08124560-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "6441e51aa2004fb9c436dffc91150384e9233f141ffbfe362bb954a8381f0c3d",
-        "acknowledged_cursor": 6714869167,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "6441e51aa2004fb9c436dffc91150384e9233f141ffbfe362bb954a8381f0c3d",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08124560\",\"who\":\"sol-08124560-3773\",\"claim_id\":6714770770,\"reason\":\"Eight native/compiler calls all NONMATCH. Preserved plausible232B form204/232 actual positional bytes; search-loop stride/mask allocation and coordinate-address registers differ. Fully stopped, no MATCH credit.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; ordinary C types/loops/expressions/scopes\"}",
-          "created_at": "2026-11-08T00:10:23Z",
-          "id": 6714869167,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:10:23Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ae1178d983c5736de3ef775d1a4d8ecbe074ecb2a5f06dc110dd693810e12f03",
-        "result": {
-          "address": "0x08124560",
-          "claim_id": 6714770770,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714869167,
-          "status": "accepted",
-          "who": "sol-08124560-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "56c94250291edeedd627c97c1d8b08900dbc92a8fb15c147a821752ad900e353",
         "acknowledged_cursor": 6714772972,
         "body_provenance": "acceptance-time",
