@@ -30,6 +30,9 @@ GUARDED_SWITCH_CONTROL_FLOW = 'bounded buffer calls with an exact unsigned-guard
 NESTED_OUTPUT_SELECTOR = 'bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-nested-halfword-output-v1'
 NESTED_OUTPUT_CONTROL_FLOW = 'bounded buffer calls with native nested formal halfword outputs and retained entry aliases'
+THUNK_SELECTOR = 'bounded-buffer-conditional-thunks-v1'
+THUNK_SCHEMA = 'elf-symbol-thumb-bounded-buffer-conditional-thunks-v1'
+THUNK_CONTROL_FLOW = 'complete named-data owner with typed function words, bounded buffer callees and conditional canonical indirect-call ABI'
 GUARDED_ALIAS_SELECTOR = 'bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_CONTROL_FLOW = 'complete ordinary Thumb owner with guarded bounded-buffer callees and every native return alias retained'
@@ -53,8 +56,8 @@ CALLBACK_CLOSURE_SELECTOR = 'conditional-two-word-callback-closure-v1'
 CALLBACK_CLOSURE_SCHEMA = 'elf-symbol-thumb-conditional-two-word-callback-closure-v1'
 DIRECT_OUTPUT_SELECTOR = 'bounded-buffer-direct-halfword-output-v1'
 DIRECT_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-direct-halfword-output-v1'
-SELECTORS = (KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
-SCHEMAS = (KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
+SELECTORS = (THUNK_SELECTOR, KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
+SCHEMAS = (THUNK_SCHEMA, KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -205,6 +208,93 @@ def root_switch_context(proof, data, address, calls, words, data_words):
             proof._root_switch != (data, address, calls, words):
         raise ValueError('root buffer switch differs from authenticated complete context')
     return True
+
+
+class ConditionalThunkBufferProof(NamedDataBufferProof):
+    """Root-only canonical calls never receive tracked local or return pointers."""
+
+    def bind_root(self, data, address, calls):
+        import function_thunk_profile as thunk
+        import owner_admission_profile as owner
+        if hasattr(self, '_thunk_root'):
+            raise ValueError('conditional thunk root context is single use')
+        validate_owner(data, address, self.rom, self.mapping, self.index)
+        refinement = owner.refine(data, address, self.mapping)
+        ins, _, branches, actual_calls, words = graph.graph(data, address, refinement)
+        selected = {site: target for site, target in calls.items() if thunk.reserved(target)}
+        if branches or words or actual_calls != calls or not selected or any(
+                target not in thunk.ALIASES.values() for target in selected.values()):
+            raise ValueError('conditional thunks require exact complete root calls')
+        self._thunk_root = (address, bytes(data), dict(selected))
+        self._thunk_observations = {}
+        self._thunk_partition = graph.partition(data, address, refinement, ins, words)
+        self._thunk_dependencies = []
+        for target in sorted(set(selected.values())):
+            name = next(name for name, value in thunk.ALIASES.items() if value == target)
+            dependency, = thunk.dependencies([name], self.rom)
+            body = match.BufferCallProof.span(self, target)
+            validate_owner(body, target, self.rom, self.mapping, self.index)
+            if len(body) != 2 or any(int(row['rom'], 16) < target+4 and
+                    int(row['end'], 16) > target+2 for row in self.entries):
+                raise ValueError('canonical thunk requires its exact indexed BX and separate padding')
+            self._thunk_dependencies.append(dependency)
+
+    def check_indirect_target(self, address, aliases, returns, *, site):
+        import function_thunk_profile as thunk
+        if not thunk.reserved(address):
+            return
+        if not hasattr(self, '_thunk_root') or self._thunk_root[2].get(site) != address:
+            raise ValueError('conditional thunk differs from the authenticated root call site')
+        register = match.ARM_REG_R0 + (address-thunk.START)//4
+        if register in aliases or register in returns:
+            raise ValueError('indirect target carries tracked stack or return provenance')
+        if set(returns) & (set(match.CALLER_CLOBBERED) - {match.ARM_REG_LR}):
+            raise ValueError('conditional indirect argument carries saved-return provenance')
+
+    def check_call(self, address, aliases, stack, slots=None, *, constants=None,
+                   site=None, words=None):
+        import function_thunk_profile as thunk
+        if not thunk.reserved(address):
+            return super().check_call(address, aliases, stack, slots,
+                constants=constants, site=site, words=words)
+        self.check_indirect_target(address, aliases, (), site=site)
+        if slots or words or any(reg in aliases for reg in match.CALLER_CLOBBERED):
+            raise ValueError('conditional indirect call excludes local argument aliases and pointer words')
+        observation = dict(site=site, target=address,
+            target_register=(address-thunk.START)//4,
+            preserved_local_registers=[[reg-match.ARM_REG_R0, offset]
+                                      for reg, offset in sorted(aliases.items())],
+            local_argument_aliases=[], pointer_slots=[], pointer_words=[])
+        if site in self._thunk_observations and self._thunk_observations[site] != observation:
+            raise ValueError('conditional indirect local preservation context differs between paths')
+        self._thunk_observations[site] = observation
+        return {}
+
+    def thunk_manifest(self):
+        import function_thunk_profile as thunk
+        from pathlib import Path
+        if not hasattr(self, '_thunk_root') or set(self._thunk_observations) != set(self._thunk_root[2]):
+            raise ValueError('conditional thunk policy requires every actual root indirect call')
+        address, data, calls = self._thunk_root
+        return dict(schema=THUNK_SCHEMA, runtime=thunk.RUNTIME, ABI=thunk.ABI,
+            root=address, root_sha256=hashlib.sha256(data).hexdigest(),
+            partition=self._thunk_partition,
+            contract='conditional compatible returning indirect ARM ABI: target code and '
+                'ordinary memory access remain premises; R4-R11 and SP preserved, '
+                'caller-clobbered results carry no local or saved-return pointers; '
+                'no tracked local pointer is passed in an argument, stack word or target; '
+                'no callback body identity, memory effects, physical readability, '
+                'initialization, nonalias, numerical or termination theorem',
+            dependencies=self._thunk_dependencies,
+            source_sha256={name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+                for name in ('named_data_buffer_profile.py', 'function_thunk_profile.py',
+                             'owner_admission_profile.py', 'owner_graph_profile.py',
+                             'inert_spin_profile.py', 'analyze.py', 'match.py')},
+            observations=[self._thunk_observations[site] for site in sorted(calls)])
+
+
+def conditional_thunk_replay(proof):
+    return type(proof) is ConditionalThunkBufferProof
 
 
 class DiscardedReturnScratchProof(NamedDataBufferProof):

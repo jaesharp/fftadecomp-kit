@@ -2954,11 +2954,13 @@ class FunctionBufferCallProof(BufferCallProof):
         return super().target(address)
 
 
-def _ordinary_call_replay(proof):
+def _ordinary_call_replay(proof, address=None):
     if proof is None:
         return False
     from static_callback_r6_frame_profile import requires_replay
-    return requires_replay(proof)
+    from named_data_buffer_profile import conditional_thunk_replay
+    return requires_replay(proof) or (conditional_thunk_replay(proof) and
+                                      function_thunk.reserved(address or 0))
 
 
 def verify_leaf_instructions(data, address, thumb, validated_calls=None,
@@ -3600,6 +3602,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
             aliases.pop(ARM_REG_LR, None)
             successors = (local_branches[current],)
         elif calling:
+            from named_data_buffer_profile import conditional_thunk_replay
+            if conditional_thunk_replay(buffer_proof):
+                buffer_proof.check_indirect_target(operands[0].imm, aliases,
+                                                  return_registers, site=current)
             if function_thunk_context is not None and operands[0].imm in function_thunk.ALIASES.values():
                 target_number = (operands[0].imm - function_thunk.START) // 4
                 target_register = ARM_REG_R0 + target_number
@@ -3610,7 +3616,7 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
                     pointer_slots or any(register in aliases for register in caller_clobbered)):
                 returned_aliases = bounded_output_proof.check_call(operands[0].imm,aliases,stack,
                     pointer_slots,site=current,words=words)
-            elif pointer_slots or words or word_mode and aliases or any(register in aliases for register in caller_clobbered) or _ordinary_call_replay(buffer_proof):
+            elif pointer_slots or words or word_mode and aliases or any(register in aliases for register in caller_clobbered) or _ordinary_call_replay(buffer_proof, operands[0].imm):
                 if ignored_leaf_alias_proof is not None:
                     returned_aliases = ignored_leaf_alias_proof.check_call(
                         current, operands[0].imm, aliases, pointer_slots)
@@ -4245,6 +4251,7 @@ def main():
                                                       "restoring-owner-acyclic-v1",
                                                       "restoring-owner-ignored-leaf-alias-v1",
                                                       "named-data-buffer-v1", "bounded-buffer-datafree-caller-v1",
+                                                      "bounded-buffer-conditional-thunks-v1",
                                                       "conditional-two-word-callback-closure-v1",
                                                       "conditional-two-word-tree-callback-closure-v1",
                                                       "conditional-known-query-native-closure-v1",
