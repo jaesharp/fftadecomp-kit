@@ -139,7 +139,8 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         observation = dict(site=site, target=address, local_offset=offset, bytes=width,
                            aliases=sorted(aliases.items()), pointer_words=sorted((slots or {}).items()))
         if payload:
-            observation.update(payload_offset=payload[0], payload_bytes=payload[1])
+            observation.update(payload_offset=payload[0], payload_frame_bytes=payload[1],
+                               payload_extent='remaining-private-frame')
         require(site not in self.observations or self.observations[site] == observation,
                 'local-buffer contract differs across incoming paths')
         self.observations[site] = observation
@@ -163,11 +164,12 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                  'Iterator objects and scalar-query callees are valid and separate from the caller frame; '
                  'the visitor record remains unchanged and the known callback accesses only state bytes 0 and 1.')]
                 + ([('The descriptor+4 word is the only local pointer word; it addresses the payload adjacent to the '
-                     'descriptor, whose extent is the rest of the private frame recorded as payload_bytes. The callback reads '
+                     'descriptor, whose extent is bounded above by the rest of the private frame, recorded as payload_frame_bytes '
+                     '(an upper bound, not the payload type size). Payload initialization is not checked. The callback reads '
                      'the payload only through that word, only within that extent and only before the scheduler call '
                      'returns; caller-initialized members are values and padding bytes are representation only. '
-                     'The copied pointer word in the allocation is not dereferenced after return; the payload extent, '
-                     'its initialization and the callback read bound are premises, not proofs.')]
+                     'The copied pointer word in the allocation is not dereferenced after return; the payload size within '
+                     'that bound, its initialization and the callback read bound are premises, not proofs.')]
                    if self.policy == SCHEDULER_PAYLOAD else []),
             actual_callback_effects_proved=False, nonescape_proved=False, termination_proved=False,
             source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())

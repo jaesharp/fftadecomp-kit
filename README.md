@@ -726,9 +726,11 @@ python tools/match.py --root ../fftadecomp 080DF9AC --owner-runtime-profile cond
 
 It keeps every scheduler check above and admits exactly one local pointer word:
 descriptor+4, addressing the payload. The private frame must hold exactly the
-descriptor and one adjacent nonempty payload, in either order; the payload's
-offset and byte extent are recorded in the observation and every byte is
-checked against the private frame. Any other pointer word, payload placement,
+descriptor and one adjacent nonempty payload, in either order. The observation
+records `payload_offset` and `payload_frame_bytes` with
+`payload_extent: remaining-private-frame`: the extent is an upper bound equal to
+the rest of the private frame, not the payload type's size, and every byte of it
+is checked as private. Payload initialization is not checked. Any other pointer word, payload placement,
 extra argument alias or interleaved saved word is refused, and the descriptor
 profile still refuses these callers. The callback's payload read bound, the
 payload's initialization (padding is representation only) and nonuse of the
