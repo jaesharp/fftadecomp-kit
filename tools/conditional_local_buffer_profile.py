@@ -134,12 +134,19 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             dependencies = (OUTPUT_CALLEE,)
             runtime_names = ()
         else:
+            # The one owner-list load at +28 is LDR R0,[R4,#imm5*4]; every other
+            # code byte is fixed and the word offset is bound in the report.
+            load = struct.unpack_from('<H', data, 28)[0] if len(data) == 60 else None
             require(len(data) == 60 and calls == {address+14: 0x0814224C, address+32: 0x080C7CC0}
                     and data[:14] == bytes.fromhex('10b583b0041c0a48026868460421')
-                    and data[18:32] == bytes.fromhex('08486946019101aa5060a0690649')
+                    and data[18:28] == bytes.fromhex('08486946019101aa5060')
+                    and load & 0xF83F == 0x6820
+                    and data[30:32] == bytes.fromhex('0649')
                     and data[36:48] == bytes.fromhex('6846007803b010bc02bc0847')
                     and struct.unpack_from('<III', data, 48) == (0x0836D4B8, 0x08098BB1, 0x0809ABE9),
                     'state contract requires the exact four-byte state and initialized visitor interface')
+            self.owner_list_load = dict(site=address+28, base_register=4, destination_register=0,
+                                        offset=4*((load >> 6) & 31), width=4)
             dependencies = (0x080C7CC0, 0x0809ABE8, 0x080C7B74, 0x08098BB0)
             runtime_names = ('_call_via_r2', '_call_via_r6')
         for target in dependencies:
@@ -275,6 +282,7 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         return dict(schema=SCHEMAS[self.policy], runtime_dependencies=self.runtime_dependencies,
             environment=self.environment,
             **({'predicates': self.predicates} if self.policy == SCHEDULER_GUARDED else {}),
+            **({'owner_list_load': self.owner_list_load} if self.policy == STATE else {}),
             **({'branch_calls': self.branch_calls} if self.policy in (SCHEDULER_BRANCH, SCHEDULER_FOLLOWING, SCHEDULER_WIDE, SCHEDULER_LOOP) else {}),
             observations=[self.observations[s] for s in sorted(self.observations)],
             assumptions=[

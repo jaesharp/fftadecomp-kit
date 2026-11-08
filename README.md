@@ -812,6 +812,10 @@ The scheduler profile checks a complete 28-byte local descriptor, exact indexed
 scheduler bodies, typed callback literals, and the canonical dependency thunks.
 The state profile checks the complete four-byte state/initialized visitor caller,
 actual size argument, iterator, adapter, state callback, and canonical thunks.
+Its one variable root halfword is the owner-list load `ldr r0, [r4, #imm5*4]`:
+any aligned word offset from R4 into R0 is accepted, every other code byte is
+fixed, and the report binds the offset as `owner_list_load` (0x18 for
+`0809A77C`, 0x14 for `0809A740`).
 Both retain exact ELF relocation, full-symbol ROM comparison, plausibility,
 source/index binding and report replay. Default buffer rules remain unchanged.
 

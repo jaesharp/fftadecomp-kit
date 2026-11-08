@@ -23,6 +23,7 @@ def proof(policy, calls):
     result.policy, result.calls, result.observations = policy, calls, {}
     result.runtime_dependencies = []
     result.environment = {}
+    result.owner_list_load = {}
     return result
 
 
@@ -65,6 +66,33 @@ def bound_scheduler(calls, bodies=None):
             mock.patch.object(owner, 'refine'), \
             mock.patch('known_query_native_closure_profile.environment_fingerprint', return_value={}):
         result.bind_root(b'', 0x080DF9AC, calls)
+    return result
+
+
+STATE_ROOTS = {  # genuine 60-byte roots; only the owner-list load at +28 differs
+    0x0809A740: '10b583b0041c0a48026868460421a7f07dfd08486946019101aa5060606906492df0aefa6846007803b010bc02bc0847b8d43608b18b0908e9ab0908',
+    0x0809A77C: '10b583b0041c0a48026868460421a7f05ffd08486946019101aa5060a06906492df090fa6846007803b010bc02bc0847b8d43608b18b0908e9ab0908'}
+STATE_DEPENDENCIES = (0x080C7CC0, 0x0809ABE8, 0x080C7B74, 0x08098BB0)
+
+
+def bound_state(address, data):
+    """Run the real state-iterator bind_root with only ROM/index access stubbed."""
+    bodies = {target: bytes([n])*8 for n, target in enumerate(STATE_DEPENDENCIES)}
+    calls = {address+14: 0x0814224C, address+32: 0x080C7CC0}
+    result = object.__new__(local.ConditionalLocalBufferProof)
+    result.policy, result.rom, result.entries = local.STATE, b'', []
+    result.mapping = result.index = b''
+    result.dependencies, result.records, result.identities = {}, {}, {}
+    result.calls, result.observations, result.environment = {}, {}, {}
+    result.span = lambda target: bodies.get(target, b'\x00\x00')
+    pinned = {target: (8, hashlib.sha256(body).hexdigest()) for target, body in bodies.items()}
+    with mock.patch.dict(local.DEPENDENCIES, pinned), \
+            mock.patch.object(local.named, 'validate_owner'), \
+            mock.patch.object(local.graph, 'graph', return_value=({}, None, {}, dict(calls), {})), \
+            mock.patch.object(local.thunk, 'dependencies', return_value=[]), \
+            mock.patch.object(owner, 'refine'), \
+            mock.patch('known_query_native_closure_profile.environment_fingerprint', return_value={}):
+        result.bind_root(data, address, calls)
     return result
 
 
@@ -190,6 +218,24 @@ class ConditionalLocalBufferTests(unittest.TestCase):
             with self.subTest(constants=constants), self.assertRaises(ValueError):
                 p.check_call(0x0814224C, {R0: -20}, [LOCAL]*3+[SAVED]*2,
                              constants=constants, site=100)
+
+    def test_state_owner_list_load_accepts_aligned_offsets_and_binds_them(self):
+        for address, offset in ((0x0809A740, 0x14), (0x0809A77C, 0x18)):
+            with self.subTest(offset=hex(offset)):
+                p = bound_state(address, bytes.fromhex(STATE_ROOTS[address]))
+                self.assertEqual(p.owner_list_load, dict(site=address+28, base_register=4,
+                                 destination_register=0, offset=offset, width=4))
+                p.observations = {site: {} for site in p.calls}
+                self.assertEqual(p.contract_manifest()['owner_list_load']['offset'], offset)
+
+    def test_state_owner_list_load_refuses_other_registers_and_forms(self):
+        # LDR R0,[R5,#0x18]; LDR R1,[R4,#0x18]; LDRH R0,[R4,#0x18]; LDR R0,[R4,R0].
+        address = 0x0809A77C
+        for value in (0x69A8, 0x69A1, 0x8B20, 0x5820):
+            data = bytearray.fromhex(STATE_ROOTS[address])
+            data[28:30] = value.to_bytes(2, 'little')
+            with self.subTest(value=hex(value)), self.assertRaisesRegex(ValueError, 'exact four-byte state'):
+                bound_state(address, bytes(data))
 
     def test_visitor_requires_exact_pointer_word(self):
         p = proof(local.STATE, {100: 0x080C7CC0})
