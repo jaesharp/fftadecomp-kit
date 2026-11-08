@@ -16,7 +16,11 @@ import two_word_callback_closure_profile as previous
 import literal_callback_closure_profile as closure
 
 A,C,G,X=0x08001000,0x08003000,0x08004000,0x08005000
-W,S=closure.ITERATOR,0x0809AC20
+W,S=0x080C7CC0,0x0809AC20
+T1,T2,F,FG=0x080C7D18,0x080C7D70,0x0809AC00,0x080C7B78
+# Genuine tree-iterator bodies; their BL words reach the canonical R7 thunk.
+TREE={T1:'f0b50f1c161c846801225242251c002c1ed0e168002907d0914205d02069904211d0221c0c1cf2e7206990420bd0201c311c7af089fa00280ad02069002802d0221c041ce3e7ac4202d0221ca468dee7f0bc01bc0047',
+      T2:'f0b50f1c161c846801225242251c002c1ed02169002907d0914205d0e068904211d0221c0c1cf2e7e06890420bd0201c311c7af05dfa00280ad0e068002802d0221c041ce3e7ac4202d0221ca468dee7f0bc01bc0047'}
 ROOTS={  # form: (owner-load halfword, callback)
     'private-state':(0x6900,S),'entry-object':(0x6910,X),'null':(0x6900,X)}
 
@@ -26,26 +30,36 @@ def bl(site,target):
     return struct.pack('<HH',0xF000|((delta>>12)&0x7FF),0xF800|((delta>>1)&0x7FF))
 
 
-def root(form,callback):
+def root(form,callback,iterator=W,adapter=C):
     shape=closure.FORMS[form];code=shape['code']
     load=ROOTS[form][0]
     body=bytearray(bytes.fromhex(code.replace('xx','00')))
     struct.pack_into('<H',body,shape['owner'],load)
-    body[shape['call']:shape['call']+4]=bl(A+shape['call'],W)
-    return bytes(body)+struct.pack('<II',callback+1,C+1)
+    body[shape['call']:shape['call']+4]=bl(A+shape['call'],iterator)
+    return bytes(body)+struct.pack('<II',callback+1,adapter+1)
 
 
-def fixture(form='private-state',changes=None,callback=None):
+def fixture(form='private-state',changes=None,callback=None,iterator=W,framed=False,extra=None):
     callback=ROOTS[form][1] if callback is None else callback
     worker=bytes.fromhex('70b50e1c151c446800e0a468002c05d0201c291c')+bl(W+20,thunk.ALIASES['_call_via_r6'])+bytes.fromhex('0028f6d170bc01bc0047')
     adapter=bytes.fromhex('10b50c1c')+bl(C+4,G)+bytes.fromhex('21686268')+bl(C+12,thunk.ALIASES['_call_via_r2'])+bytes.fromhex('10bc02bc0847')
-    bodies={A:root(form,callback),W:worker,C:adapter,G:bytes.fromhex('00687047'),
+    used=F if framed else C
+    bodies={A:root(form,callback,iterator,used),W:worker,G:bytes.fromhex('00687047'),
             S:bytes.fromhex(closure.STATE_CALLBACKS[S][1]),X:bytes.fromhex('01207047')}
-    counts={A:closure.FORMS[form]['count'],W:16,C:9,G:2,S:8,X:2}
+    counts={A:closure.FORMS[form]['count'],W:16,G:2,S:8,X:2}
+    if framed:
+        bodies[F]=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['body']);counts[F]=14
+        bodies[FG]=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['getter_body']);counts[FG]=5
+    else:
+        bodies[C]=adapter;counts[C]=9
+    if iterator in TREE:
+        bodies[iterator]=bytes.fromhex(TREE[iterator]);counts[iterator]=42
+    for target,(body,count) in (extra or {}).items():
+        bodies[target]=body;counts[target]=count
     rom=bytearray(thunk.END-match.ROM_BASE)
     for number,target in enumerate(thunk.ALIASES.values()):
         struct.pack_into('<HH',rom,target-match.ROM_BASE,0x4700+(number<<3),0x46C0)
-    for target in (thunk.ALIASES['_call_via_r6'],thunk.ALIASES['_call_via_r2']):
+    for target in (thunk.ALIASES['_call_via_r6'],thunk.ALIASES['_call_via_r7'],thunk.ALIASES['_call_via_r2']):
         bodies[target]=bytes(rom[target-match.ROM_BASE:target-match.ROM_BASE+2]);counts[target]=1
     for (target,offset),value in (changes or {}).items():
         code=bytearray(bodies[target]);struct.pack_into('<H',code,offset,value);bodies[target]=bytes(code)
@@ -56,8 +70,8 @@ def fixture(form='private-state',changes=None,callback=None):
     index=''.join(f'{int(row["rom"],16):08X} {int(row["end"],16):08X} {int(row["end"],16)-int(row["rom"],16)} {row["instrs"]} return\n'for row in rows).encode()
     shape=closure.FORMS[form]
     return dict(data=bodies[A],address=A,rom=bytes(rom),mapping=json.dumps(rows).encode(),index=index,objects=b'{}',selector=closure.SELECTOR,
-        bindings=dict(calls=[[shape['call'],f'func_{W:08X}']],data=[],
-                      functions=[[shape['callback'],f'func_{callback:08X}'],[shape['adapter'],f'func_{C:08X}']],switches=[]))
+        bindings=dict(calls=[[shape['call'],f'func_{iterator:08X}']],data=[],
+                      functions=[[shape['callback'],f'func_{callback:08X}'],[shape['adapter'],f'func_{used:08X}']],switches=[]))
 
 
 class LiteralClosureTests(unittest.TestCase):
@@ -234,6 +248,129 @@ class LiteralClosureTests(unittest.TestCase):
         for key,value in(('selector',previous.SELECTOR),('address',True),('data',bytearray(values['data']))):
             changed=dict(values);changed[key]=value
             with self.subTest(key=key),self.assertRaises(ValueError):closure.prove(**changed)
+
+    def test_tree_iterators_are_admitted_with_their_own_obligations(self):
+        for iterator,first in ((T1,12),(T2,16)):
+            for form in closure.FORMS:
+                with self.subTest(iterator=hex(iterator),form=form):
+                    manifest,ins=owner.verify(**fixture(form,iterator=iterator))
+                    proof=manifest['proof']['literal_callback_closure']
+                    self.assertEqual(manifest['proof']['calls'],[[closure.FORMS[form]['call'],f'func_{iterator:08X}']])
+                    it=proof['iterator']
+                    self.assertEqual((it['address'],it['end'],it['instructions']),(iterator,iterator+86,42))
+                    self.assertEqual((it['adapter_register'],it['descriptor_register'],it['call_site']),(7,6,iterator+50))
+                    self.assertEqual(it['thunk'][0],'_call_via_r7');self.assertEqual(it['stores'],[])
+                    self.assertIn(f'node+{first} subtree visited before',it['kind'])
+                    self.assertEqual(sorted(r['offset'] for r in it['reads'] if r['base']=='current node'),[8,12,16])
+                    self.assertEqual([r['offset'] for r in it['reads'] if r['base']=='list object'],[8])
+                    self.assertEqual(proof['outward_expired_aliases'],[])
+                    self.assertFalse(it['termination_proved'])
+
+    def test_list_iterator_record_is_bound(self):
+        proof=owner.verify(**fixture())[0]['proof']['literal_callback_closure']
+        self.assertEqual(proof['iterator']['thunk'][0],'_call_via_r6')
+        self.assertEqual([(r['base'],r['offset']) for r in proof['iterator']['reads']],[('list object',4),('current node',8)])
+        self.assertEqual(proof['outward_expired_aliases'][0]['register'],2)
+        self.assertEqual(proof['adapter_shape'],'scalar-inventory')
+
+    def test_tampered_iterator_record_refuses(self):
+        values=fixture(iterator=T1);report,_=owner.verify(**values)
+        for key,value in (('address',T2),('kind','list'),('adapter_register',6)):
+            changed=copy.deepcopy(report);changed['proof']['literal_callback_closure']['iterator'][key]=value
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'manifest differs'):
+                owner.verify(**values,manifest=changed)
+
+    def test_wrong_tree_iterator_body_refuses(self):
+        # node+12 -> node+20, the R1 entry copy, and the call argument register.
+        for iterator in (T1,T2):
+            for offset,value in ((18,0x6961),(2,0x1C0E),(48,0x1C29)):
+                with self.subTest(iterator=hex(iterator),offset=offset),self.assertRaisesRegex(ValueError,'pinned identity'):
+                    owner.verify(**fixture(iterator=iterator,changes={(iterator,offset):value}))
+
+    def test_iterator_structure_is_checked_even_when_pinned(self):
+        raw=bytes.fromhex(TREE[T1])
+        for edit,error in (((18,0x6061),'must not store'),((58,0x1C26),'overwrites its adapter'),
+                           ((36,0x1C0F),'overwrites its adapter'),((18,0x6961),'read set differs'),((18,0x6969),'outside the list object'),
+                           ((2,0x1C0E),'entry copies')):
+            changed=bytearray(raw);struct.pack_into('<H',changed,*edit)
+            entry=dict(closure.ITERATORS[T1],sha256=closure.sha(bytes(changed)))
+            calls={T1+50:thunk.ALIASES['_call_via_r7']}
+            with self.subTest(edit=edit),self.assertRaisesRegex(ValueError,error):
+                closure.iterator_structure(bytes(changed),T1,entry,calls)
+
+    def test_unlisted_iterator_refuses(self):
+        # The tree walk at an unlisted address, and the next indexed function.
+        for target in (0x08006000,0x080C7DC8):
+            body=bytes.fromhex(TREE[T1])
+            values=fixture(iterator=target,extra={target:(body,42)})
+            with self.subTest(target=hex(target)),self.assertRaisesRegex(ValueError,'exact iterator call'):
+                owner.verify(**values)
+
+    def test_framed_adapter_with_each_iterator(self):
+        for iterator in (W,T1,T2):
+            for form in closure.FORMS:
+                with self.subTest(iterator=hex(iterator),form=form):
+                    manifest,_=owner.verify(**fixture(form,iterator=iterator,framed=True))
+                    proof=manifest['proof']['literal_callback_closure']
+                    self.assertEqual(proof['adapter_shape'],'framed-two-output')
+                    self.assertEqual(proof['iterator']['address'],iterator)
+                    adapter=proof['adapter']
+                    self.assertEqual((adapter['schema'],adapter['address'],adapter['descriptor_register']),(closure.FRAMED_SCHEMA,F,4))
+                    self.assertEqual([(w['frame_offset'],w['value']) for w in adapter['getter']['writes']],
+                                     [(-16,'node word 4'),(-12,'node word 0')])
+                    self.assertEqual(adapter['callback']['arguments'][0],'node word at offset 4, copied through private word -16')
+                    getter=[r['offset'] for r in proof['external_read_obligations'] if r['base']=='each nonnull current node passed to getter']
+                    self.assertEqual(getter,[4,0])
+                    conditions=' '.join(proof['explicit_conditions'])
+                    self.assertIn('nonnull',conditions);self.assertIn('out-pointers address only that local area',conditions)
+                    if form=='private-state':
+                        self.assertNotIn('Loaded input words carry no tracked private-frame',conditions)
+                        self.assertEqual(proof['callback']['address'],S)
+
+    def test_framed_adapter_or_getter_byte_change_refuses(self):
+        for target,offset,value in ((F,2,0xB083),(F,6,0xAA02),(F,14,0x9801),(F,16,0x6861),
+                                    (FG,0,0x6883),(FG,2,0x604B),(FG,6,0x6050)):
+            with self.subTest(target=hex(target),offset=offset),self.assertRaisesRegex(ValueError,'pinned framed adapter'):
+                owner.verify(**fixture(iterator=T1,framed=True,changes={(target,offset):value}))
+
+    def test_framed_getter_cannot_write_outside_the_frame(self):
+        getter=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['getter_body']);body=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['body'])
+        # str r3,[r1,#8] (saved R4), str r3,[r0] (the node), str r3,[r1,#4] (twice into word -12).
+        for edit,error in (((2,0x608B),'leaves the adapter private frame'),((2,0x6003),'leaves the adapter private frame'),
+                           ((2,0x604B),'getter effect relation')):
+            changed=bytearray(getter);struct.pack_into('<H',changed,*edit)
+            pinned=dict(closure.FRAMED_ADAPTERS[F],getter_body=changed.hex())
+            with self.subTest(edit=edit),self.assertRaisesRegex(ValueError,error),patch.dict(closure.FRAMED_ADAPTERS,{F:pinned}):
+                closure.framed_adapter_effects(body,F,bytes(changed),FG)
+
+    def test_framed_adapter_interpreter_escapes_refuse(self):
+        getter=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['getter_body']);raw=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['body'])
+        # Out pointer at saved R4; callback argument from word -12; descriptor word 8;
+        # local area of 16 bytes; pop into PC.
+        for edit,error in (((6,0xAA03),'leaves the adapter private frame'),((14,0x9801),'effect relation'),
+                           ((18,0x68A2),'two descriptor words'),((2,0xB084),'getter effect relation'),((26,0xBD10),'must not pop PC'),((10,0x4770),'return only at its end')):
+            changed=bytearray(raw);struct.pack_into('<H',changed,*edit)
+            pinned=dict(closure.FRAMED_ADAPTERS[F],body=changed.hex())
+            with self.subTest(edit=edit),self.assertRaisesRegex(ValueError,error),patch.dict(closure.FRAMED_ADAPTERS,{F:pinned}):
+                closure.framed_adapter_effects(bytes(changed),F,getter,FG)
+
+    def test_framed_adapter_requires_its_table_entry(self):
+        # The same bytes at an unlisted address go through the scalar inventory and refuse.
+        body=bytes.fromhex(closure.FRAMED_ADAPTERS[F]['body'])
+        with self.assertRaises(ValueError):
+            closure.framed_adapter_effects(body,0x0809AC02,bytes.fromhex(closure.FRAMED_ADAPTERS[F]['getter_body']),FG)
+        values=fixture(iterator=T1,framed=True)
+        with patch.dict(closure.FRAMED_ADAPTERS,{},clear=True),self.assertRaises(ValueError):
+            owner.verify(**values)
+
+    def test_framed_adapter_report_tampering_refuses(self):
+        values=fixture(iterator=T2,framed=True);report,_=owner.verify(**values)
+        for path in (('adapter_shape',),('adapter','getter','relation'),('adapter','descriptor_register')):
+            changed=copy.deepcopy(report);target=changed['proof']['literal_callback_closure']
+            for key in path[:-1]:target=target[key]
+            target[path[-1]]=5 if path[-1]=='descriptor_register' else 'scalar-inventory' if path[-1]=='adapter_shape' else 'x'
+            with self.subTest(path=path),self.assertRaisesRegex(ValueError,'manifest differs'):
+                owner.verify(**values,manifest=changed)
 
 
 if __name__=='__main__':
