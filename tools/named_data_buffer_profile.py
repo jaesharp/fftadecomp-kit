@@ -33,6 +33,11 @@ NESTED_OUTPUT_CONTROL_FLOW = 'bounded buffer calls with native nested formal hal
 THUNK_SELECTOR = 'bounded-buffer-conditional-thunks-v1'
 THUNK_SCHEMA = 'elf-symbol-thumb-bounded-buffer-conditional-thunks-v1'
 THUNK_CONTROL_FLOW = 'complete named-data owner with typed function words, bounded buffer callees and conditional canonical indirect-call ABI'
+THUNK_SCRATCH_SELECTOR = 'bounded-buffer-conditional-thunks-discarded-scratch-v1'
+THUNK_SCRATCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-conditional-thunks-discarded-scratch-v1'
+THUNK_SCRATCH_CONTROL_FLOW = 'bounded buffer outputs with proven unobserved R2/R3 returns and conditional canonical indirect-call ABI'
+THUNK_SELECTORS = (THUNK_SELECTOR, THUNK_SCRATCH_SELECTOR)
+THUNK_SCHEMAS = {THUNK_SELECTOR: THUNK_SCHEMA, THUNK_SCRATCH_SELECTOR: THUNK_SCRATCH_SCHEMA}
 GUARDED_ALIAS_SELECTOR = 'bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_CONTROL_FLOW = 'complete ordinary Thumb owner with guarded bounded-buffer callees and every native return alias retained'
@@ -56,8 +61,8 @@ CALLBACK_CLOSURE_SELECTOR = 'conditional-two-word-callback-closure-v1'
 CALLBACK_CLOSURE_SCHEMA = 'elf-symbol-thumb-conditional-two-word-callback-closure-v1'
 DIRECT_OUTPUT_SELECTOR = 'bounded-buffer-direct-halfword-output-v1'
 DIRECT_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-direct-halfword-output-v1'
-SELECTORS = (THUNK_SELECTOR, KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
-SCHEMAS = (THUNK_SCHEMA, KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
+SELECTORS = (THUNK_SCRATCH_SELECTOR, THUNK_SELECTOR, KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
+SCHEMAS = (THUNK_SCRATCH_SCHEMA, THUNK_SCHEMA, KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -294,7 +299,7 @@ class ConditionalThunkBufferProof(NamedDataBufferProof):
 
 
 def conditional_thunk_replay(proof):
-    return type(proof) is ConditionalThunkBufferProof
+    return type(proof) in (ConditionalThunkBufferProof, ConditionalThunkScratchBufferProof)
 
 
 class DiscardedReturnScratchProof(NamedDataBufferProof):
@@ -380,6 +385,10 @@ class DiscardedReturnScratchProof(NamedDataBufferProof):
                 Path(importlib.import_module(name).__file__).read_bytes()).hexdigest()
                 for name in producers},
             observations=[self._scratch_returns[key] for key in sorted(self._scratch_returns)])
+
+
+class ConditionalThunkScratchBufferProof(ConditionalThunkBufferProof, DiscardedReturnScratchProof):
+    """Compose exact thunk checks with actual consumer scratch nonobservation."""
 
 
 class GuardedSwitchBufferProof(DiscardedReturnScratchProof):
