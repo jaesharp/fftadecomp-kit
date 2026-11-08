@@ -276,19 +276,14 @@ class VolatileAllowlistTests(unittest.TestCase):
             self.assertEqual(plausible.check_file(source), [])
         self.assertEqual(self.rules("\f#define X 1\n", relpath="src/a.c", mapping={}), [])
 
-    def test_statements_that_only_read_a_member_are_refused(self):
+    def test_member_reads_are_left_to_the_semantic_check(self):
+        # Planted reads are refused by match.py's stripped-declaration compile
+        # (tests/test_volatile_semantics.py), which sees every spelling; the
+        # lint no longer guesses at them.
         for statement in (SYMBOL + ".unknown_3C;", "(void)" + SYMBOL + ".unknown_3D;",
-                          "(void)(" + SYMBOL + ".unknown_3D);", "(" + SYMBOL + ".unknown_3D);",
-                          "(u8)" + SYMBOL + ".unknown_3C;", "if (c) " + SYMBOL + ".unknown_3C;",
-                          "while (c) " + SYMBOL + ".unknown_3C;", "else " + SYMBOL + ".unknown_3C;",
-                          "case 1: " + SYMBOL + ".unknown_3C;", "do " + SYMBOL + ".unknown_3C;"):
-            with self.subTest(statement=statement):
-                self.assertIn("volatile-allowlist", self.rules(
-                    "void f(void) { " + statement + " }\n", relpath="src/08028C34.c"))
-        for statement in ("x = " + SYMBOL + ".unknown_3C;", "f(a, " + SYMBOL + ".unknown_3C);",
-                          "x = (u8)" + SYMBOL + ".unknown_3C;", "return " + SYMBOL + ".unknown_3C;",
-                          "if (" + SYMBOL + ".unknown_3C) g();", SYMBOL + ".unknown_3C = 1;",
-                          "x = c ? " + SYMBOL + ".unknown_3C : 0;", "g(" + SYMBOL + ".unknown_3C);"):
+                          "x = " + SYMBOL + ".unknown_3C;", "f(a, " + SYMBOL + ".unknown_3C);",
+                          "return " + SYMBOL + ".unknown_3C;", "if (" + SYMBOL + ".unknown_3C) g();",
+                          SYMBOL + ".unknown_3C = 1;", "x = c ? " + SYMBOL + ".unknown_3C : 0;"):
             with self.subTest(statement=statement):
                 self.assertEqual(self.rules("void f(void) { " + statement + " }\n",
                                             relpath="src/08028C34.c"), [])

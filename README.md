@@ -1613,8 +1613,7 @@ declaration (`u8`, member names, `struct`, ...) or the entry's include
 guard; and any `#define` whose
 replacement names the symbol; and any `#include` that resolves outside
 `include/` or to a non-header under `src/`, which the sweep would never lint.
-Other headers may not name the symbol, a statement may not consist only of
-a read of `symbol.member` (with or without casts such as `(void)`), and every
+Other headers may not name the symbol, and every
 use must be `symbol.member`, so neither its address nor the whole object reaches pointer
 arithmetic, a macro or a copy. The only exemption is a file with its own
 file-scope `extern` declarator of the symbol (a parameter name does not
@@ -1626,24 +1625,74 @@ same byte throughout the ROM and on no other RAM.
 
 When the addressed source reaches the listed header through its include
 closure (an over-approximation of the preprocessor's dependencies, since
-computed includes are refused), or names the symbol without declaring it, the
-match report records `* allowlisted volatile: ...` for it, including the
-header's SHA-256, and saved reports are refused unless those records equal a
-fresh recomputation. The premise is that the pinned declaration is the
-original program's; the byte comparison, linking and every other check are
-unchanged.
+computed includes are refused), or names the symbol without declaring it,
+match.py also runs a **semantic check**
+(`tools/volatile_semantics.py`). It compiles the source a second time with
+`volatile` removed from exactly the pinned declaration in the preprocessed
+text (which must occur there exactly once; the preprocessor rules above keep
+it intact). Removing the qualifier changes register allocation and address
+arithmetic, so the two bodies are not diffed as text. Both are executed
+symbolically along every path, and the check requires:
 
-**Residual risk (accepted in this draft):** the bare-read rule is best
-effort. A source can still plant a dead load of a pinned byte through other
-spellings (`(sym.x, 0);`, an unused local, `c ? sym.x : 0;`, `!sym.x;`, ...)
-or fake a load/store pair with a self-assignment (`sym.x |= 0;`), and such a
-plant can shift the scheduling of unrelated code. The qualifier still reaches
-only the pinned bit-fields. Closing this by construction would need a
-semantic check: recompile with `volatile` stripped from the pinned header and
-require the only difference to be an `ldrb` of byte X directly before each
-`strb` to byte X.
+* the same observable behaviour: the same non-stack stores with the same
+  values in the same order, the same calls with the same arguments, the same
+  branch conditions and, for a non-void function, the same return value;
+* every load of the object in the real compile to be either a
+  read-modify-write load, a chained re-read or a counterpart of a stripped
+  load. A read-modify-write load is an `ldrb` of a pinned byte whose
+  destination is overwritten before any use, followed by an `strb` to the
+  same byte with no other memory access, call or branch in between. A chained
+  re-read is an `ldrb` of a byte just stored whose value only reaches pinned
+  `strb`s through register copies; agbcc emits it for `a = (b = v)`, and the
+  ROM shows it at `0x08122C6C`. A counterpart is matched in order to the
+  stripped compile's loads of the object, with the same address and width;
+* every store overlapping a pinned byte to be an `strb` of exactly that byte
+  with its own read-modify-write load (this refuses a non-volatile alias such
+  as `sym.unknown_02[0x3A]`);
+* no store to write back the value just loaded from the same byte (an
+  `ldrb`/`strb` self-assignment).
 
-Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py`.
+A planted read either vanishes from the stripped compile, which leaves a load
+the rules cannot explain, or stays, which shows the qualifier did not produce
+it. Either way it is refused or is ordinary code. The checked spellings are
+`(sym.x, 0);`, `sym.x;`, `(void)sym.x;`, `!sym.x;`, `if (sym.x) ;`, an
+unused local, `switch (sym.x) { default:; }` and `g(0 * sym.x)`, which are
+dead loads; `c ? sym.x : 0;`, which keeps a branch the stripped compile drops;
+`g(sym.x - sym.x)`, which adds a read; and `sym.x |= 0;`, `sym.x = sym.x;`, `sym.x ^= 0;` and `sym.x &= 0xFF;`, which
+are self-assignments. Code the executor does not model fails closed with a
+reason: ARM code, computed jumps, loops whose exit depends on unknown values,
+and more than 256 paths. The check therefore no longer needs the earlier
+syntactic rule against statements that only read `symbol.member`, and that
+rule is gone.
+
+The match report records `* allowlisted volatile: ...` for each such object,
+with the header's SHA-256, and `* allowlisted volatile semantics: ...`, which
+lists the paths and the instructions explained as read-modify-write loads and
+chained re-reads. Saved reports are refused unless both records equal a fresh
+recomputation, which recompiles both versions. The premise is that the pinned
+declaration is the original program's. The byte comparison, linking and
+every other check are unchanged.
+
+**Residual risk:** the semantic check can refuse genuine code but cannot
+accept an unexplained effect of the qualifier, within its model. The model
+has these gaps:
+
+* It refuses legitimate volatile semantics that an ordinary declaration would
+  optimise differently. Examples are reading a flag twice
+  (`if (x) ...; if (x) ...`), spin loops and repeated stores. Such functions
+  cannot use the allowlist.
+* It reasons about agbcc's assembly. It assumes cc1's output is what the
+  assembler encodes, and that agbcc does not schedule the read-modify-write
+  load of one store next to the store of another.
+* It does not police reads that stay in both compiles. These are ordinary
+  code that any declaration produces, and the general plausibility rules
+  apply to them.
+* It does not police stores through variable indices into the object. Its
+  pinned-byte rules see only constant offsets. A non-volatile alias can only
+  remove the documented load, never add one.
+
+Focused checks: `PYTHONDONTWRITEBYTECODE=1 python tests/test_plausible_volatile_allowlist.py` and
+`PYTHONDONTWRITEBYTECODE=1 python tests/test_volatile_semantics.py` (the latter compiles with agbcc when it is installed).
 
 It handles the compiler stage as `cc -> .s`, so it works with a classic cc1
 (GCC 2.9 / agbcc), with modern gcc and with clang:

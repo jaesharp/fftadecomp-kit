@@ -316,9 +316,7 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
 
     While the entry is active, every linted file is scanned with line splices
     joined as cpp joins them, and refuses: form feed, vertical tab and lone
-    carriage return; statements that only read `symbol.member` (best effort:
-    other spellings of a dead read or a self-assignment are not detected, a
-    documented residual risk limited to the pinned bit-fields); #include
+    carriage return; #include
     outside include/ and src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
     can build a directive or name the scan cannot see); typeof (it would copy
     the qualifier onto locals); #line, linemarkers, #import, #include_next
@@ -331,6 +329,12 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
     argument or a copy.  Only a file with its own file-scope declarator whose
     include closure (closure=(inside, outside)) provably misses the listed
     header is exempt; without a closure nothing is.
+
+    These rules keep the pinned declaration's text intact through the
+    preprocessor, which match.py's semantic check relies on: it strips
+    `volatile` from exactly that declaration and refuses any difference
+    beyond the qualifier's documented effect (tools/volatile_semantics.py).
+    Planted reads and self-assignments are refused there, not here.
     """
     allowed, findings = set(), []
 
@@ -386,10 +390,6 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             finding(0, f"#include of `{escape}` leaves include/ and src/*.h, which are the "
                     f"only linted inputs, while {symbol} is allowlisted")
         references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", joined))
-        for reference in references:
-            if bare_member_read(joined, reference):
-                finding(reference.start(), f"a statement that only reads {symbol}.member "
-                        "plants a load the program has no use for")
         if relpath is None or not relpath.endswith(".h"):
             # A file's own declaration exempts it only when it provably cannot
             # see the listed one: the header is outside its include closure.
@@ -435,46 +435,6 @@ def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closur
             if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
                 allowed.add(offset)
     return allowed, findings
-
-
-def bare_member_read(code, reference):
-    """is this `symbol.member` the whole of an expression statement?
-
-    Accepts surrounding parentheses and casts such as `(void)`, and statement
-    positions after `;`, braces, labels, `else`, `do` or the condition of
-    `if`/`while`/`for`/`switch`.  Such a statement only reads the member, so
-    with a volatile member it exists to plant a load.
-    """
-    member = re.match(r"\s*\.\s*[A-Za-z_]\w*((?:\s*\))*)\s*;", code[reference.end():])
-    if member is None:
-        return False
-    closing, opening, index = member[1].count(")"), 0, reference.start()
-    while True:
-        while index and code[index - 1].isspace():
-            index -= 1
-        if index and code[index - 1] == "(":
-            opening += 1
-            index -= 1
-            continue
-        if not index or code[index - 1] != ")":
-            break
-        depth, start = 0, index - 1
-        while start >= 0:
-            depth += {")": 1, "(": -1}.get(code[start], 0)
-            if depth == 0:
-                break
-            start -= 1
-        if start < 0:
-            return False
-        if re.search(r"\b(?:if|while|for|switch)\s*$", code[:start]):
-            return opening == closing
-        if not re.fullmatch(r"\s*[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*\**\s*",
-                            code[start + 1:index - 1]):
-            return False
-        index = start
-    return opening == closing and (
-        not index or code[index - 1] in ";{}:" or
-        re.search(r"\b(?:else|do)\s*$", code[:index]) is not None)
 
 
 def strip_comments_and_strings_keep_strings(text):
