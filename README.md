@@ -878,6 +878,16 @@ Callee-saved register aliases to the descriptor or payload are admitted and
 recorded, as in the descriptor profile; the read-through-descriptor+4 premise
 covers them.
 
+For the interface whose payload pointer is descriptor+8, select
+`conditional-scheduler-descriptor-payload8-calls-v1`. It requires exactly one
+pointer word at +8 and the same two adjacent private objects and bounded
+payload extent. Its report records `payload_pointer_word_offset: 8` and applies
+the explicit read-through-payload and synchronous nonretention premises to that
+field. The existing payload profile still accepts only +4; neither profile
+permits a second pointer word or infers callback effects, initialization or
+allocation separation from the field offset.
+
+
 ### Named data literals
 
 For a known external object address, add an explicit mapping to the decomp
