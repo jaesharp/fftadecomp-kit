@@ -254,66 +254,6 @@
     },
     {
       "claim": {
-        "acceptance_body_sha256": "197065673c7301b3b49dfc96c026d9fa0c5003822af3a2e893a0e002545d9f1c",
-        "acknowledged_cursor": 6714779826,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "197065673c7301b3b49dfc96c026d9fa0c5003822af3a2e893a0e002545d9f1c",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x0801692C\",\"who\":\"sol-0801692C-3773\",\"note\":\"Bounded plausible C matching using existing native compiler. Address-specific executor only; no tooling changes.\"}",
-          "created_at": "2026-11-08T00:01:26Z",
-          "id": 6714778074,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:01:26Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "f249bdb4bb23921f44cbfd99fa34a7034a5a688ac6c45e3509bcd4dacc11a0a4",
-        "result": {
-          "address": "0x0801692C",
-          "claim_id": 6714778074,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714778074,
-          "status": "accepted",
-          "who": "sol-0801692C-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "c0f112ea7261c2f40ef3377ea8338825126e4ba781dfea5fa212652b420819a5",
-        "acknowledged_cursor": 6714869167,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "c0f112ea7261c2f40ef3377ea8338825126e4ba781dfea5fa212652b420819a5",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0801692C\",\"who\":\"sol-0801692C-3773\",\"claim_id\":6714778074,\"reason\":\"Six native/compiler calls all NONMATCH against220B. Five short-symbol refusals; preserved plausible226B form differs in row-counter/control flow. Fully stopped, no MATCH credit.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; ordinary C types/loops/expressions/scopes\"}",
-          "created_at": "2026-11-08T00:09:52Z",
-          "id": 6714864008,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:09:52Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "ae1178d983c5736de3ef775d1a4d8ecbe074ecb2a5f06dc110dd693810e12f03",
-        "result": {
-          "address": "0x0801692C",
-          "claim_id": 6714778074,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714864008,
-          "status": "accepted",
-          "who": "sol-0801692C-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "c2a7a04551733465fb1179bc04f7e88b687bb7d958126ec14a763713ae11615d",
         "acknowledged_cursor": 6714779826,
         "body_provenance": "acceptance-time",
