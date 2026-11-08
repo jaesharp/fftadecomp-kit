@@ -606,7 +606,35 @@
           "who": "sol-0809D79C-3777"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "13779ac2d2247749ef503245107905d02f48d390d13e4a8247b8a4dd49532506",
+        "acknowledged_cursor": 6715102455,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "13779ac2d2247749ef503245107905d02f48d390d13e4a8247b8a4dd49532506",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x0809D79C\",\"who\":\"sol-0809D79C-3777\",\"claim_id\":6715008363,\"reason\":\"Complete72-byte plausible native exact match; proof frozen and source queued for native publication. Fully stopped.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-08T00:33:28Z",
+          "id": 6715099981,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:33:28Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8d87423376bad43c9a9b7d567f01bc09d85f7a80722270b90ed01c0f8a88e71e",
+        "result": {
+          "address": "0x0809D79C",
+          "claim_id": 6715008363,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715099981,
+          "status": "accepted",
+          "who": "sol-0809D79C-3777"
+        }
+      }
     },
     {
       "claim": {
@@ -798,7 +826,35 @@
           "who": "Team2-native148"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "a746e80ed39cc4d57894ddb5df30d03178360653a4b794d320adfffcb1677a8c",
+        "acknowledged_cursor": 6715102455,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "a746e80ed39cc4d57894ddb5df30d03178360653a4b794d320adfffcb1677a8c",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080D499C\",\"who\":\"Team2-native148\",\"claim_id\":6715084984,\"reason\":\"First native MATCH96B frozen, one compiler, unchanged original source and complete ELF; publication pending native gate.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-08T00:33:44Z",
+          "id": 6715102455,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:33:44Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "8d87423376bad43c9a9b7d567f01bc09d85f7a80722270b90ed01c0f8a88e71e",
+        "result": {
+          "address": "0x080D499C",
+          "claim_id": 6715084984,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715102455,
+          "status": "accepted",
+          "who": "Team2-native148"
+        }
+      }
     }
   ],
   "issue": 66,
