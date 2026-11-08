@@ -2406,3 +2406,23 @@ pins, source and headers remain authenticated. The default scalar and six-word
 selectors retain their existing boundaries. Readable aligned incoming words and
 ordinary returning callee ABI contracts are explicit premises; named object
 points grant no contents, extents or physical memory permissions.
+
+### Conditional counted scheduler loop
+
+`--owner-runtime-profile conditional-scheduler-u16-counted-loop-v1` admits a
+separate closed loop form: actual unsigned 16-bit count narrowing, zero counter,
+initial unsigned bypass, exact increment and narrowing, and a strict unsigned
+backedge. The counter and bound occupy distinct ABI-preserved low registers;
+all body paths reach the update without modifying them. There is one scheduler
+site and at most four ordinary targets/eight call sites in a finite body.
+The complete prefix and suffix are call-free and the owner has no other cycle.
+The rank proves at most 65,535 iterations conditional on instruction completion
+and returning calls. It does not prove that any array has that capacity.
+
+Every reached call still passes the full existing frame and pointer-provenance
+checks. Ordinary calls reject all tracked local aliases and pointer words.
+The 28-byte descriptor contract is reapplied on every abstract incoming path;
+allocation separation, physical access, protected-frame preservation and no
+retained descriptor pointer remain explicit premises across iterations. No
+callback effect, memory permission, actual count, or unconditional termination
+claim follows. Existing acyclic scheduler selectors retain their strict guards.
