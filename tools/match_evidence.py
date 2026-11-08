@@ -916,7 +916,10 @@ def report_matches(report, root, address):
     import plausible
     try:
         records = plausible.allowlisted_volatile_uses(root, address)
-    except OSError:
+        if records:
+            from match import allowlisted_volatile_semantics
+            records += allowlisted_volatile_semantics(root, address)
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
         return False
     if [line for line in report.splitlines()
             if line.lstrip().startswith("* allowlisted volatile")] != records:

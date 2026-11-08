@@ -32,7 +32,10 @@ for objects on the maintainer's volatile allow list (tools/volatile_allow.json),
 and only inside the one listed header's anonymous `extern struct { ... }
 symbol;` declaration, which must equal the pinned text, as qualifiers of
 bit-field members of listed types, while config/data_symbols.json maps the
-symbol to the listed address.  Source files never qualify.
+symbol to the listed address.  Source files never qualify.  match.py then
+compiles each user a second time with the qualifier stripped from that
+declaration and refuses any difference beyond the documented dead load before
+each byte store (tools/volatile_semantics.py).
 """
 
 import argparse
@@ -520,13 +523,11 @@ def include_closure(root, source):
             sorted(set(outside)))
 
 
-def allowlisted_volatile_uses(root, address, entries=None):
-    """report records for allowlisted volatile objects the addressed source uses.
+def allowlisted_volatile_used(root, address, entries=None):
+    """the active allow-list entries whose object the addressed source uses.
 
     A use is the source reaching the listed header through its include
-    closure, or naming the symbol without declaring it itself.  Each record
-    binds the header's current SHA-256; an unreadable header raises OSError,
-    which callers treat as a failure.
+    closure, or naming the symbol without declaring it itself.
     """
     root = Path(root)
     try:
@@ -537,7 +538,7 @@ def allowlisted_volatile_uses(root, address, entries=None):
         data_symbols = {}
     entries = volatile_allow_entries() if entries is None else entries
     sources = sorted((root / "src").rglob(f"{address:08X}.c"))
-    records = []
+    used = []
     for entry in active_volatile_entries(data_symbols, entries):
         symbol = re.escape(entry["symbol"])
         for source in sources:
@@ -545,11 +546,24 @@ def allowlisted_volatile_uses(root, address, entries=None):
                 source.read_text(encoding="utf-8", errors="replace")))
             if entry["header"] in include_closure(root, source)[0] or \
                     re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
-                digest = hashlib.sha256((root / entry["header"]).read_bytes()).hexdigest()
-                records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
-                               f"`{entry['address']}` declared in `{entry['header']}` "
-                               f"(SHA-256 `{digest}`)")
+                used.append(entry)
                 break
+    return used
+
+
+def allowlisted_volatile_uses(root, address, entries=None):
+    """report records for allowlisted volatile objects the addressed source uses.
+
+    Each record binds the header's current SHA-256; an unreadable header
+    raises OSError, which callers treat as a failure.  match.py adds the
+    semantic-check record (allowlisted_volatile_semantics) after these.
+    """
+    records = []
+    for entry in allowlisted_volatile_used(root, address, entries):
+        digest = hashlib.sha256((Path(root) / entry["header"]).read_bytes()).hexdigest()
+        records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
+                       f"`{entry['address']}` declared in `{entry['header']}` "
+                       f"(SHA-256 `{digest}`)")
     return records
 
 

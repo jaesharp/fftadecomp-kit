@@ -46,6 +46,7 @@ import function_thunk_profile as function_thunk
 import empty_body_profile as empty_body
 import stack_pointer_compare_profile as sp_compare
 import plausible as plausibility
+import volatile_semantics
 import signal
 from contextvars import ContextVar
 from rompath import rom_path
@@ -234,12 +235,16 @@ class Runner:
             self.sh(f"rm -f -- {outputs} && rmdir -- {shlex.quote(path)}")
 
 
-def compile_object(runner, workspace, args, root, address, source, thumb=True):
+def compile_object(runner, workspace, args, root, address, source, thumb=True, rewrite=None):
+    """cpp -> cc1 -> as -> objcopy; rewrite, if given, maps the verified .i text first"""
     temporary = shlex.quote(workspace)
     environment = f"export TMPDIR={temporary}; "
     runner.sh(f"{environment}{args.cpp} -nostdinc -undef -I include {shlex.quote(source)} "
               f"-o {temporary}/f.i")
-    verify_dependencies(runner.read_binary(f"{workspace}/f.i").decode("utf-8"), root, address)
+    preprocessed = runner.read_binary(f"{workspace}/f.i").decode("utf-8")
+    verify_dependencies(preprocessed, root, address)
+    if rewrite is not None:
+        runner.write_text(f"{workspace}/f.i", rewrite(preprocessed))
     runner.sh(f"{environment}{args.cc} {args.flags} {temporary}/f.i -o {temporary}/f.s")
     assembler_flags = "-mthumb-interwork" if thumb else ""
     runner.sh(f"{environment}{args.assembler} {assembler_flags} {temporary}/f.s -o {temporary}/f.o")
@@ -250,6 +255,42 @@ def compile_object(runner, workspace, args, root, address, source, thumb=True):
     if image["text"] != text_data:
         raise ValueError("objcopy output does not equal ELF .text")
     return object_data, text_data, image
+
+
+def allowlisted_volatile_semantics(root, address, args=None, runner=None):
+    """report records of the kit#90 semantic check, one per allowlisted object used.
+
+    The addressed source is compiled as written and again with `volatile`
+    removed from exactly the pinned declaration in its preprocessed text;
+    volatile_semantics.compare() then requires the two to differ only by the
+    qualifier's documented effect.  Raises ValueError (with the reason),
+    RuntimeError or OSError when the check cannot pass.
+    """
+    used = plausibility.allowlisted_volatile_used(root, address)
+    if not used:
+        return []
+    if args is None:
+        args = argparse.Namespace(cc=DEFAULT_CC, cpp=DEFAULT_CPP, assembler=DEFAULT_AS,
+                                  objcopy=DEFAULT_OBJCOPY, linker=DEFAULT_LD, flags=DEFAULT_FLAGS)
+    if runner is None:
+        runner = Runner(DEFAULT_CC, "Ubuntu", DEFAULT_WSL_PATH, root=str(root))
+    sources = sorted(Path(root, "src").rglob(f"{address:08X}.c"))
+    if len(sources) != 1:
+        raise ValueError("the semantic check needs exactly one addressed source")
+    source = sources[0].relative_to(root).as_posix()
+    records = []
+    with runner.workspace() as workspace:
+        compile_object(runner, workspace, args, str(root), address, source)
+        preprocessed = runner.read_binary(f"{workspace}/f.i").decode("utf-8")
+        real = runner.read_binary(f"{workspace}/f.s").decode("utf-8")
+        for entry in used:
+            declaration = entry["declaration"]
+            compile_object(runner, workspace, args, str(root), address, source,
+                           rewrite=lambda text: volatile_semantics.strip_pinned_volatile(text, declaration))
+            stripped = runner.read_binary(f"{workspace}/f.s").decode("utf-8")
+            results = volatile_semantics.compare(real, stripped, preprocessed, entry["symbol"], declaration)
+            records.append(volatile_semantics.record(entry["symbol"], results))
+    return records
 
 
 def elf_image(object_data):
@@ -4807,6 +4848,12 @@ def main():
         except OSError as error:
             findings = [f"allowlisted volatile record failed: {error}"]
             plausible = False
+    if plausible and volatile_records:
+        try:
+            volatile_records += allowlisted_volatile_semantics(ROOT, addr, args, runner)
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+            findings = [f"allowlisted volatile semantic check: {error}"]
+            plausible = False
     if source_fingerprint(ROOT, addr) != fingerprint:
         sys.exit("source or headers changed during verification; re-run match.py")
     if empty_profile and (mapping_snapshot(ROOT) != mapping or
@@ -4901,7 +4948,7 @@ def main():
     print(f"source  {'plausible' if plausible else 'IMPLAUSIBLE'}"
           + ("" if plausible or hand_asm_allowed else " (not on the allow list)"))
     for record in volatile_records:
-        print(f"volatile {record.removeprefix('* allowlisted volatile:')}")
+        print(f"volatile{record.removeprefix('* allowlisted volatile').removeprefix(':')}")
     print(f"verdict {verdict}\n")
     if findings:
         print("plausibility findings:")
