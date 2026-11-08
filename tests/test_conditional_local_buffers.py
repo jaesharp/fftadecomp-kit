@@ -46,6 +46,49 @@ class ConditionalLocalBufferTests(unittest.TestCase):
                 proof(local.SCHEDULER, {100: 0x08005B6C}).check_call(
                     0x08005B6C, aliases, [LOCAL]*7+[SAVED]*4, slots, site=100)
 
+    def test_scheduler_payload_accepts_one_pointer_word_to_trailing_payload(self):
+        # 0x080DF9AC: descriptor at sp, 12-byte payload at sp+0x1C, r4 keeps the payload.
+        p = proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C})
+        stack = [LOCAL]*10 + [SAVED]*4
+        self.assertEqual(p.check_call(0x08005B6C, {R0+2: -56, R0+4: -28}, stack,
+                                      {-52: -28}, site=100), {})
+        manifest = p.contract_manifest()
+        observation = manifest['observations'][0]
+        self.assertEqual((observation['payload_offset'], observation['payload_bytes']), (-28, 12))
+        self.assertEqual(manifest['schema'], local.SCHEMAS[local.SCHEDULER_PAYLOAD])
+        self.assertFalse(manifest['actual_callback_effects_proved'])
+        self.assertFalse(manifest['nonescape_proved'])
+        self.assertIn('premises, not proofs', ' '.join(manifest['assumptions']))
+
+    def test_scheduler_payload_records_sixteen_byte_extent(self):
+        p = proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C})
+        p.check_call(0x08005B6C, {R0+2: -60}, [LOCAL]*11+[SAVED]*4, {-56: -32}, site=100)
+        self.assertEqual(p.observations[100]['payload_bytes'], 16)
+
+    def test_scheduler_payload_rejects_near_miss_pointer_words(self):
+        stack = [LOCAL]*10 + [SAVED]*4
+        for slots in (None, {}, {-48: -28}, {-52: -32}, {-52: -56}, {-52: -12},
+                      {-52: -28, -48: -28}, {-52: -28, -24: -56}):
+            with self.subTest(slots=slots), self.assertRaises(ValueError):
+                proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C}).check_call(
+                    0x08005B6C, {R0+2: -56}, stack, slots, site=100)
+
+    def test_scheduler_payload_rejects_other_frames_and_aliases(self):
+        cases = (({R0+2: -56, R0: -28}, [LOCAL]*10+[SAVED]*4, {-52: -28}),  # extra argument alias
+                 ({R0+2: -52}, [LOCAL]*10+[SAVED]*4, {-48: -24}),           # descriptor not at SP
+                 ({R0+2: -44}, [LOCAL]*7+[SAVED]*4, {-40: -16}),            # empty payload
+                 ({R0+2: -56}, [LOCAL]*9+[SAVED]+[LOCAL]+[SAVED]*3, {-52: -28}),  # saved word inside payload
+                 ({R0+2: -56}, [LOCAL]*10+[SAVED]*4, {-52: -28, -36: -40}))  # second pointer word
+        for aliases, stack, slots in cases:
+            with self.subTest(aliases=aliases, slots=slots), self.assertRaises(ValueError):
+                proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C}).check_call(
+                    0x08005B6C, aliases, stack, slots, site=100)
+
+    def test_descriptor_only_scheduler_still_refuses_payload_word(self):
+        with self.assertRaises(ValueError):
+            proof(local.SCHEDULER, {100: 0x08005B6C}).check_call(
+                0x08005B6C, {R0+2: -56}, [LOCAL]*10+[SAVED]*4, {-52: -28}, site=100)
+
     def test_state_clear_requires_constant_four_and_complete_local_word(self):
         p = proof(local.STATE, {100: 0x0814224C})
         self.assertEqual(p.check_call(0x0814224C, {R0: -20}, [LOCAL]*3+[SAVED]*2,

@@ -717,6 +717,23 @@ or initialization behavior. Allocator/installed callback effects, physical
 permissions and termination remain unproved. Select these profiles only under
 the stated contracts; they are not an unconditional memory-safety theorem.
 
+Issue #82's scheduler callers pass a descriptor whose second word points at a
+separate local parameter block. They have a sibling opt-in profile:
+
+```sh
+python tools/match.py --root ../fftadecomp 080DF9AC --owner-runtime-profile conditional-scheduler-descriptor-payload-calls-v1
+```
+
+It keeps every scheduler check above and admits exactly one local pointer word:
+descriptor+4, addressing the payload at descriptor+28. The frame must hold only
+the descriptor at SP and one nonempty payload running to the saved words; the
+payload's offset and byte extent are recorded in the observation and every byte
+is checked against the private frame. Any other pointer word, payload placement,
+extra argument alias or interleaved saved word is refused, and the descriptor
+profile still refuses these callers. The callback's payload read bound, the
+payload's initialization (padding is representation only) and nonuse of the
+pointer copied into the allocation after return are listed premises, not proofs.
+
 ### Named data literals
 
 For a known external object address, add an explicit mapping to the decomp

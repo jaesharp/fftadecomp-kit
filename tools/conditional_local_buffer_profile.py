@@ -1,4 +1,4 @@
-"""Opt-in local-buffer call contracts for the two issue #73 interfaces.
+"""Opt-in local-buffer call contracts for the issue #73 and #82 interfaces.
 
 These are conditional ABI/effect contracts, not inferred callback effects.
 In particular a length argument does not prove a write bound, and the scheduler
@@ -14,9 +14,11 @@ import owner_graph_profile as graph
 import function_thunk_profile as thunk
 
 SCHEDULER = 'conditional-scheduler-descriptor-calls-v1'
+SCHEDULER_PAYLOAD = 'conditional-scheduler-descriptor-payload-calls-v1'
 STATE = 'conditional-local-state-iterator-v1'
 SCHEMAS = {
     SCHEDULER: 'elf-symbol-thumb-conditional-scheduler-descriptor-calls-v1',
+    SCHEDULER_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload-calls-v1',
     STATE: 'elf-symbol-thumb-conditional-local-state-iterator-v1',
 }
 SELECTORS = tuple(SCHEMAS)
@@ -54,7 +56,7 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                 'local-buffer contracts exclude local BL and switches')
         self.root, self.calls = (address, bytes(data)), dict(calls)
         self.environment = environment_fingerprint()
-        if self.policy == SCHEDULER:
+        if self.policy in (SCHEDULER, SCHEDULER_PAYLOAD):
             require(len(calls) == 1 and set(calls.values()) == {0x08005B6C},
                     'scheduler contract requires one actual scheduler call')
             dependencies = (0x08005B6C, 0x08005954)
@@ -97,10 +99,26 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         require(self.calls.get(site) == address and not words,
                 'local-buffer call differs from its authenticated interface')
         r0, r2 = match.ARM_REG_R0, match.ARM_REG_R0+2
+        payload = None
         if self.policy == SCHEDULER:
             require({reg for reg in aliases if reg in match.CALLER_CLOBBERED} == {r2} and not slots,
                     'scheduler contract excludes additional register or pointer-word aliases')
             offset, width = aliases[r2], 28
+        elif self.policy == SCHEDULER_PAYLOAD:
+            require({reg for reg in aliases if reg in match.CALLER_CLOBBERED} == {r2},
+                    'scheduler contract excludes additional register aliases')
+            offset, width = aliases[r2], 28
+            # Exactly one pointer word, descriptor+4, addressing the payload
+            # placed directly after the descriptor. The payload extent is the
+            # complete remaining run of private words below the saved area.
+            require(slots == {offset+4: offset+28},
+                    'scheduler payload contract requires one descriptor+4 word addressing descriptor+28')
+            base, start = -4*len(stack), offset+28
+            local = [index for index, word in enumerate(stack) if word[2]]
+            end = next((index for index in range((start-base)//4, len(stack)) if not stack[index][2]), len(stack))
+            require(offset == base and local == list(range(end)) and (start-base)//4 < end,
+                    'scheduler payload contract requires a frame of exactly the descriptor and one nonempty payload')
+            payload = (start, 4*end + base - start)
         else:
             base = -4*len(stack)
             if address == 0x0814224C:
@@ -111,10 +129,13 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                 require(aliases == {r2: base+4} and slots == {base+4: base},
                         'visitor call requires its exact initialized state-pointer word')
                 offset, width = base, 12
-        for byte in range(offset, offset+width):
-            self.access(byte, 1, stack)
+        for start, size in ((offset, width),) + ((payload,) if payload else ()):
+            for byte in range(start, start+size):
+                self.access(byte, 1, stack)
         observation = dict(site=site, target=address, local_offset=offset, bytes=width,
                            aliases=sorted(aliases.items()), pointer_words=sorted((slots or {}).items()))
+        if payload:
+            observation.update(payload_offset=payload[0], payload_bytes=payload[1])
         require(site not in self.observations or self.observations[site] == observation,
                 'local-buffer contract differs across incoming paths')
         self.observations[site] = observation
@@ -132,10 +153,17 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                  'descriptor is readable as representation bytes, its copied pointer values remain conditional, '
                  'and the returned allocation is separate from all caller stack words. Both the copied R1 '
                  'descriptor and ambient original R9 pointer are exposed to the callback; copying does not prove nonescape.'
-                 if self.policy == SCHEDULER else
+                 if self.policy in (SCHEDULER, SCHEDULER_PAYLOAD) else
                  'The installed initial callback initializes exactly the four state bytes without accessing other '
                  'private/saved words. Constant n=4 is an interface argument, not a proof of callback behavior. '
                  'Iterator objects and scalar-query callees are valid and separate from the caller frame; '
-                 'the visitor record remains unchanged and the known callback accesses only state bytes 0 and 1.')],
+                 'the visitor record remains unchanged and the known callback accesses only state bytes 0 and 1.')]
+                + ([('The descriptor+4 word is the only local pointer word; it addresses the payload at descriptor+28, '
+                     'whose extent is the complete remaining private frame recorded as payload_bytes. The callback reads '
+                     'the payload only through that word, only within that extent and only before the scheduler call '
+                     'returns; caller-initialized members are values and padding bytes are representation only. '
+                     'The copied pointer word in the allocation is not dereferenced after return; the payload extent, '
+                     'its initialization and the callback read bound are premises, not proofs.')]
+                   if self.policy == SCHEDULER_PAYLOAD else []),
             actual_callback_effects_proved=False, nonescape_proved=False, termination_proved=False,
             source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
