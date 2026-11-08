@@ -26,9 +26,20 @@ GBA I/O register window:
 
     /* plausible: hardware register, volatile is required here */
     *(volatile u16 *)0x04000000 = v;
+
+Allowlisted volatile RAM (kit#90): volatile RAM is allowed only
+for objects on the maintainer's volatile allow list (tools/volatile_allow.json),
+and only inside the one listed header's anonymous `extern struct { ... }
+symbol;` declaration, which must equal the pinned text, as qualifiers of
+bit-field members of listed types, while config/data_symbols.json maps the
+symbol to the listed address.  Source files never qualify.  match.py then
+compiles each user a second time with the qualifier stripped from that
+declaration and refuses any difference beyond the documented dead load before
+each byte store (tools/volatile_semantics.py).
 """
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -89,6 +100,16 @@ RULES = [
      r"so the compiler will|to make (?:it|the) (?:match|compile)|codegen hack",
      "the comment admits the source exists to steer the compiler"),
 ]
+
+
+# A backslash, optional horizontal whitespace and a newline: GCC's cpp splices
+# the lines even with the whitespace (it only warns), so every scan must too.
+SPLICE = r"\\[ \t\f\v]*\r?\n"
+
+
+def join_splices(text):
+    """translation phase 2, as the preprocessor does it"""
+    return re.sub(SPLICE, "", text)
 
 
 def strip_comments_and_strings(text):
@@ -220,6 +241,463 @@ def hardware_volatile_offsets(text, code, data_symbols):
     return allowed
 
 
+def volatile_allow_path():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "volatile_allow.json")
+
+
+def volatile_allow_entries():
+    """the maintainer's volatile allow list; unreadable or malformed is empty"""
+    try:
+        doc = json.loads(Path(volatile_allow_path()).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    entries = doc.get("entries") if isinstance(doc, dict) else None
+    return entries if isinstance(entries, list) else []
+
+
+def declaration_tokens(code):
+    """C tokens of a declaration, so the pinned text ignores only whitespace"""
+    return re.findall(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+|[0-9]+|\S", code)
+
+
+def declares_symbol(code, symbol):
+    """a file-scope `extern` declarator of the symbol in this file.
+
+    Such a file cannot also see the listed volatile declaration (the types
+    would conflict), so it is not a user of it.  Only a depth-0 `extern`
+    whose declarator list names the symbol outside any parentheses counts;
+    a parameter name in a prototype does not.
+    """
+    declarator = re.compile(r"extern\b(?:[^;{}()]|\{[^{}]*\})*?\b" + re.escape(symbol) +
+                            r"\s*[;,=\[]")
+    for keyword in re.finditer(r"\bextern\b", code):
+        prefix = code[:keyword.start()]
+        if prefix.count("{") == prefix.count("}") and declarator.match(code, keyword.start()):
+            return True
+    return False
+
+
+def active_volatile_entries(data_symbols, entries):
+    """entries whose symbol the data map binds to exactly the listed address"""
+    active = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        symbol, address, header, types, declaration = (
+            entry.get("symbol"), entry.get("address"), entry.get("header"),
+            entry.get("member_types"), entry.get("declaration"))
+        if not (isinstance(symbol, str) and re.fullmatch(r"[A-Za-z_]\w*", symbol) and
+                isinstance(address, str) and isinstance(header, str) and
+                isinstance(declaration, str) and
+                isinstance(types, list) and types and
+                all(isinstance(t, str) and re.fullmatch(r"[A-Za-z_]\w*", t) for t in types)):
+            continue
+        mapped = data_symbols.get(symbol)
+        try:
+            if int(mapped, 0) != int(address, 0):
+                continue
+        except (TypeError, ValueError):
+            continue
+        active.append(entry)
+    return active
+
+
+def allowlisted_volatile(code, relpath, data_symbols, entries, text=None, closure=None,
+                         untranslated=None, tree=None):
+    """(exempt volatile offsets, findings) for the volatile allow list.
+
+    Only the listed header may hold the listed object's declaration, and its
+    tokens must equal the entry's pinned `declaration`: one file-scope
+    anonymous `extern struct { ... } symbol;`.  Inside its braces, `volatile`
+    may only begin a bit-field member `volatile T name : N;` with T a listed
+    member type.  Bit-fields have no address, and the braces hold no nested,
+    tagged or parenthesized types, so the qualifier cannot reach any other
+    object.
+
+    While the entry is active, every linted file is scanned with line splices
+    joined as cpp joins them, and refuses: form feed, vertical tab and lone
+    carriage return; #include
+    outside include/ and src/*.h (from the closure); token pasting, digraph and trigraph spellings (they
+    can build a directive or name the scan cannot see); typeof (it would copy
+    the qualifier onto locals); #line, linemarkers, #import, #include_next
+    and computed #include (they hide or fake dependencies); #define/#undef of
+    any identifier of the pinned declaration or the entry's include guard;
+    and any #define whose
+    replacement names the symbol.  Other headers may not name the symbol, and
+    every use must be immediate member access `symbol.member`, so neither its
+    address nor the whole object can reach pointer arithmetic, a macro
+    argument or a copy.  Only a file with its own file-scope declarator whose
+    include closure (closure=(inside, outside)) provably misses the listed
+    header is exempt; without a closure nothing is.
+
+    These rules keep the pinned declaration's text intact through the
+    preprocessor, which match.py's semantic check relies on: it strips
+    `volatile` from exactly that declaration and refuses any difference
+    beyond the qualifier's documented effect (tools/volatile_semantics.py).
+    Planted reads and self-assignments are refused there, not here.
+    """
+    allowed, findings = set(), []
+
+    def finding(offset, message):
+        findings.append((code.count("\n", 0, min(offset, len(code))) + 1,
+                         "volatile-allowlist", "error", message))
+
+    source = join_splices(text if text is not None else code)
+    joined = strip_comments_and_strings(source)
+    raw = strip_comments_and_strings_keep_strings(source)
+    inside, outside = closure if closure is not None else (None, [])
+    for entry in active_volatile_entries(data_symbols, entries):
+        symbol, header = entry["symbol"], entry["header"]
+        pinned = declaration_tokens(entry["declaration"])
+        lexical = (r"##|%:", "token pasting, digraphs and trigraphs")
+        for match in list(re.finditer(lexical[0], joined)) + \
+                list(re.finditer(r"\?\?[=/'()!<>\-]", text if text is not None else code)):
+            finding(match.start(), f"{lexical[1]} are refused while {symbol} is an "
+                    "allowlisted volatile object: they can spell what the scan cannot see")
+        # `#` only belongs on a directive line; anywhere else (`F(#) pragma`)
+        # it can be pasted into a forged directive or linemarker.
+        for line in re.finditer(r"(?m)^[^\n]*", joined):
+            if line[0].lstrip().startswith("#"):
+                continue
+            for hash_token in re.finditer(r"#", line[0]):
+                finding(line.start() + hash_token.start(), f"`#` outside a directive line is "
+                        f"refused while {symbol} is allowlisted: it could forge a directive")
+        for control in re.finditer(r"[\f\v]|\r(?!\n)", untranslated if untranslated is not None
+                                   else text if text is not None else code):
+            finding(control.start(), f"form feed, vertical tab and lone carriage return are "
+                    f"refused while {symbol} is allowlisted: cpp treats them as whitespace "
+                    "where the directive scans do not")
+        for typeof in re.finditer(r"\b(?:typeof|__typeof|__typeof__)\b", joined):
+            finding(typeof.start(), f"typeof while {symbol} is an allowlisted volatile "
+                    "object: it would copy the qualifier onto other objects")
+        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*(?:line\b|[0-9]|import\b|include_next\b)",
+                                     joined):
+            finding(directive.start(), f"#line, linemarkers, #import and #include_next are "
+                    f"refused while {symbol} is allowlisted: they hide or fake dependencies")
+        for include in re.finditer(r"(?m)^[ \t]*#[ \t]*include\b(?![ \t]*[\"<])", raw):
+            finding(include.start(), f"computed #include is refused while {symbol} is allowlisted")
+        names = {token for token in pinned if re.fullmatch(r"[A-Za-z_]\w*", token)}
+        if isinstance(entry.get("guard"), str):
+            names.add(entry["guard"])
+        directives = list(re.finditer(
+            r"(?m)^[ \t]*#[ \t]*(?P<kind>define|undef)[ \t]+(?P<name>[A-Za-z_]\w*)(?P<rest>[^\n]*)",
+            joined))
+        # The listed header itself defines its guard once, with no replacement.
+        guard_definitions = [d for d in directives if d["name"] == entry.get("guard")]
+        own_guard = (relpath == header and len(guard_definitions) == 1 and
+                     guard_definitions[0]["kind"] == "define" and
+                     not guard_definitions[0]["rest"].strip())
+        for directive in directives:
+            if directive["name"] in names and not (own_guard and directive["name"] == entry["guard"]):
+                finding(directive.start(), f"`{directive['name']}` is part of the pinned {symbol} "
+                        "declaration and may not be redefined while it is allowlisted")
+            if directive["kind"] == "define" and re.search(r"\b" + re.escape(symbol) + r"\b",
+                                                           directive["rest"]):
+                finding(directive.start(), f"a macro may not expand to allowlisted volatile {symbol}")
+            if directive["kind"] == "define" and forges_directive(directive["rest"]):
+                finding(directive.start(), f"a macro may not expand to `#` while {symbol} is "
+                        "allowlisted: it could forge a linemarker or directive")
+        for escape in outside:
+            finding(0, f"#include of `{escape}` leaves include/ and src/*.h, which are the "
+                    f"only linted inputs, while {symbol} is allowlisted")
+        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", joined))
+        if relpath is None or not relpath.endswith(".h"):
+            # A file's own declaration exempts it only when it provably cannot
+            # see the listed one: the header is outside its include closure.
+            if not (declares_symbol(joined, symbol) and inside is not None and header not in inside):
+                for reference in references:
+                    if not re.match(r"\s*\.\s*[A-Za-z_]", joined[reference.end():]):
+                        finding(reference.start(), f"allowlisted volatile {symbol} may only be "
+                                "used as `symbol.member`: its address or whole object would "
+                                "carry the qualifier to other memory")
+                for offset, message in member_provenance(joined, entry):
+                    finding(offset, message)
+                for extension in re.finditer(r"\b__extension__\b", joined):
+                    finding(extension.start(), f"`__extension__` may not appear in a {symbol} user: "
+                            "it admits lvalue forms that reach a member's address")
+                # Defence in depth for the provenance rules (match.py also
+                # applies them to the preprocessed text): in a file that uses
+                # the object, no macro may expand to `&` or to any identifier
+                # of the pinned declaration.
+                if (inside is not None and header in inside) or references:
+                    for directive in directives:
+                        if directive["kind"] == "define" and user_macro(directive["rest"], names):
+                            finding(directive.start(), f"a macro in a {symbol} user may not expand "
+                                    "to `&` or to a name of the pinned declaration")
+                    # ... nor may any header it includes (other than the listed one)
+                    for included in sorted(inside or ()):
+                        if included in (relpath, header) or tree is None:
+                            continue
+                        try:
+                            other = strip_comments_and_strings(join_splices(
+                                (Path(tree) / included).read_text(encoding="utf-8", errors="replace")))
+                        except OSError:
+                            finding(0, f"cannot read {included}, which a {symbol} user includes")
+                            continue
+                        for directive in re.finditer(r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*([^\n]*)",
+                                                     other):
+                            if user_macro(directive[1], names):
+                                finding(0, f"{included}, included by a {symbol} user, defines a macro "
+                                        "that expands to `&` or to a name of the pinned declaration")
+            continue
+        if relpath != header:
+            for reference in references:
+                finding(reference.start(), f"{symbol} is declared volatile only in {header}; "
+                        "other headers may not name it")
+            continue
+        references = list(re.finditer(r"\b" + re.escape(symbol) + r"\b", code))
+        declarations = list(re.finditer(
+            r"(?m)^[ \t]*extern\s+struct\s*\{(?P<body>[^{}]*)\}\s*" + re.escape(symbol) +
+            r"\s*;", code))
+        if len(declarations) != 1 or len(references) != 1 or \
+                not declarations[0].start() <= references[0].start() < declarations[0].end() or \
+                re.search(SPLICE, text if text is not None else code):
+            for reference in references or [None]:
+                finding(reference.start() if reference else 0,
+                        f"{header} must declare {symbol} exactly once as a file-scope "
+                        f"`extern struct {{ ... }} {symbol};` and name it nowhere else")
+            continue
+        body = declarations[0]
+        if declaration_tokens(body[0]) != pinned:
+            finding(body.start(), f"the {symbol} declaration differs from the one pinned in "
+                    "tools/volatile_allow.json; only the maintainer may change it")
+            continue
+        if re.search(r"\b(?:struct|union|enum|typedef|extern|static)\b|[#()\[\]=]",
+                     re.sub(r"\[\s*(?:0x[0-9A-Fa-f]+|[0-9]+)\s*\]", "", body["body"])):
+            finding(body.start(), f"the {symbol} declaration may only hold plain members")
+            continue
+        types = "|".join(re.escape(t) for t in entry["member_types"])
+        member = re.compile(r"volatile\s+(?:" + types + r")\s+[A-Za-z_]\w*"
+                            r"\s*:\s*[0-9]+\s*;")
+        for qualifier in re.finditer(r"\bvolatile\b", body["body"]):
+            offset = body.start("body") + qualifier.start()
+            prefix = code[body.start("body"):offset]
+            if re.search(r"(?:^|;)\s*$", prefix) and member.match(code, offset):
+                allowed.add(offset)
+    return allowed, findings
+
+
+C_TOKEN = re.compile(r"[A-Za-z_]\w*|0[xX][0-9A-Fa-f]+[uUlL]*|[0-9]+[uUlL]*|->|\+\+|--|<<=|>>=|<<|>>|"
+                     r"<=|>=|==|!=|&&|\|\||[-+*/%&|^]=|\S")
+def integer_literal(token):
+    """the value of a plain decimal, octal or hex literal, else None"""
+    if re.fullmatch(r"0[xX][0-9A-Fa-f]+", token):
+        return int(token, 16)
+    if re.fullmatch(r"0[0-7]*", token):
+        return int(token, 8)
+    if re.fullmatch(r"[1-9][0-9]*", token):
+        return int(token)
+    return None
+
+
+def user_macro(rest, names):
+    """does a #define's parameters-and-replacement text expand to `&` or a pinned name?"""
+    return "&" in rest or bool(set(re.findall(r"[A-Za-z_]\w*", macro_replacement(rest))) & names)
+
+
+def macro_replacement(rest):
+    """the replacement list of a #define, given the text after its name"""
+    if rest.startswith("("):
+        close = rest.find(")")
+        return rest[close + 1:] if close >= 0 else ""
+    return rest
+
+
+def forges_directive(rest):
+    """`#` in an object-like replacement.
+
+    Such a macro can put a bare `#` at the start of a line and forge a
+    linemarker or directive (`#define H #` then `H 1 "include/x.h"`).  In a
+    function-like macro `#` must stringize a parameter, so it always yields
+    a string literal, never a bare `#`.
+    """
+    return not rest.startswith("(") and "#" in rest
+
+
+def whole_object_uses(code, symbol):
+    """[(offset, message)] for every occurrence of symbol not written `symbol . member`.
+
+    The one exception is the pinned declaration's own `} symbol ;`, which a
+    preprocessed source contains exactly once.  This refuses whole-object
+    sizeof, __alignof__, copies and address-taking on preprocessed text,
+    where a macro can no longer hide them.
+    """
+    tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
+    findings, declarations = [], 0
+    for index, (token, offset) in enumerate(tokens):
+        if token != symbol:
+            continue
+        after = [t for t, _ in tokens[index + 1:index + 3]]
+        if after[:1] == ["."] and len(after) == 2 and re.fullmatch(r"[A-Za-z_]\w*", after[1]):
+            continue
+        if index and tokens[index - 1][0] == "}" and after[:1] == [";"] and not declarations:
+            declarations += 1
+            continue
+        findings.append((offset, f"{symbol} may only be used as `{symbol}.member`: the whole object "
+                         "(its size, alignment, address or a copy) depends on the pinned layout"))
+    return findings
+
+
+def member_provenance(code, entry):
+    """[(offset, message)] for uses that could reach a volatile byte without its member.
+
+    Works on C tokens, so it applies equally to a source and to its
+    preprocessed text.  An array member of the object may only be written
+    `symbol.array[literal]` with the literal inside the array (no decay,
+    pointer arithmetic, `k[array]` or `(symbol.array)[k]`).  No `&` may
+    precede the symbol (through any `(`), unary or binary, so no member's
+    address can be taken however it is spelt; write `symbol.x & a`.  Casts
+    and type names that hold a struct or union body or an abstract `(*)`
+    declarator are refused, since they can reinterpret the object.
+    """
+    symbol = entry["symbol"]
+    arrays = {name: integer_literal(size) for name, size in re.findall(
+        r"([A-Za-z_]\w*)\s*\[\s*(0[xX][0-9A-Fa-f]+|[0-9]+)\s*\]", entry["declaration"])}
+    tokens = [(m[0], m.start()) for m in C_TOKEN.finditer(code)]
+    findings = []
+    # `&( ... symbol ... )`: a parenthesised operand of `&` holding the symbol
+    # (a comma or conditional lvalue) takes a member's address.
+    for index, (token, offset) in enumerate(tokens[:-1]):
+        if token != "&" or tokens[index + 1][0] != "(":
+            continue
+        depth, close = 0, index + 1
+        while close < len(tokens):
+            depth += {"(": 1, ")": -1}.get(tokens[close][0], 0)
+            if depth == 0:
+                break
+            close += 1
+        if any(t == symbol for t, _ in tokens[index + 2:close]):
+            findings.append((offset, f"`&(...)` around {symbol} may not take a member's address"))
+    qualifiers = {"const", "volatile", "__extension__", "signed", "unsigned"}
+    for index, (token, offset) in enumerate(tokens):
+        if token != "(":
+            continue
+        after = index + 1
+        while after < len(tokens) and tokens[after][0] in qualifiers:
+            after += 1
+        rest = [t for t, _ in tokens[after:after + 3]]
+        if rest[:1] in (["struct"], ["union"]) and ("{" in rest[1:3]):
+            findings.append((offset, f"a type name with a struct or union body may not appear in a "
+                             f"{symbol} user: it can reinterpret the object"))
+        if rest[:1] == ["*"]:
+            close = after + 1
+            while close < len(tokens) and tokens[close][0] in qualifiers:
+                close += 1
+            if close < len(tokens) and tokens[close][0] == ")":
+                findings.append((offset, f"an abstract `(*)` declarator may not appear in a {symbol} "
+                                 "user: it can reinterpret the object"))
+    for index, (token, offset) in enumerate(tokens):
+        if token != symbol:
+            continue
+        before = index - 1
+        while before >= 0 and tokens[before][0] == "(":
+            before -= 1
+        if before >= 0 and tokens[before][0] == "&":
+            findings.append((offset, f"no `&` may precede {symbol} (write `{symbol}.x & a`): "
+                             "a member's address could reach a volatile byte without its qualifier"))
+        after = [t for t, _ in tokens[index + 1:index + 6]]
+        if after[:1] != ["."] or len(after) < 2 or after[1] not in arrays:
+            continue
+        member = after[1]
+        value = integer_literal(after[3]) if len(after) >= 5 and after[2] == "[" and after[4] == "]" \
+            else None
+        if value is None or value >= arrays[member]:
+            findings.append((offset, f"`{symbol}.{member}` may only be used as `{symbol}.{member}"
+                             f"[literal]` with a literal below {arrays[member]}: anything else could "
+                             "reach a volatile member without its qualifier"))
+    return findings
+
+
+def strip_comments_and_strings_keep_strings(text):
+    """comments blanked, string and character literals kept (for #include)"""
+    code = strip_comments_and_strings(text)
+    out = list(code)
+    for literal in re.finditer(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'', text):
+        if code[literal.start()] == " " and not code[literal.start():literal.end()].strip():
+            out[literal.start():literal.end()] = text[literal.start():literal.end()]
+    return "".join(out)
+
+
+def include_closure(root, source):
+    """(root-relative paths a source can #include transitively, escapes).
+
+    Escapes are included files that are neither under include/ nor a header
+    under src/, so the plausibility sweep never lints them.
+
+    Quoted names resolve against the including file's directory, then
+    include/; angled names against include/ only (the tools run cpp with
+    -nostdinc -I include).  Computed includes are refused while an entry is
+    active, so this over-approximates the preprocessor's dependencies.
+    """
+    root = Path(root).resolve()
+    start = Path(source).resolve()
+    seen, pending, outside = set(), [start], []
+    while pending:
+        path = pending.pop()
+        if path in seen:
+            continue
+        seen.add(path)
+        text = strip_comments_and_strings_keep_strings(join_splices(
+            path.read_text(encoding="utf-8", errors="replace")))
+        for include in re.finditer(r'(?m)^[ \t]*#[ \t]*include[ \t]*(?:"([^"\n]+)"|<([^>\n]+)>)', text):
+            name = include[1] or include[2]
+            candidates = ([path.parent / name] if include[1] else []) + [root / "include" / name]
+            for candidate in candidates:
+                if candidate.is_file():
+                    resolved = candidate.resolve()
+                    if not ((root / "include") in resolved.parents or
+                            (root / "src") in resolved.parents and resolved.suffix == ".h"):
+                        outside.append(name)
+                    pending.append(resolved)
+                    break
+    return ({path.relative_to(root).as_posix() for path in seen if root in path.parents},
+            sorted(set(outside)))
+
+
+def allowlisted_volatile_used(root, address, entries=None):
+    """the active allow-list entries whose object the addressed source uses.
+
+    A use is the source reaching the listed header through its include
+    closure, or naming the symbol without declaring it itself.
+    """
+    root = Path(root)
+    try:
+        data_symbols = json.loads((root / "config" / "data_symbols.json").read_text())
+    except (OSError, ValueError):
+        data_symbols = {}
+    if not isinstance(data_symbols, dict):
+        data_symbols = {}
+    entries = volatile_allow_entries() if entries is None else entries
+    sources = sorted((root / "src").rglob(f"{address:08X}.c"))
+    used = []
+    for entry in active_volatile_entries(data_symbols, entries):
+        symbol = re.escape(entry["symbol"])
+        for source in sources:
+            code = strip_comments_and_strings(join_splices(
+                source.read_text(encoding="utf-8", errors="replace")))
+            if entry["header"] in include_closure(root, source)[0] or \
+                    re.search(r"\b" + symbol + r"\b", code) and not declares_symbol(code, entry["symbol"]):
+                used.append(entry)
+                break
+    return used
+
+
+def allowlisted_volatile_uses(root, address, entries=None):
+    """report records for allowlisted volatile objects the addressed source uses.
+
+    Each record binds the header's current SHA-256; an unreadable header
+    raises OSError, which callers treat as a failure.  match.py adds the
+    semantic-check record (allowlisted_volatile_semantics) after these.
+    """
+    records = []
+    for entry in allowlisted_volatile_used(root, address, entries):
+        digest = hashlib.sha256((Path(root) / entry["header"]).read_bytes()).hexdigest()
+        records.append(f"* allowlisted volatile: `{entry['symbol']}` at "
+                       f"`{entry['address']}` declared in `{entry['header']}` "
+                       f"(SHA-256 `{digest}`)")
+    return records
+
+
 def inert_control_flow(text):
     """find `if (c) X; else X;` - identical arms, so the test means nothing.
 
@@ -250,7 +728,7 @@ def hardware_polling_bodies(code, hardware_qualifiers):
     qualify. Function bodies, RAM reads, calls and mutable aliases still fail.
     """
     bodies = set()
-    if re.search(r"\\\r?\n", code):
+    if re.search(SPLICE, code):
         return bodies
     definitions = list(re.finditer(
         r"(?m)^[ \t]*#[ \t]*define[ \t]+(?P<name>[A-Za-z_]\w*)[ \t]+"
@@ -279,7 +757,7 @@ def statement_macro_tails(code):
     the body is still scanned for dead code and every other forbidden construct.
     Comments and literals have already been blanked without changing offsets.
     """
-    logical = re.sub(r"\\\r?\n", lambda match: " " * len(match[0]), code)
+    logical = re.sub(SPLICE, lambda match: " " * len(match[0]), code)
     tails = set()
     headers = re.finditer(
         r"(?m)^[ \t]*#[ \t]*define[ \t]+[A-Za-z_]\w*(?:\([^()\r\n]*\))?", logical)
@@ -302,7 +780,7 @@ def statement_macro_tails(code):
         if depth or not logical[opening + 1:closing - 1].strip(" \t\r\n;"):
             continue
         body = code[opening + 1:closing - 1]
-        joined_body = re.sub(r"\\\r?\n", "", body)
+        joined_body = join_splices(body)
         # Do not let a newly accepted wrapper conceal a forbidden token split
         # across physical lines; the ordinary rule scan retains source offsets.
         if any(re.search(pattern, joined_body) and not re.search(pattern, body)
@@ -315,16 +793,26 @@ def statement_macro_tails(code):
     return tails
 
 
-def check_text(text, origin="", data_symbols=None):
-    """returns list of findings: (line, rule, severity, message)"""
+def check_text(text, origin="", data_symbols=None, relpath=None, volatile_allow=None,
+               closure=None, untranslated=None, tree=None):
+    """returns list of findings: (line, rule, severity, message)
+
+    relpath is the file's path relative to the project root; only the header
+    an allowlisted volatile object names can be exempted, so None never is.
+    closure is include_closure() of the file; without it no file is assumed
+    unable to see an allowlisted declaration.
+    """
     code = strip_comments_and_strings(text)
     macro_tails = statement_macro_tails(code)
     hardware_qualifiers = hardware_volatile_offsets(text, code, data_symbols or {})
+    listed_qualifiers, findings = allowlisted_volatile(
+        code, relpath, data_symbols or {},
+        volatile_allow_entries() if volatile_allow is None else volatile_allow, text, closure,
+        untranslated, tree)
     polling_bodies = hardware_polling_bodies(code, hardware_qualifiers)
-    findings = []
     for rid, sev, pat, msg in RULES:
         for m in re.finditer(pat, code):
-            if rid == "volatile" and m.start() in hardware_qualifiers:
+            if rid == "volatile" and m.start() in hardware_qualifiers | listed_qualifiers:
                 continue
             if rid == "dead-code" and m.start() in macro_tails:
                 continue
@@ -349,10 +837,13 @@ def check_text(text, origin="", data_symbols=None):
 
 def check_file(path):
     try:
-        text = open(path, encoding="utf-8", errors="replace").read()
+        with open(path, encoding="utf-8", errors="replace", newline="") as source:
+            untranslated = source.read()
+        text = untranslated.replace("\r\n", "\n").replace("\r", "\n")
     except OSError as e:
         return [(0, "unreadable", "error", str(e))]
     data_symbols = {}
+    relpath = closure = tree = None
     for parent in Path(path).resolve().parents:
         mapping = parent / "config" / "data_symbols.json"
         if mapping.is_file():
@@ -362,8 +853,22 @@ def check_file(path):
                     data_symbols = value
             except (OSError, ValueError):
                 pass
+            parts = Path(path).resolve().relative_to(parent).parts
+            # Replays lint byte copies of the project's sources captured under
+            # build/<capture>/; the copy's own layout is the relative path.
+            tree = parent
+            if len(parts) > 2 and parts[0] == "build":
+                relpath = Path(*parts[2:]).as_posix()
+                tree = parent / "build" / parts[1]
+            else:
+                relpath = Path(*parts).as_posix()
+            try:
+                closure = include_closure(tree, path)
+            except OSError:
+                closure = None
             break
-    return check_text(text, os.path.basename(path), data_symbols)
+    return check_text(text, os.path.basename(path), data_symbols, relpath, closure=closure,
+                      untranslated=untranslated, tree=tree)
 
 
 def asm_allow_path():

@@ -913,6 +913,18 @@ def valid_match_verdict(report):
 def report_matches(report, root, address):
     if not valid_match_verdict(report):
         return False
+    import plausible
+    try:
+        records = plausible.allowlisted_volatile_uses(root, address)
+        if records:
+            from match import allowlisted_volatile_semantics
+            records += allowlisted_volatile_semantics(root, address)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError, RecursionError,
+            RuntimeError, subprocess.SubprocessError):
+        return False
+    if [line for line in report.splitlines()
+            if line.lstrip().startswith("* allowlisted volatile")] != records:
+        return False
     try:
         import unsigned_divmod_profile
         if unsigned_divmod_profile.selected(report):
