@@ -606,7 +606,35 @@
           "who": "sol-080DCBBC-3777"
         }
       },
-      "release": null
+      "release": {
+        "acceptance_body_sha256": "e247d7a5dd5a86785ca313d4647e217f5f29d0e1339dbc693636f5c0f94c7ce1",
+        "acknowledged_cursor": 6715002516,
+        "body_provenance": "acceptance-time",
+        "body_sha256": "e247d7a5dd5a86785ca313d4647e217f5f29d0e1339dbc693636f5c0f94c7ce1",
+        "comment": {
+          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x080DCBBC\",\"who\":\"sol-080DCBBC-3777\",\"claim_id\":6714911750,\"reason\":\"Native MATCH exit0, plausible complete330B identical. Source/report/full FUNC frozen, matching owner fully stopped. No success replay.\",\"unmatchable\":false,\"tried\":\"\"}",
+          "created_at": "2026-11-08T00:23:29Z",
+          "id": 6715002516,
+          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
+          "updated_at": "2026-11-08T00:23:29Z",
+          "user": {
+            "id": 18360463,
+            "type": "User"
+          }
+        },
+        "ledger_body_sha256": "50f3f59ac5516d8cf8bf61bd6e54de9576d821db0aad38fe6dcbc525aab144bb",
+        "result": {
+          "address": "0x080DCBBC",
+          "claim_id": 6714911750,
+          "code": 0,
+          "message": "release accepted",
+          "operation": "release",
+          "owner_id": 18360463,
+          "request_id": 6715002516,
+          "status": "accepted",
+          "who": "sol-080DCBBC-3777"
+        }
+      }
     },
     {
       "claim": {
