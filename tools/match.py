@@ -3377,8 +3377,10 @@ def verify_leaf_instructions(data, address, thumb, validated_calls=None,
     alignment = 2 if thumb else 4
     states = {address: (frozenset({ARM_REG_LR}), (), (), (), (), ())}
     stack_arguments = buffer_proof is not None and buffer_proof.stack_arguments
-    from named_data_buffer_profile import GuardedAliasBufferProof
-    guarded_live_aliases = type(buffer_proof) is GuardedAliasBufferProof
+    from named_data_buffer_profile import (GuardedAliasBufferProof,
+        ConditionalThunkSelectiveScratchBufferProof)
+    guarded_live_aliases = type(buffer_proof) in (GuardedAliasBufferProof,
+        ConditionalThunkSelectiveScratchBufferProof)
     caller_clobbered = CALLER_CLOBBERED
     pending = [address]
     path_states = None
@@ -4253,6 +4255,7 @@ def main():
                                                       "named-data-buffer-v1", "bounded-buffer-datafree-caller-v1",
                                                       "bounded-buffer-conditional-thunks-v1",
                                                       "bounded-buffer-conditional-thunks-discarded-scratch-v1",
+                                                      "bounded-buffer-conditional-thunks-selective-scratch-v1",
                                                       "conditional-two-word-callback-closure-v1",
                                                       "conditional-two-word-tree-callback-closure-v1",
                                                       "conditional-known-query-native-closure-v1",

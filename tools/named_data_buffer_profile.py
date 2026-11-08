@@ -36,8 +36,11 @@ THUNK_CONTROL_FLOW = 'complete named-data owner with typed function words, bound
 THUNK_SCRATCH_SELECTOR = 'bounded-buffer-conditional-thunks-discarded-scratch-v1'
 THUNK_SCRATCH_SCHEMA = 'elf-symbol-thumb-bounded-buffer-conditional-thunks-discarded-scratch-v1'
 THUNK_SCRATCH_CONTROL_FLOW = 'bounded buffer outputs with proven unobserved R2/R3 returns and conditional canonical indirect-call ABI'
-THUNK_SELECTORS = (THUNK_SELECTOR, THUNK_SCRATCH_SELECTOR)
-THUNK_SCHEMAS = {THUNK_SELECTOR: THUNK_SCHEMA, THUNK_SCRATCH_SELECTOR: THUNK_SCRATCH_SCHEMA}
+THUNK_PARTIAL_SELECTOR = 'bounded-buffer-conditional-thunks-selective-scratch-v1'
+THUNK_PARTIAL_SCHEMA = 'elf-symbol-thumb-bounded-buffer-conditional-thunks-selective-scratch-v1'
+THUNK_PARTIAL_CONTROL_FLOW = 'conditional canonical thunks with individually proved dead scratch and retained live pointer aliases'
+THUNK_SELECTORS = (THUNK_SELECTOR, THUNK_SCRATCH_SELECTOR, THUNK_PARTIAL_SELECTOR)
+THUNK_SCHEMAS = {THUNK_SELECTOR: THUNK_SCHEMA, THUNK_SCRATCH_SELECTOR: THUNK_SCRATCH_SCHEMA, THUNK_PARTIAL_SELECTOR: THUNK_PARTIAL_SCHEMA}
 GUARDED_ALIAS_SELECTOR = 'bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_SCHEMA = 'elf-symbol-thumb-bounded-buffer-guarded-callee-aliases-v1'
 GUARDED_ALIAS_CONTROL_FLOW = 'complete ordinary Thumb owner with guarded bounded-buffer callees and every native return alias retained'
@@ -61,8 +64,8 @@ CALLBACK_CLOSURE_SELECTOR = 'conditional-two-word-callback-closure-v1'
 CALLBACK_CLOSURE_SCHEMA = 'elf-symbol-thumb-conditional-two-word-callback-closure-v1'
 DIRECT_OUTPUT_SELECTOR = 'bounded-buffer-direct-halfword-output-v1'
 DIRECT_OUTPUT_SCHEMA = 'elf-symbol-thumb-bounded-buffer-direct-halfword-output-v1'
-SELECTORS = (THUNK_SCRATCH_SELECTOR, THUNK_SELECTOR, KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
-SCHEMAS = (THUNK_SCRATCH_SCHEMA, THUNK_SCHEMA, KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
+SELECTORS = (THUNK_PARTIAL_SELECTOR, THUNK_SCRATCH_SELECTOR, THUNK_SELECTOR, KNOWN_LIST_QUERY_SELECTOR, KNOWN_QUERY_SELECTOR, TREE_CALLBACK_SELECTOR, CALLBACK_CLOSURE_SELECTOR, DIRECT_OUTPUT_SELECTOR, DYNAMIC_DIV_SELECTOR, THREE_OUTPUT_SELECTOR, FAST_FILL_SELECTOR, BIOS_DIV_GUARDED_SELECTOR, SELECTOR, SCRATCH_SELECTOR, BIOS_SQRT_SELECTOR, BIOS_FILL_SELECTOR, GUARDED_SWITCH_SELECTOR, NESTED_OUTPUT_SELECTOR, ROOT_SWITCH_SELECTOR, GUARDED_ALIAS_SELECTOR, DATAFREE_SELECTOR)
+SCHEMAS = (THUNK_PARTIAL_SCHEMA, THUNK_SCRATCH_SCHEMA, THUNK_SCHEMA, KNOWN_LIST_QUERY_SCHEMA, KNOWN_QUERY_SCHEMA, TREE_CALLBACK_SCHEMA, CALLBACK_CLOSURE_SCHEMA, DIRECT_OUTPUT_SCHEMA, DYNAMIC_DIV_SCHEMA, THREE_OUTPUT_SCHEMA, FAST_FILL_SCHEMA, BIOS_DIV_GUARDED_SCHEMA, SCHEMA, SCRATCH_SCHEMA, BIOS_SQRT_SCHEMA, BIOS_FILL_SCHEMA, GUARDED_SWITCH_SCHEMA, NESTED_OUTPUT_SCHEMA, ROOT_SWITCH_SCHEMA, GUARDED_ALIAS_SCHEMA, DATAFREE_SCHEMA)
 CONTROL_FLOW = 'complete Thumb owner with typed data literals and ROM-proved bounded buffer callees'
 MAX_DEPENDENCIES = 8
 MAX_BYTES = 4096
@@ -299,7 +302,8 @@ class ConditionalThunkBufferProof(NamedDataBufferProof):
 
 
 def conditional_thunk_replay(proof):
-    return type(proof) in (ConditionalThunkBufferProof, ConditionalThunkScratchBufferProof)
+    return type(proof) in (ConditionalThunkBufferProof, ConditionalThunkScratchBufferProof,
+                           ConditionalThunkSelectiveScratchBufferProof)
 
 
 class DiscardedReturnScratchProof(NamedDataBufferProof):
@@ -389,6 +393,78 @@ class DiscardedReturnScratchProof(NamedDataBufferProof):
 
 class ConditionalThunkScratchBufferProof(ConditionalThunkBufferProof, DiscardedReturnScratchProof):
     """Compose exact thunk checks with actual consumer scratch nonobservation."""
+
+
+class ConditionalThunkSelectiveScratchBufferProof(ConditionalThunkScratchBufferProof):
+    """Retain observed aliases for normal buffer replay; project only dead ones."""
+
+    def normal_return_aliases(self, address, site, aliases):
+        scratch = {match.ARM_REG_R0 + 2, match.ARM_REG_R0 + 3}
+        projected = {register: offset for register, offset in aliases.items()
+                     if register in scratch}
+        if not projected:
+            return aliases
+        if not self._consumers or self._consumers[-1][0] != address:
+            raise ValueError('discarded return scratch requires its active exact callee')
+        call_site = self._consumers[-1][1]
+        if type(call_site) is not int:
+            raise ValueError('discarded return scratch requires the actual consumer call site')
+        owners = [row for row in self.entries
+                  if int(row['rom'], 16) <= call_site < int(row['end'], 16)]
+        if len(owners) != 1:
+            raise ValueError('discarded return scratch requires one complete consumer')
+        consumer = int(owners[0]['rom'], 16)
+        data = match.BufferCallProof.span(self, consumer)
+        if len(data) > MAX_BYTES:
+            raise ValueError('discarded return scratch consumer exceeds bounded owner size')
+        validate_owner(data, consumer, self.rom, self.mapping, self.index)
+        import owner_admission_profile as owner
+        refinement = owner.refine(data, consumer, self.mapping)
+        ins, edges, branches, calls, words = graph.graph(data, consumer, refinement)
+        if branches or words or calls.get(call_site) != address:
+            raise ValueError('discarded return scratch differs from the exact ordinary consumer')
+        pending = [(call_site + ins[call_site].size, frozenset({register}))
+                   for register in sorted(projected)]
+        seen = set()
+        observed = set()
+        while pending:
+            current, live = pending.pop()
+            if (current, live) in seen:
+                continue
+            if len(seen) >= 4096:
+                raise ValueError('selective scratch continuation state budget exceeded')
+            seen.add((current, live))
+            instruction = ins[current]
+            read, written = instruction.regs_access()
+            if set(read) & live or current in calls and live:
+                observed.update(live)
+                continue
+            live -= set(written)
+            pending.extend((target, live) for target in edges[current] if live)
+        retained = {register: offset for register, offset in projected.items()
+                    if register in observed}
+        projected = {register: offset for register, offset in projected.items()
+                     if register not in observed}
+        receipt = dict(address=address, site=site, consumer=consumer,
+            call_site=call_site, call_target=address,
+            consumer_sha256=hashlib.sha256(data).hexdigest(),
+            partition=graph.partition(data, consumer, refinement, ins, words),
+            projected=[[register-match.ARM_REG_R0, offset]
+                       for register, offset in sorted(projected.items())],
+            retained=[[register-match.ARM_REG_R0, offset]
+                      for register, offset in sorted(retained.items())],
+            continuation_states=len(seen))
+        self._scratch_returns[json.dumps(receipt, sort_keys=True)] = receipt
+        return {register: offset for register, offset in aliases.items()
+                if register not in projected}
+
+    def scratch_manifest(self):
+        manifest = super().scratch_manifest()
+        manifest['selection'] = 'each R2/R3 independently; observed aliases remain tracked'
+        manifest['contract'] += ('; observed R2/R3 aliases are retained unchanged for every '
+            'ordinary buffer bound, nested call, indirect argument and root return check; '
+            'root alias memory accesses are limited to allocated local words, excluding saves')
+        return manifest
 
 
 class GuardedSwitchBufferProof(DiscardedReturnScratchProof):
