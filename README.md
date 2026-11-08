@@ -824,6 +824,20 @@ or initialization behavior. Allocator/installed callback effects, physical
 permissions and termination remain unproved. Select these profiles only under
 the stated contracts; they are not an unconditional memory-safety theorem.
 
+A guarded descriptor caller can instead select
+`conditional-scheduler-guarded-descriptor-calls-v1`. It permits exactly one
+scheduler call preceded by read-only predicate calls, with no calls after the
+scheduler on any CFG path. Every predicate's complete indexed Thumb body and
+nested calls are checked, with at most eight helpers of 512 bytes each and no
+CFG or call cycles. A closed instruction set excludes stores except private
+PUSH saves, indirect calls, runtime calls and stack-address materialization.
+The frame proof requires restored SP, R4–R11 and the original return address.
+No live local-register alias or pointer word may enter a predicate call.
+The report retains the scheduler premises above and separately states that
+predicate reads require live, defined ordinary memory and valid, nonoverlapping
+stack saves. Actual readability and predicate values are not established.
+The descriptor and payload profiles keep their existing single-call limit.
+
 Issue #81's single local result word passed to an indexed callee has its own
 opt-in profile:
 

@@ -15,11 +15,13 @@ import owner_graph_profile as graph
 import function_thunk_profile as thunk
 
 SCHEDULER = 'conditional-scheduler-descriptor-calls-v1'
+SCHEDULER_GUARDED = 'conditional-scheduler-guarded-descriptor-calls-v1'
 SCHEDULER_PAYLOAD = 'conditional-scheduler-descriptor-payload-calls-v1'
 STATE = 'conditional-local-state-iterator-v1'
 OUTPUT = 'conditional-local-output-word-call-v1'
 SCHEMAS = {
     SCHEDULER: 'elf-symbol-thumb-conditional-scheduler-descriptor-calls-v1',
+    SCHEDULER_GUARDED: 'elf-symbol-thumb-conditional-scheduler-guarded-descriptor-calls-v1',
     SCHEDULER_PAYLOAD: 'elf-symbol-thumb-conditional-scheduler-descriptor-payload-calls-v1',
     STATE: 'elf-symbol-thumb-conditional-local-state-iterator-v1',
     OUTPUT: 'elf-symbol-thumb-conditional-local-output-word-call-v1',
@@ -51,18 +53,27 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         super().__init__(rom, mapping, index, objects)
         self.policy = policy
         self.observations = {}
+        if policy == SCHEDULER_GUARDED:
+            # Eight closed predicates plus two scheduler bodies and two thunks.
+            self.dependency_budget = 12
 
     def bind_root(self, data, address, calls):
         import owner_admission_profile as owner
         from known_query_native_closure_profile import environment_fingerprint
         require(not hasattr(self, 'root'), 'local-buffer contract context is single use')
         named.validate_owner(data, address, self.rom, self.mapping, self.index)
-        ins, _, branches, actual, words = graph.graph(data, address, owner.refine(data, address, self.mapping))
+        ins, edges, branches, actual, words = graph.graph(data, address, owner.refine(data, address, self.mapping))
         require(not branches and not words and calls == actual,
                 'local-buffer contracts exclude local BL and switches')
         self.root, self.calls = (address, bytes(data)), dict(calls)
         self.environment = environment_fingerprint()
-        if self.policy in (SCHEDULER, SCHEDULER_PAYLOAD):
+        if self.policy == SCHEDULER_GUARDED:
+            import scheduler_predicate_profile as predicates
+            predicates.phases(edges, calls)
+            self.predicates = predicates.close(self, set(calls.values()) - {0x08005B6C})
+            dependencies = (0x08005B6C, 0x08005954)
+            runtime_names = ('_call_via_r2', '_call_via_r3')
+        elif self.policy in (SCHEDULER, SCHEDULER_PAYLOAD):
             require(len(calls) == 1 and set(calls.values()) == {0x08005B6C},
                     'scheduler contract requires one actual scheduler call')
             dependencies = (0x08005B6C, 0x08005954)
@@ -109,9 +120,14 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
     def check_call(self, address, aliases, stack, slots=None, *, constants=None, site=None, words=None):
         require(self.calls.get(site) == address and not words,
                 'local-buffer call differs from its authenticated interface')
+        if self.policy == SCHEDULER_GUARDED and address != 0x08005B6C:
+            require(address in self.predicates['helpers'] and not aliases and not slots,
+                    'predicate calls exclude every live local alias and pointer word')
+            self.observations[site] = dict(site=site, target=address, kind='closed-read-only-predicate')
+            return {}
         r0, r2 = match.ARM_REG_R0, match.ARM_REG_R0+2
         payload = None
-        if self.policy == SCHEDULER:
+        if self.policy in (SCHEDULER, SCHEDULER_GUARDED):
             require({reg for reg in aliases if reg in match.CALLER_CLOBBERED} == {r2} and not slots,
                     'scheduler contract excludes additional register or pointer-word aliases')
             offset, width = aliases[r2], 28
@@ -170,6 +186,7 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
         require(set(self.observations) == set(self.calls), 'every conditional local-buffer call must be observed')
         return dict(schema=SCHEMAS[self.policy], runtime_dependencies=self.runtime_dependencies,
             environment=self.environment,
+            **({'predicates': self.predicates} if self.policy == SCHEDULER_GUARDED else {}),
             observations=[self.observations[s] for s in sorted(self.observations)],
             assumptions=[
                 'Actual calls return with compatible ARM ABI, exact SP and protected saved/caller words preserved.',
@@ -178,7 +195,7 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                  'descriptor is readable as representation bytes, its copied pointer values remain conditional, '
                  'and the returned allocation is separate from all caller stack words. Both the copied R1 '
                  'descriptor and ambient original R9 pointer are exposed to the callback; copying does not prove nonescape.'
-                 if self.policy in (SCHEDULER, SCHEDULER_PAYLOAD) else
+                 if self.policy in (SCHEDULER, SCHEDULER_PAYLOAD, SCHEDULER_GUARDED) else
                  'The indexed output callee writes at most the single four-byte local result word through R2 and '
                  'accesses no other private/saved caller word. Its body identity is checked, but its stores are '
                  'not alias-analysed; ROM inspection shows two 16-bit stores at R2+0 (0x0807A046, 0x0807A05C). '
