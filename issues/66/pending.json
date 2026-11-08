@@ -2,66 +2,6 @@
   "generations": [
     {
       "claim": {
-        "acceptance_body_sha256": "e2a8e0be6528a848fccae944a807104d2429f0c60bc0bdb55030a793b7b34636",
-        "acknowledged_cursor": 6714740114,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "e2a8e0be6528a848fccae944a807104d2429f0c60bc0bdb55030a793b7b34636",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"claim\",\"address\":\"0x08064DB4\",\"who\":\"sol-08064DB4-3773\",\"note\":\"Bounded ordinary C matching continuation using unchanged native tools; address-specific executor. No tooling work.\"}",
-          "created_at": "2026-11-07T23:56:59Z",
-          "id": 6714734195,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-07T23:56:59Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "5ecf616f2bd2df8d5a2210150fca35a6bafcf3b048f8683bf3241ca3117a94b8",
-        "result": {
-          "address": "0x08064DB4",
-          "claim_id": 6714734195,
-          "code": 0,
-          "message": "claim accepted",
-          "operation": "claim",
-          "owner_id": 18360463,
-          "request_id": 6714734195,
-          "status": "accepted",
-          "who": "sol-08064DB4-3773"
-        }
-      },
-      "release": {
-        "acceptance_body_sha256": "f7bdcdc90895e4653edd16ee57ffcf03d24b59d1a6f74767da4f252fb9d7f1a8",
-        "acknowledged_cursor": 6714852934,
-        "body_provenance": "acceptance-time",
-        "body_sha256": "f7bdcdc90895e4653edd16ee57ffcf03d24b59d1a6f74767da4f252fb9d7f1a8",
-        "comment": {
-          "body": "<!-- ffta-reservation-request:v1 -->\n{\"operation\":\"release\",\"address\":\"0x08064DB4\",\"who\":\"sol-08064DB4-3773\",\"claim_id\":6714734195,\"reason\":\"Fully stopped NONMATCH; plausible full120B best115/120 exact positions. Five dispatch-condition bytes remain; all native outputs retained, no MATCH credit.\",\"unmatchable\":true,\"tried\":\"agbcc -mthumb-interwork -O2; nine ordinary C forms\"}",
-          "created_at": "2026-11-08T00:08:47Z",
-          "id": 6714852934,
-          "issue_url": "https://api.github.com/repos/shubshub/fftadecomp-kit/issues/66",
-          "updated_at": "2026-11-08T00:08:47Z",
-          "user": {
-            "id": 18360463,
-            "type": "User"
-          }
-        },
-        "ledger_body_sha256": "a576522b69cc040cccb9286883a27fabc9491add8dddc7ea4e67c8e7126496e9",
-        "result": {
-          "address": "0x08064DB4",
-          "claim_id": 6714734195,
-          "code": 0,
-          "message": "release accepted; unmatchable evidence requires maintainer review",
-          "operation": "release",
-          "owner_id": 18360463,
-          "request_id": 6714852934,
-          "status": "accepted",
-          "who": "sol-08064DB4-3773"
-        }
-      }
-    },
-    {
-      "claim": {
         "acceptance_body_sha256": "e77a56a27d88a7afc8970e2f98615051fc7e1132f95783e0f17efe5993ff1463",
         "acknowledged_cursor": 6714740114,
         "body_provenance": "acceptance-time",
