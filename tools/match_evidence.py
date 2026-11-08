@@ -910,6 +910,46 @@ def valid_match_verdict(report):
         r"\*\*MATCH - byte identical\*\* - ([1-9][0-9]*)/\1 bytes", records[0]) is not None
 
 
+VOLATILE_RECORD_PREFIX = "* allowlisted volatile"
+VOLATILE_RECORD_ANCHOR = "* source plausibility: plausible"
+
+
+def volatile_record_lines(report):
+    return [line for line in report.splitlines()
+            if line.lstrip().startswith(VOLATILE_RECORD_PREFIX)]
+
+
+def carry_volatile_records(report, records):
+    """the report with the allowlisted volatile records in their one place.
+
+    Every writer puts the records directly after its single
+    `* source plausibility: plausible` line.  A report that already carries
+    records, or lacks that line or has it twice, cannot carry them: ValueError.
+    """
+    if volatile_record_lines(report):
+        raise ValueError("report already carries allowlisted volatile records")
+    if not records:
+        return report
+    lines = report.split("\n")
+    anchors = [index for index, line in enumerate(lines) if line == VOLATILE_RECORD_ANCHOR]
+    if len(anchors) != 1:
+        raise ValueError("report has no single plausible-source line to carry allowlisted volatile records")
+    return "\n".join(lines[:anchors[0] + 1] + list(records) + lines[anchors[0] + 1:])
+
+
+def strip_volatile_records(report, records):
+    """the report without its allowlisted volatile records, once they equal `records`.
+
+    report_matches checks the records here, centrally, and hands each profile
+    validator the report as that profile's writer rendered it.
+    """
+    if volatile_record_lines(report) != list(records):
+        raise ValueError("allowlisted volatile records differ from the recomputed records")
+    if not records:
+        return report
+    return "\n".join(line for line in report.split("\n") if line not in records)
+
+
 def report_matches(report, root, address):
     if not valid_match_verdict(report):
         return False
@@ -919,11 +959,9 @@ def report_matches(report, root, address):
         if records:
             from match import allowlisted_volatile_semantics
             records += allowlisted_volatile_semantics(root, address)
+        report = strip_volatile_records(report, records)
     except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError, RecursionError,
             RuntimeError, subprocess.SubprocessError):
-        return False
-    if [line for line in report.splitlines()
-            if line.lstrip().startswith("* allowlisted volatile")] != records:
         return False
     try:
         import unsigned_divmod_profile
