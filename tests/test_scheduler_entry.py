@@ -19,9 +19,11 @@ POOL, DIRECT = profile.POOL, profile.DIRECT
 MANAGER = 0x0200F430
 
 
-def pool_caller(*, register=2, extra=False):
+def pool_caller(*, register=2, extra=False, adjust=False):
     # push {lr}; sub sp,#28; add rN,sp,#0; movs r1,#8; [movs r3,#0]; bl; add sp,#28; pop {r1}; bx r1
     data = half(0xB500, 0xB087, 0xA800 | register << 8, 0x2108)
+    if adjust:
+        data += half(0x3002 | register << 8)  # adds rN,#2
     if register != 3:
         data += half(0x2300)
     if extra:
@@ -30,7 +32,7 @@ def pool_caller(*, register=2, extra=False):
     return data+bl(site, POOL)+half(0xB007, 0xBC02, 0x4708), {site: POOL}
 
 
-def direct_caller(*, descriptor=1, deref=0x6800, parent=0x9200, join=False):
+def direct_caller(*, descriptor=1, deref=0x6800, parent=0x9200, join=False, between=None, adjust=False):
     # push {lr}; sub sp,#32; add r3,sp,#4*descriptor; ldr r0,[pc,#16]; ldr r0,[r0];
     # str r2,[sp]; movs r2,#40; bl; add sp,#32; pop {r1}; bx r1; .word MANAGER
     if join:
@@ -39,7 +41,8 @@ def direct_caller(*, descriptor=1, deref=0x6800, parent=0x9200, join=False):
         data = half(0xB500, 0xB088, 0xAB00+descriptor, 0x4805, 0x2900, 0xD000, 0x6800,
                     parent, 0x2228)
     else:
-        data = half(0xB500, 0xB088, 0xAB00+descriptor, 0x4804, deref, parent, 0x2228)
+        data = half(0xB500, 0xB088, 0xAB00+descriptor, *((0x3302,) if adjust else ()),
+                    0x4804, deref, parent, between or 0x2228)
     site = A+len(data)
     data += bl(site, DIRECT)+half(0xB008, 0xBC02, 0x4708)
     data += b'\0\0'*((-len(data)) % 4 // 2)
@@ -121,8 +124,28 @@ class SchedulerEntryTests(unittest.TestCase):
 
     def test_direct_local_pointer_as_parent_refused(self):
         data, calls = direct_caller(parent=0x9300)  # str r3,[sp]: parent is the descriptor address
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'additional register or pointer-word aliases'):
             verified(data, calls)
+
+    def test_unaligned_descriptor_refused(self):
+        # add rN,sp,#imm; adds rN,#2: func_08005954's LDM copy would ignore bits [1:0].
+        data, calls = direct_caller(adjust=True)
+        with self.assertRaisesRegex(ValueError, 'word-aligned'):
+            verified(data, calls)
+        data, calls = pool_caller(adjust=True)
+        with self.assertRaisesRegex(ValueError, 'word-aligned'):
+            verified(data, calls)
+
+    def test_direct_manager_overwritten_or_without_predecessor_refused(self):
+        data, calls = direct_caller(between=0x1C08)  # adds r0,r1,#0 after the dereference
+        with self.assertRaisesRegex(ValueError, 'named data load'):
+            bound(data, calls)
+        # ldr r0,[r0] as the entry instruction: no literal load can reach it.
+        data = half(0x6800, 0xB500, 0xB088, 0xAB01, 0x9200, 0x2228)
+        site = A+len(data)
+        data += bl(site, DIRECT)+half(0xB008, 0xBC02, 0x4708)
+        with self.assertRaisesRegex(ValueError, 'straight-line named data load'):
+            bound(data, {site: DIRECT})
 
     def test_direct_manager_not_one_named_data_load_refused(self):
         for deref in (0x2000, 0x6840, 0x6808):  # movs r0,#0; ldr r0,[r0,#4]; ldr r0,[r1]

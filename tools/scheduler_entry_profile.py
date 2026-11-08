@@ -78,6 +78,8 @@ def check_call(proof, address, aliases, stack, slots, *, site):
             {reg for reg in aliases if reg in match.CALLER_CLOBBERED} == {register} and not slots,
             'scheduler entry contract excludes additional register or pointer-word aliases')
     offset = aliases[register]
+    # func_08005954 copies the descriptor with LDM, which ignores address bits [1:0].
+    require(offset % 4 == 0, 'scheduler entry descriptor must be word-aligned')
     observation = dict(site=site, target=address, scheduler_entry=entry['kind'],
                        local_offset=offset, bytes=DESCRIPTOR_BYTES,
                        aliases=sorted(aliases.items()), pointer_words=[])
@@ -123,6 +125,11 @@ def manifest(proof):
             'descriptor is readable as representation bytes, its copied pointer values remain conditional, '
             'and the returned allocation is separate from all caller stack words. Both the copied R1 '
             'descriptor and ambient original R9 pointer are exposed to the callback; copying does not prove nonescape.',
+            'Every recorded preserved-register alias is also exposed; the callback must not access other '
+            'private or saved caller bytes through it.',
+            'The parent argument is NULL or a valid scheduler node that addresses no caller stack word: '
+            'func_08005954 writes through it (str r7,[r6,#0x10] at 0x080059BC) and walks its +8 chain, '
+            'storing into the last node (0x080059A6-0x080059B0). Its value is not checked.',
             ('The pinned func_08121B8C body forwards R0-R3 unchanged as callback, u16 size, descriptor and '
              'parent to the pinned func_08005954 body, with the manager loaded from the word addressed by its '
              'pool state data_020159CC; that pool word is a valid scheduler manager separate from every caller '
