@@ -717,6 +717,21 @@ or initialization behavior. Allocator/installed callback effects, physical
 permissions and termination remain unproved. Select these profiles only under
 the stated contracts; they are not an unconditional memory-safety theorem.
 
+Issue #81's single local result word passed to an indexed callee has its own
+opt-in profile:
+
+```sh
+python tools/match.py --root ../fftadecomp 08080EB8 --owner-runtime-profile conditional-local-output-word-call-v1
+```
+
+It requires exactly one actual call, to an indexed output callee with a pinned
+body size and SHA-256, whose only caller-frame pointer is R2 naming the frame's
+single local word, with no other local register or pointer-word aliases. The
+callee body is not alias-analysed; its result stores are an observation, not a
+verified write bound. The report states the premises: the callee writes at most
+that four-byte word, accesses no other private or saved word, returns
+compatibly and retains no local pointer.
+
 ### Named data literals
 
 For a known external object address, add an explicit mapping to the decomp

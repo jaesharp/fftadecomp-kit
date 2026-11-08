@@ -64,6 +64,44 @@ class ConditionalLocalBufferTests(unittest.TestCase):
             with self.subTest(slots=slots), self.assertRaises(ValueError):
                 p.check_call(0x080C7CC0, {R0+2: -16}, [LOCAL]*3+[SAVED]*2, slots, site=100)
 
+    def test_output_word_accepts_single_local_result_word(self):
+        p = proof(local.OUTPUT, {100: 0x080799C0})
+        stack = [LOCAL] + [SAVED]*3
+        self.assertEqual(p.check_call(0x080799C0, {R0+2: -16}, stack, site=100), {})
+        self.assertEqual(p.check_call(0x080799C0, {R0+2: -16}, stack, site=100), {})
+        manifest = p.contract_manifest()
+        self.assertFalse(manifest['actual_callback_effects_proved'])
+        self.assertFalse(manifest['nonescape_proved'])
+        self.assertIn('not a verified write bound', ' '.join(manifest['assumptions']))
+        self.assertEqual(manifest['observations'][0]['bytes'], 4)
+
+    def test_output_word_rejects_offsets_outside_its_local_word(self):
+        for offset in (-20, -14, -12, -4, 0):
+            with self.subTest(offset=offset), self.assertRaises(ValueError):
+                proof(local.OUTPUT, {100: 0x080799C0}).check_call(
+                    0x080799C0, {R0+2: offset}, [LOCAL]+[SAVED]*3, site=100)
+
+    def test_output_word_rejects_extra_aliases_slots_and_wider_frames(self):
+        for aliases, stack, slots in (({R0+2: -16, R0: -16}, [LOCAL]+[SAVED]*3, None),
+                                      ({R0+2: -16, R0+1: -16}, [LOCAL]+[SAVED]*3, None),
+                                      ({R0+2: -16, R0+4: -16}, [LOCAL]+[SAVED]*3, None),
+                                      ({R0: -16}, [LOCAL]+[SAVED]*3, None),
+                                      ({R0+2: -16}, [LOCAL]+[SAVED]*3, {-16: -16}),
+                                      ({R0+2: -20}, [LOCAL]*2+[SAVED]*3, None)):
+            with self.subTest(aliases=aliases, slots=slots), self.assertRaises(ValueError):
+                proof(local.OUTPUT, {100: 0x080799C0}).check_call(
+                    0x080799C0, aliases, stack, slots, site=100)
+
+    def test_output_word_rejects_other_targets_and_sites(self):
+        p = proof(local.OUTPUT, {100: 0x080799C0})
+        for address, site in ((0x0808CBDC, 100), (0x080799C0, 102)):
+            with self.subTest(address=address, site=site), self.assertRaises(ValueError):
+                p.check_call(address, {R0+2: -16}, [LOCAL]+[SAVED]*3, site=site)
+        with self.assertRaises(ValueError):
+            p.contract_manifest()
+        with self.assertRaises(ValueError):
+            p.check_indirect_target(local.thunk.ALIASES['_call_via_r2'], {}, (), site=100)
+
     def test_unauthenticated_site_and_unobserved_call_refused(self):
         p = proof(local.SCHEDULER, {100: 0x08005B6C})
         with self.assertRaises(ValueError):
