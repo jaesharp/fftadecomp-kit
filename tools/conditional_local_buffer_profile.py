@@ -108,17 +108,21 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
             require({reg for reg in aliases if reg in match.CALLER_CLOBBERED} == {r2},
                     'scheduler contract excludes additional register aliases')
             offset, width = aliases[r2], 28
-            # Exactly one pointer word, descriptor+4, addressing the payload
-            # placed directly after the descriptor. The payload extent is the
-            # complete remaining run of private words below the saved area.
-            require(slots == {offset+4: offset+28},
-                    'scheduler payload contract requires one descriptor+4 word addressing descriptor+28')
-            base, start = -4*len(stack), offset+28
+            # The private frame is exactly two adjacent objects: the descriptor
+            # and one nonempty payload, in either order. The payload extent is
+            # every private word outside the descriptor.
+            base = -4*len(stack)
             local = [index for index, word in enumerate(stack) if word[2]]
-            end = next((index for index in range((start-base)//4, len(stack)) if not stack[index][2]), len(stack))
-            require(offset == base and local == list(range(end)) and (start-base)//4 < end,
-                    'scheduler payload contract requires a frame of exactly the descriptor and one nonempty payload')
-            payload = (start, 4*end + base - start)
+            first, end = (offset-base)//4, len(local)
+            require(offset % 4 == 0 and local == list(range(end)) and 0 <= first and first+7 <= end,
+                    'scheduler payload contract requires a private frame holding the complete descriptor')
+            payload = ((base, offset-base) if first and first+7 == end else
+                       (offset+28, 4*end+base-offset-28) if not first and first+7 < end else None)
+            require(payload is not None,
+                    'scheduler payload contract requires a frame of exactly the descriptor and one adjacent nonempty payload')
+            # Exactly one pointer word, descriptor+4, addressing the payload start.
+            require(slots == {offset+4: payload[0]},
+                    'scheduler payload contract requires one descriptor+4 word addressing the payload')
         else:
             base = -4*len(stack)
             if address == 0x0814224C:
@@ -158,8 +162,8 @@ class ConditionalLocalBufferProof(named.NamedDataBufferProof):
                  'private/saved words. Constant n=4 is an interface argument, not a proof of callback behavior. '
                  'Iterator objects and scalar-query callees are valid and separate from the caller frame; '
                  'the visitor record remains unchanged and the known callback accesses only state bytes 0 and 1.')]
-                + ([('The descriptor+4 word is the only local pointer word; it addresses the payload at descriptor+28, '
-                     'whose extent is the complete remaining private frame recorded as payload_bytes. The callback reads '
+                + ([('The descriptor+4 word is the only local pointer word; it addresses the payload adjacent to the '
+                     'descriptor, whose extent is the rest of the private frame recorded as payload_bytes. The callback reads '
                      'the payload only through that word, only within that extent and only before the scheduler call '
                      'returns; caller-initialized members are values and padding bytes are representation only. '
                      'The copied pointer word in the allocation is not dereferenced after return; the payload extent, '

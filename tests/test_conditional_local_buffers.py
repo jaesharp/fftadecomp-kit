@@ -65,6 +65,19 @@ class ConditionalLocalBufferTests(unittest.TestCase):
         p.check_call(0x08005B6C, {R0+2: -60}, [LOCAL]*11+[SAVED]*4, {-56: -32}, site=100)
         self.assertEqual(p.observations[100]['payload_bytes'], 16)
 
+    def test_scheduler_payload_accepts_payload_below_descriptor(self):
+        # 0x080DE0AC: 12-byte payload at sp, descriptor at sp+0xC up to the saved words.
+        p = proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C})
+        p.check_call(0x08005B6C, {R0+2: -44}, [LOCAL]*10+[SAVED]*4, {-40: -56}, site=100)
+        self.assertEqual((p.observations[100]['payload_offset'], p.observations[100]['payload_bytes']), (-56, 12))
+
+    def test_scheduler_payload_rejects_descriptor_between_private_words(self):
+        for aliases, slots in (({R0+2: -52}, {-48: -56}), ({R0+2: -52}, {-48: -24}),
+                               ({R0+2: -44}, {-40: -52}), ({R0+2: -44}, {-40: -16})):
+            with self.subTest(aliases=aliases, slots=slots), self.assertRaises(ValueError):
+                proof(local.SCHEDULER_PAYLOAD, {100: 0x08005B6C}).check_call(
+                    0x08005B6C, aliases, [LOCAL]*10+[SAVED]*4, slots, site=100)
+
     def test_scheduler_payload_rejects_near_miss_pointer_words(self):
         stack = [LOCAL]*10 + [SAVED]*4
         for slots in (None, {}, {-48: -28}, {-52: -32}, {-52: -56}, {-52: -12},
@@ -75,7 +88,7 @@ class ConditionalLocalBufferTests(unittest.TestCase):
 
     def test_scheduler_payload_rejects_other_frames_and_aliases(self):
         cases = (({R0+2: -56, R0: -28}, [LOCAL]*10+[SAVED]*4, {-52: -28}),  # extra argument alias
-                 ({R0+2: -52}, [LOCAL]*10+[SAVED]*4, {-48: -24}),           # descriptor not at SP
+                 ({R0+2: -52}, [LOCAL]*10+[SAVED]*4, {-48: -24}),           # descriptor inside the frame
                  ({R0+2: -44}, [LOCAL]*7+[SAVED]*4, {-40: -16}),            # empty payload
                  ({R0+2: -56}, [LOCAL]*9+[SAVED]+[LOCAL]+[SAVED]*3, {-52: -28}),  # saved word inside payload
                  ({R0+2: -56}, [LOCAL]*10+[SAVED]*4, {-52: -28, -36: -40}))  # second pointer word
