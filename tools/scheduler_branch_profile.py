@@ -14,6 +14,8 @@ SCHEDULER = 0x08005B6C
 MAX_SCHEDULER_SITES = 2
 MAX_CALL_SITES = 8
 MAX_ORDINARY_TARGETS = 4
+WIDE_ORDINARY_TARGETS = 8
+WIDE_CALL_SITES = 12
 
 
 def require(condition, message):
@@ -21,30 +23,45 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def phases(edges, calls):
+def phases(edges, calls, *, following_calls=False, wide_targets=False):
+    require(type(following_calls) is bool, 'following-call selection must be Boolean')
+    require(type(wide_targets) is bool and not (following_calls and wide_targets),
+            'wide-target selection must be Boolean and separate from following calls')
+    target_budget = WIDE_ORDINARY_TARGETS if wide_targets else MAX_ORDINARY_TARGETS
+    call_budget = WIDE_CALL_SITES if wide_targets else MAX_CALL_SITES
     schedulers = sorted(site for site, target in calls.items() if target == SCHEDULER)
     ordinary = sorted(set(calls.values()) - {SCHEDULER})
     require(1 <= len(schedulers) <= MAX_SCHEDULER_SITES and
-            1 <= len(ordinary) <= MAX_ORDINARY_TARGETS and
-            len(calls) <= MAX_CALL_SITES and set(calls) <= set(edges),
+            1 <= len(ordinary) <= target_budget and
+            len(calls) <= call_budget and set(calls) <= set(edges),
             'scheduler branches exceed the explicit call-site or target bounds')
     after = dict.fromkeys(edges, False)
+    following_sites = []
     for site in acyclic(edges):
-        # Union at joins: an ordinary call or second scheduler reachable after
-        # any scheduler return is refused, even if another arm has no call.
-        require(not (after[site] and site in calls),
-                'scheduler branches exclude every call after a scheduler return')
+        # Union at joins retains every scheduler-return path. The separate
+        # following-call selector permits only ordinary calls afterwards; each
+        # such call still undergoes the complete frame/alias check.
+        if after[site] and site in calls:
+            require(following_calls and calls[site] != SCHEDULER,
+                    'scheduler branches exclude every call after a scheduler return')
+            following_sites.append(site)
         scheduled = after[site] or calls.get(site) == SCHEDULER
         for target in edges[site]:
             after[target] |= scheduled
-    return dict(scheduler_sites=schedulers, ordinary_targets=ordinary,
-        scheduler_site_budget=MAX_SCHEDULER_SITES, call_site_budget=MAX_CALL_SITES,
-        ordinary_target_budget=MAX_ORDINARY_TARGETS,
-        maximum_scheduler_calls_per_path=1, ordinary_calls_after_scheduler=False)
+    if following_calls:
+        require(len(schedulers) == 1 and following_sites,
+                'following-call contract requires one scheduler site and a reached following ordinary call')
+    result = dict(scheduler_sites=schedulers, ordinary_targets=ordinary,
+        scheduler_site_budget=MAX_SCHEDULER_SITES, call_site_budget=call_budget,
+        ordinary_target_budget=target_budget,
+        maximum_scheduler_calls_per_path=1, ordinary_calls_after_scheduler=bool(following_sites))
+    if following_calls:
+        result['following_ordinary_sites'] = sorted(following_sites)
+    return result
 
 
-def bind(proof, edges, calls):
-    result = phases(edges, calls)
+def bind(proof, edges, calls, *, following_calls=False, wide_targets=False):
+    result = phases(edges, calls, following_calls=following_calls, wide_targets=wide_targets)
     for target in result['ordinary_targets']:
         require(not match.function_thunk.reserved(target) and
                 target not in match.RUNTIME_HELPERS.values(),

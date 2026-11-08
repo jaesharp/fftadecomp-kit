@@ -851,6 +851,23 @@ identity does not establish their memory effects or nested execution. Reports
 keep that conditional boundary separate from the read-only predicate proof.
 Existing single-call, predicate and payload profiles keep their own guards.
 
+`conditional-scheduler-eight-target-branches-v1` is a separate bounded option
+for phase controllers with up to eight ordinary helper targets and twelve call
+sites. It preserves the acyclic all-path check, two static scheduler-site limit,
+at most one scheduler execution per path, and prohibition on calls after the
+scheduler. Every helper has a complete authenticated indexed body, and every
+ordinary call still excludes all local aliases, pointer words and word facts.
+The larger inventory does not prove callee effects or nested execution. The
+original branch selector retains its four-target and eight-site limits.
+
+`conditional-scheduler-following-call-v1` permits ordinary calls after exactly
+one scheduler site in an acyclic caller, with the original four-target and
+eight-site limits. Each following call undergoes the same complete alias/frame
+checks; a second scheduler invocation, tracked local alias, pointer word or word
+fact refuses. This option is separate from the eight-target profile. Both keep
+physical access, protected-frame preservation, synchronous lifetime,
+allocation separation, callback effects and termination as explicit conditions.
+
 Issue #81's single local result word passed to an indexed callee has its own
 opt-in profile:
 
