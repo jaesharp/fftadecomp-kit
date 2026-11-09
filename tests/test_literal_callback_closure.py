@@ -12,6 +12,7 @@ import match
 import owner_admission_profile as owner
 import named_data_buffer_profile as named
 import function_thunk_profile as thunk
+import owner_graph_profile as graph
 import two_word_callback_closure_profile as previous
 import literal_callback_closure_profile as closure
 
@@ -23,6 +24,13 @@ TREE={T1:'f0b50f1c161c846801225242251c002c1ed0e168002907d0914205d02069904211d022
       T2:'f0b50f1c161c846801225242251c002c1ed02169002907d0914205d0e068904211d0221c0c1cf2e7e06890420bd0201c311c7af05dfa00280ad0e068002802d0221c041ce3e7ac4202d0221ca468dee7f0bc01bc0047'}
 ROOTS={  # form: (owner-load halfword, callback)
     'private-state':(0x6900,S),'entry-object':(0x6910,X),'null':(0x6900,X)}
+
+
+def tree_graph(body,address=T1,count=42):
+    rows=[dict(rom=f'0x{address:08X}',end=f'0x{address+len(body):08X}',mode='thumb',instrs=count)]+[
+          dict(rom=f'0x{t:08X}',end=f'0x{t+2:08X}',mode='thumb',instrs=1) for t in thunk.ALIASES.values()]
+    ins,edges,_,calls,_=graph.graph(body,address,owner.refine(body,address,json.dumps(rows).encode()))
+    return ins,edges,calls
 
 
 def bl(site,target):
@@ -294,9 +302,8 @@ class LiteralClosureTests(unittest.TestCase):
                            ((2,0x1C0E),'entry copies')):
             changed=bytearray(raw);struct.pack_into('<H',changed,*edit)
             entry=dict(closure.ITERATORS[T1],sha256=closure.sha(bytes(changed)))
-            calls={T1+50:thunk.ALIASES['_call_via_r7']}
             with self.subTest(edit=edit),self.assertRaisesRegex(ValueError,error):
-                closure.iterator_structure(bytes(changed),T1,entry,calls)
+                closure.iterator_structure(bytes(changed),T1,entry,*tree_graph(bytes(changed)))
 
     def test_unlisted_iterator_refuses(self):
         # The tree walk at an unlisted address, and the next indexed function.
@@ -371,6 +378,51 @@ class LiteralClosureTests(unittest.TestCase):
             target[path[-1]]=5 if path[-1]=='descriptor_register' else 'scalar-inventory' if path[-1]=='adapter_shape' else 'x'
             with self.subTest(path=path),self.assertRaisesRegex(ValueError,'manifest differs'):
                 owner.verify(**values,manifest=changed)
+
+    def test_framed_adapter_cannot_pass_or_return_frame_addresses(self):
+        # Review repro: MOV R3,SP before the thunk BL; also MOV R2,SP before the return.
+        p=closure.FRAMED_ADAPTERS[F];body=bytes.fromhex(p['body']);getter=bytes.fromhex(p['getter_body'])
+        passed=body[:20]+struct.pack('<H',0x466B)+bl(F+22,thunk.ALIASES['_call_via_r2'])+body[24:]
+        returned=body[:24]+struct.pack('<H',0x466A)+body[24:]
+        for changed,error in ((passed,'passes a private frame address'),(returned,'returns a private frame address')):
+            with self.subTest(error=error),self.assertRaisesRegex(ValueError,error),\
+                    patch.dict(closure.FRAMED_ADAPTERS,{F:dict(p,body=changed.hex())}):
+                closure.framed_adapter_effects(changed,F,getter,FG)
+
+    def test_framed_getter_must_preserve_callee_saved_registers(self):
+        p=closure.FRAMED_ADAPTERS[F];changed=bytearray.fromhex(p['getter_body'])
+        struct.pack_into('<H',changed,4,0x6804)  # ldr r4,[r0]; then str r0,[r2] stores the stale R0
+        with self.assertRaises(ValueError),patch.dict(closure.FRAMED_ADAPTERS,{F:dict(p,getter_body=changed.hex())}):
+            closure.framed_adapter_effects(bytes.fromhex(p['body']),F,bytes(changed),FG)
+        struct.pack_into('<H',changed,4,0x6805)  # ldr r5,[r0]: preserved-register violation only
+        struct.pack_into('<H',changed,6,0x6015)  # str r5,[r2]
+        with self.assertRaisesRegex(ValueError,'preserve R4-R11'),patch.dict(closure.FRAMED_ADAPTERS,{F:dict(p,getter_body=changed.hex())}):
+            closure.framed_adapter_effects(bytes.fromhex(p['body']),F,bytes(changed),FG)
+
+    def test_framed_descriptor_register_is_derived(self):
+        p=closure.FRAMED_ADAPTERS[F];getter=bytes.fromhex(p['getter_body'])
+        self.assertEqual(closure.framed_adapter_effects(bytes.fromhex(p['body']),F,getter,FG)['descriptor_register'],4)
+        r5=bytes.fromhex('20b582b00d1c01aa6946')+bl(F+10,FG)+bytes.fromhex('009829686a68')+bl(F+20,thunk.ALIASES['_call_via_r2'])+bytes.fromhex('02b020bc02bc0847')
+        with patch.dict(closure.FRAMED_ADAPTERS,{F:dict(p,body=r5.hex())}):
+            effects=closure.framed_adapter_effects(r5,F,getter,FG)
+        self.assertEqual(effects['descriptor_register'],5)
+        self.assertEqual({row['base_register'] for row in effects['descriptor_reads']},{5})
+
+    def test_empty_path_descriptor_alias_is_derived(self):
+        worker=fixture()['rom'][W-match.ROM_BASE:W-match.ROM_BASE+34]
+        self.assertTrue(closure.iterator_structure(worker,W,closure.ITERATORS[W],*tree_graph(worker,W,16))[1])
+        for iterator in (T1,T2):
+            body=bytes.fromhex(TREE[iterator])
+            self.assertFalse(closure.iterator_structure(body,iterator,closure.ITERATORS[iterator],*tree_graph(body,iterator))[1])
+
+    def test_list_object_liveness_follows_the_graph(self):
+        # ldr r4,[r0,#8] at the loop's advance precedes R0's write in text order,
+        # but is reached after "adds r0, r4, #0" on the loop's back edge.
+        worker=bytearray(fixture()['rom'][W-match.ROM_BASE:W-match.ROM_BASE+34])
+        struct.pack_into('<H',worker,10,0x6884)
+        entry=dict(closure.ITERATORS[W],sha256=closure.sha(bytes(worker)),reads=(('list',4),('list',8)))
+        with self.assertRaisesRegex(ValueError,'outside the list object'):
+            closure.iterator_structure(bytes(worker),W,entry,*tree_graph(bytes(worker),W,16))
 
 
 if __name__=='__main__':

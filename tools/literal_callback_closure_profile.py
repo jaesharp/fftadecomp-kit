@@ -32,32 +32,37 @@ SCHEMA = 'elf-symbol-thumb-conditional-two-word-literal-callback-closure-v1'
 CONTROL_FLOW = 'complete initialized two-word local descriptor with typed callback literal and read-only callback iterator; private state only through an interpreted pinned callback; compatible returning indirect ABI and memory noninterference conditional; termination unproved'
 PRESERVED = adapter.PRESERVED
 # Closed table of read-only callback iterators. Each body is pinned by size,
-# refined count and SHA-256 and its structure is re-derived below: the entry
-# copies of the adapter (R1) and descriptor (R2) into callee-saved registers,
-# which nothing else writes; the one call through the adapter register's thunk
-# with R0 = current node and R1 = descriptor; no stores; and exactly the listed
-# word reads, from the list object (entry R0, first load only) or the current
-# node (R4).
+# refined count and SHA-256; the pin is the admission gate. The structure is
+# then re-derived over the instruction graph: the entry copies of the adapter
+# (R1) and descriptor (R2) into callee-saved registers, which nothing else
+# writes; the one call through the adapter register's thunk with R0 = current
+# node and R1 = descriptor; no stores; and exactly the listed word reads, from
+# the list object (entry R0 before any path overwrites it) or the current node
+# (R4). The two tree walks are the bodies that
+# tree_two_word_callback_closure_profile (conditional-two-word-tree-callback-
+# closure-v1) admits by template for parameter-callback roots.
 ITERATORS = {
     0x080C7CC0: dict(size=34, count=16, call=20, adapter_register=6, descriptor_register=5,
         sha256='47422d610f242091222c8c8e303ea235eede92f9a9c9cc40cd8552e8f44f45d1',
         kind='singly linked list: first node at list+4, next node at node+8',
-        reads=(('list', 4), ('node', 8)), descriptor_in_r2_on_empty_path=True,
+        reads=(('list', 4), ('node', 8)),
         loop_invariant='R6 is the exact adapter Thumb pointer; R5 is the original initialized descriptor; R4 is null or the current ordinary node. Each returning adapter preserves R4-R11/SP. Only node+8 advances the loop; callback R0 selects continuation.'),
     0x080C7D18: dict(size=86, count=42, call=50, adapter_register=7, descriptor_register=6,
         sha256='ee7686daca5c7774589a5795bd17453d4f109674942402d1a7fcc13296e78da2',
         kind='parent-linked binary tree, in order: root at list+8, parent at node+8, node+12 subtree visited before node+16',
-        reads=(('list', 8), ('node', 8), ('node', 12), ('node', 16)), descriptor_in_r2_on_empty_path=False,
-        loop_invariant='R7 is the exact adapter Thumb pointer; R6 is the original initialized descriptor; R5 is the root node; R4 is null or the current ordinary node; R2 is -1 or the previous node. Moves are only to node+12, node+16 or the node+8 parent; each returning adapter preserves R4-R11/SP. The adapter is called with the current nonnull node and the descriptor; callback R0 zero stops, as does ascending from the root.'),
+        reads=(('list', 8), ('node', 8), ('node', 12), ('node', 16)),
+        loop_invariant='R7 is the exact adapter Thumb pointer; R6 is the original initialized descriptor; R5 is the root node; R4 is null or the current ordinary node; at the loop head R2 is -1 or the previous node (it is reset on every path back to the head, and arbitrary after a returning adapter). Moves are only to node+12, node+16 or the node+8 parent; each returning adapter preserves R4-R11/SP. The adapter is called with the current nonnull node and the descriptor; callback R0 zero stops, as does ascending from the root.'),
     0x080C7D70: dict(size=86, count=42, call=50, adapter_register=7, descriptor_register=6,
         sha256='6af858bb8def974b2ad9e56dce5bc14c3d6a4b8c5a3570e9f6478c9d8ccf07c5',
         kind='parent-linked binary tree, in order: root at list+8, parent at node+8, node+16 subtree visited before node+12',
-        reads=(('list', 8), ('node', 8), ('node', 12), ('node', 16)), descriptor_in_r2_on_empty_path=False,
-        loop_invariant='R7 is the exact adapter Thumb pointer; R6 is the original initialized descriptor; R5 is the root node; R4 is null or the current ordinary node; R2 is -1 or the previous node. Moves are only to node+16, node+12 or the node+8 parent; each returning adapter preserves R4-R11/SP. The adapter is called with the current nonnull node and the descriptor; callback R0 zero stops, as does ascending from the root.'),
+        reads=(('list', 8), ('node', 8), ('node', 12), ('node', 16)),
+        loop_invariant='R7 is the exact adapter Thumb pointer; R6 is the original initialized descriptor; R5 is the root node; R4 is null or the current ordinary node; at the loop head R2 is -1 or the previous node (it is reset on every path back to the head, and arbitrary after a returning adapter). Moves are only to node+16, node+12 or the node+8 parent; each returning adapter preserves R4-R11/SP. The adapter is called with the current nonnull node and the descriptor; callback R0 zero stops, as does ascending from the root.'),
 }
 # Closed table of framed two-output adapters. The adapter and its getter are
-# pinned byte for byte and interpreted by framed_adapter_effects. Scalar
-# adapters still go through scalar_callback_adapter_inventory unchanged.
+# pinned byte for byte, authenticated again by
+# two_output_callback_adapter_inventory.verify, and interpreted by
+# framed_adapter_effects. Scalar adapters still go through
+# scalar_callback_adapter_inventory unchanged.
 FRAMED_ADAPTERS = {
     0x0809AC00: dict(count=14, body='10b582b00c1c01aa69462cf0b5ff009821686268a7f01afb02b010bc02bc0847',
         getter=0x080C7B78, getter_count=5, getter_body='43680b60006810607047'),
@@ -180,41 +185,87 @@ def state_callback_effects(body, address):
         private_state_address_stored=False, all_paths_interpreted=True)
 
 
-def iterator_structure(body, address, entry, calls):
-    """Check one pinned iterator entry and re-derive its structural facts."""
+def iterator_structure(body, address, entry, ins, edges, calls):
+    """Check one pinned iterator entry and re-derive its structural facts.
+
+    The SHA-256 pin is the admission gate. The checks below run over the
+    complete instruction graph from complete() and derive what the report
+    records, so a future table entry cannot declare facts its body lacks.
+    """
     require(len(body) == entry['size'] and sha(body) == entry['sha256'],
             'literal closure iterator body differs from its pinned identity')
     a, d = entry['adapter_register'], entry['descriptor_register']
     selected = thunk.ALIASES[f'_call_via_r{a}']
     require(calls == {address+entry['call']: selected}, 'literal closure iterator call differs')
-    decoder = Cs(CS_ARCH_ARM, CS_MODE_THUMB); decoder.detail = True
-    code = list(decoder.disasm(body, address))
-    require(sum(item.size for item in code) == len(body) and len(code) == entry['count'],
-            'literal closure iterator must decode completely')
-    raw = [int.from_bytes(item.bytes[:2], 'little') for item in code]
-    site = next(n for n, item in enumerate(code) if item.address == address+entry['call'])
-    r0, r4 = match.ARM_REG_R0, match.ARM_REG_R0+4
-    require(code[0].mnemonic == 'push' and raw[1] == 0x1C08 | a and raw[2] == 0x1C10 | d and
-            raw[site-2] == 0x1C20 and raw[site-1] == 0x1C01 | d << 3 and
-            [item.mnemonic for item in code[-3:]] == ['pop', 'pop', 'bx'],
-            'literal closure iterator entry copies, call arguments or exit differ')
-    reads, r0_live = set(), True
-    for number, item in enumerate(code):
-        require(not item.mnemonic.startswith(('str', 'stm')) and (number == 0 or item.mnemonic != 'push'),
+    require(len(ins) == entry['count'] and set(edges) == set(ins) and
+            all(target in ins for targets in edges.values() for target in targets),
+            'literal closure iterator must be one complete instruction graph')
+    r0, r2, r4 = match.ARM_REG_R0, match.ARM_REG_R0+2, match.ARM_REG_R0+4
+    raw = {site: int.from_bytes(item.bytes[:2], 'little') for site, item in ins.items()}
+    preds = {site: set() for site in ins}
+    for site, targets in edges.items():
+        for target in targets: preds[target].add(site)
+    site = address+entry['call']
+    exits = {s for s, item in ins.items() if not edges[s]}
+    # Entry: PUSH, then the two copies, as one straight-line prefix.
+    require(ins[address].mnemonic == 'push' and edges[address] == (address+2,) and
+            edges[address+2] == (address+4,) and preds[address+2] == {address} and preds[address+4] == {address+2} and
+            raw[address+2] == 0x1C08 | a and raw[address+4] == 0x1C10 | d,
+            'literal closure iterator entry copies differ')
+    # The call's arguments are set by its only two graph predecessors.
+    require(preds[site] == {site-2} and preds[site-2] == {site-4} and
+            raw[site-4] == 0x1C20 and raw[site-2] == 0x1C01 | d << 3,
+            'literal closure iterator call arguments differ')
+    # Exit: every return is BX R0 reached only through POP {R0} after POP of the saved set.
+    epilogue = set()
+    for done in exits:
+        require(ins[done].mnemonic == 'bx' and len(preds[done]) == 1, 'literal closure iterator exit differs')
+        restore, = preds[done]
+        require(ins[restore].mnemonic == 'pop' and len(preds[restore]) == 1, 'literal closure iterator exit differs')
+        saved, = preds[restore]
+        require(ins[saved].mnemonic == 'pop', 'literal closure iterator exit differs')
+        epilogue |= {saved, restore, done}
+    # Forward dataflow: may R0 have been overwritten on some path to here?
+    written = {s: set(item.regs_access()[1]) for s, item in ins.items()}
+    clobbered_in = {s: False for s in ins}
+    changed = True
+    while changed:
+        changed = False
+        for s in sorted(ins):
+            value = any(clobbered_in[p] or r0 in written[p] for p in preds[s])
+            if value != clobbered_in[s]:
+                clobbered_in[s], changed = value, True
+    reads = set()
+    for s, item in ins.items():
+        require(not item.mnemonic.startswith(('str', 'stm')) and (s == address or item.mnemonic != 'push'),
                 'literal closure iterator must not store')
-        written = set(item.regs_access()[1])
-        if 3 <= number < len(code)-3:
-            require(not written & {r0+a, r0+d}, 'literal closure iterator overwrites its adapter or descriptor')
+        if s not in (address+2, address+4) and s not in epilogue:
+            require(not written[s] & {r0+a, r0+d}, 'literal closure iterator overwrites its adapter or descriptor')
         if item.mnemonic == 'ldr':
             mem = item.operands[1]
             require(mem.type == match.ARM_OP_MEM and not mem.mem.index and mem.mem.disp % 4 == 0 and
-                    (mem.mem.base == r0 and r0_live or mem.mem.base == r4),
+                    (mem.mem.base == r0 and not clobbered_in[s] or mem.mem.base == r4),
                     'literal closure iterator reads outside the list object and current node')
             reads.add(('list' if mem.mem.base == r0 else 'node', mem.mem.disp))
-        if r0 in written:
-            r0_live = False
     require(reads == set(entry['reads']), 'literal closure iterator read set differs')
-    return selected
+    # Does entry R2 (the root descriptor) survive to a return that skips the call?
+    # Follow the straight-line prefix to the first conditional branch, then the
+    # successor that reaches a return without another branch or the call.
+    path, here = [], address
+    while len(edges[here]) == 1 and here != site:
+        path.append(here); here = edges[here][0]
+    require(len(edges[here]) == 2, 'literal closure iterator requires an initial conditional exit')
+    path.append(here)
+    exit_paths = []
+    for target in edges[here]:
+        chain = []
+        while target != site and len(edges[target]) == 1:
+            chain.append(target); target = edges[target][0]
+        if target in exits:
+            exit_paths.append(chain+[target])
+    require(len(exit_paths) == 1, 'literal closure iterator requires one direct empty exit')
+    r2_survives = not any(r2 in written[s] for s in path+exit_paths[0])
+    return selected, r2_survives
 
 
 def framed_adapter_effects(body, address, getter_body, getter):
@@ -265,20 +316,24 @@ def framed_adapter_effects(body, address, getter_body, getter):
             offset = 4*(raw >> 6 & 31)
             require(regs[raw >> 3 & 7] == ('descriptor',) and offset in (0, 4),
                     'framed adapter reads outside the two descriptor words')
-            regs[raw & 7] = ('descriptor-word', offset); reads.append(dict(site=here, offset=offset, width=4))
+            regs[raw & 7] = ('descriptor-word', offset)
+            reads.append(dict(site=here, offset=offset, width=4, base_register=raw >> 3 & 7))
         elif raw & 0xF800 == 0xF000 and number+1 < len(halfwords) and halfwords[number+1] & 0xF800 == 0xF800:
             low = halfwords[number+1]
             delta = ((raw & 0x7FF) << 12 | (low & 0x7FF) << 1)
             destination = here+4+(delta - (1 << 23) if delta & (1 << 22) else delta)
             if destination == getter and getter_record is None and callback is None:
-                getter_record = _framed_getter(getter_body, getter, regs, frame, local)
+                getter_record, returned = _framed_getter(getter_body, getter, regs, frame, local)
+                for r in (0, 1, 2, 3, 12): regs[r] = returned[r]
             elif destination == target and getter_record is not None and callback is None:
+                require(not any(regs[r][0] == 'frame' for r in (0, 1, 2, 3, 12)),
+                        'framed adapter passes a private frame address to the callback')
                 callback = dict(site=here, thunk=target, target=regs[2], arguments=[regs[0], regs[1]])
+                for r in (1, 2, 3, 12): regs[r] = ('clobbered',)
+                regs[0] = ('callback-result',)
             else:
                 raise ValueError('framed adapter calls differ')
-            for r in (0, 1, 2, 3, 12): regs[r] = ('clobbered',)
             regs[14] = ('clobbered',)
-            if destination == target: regs[0] = ('callback-result',)
             number += 2; continue
         elif raw & 0xFE00 == 0xBC00:  # POP {Rlist} without PC
             require(not raw & 0x100, 'framed adapter must not pop PC')
@@ -286,6 +341,8 @@ def framed_adapter_effects(body, address, getter_body, getter):
                 regs[r] = frame[sp]; sp += 4
         elif raw & 0xFF87 == 0x4700 and last:  # BX Rm
             require(regs[raw >> 3 & 15] == ('return',), 'framed adapter must return through its saved LR')
+            require(not any(regs[r][0] == 'frame' for r in (0, 1, 2, 3, 12)),
+                    'framed adapter returns a private frame address')
         else:
             raise ValueError('unsupported framed adapter instruction')
         number += 1
@@ -293,9 +350,10 @@ def framed_adapter_effects(body, address, getter_body, getter):
             all(regs[n] == ('entry', n) for n in range(4, 12)), 'framed adapter return/frame differs')
     require(callback == dict(site=callback and callback['site'], thunk=target, target=('descriptor-word', 4),
             arguments=[('node-word', 4), ('descriptor-word', 0)]) and
-            sorted(row['offset'] for row in reads) == [0, 4], 'framed adapter effect relation differs')
+            sorted(row['offset'] for row in reads) == [0, 4] and
+            len({row['base_register'] for row in reads}) == 1, 'framed adapter effect relation differs')
     return dict(schema=FRAMED_SCHEMA, address=address, end=address+len(body), instructions=FRAMED_ADAPTERS[address]['count'],
-        body_sha256=sha(body), descriptor_register=4, descriptor_reads=reads,
+        body_sha256=sha(body), descriptor_register=reads[0]['base_register'], descriptor_reads=reads,
         frame=dict(saved=['entry R4', 'entry LR'], local_bytes=8, local_offsets=[-16, -12],
                    established_by='pinned bytes and the interpreter, not the frame prover'),
         getter=getter_record,
@@ -331,12 +389,13 @@ def _framed_getter(body, address, caller, frame, local):
             writes.append(dict(site=here, frame_offset=base[1]+offset, width=4, value=f'node word {regs[rd][1]}'))
         else:
             raise ValueError('unsupported framed getter instruction')
+    require(all(regs[n] == caller[n] for n in range(4, 12)), 'framed getter must preserve R4-R11')
     require(sorted(row['frame_offset'] for row in writes) == [-16, -12] and len(writes) == 2 and
             frame.get(-16) == ('node-word', 4) and frame.get(-12) == ('node-word', 0),
             'framed getter effect relation differs')
     return dict(address=address, end=address+len(body), instructions=len(halfwords), body_sha256=sha(body),
         reads=reads, writes=writes, leaf=True, frame_bytes=0,
-        relation='private word -16 becomes node word 4 and private word -12 becomes node word 0; nothing else is written')
+        relation='private word -16 becomes node word 4 and private word -12 becomes node word 0; nothing else is written'), regs
 
 
 class _LiteralContextRead(match.BufferCallProof):
@@ -390,7 +449,7 @@ def prove(data, address, rom, mapping, index, *, selector):
     worker, wi, we, wc, wp = complete(iterator, shape['size'], shape['count'], rom, mapping, index)
     require(not wp['literal_and_table_bytes'] and not wp['alignment_bytes'],
             'literal closure requires the complete read-only node iterator')
-    selected = iterator_structure(worker, iterator, shape, wc)
+    selected, r2_survives = iterator_structure(worker, iterator, shape, wi, we, wc)
     selected_name = f"_call_via_r{shape['adapter_register']}"
     index_entries, rows = indices(mapping, index)
     if adapter_address in FRAMED_ADAPTERS:
@@ -404,8 +463,12 @@ def prove(data, address, rom, mapping, index, *, selector):
                 not gp['literal_and_table_bytes'] and not gp['alignment_bytes'] and
                 ac == {adapter_address+10: getter, adapter_address+20: thunk.ALIASES['_call_via_r2']},
                 'literal closure requires its complete pinned framed adapter')
-        adapter_proof = dict(framed_adapter_effects(adapter_data, adapter_address, gdata, getter),
-            partition=ap, explicit_conditions=[
+        # The existing two-output inventory independently authenticates the
+        # same adapter and getter; the interpreter adds the effect relation.
+        import two_output_callback_adapter_inventory as two_output
+        effects = framed_adapter_effects(adapter_data, adapter_address, gdata, getter)
+        inventory = two_output.verify(adapter_address, getter, rom, mapping, index, selector=two_output.SELECTOR)
+        adapter_proof = dict(effects, partition=ap, inventory=inventory, explicit_conditions=[
                 'Each node passed to the adapter is nonnull and its words 0 and 4 are aligned, live, initialized and readable.',
                 'The adapter\'s private eight-byte local area and saved words form a valid frame that does not wrap or alias the node, the descriptor, callback-visible memory or code; the getter\'s two out-pointers address only that local area, as interpreted, and no frame address is retained or returned.',
                 'The getter and the descriptor target are compatible returning Thumb code; the target preserves R4-R11 and SP, the private frame and continuation code.',
@@ -512,7 +575,7 @@ def prove(data, address, rom, mapping, index, *, selector):
                 ([dict(base='root entry R0', offset=128, width=4)] if name == 'entry-object' else []),
             outward_expired_aliases=[dict(register=2, origin='root descriptor on the empty-list path',
                 accessible_after_return=False, observed_by_root_continuation=False)]
-                if shape['descriptor_in_r2_on_empty_path'] else [],
+                if r2_survives else [],
             explicit_conditions=conditions,
             source_sha256={**{Path(module.__file__).name: sha(Path(module.__file__).read_bytes())
                 for module in (match, owner, graph, thunk, frame, adapter)},
