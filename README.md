@@ -997,9 +997,16 @@ address, kind, registers, reads and thunk.
 | `080C7D18` | parent-linked binary tree, in order, node+12 first | list+8, node+8/+12/+16 | `_call_via_r7` |
 | `080C7D70` | same tree, node+16 first | list+8, node+8/+12/+16 | `_call_via_r7` |
 
-All three are read-only and call the adapter with the current nonnull node and
-the original descriptor. An adapter result of zero stops the walk. No iteration
-bound is assumed; termination is unproved.
+All three are read-only and call the adapter at most once per nonnull node
+reached, in walk order, with that node and the original descriptor. An adapter
+result of zero stops the walk. No iteration bound is assumed; termination is
+unproved. The SHA-256 pin is the admission gate. The structural checks run
+over the complete instruction graph and derive the recorded facts, including
+whether entry R2 still holds the descriptor on the empty-input return. The two
+tree walks are the same bodies that `tools/tree_two_word_callback_closure_profile.py`
+(`conditional-two-word-tree-callback-closure-v1`) admits by template for
+parameter-callback roots. This profile pins them independently for
+typed-literal roots, and the overlap is intentional.
 
 There are two kinds of adapter.
 
@@ -1009,8 +1016,12 @@ There are two kinds of adapter.
   `FRAMED_ADAPTERS`. This extends the adapter rules. Today the only entry is
   `0809AC00` with getter `080C7B78`.
 
-Both the framed adapter and its getter are pinned byte for byte, and their
-effect is interpreted. The adapter reserves an eight-byte private local area
+Both the framed adapter and its getter are pinned byte for byte. They must
+also pass the existing `tools/two_output_callback_adapter_inventory.py`
+(`two-output-local-scalar-callback-adapter-inventory-v1`), whose manifest is
+embedded as `inventory`. Their effect is interpreted as well. The interpreter
+refuses any frame address left in R0-R3 or R12 at the callback or at the
+return, and it records the register that held the descriptor. The adapter reserves an eight-byte private local area
 and passes its two word addresses to the getter. The getter stores node word 4
 and node word 0 there, and writes nothing else. The adapter then passes the
 first local word and descriptor word zero to the descriptor word-four target
