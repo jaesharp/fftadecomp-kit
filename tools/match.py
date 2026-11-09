@@ -338,10 +338,28 @@ def issue_with_volatile_records(issue, root, address, args, records, source):
     bytes it just wrote are removed and no MATCH verdict is printed.
     """
     root = Path(root)
-    if records and args.label:
-        sys.exit("allowlisted volatile records need the unlabelled report")
     report = root / "docs" / "match" / f"{address:08X}.md"
     emitted = (root / args.emit).resolve() if args.emit else None
+    if not records:
+        # a non-user keeps the selector's own output and return value; only a
+        # source edited after the check (one that may now use the object) is refused
+        status = issue(root, address, args)
+        try:
+            unchanged = source is not None and source_fingerprint(root, address) == source and \
+                not plausibility.allowlisted_volatile_used(root, address)
+        except (OSError, ValueError):
+            unchanged = False
+        if not unchanged:
+            if status == 0:
+                if not args.no_write:
+                    report.unlink(missing_ok=True)
+                if emitted is not None:
+                    emitted.unlink(missing_ok=True)
+            sys.exit("allowlisted volatile check is stale: source or headers changed during "
+                     "verification; re-run match.py")
+        return status
+    if args.label:
+        sys.exit("allowlisted volatile records need the unlabelled report")
     captured = io.StringIO()
     try:
         with contextlib.redirect_stdout(captured):
