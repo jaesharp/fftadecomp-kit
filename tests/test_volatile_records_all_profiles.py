@@ -217,9 +217,21 @@ class AddressedRuntimeRecordTests(unittest.TestCase):
         with patch.object(addressed, "build", return_value=result), \
                 patch.object(match, "allowlisted_volatile_check", side_effect=raced):
             status, output = run_main(self.argv(root))
+        # a non-user's selector output is not held back, but the run exits
+        # non-zero with the refusal and its report is removed
         self.assertIn("source or headers changed", status)
-        self.assertNotIn("verdict MATCH", output)
         self.assertFalse((root / f"docs/match/{A:08X}.md").exists())
+
+    def test_non_user_selector_result_passes_through(self):
+        root, _ = self.tree()
+        (root / f"src/{A:08X}.c").write_text("/* synthetic source token */\n")
+
+        def selector(*args):
+            print("selector output")
+            return 19
+        with patch.object(addressed, "issue", side_effect=selector):
+            status, output = run_main(self.argv(root))
+        self.assertEqual((status, output), (19, "selector output\n"))
 
     def test_sources_without_the_object_are_unchanged(self):
         root, f = self.tree()
