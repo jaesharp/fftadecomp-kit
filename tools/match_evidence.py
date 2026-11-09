@@ -915,7 +915,7 @@ VOLATILE_RECORD_ANCHOR = "* source plausibility: plausible"
 
 
 def volatile_record_lines(report):
-    return [line for line in report.splitlines()
+    return [line for line in report.split("\n")
             if line.lstrip().startswith(VOLATILE_RECORD_PREFIX)]
 
 
@@ -940,14 +940,21 @@ def carry_volatile_records(report, records):
 def strip_volatile_records(report, records):
     """the report without its allowlisted volatile records, once they equal `records`.
 
-    report_matches checks the records here, centrally, and hands each profile
+    The records must sit, contiguous and in order, directly after the single
+    `* source plausibility: plausible` line, where every writer puts them.
+    report_matches checks them here, centrally, and hands each profile
     validator the report as that profile's writer rendered it.
     """
-    if volatile_record_lines(report) != list(records):
+    records = list(records)
+    if volatile_record_lines(report) != records:
         raise ValueError("allowlisted volatile records differ from the recomputed records")
     if not records:
         return report
-    return "\n".join(line for line in report.split("\n") if line not in records)
+    lines = report.split("\n")
+    anchors = [index for index, line in enumerate(lines) if line == VOLATILE_RECORD_ANCHOR]
+    if len(anchors) != 1 or lines[anchors[0] + 1:anchors[0] + 1 + len(records)] != records:
+        raise ValueError("allowlisted volatile records do not directly follow the plausible-source line")
+    return "\n".join(lines[:anchors[0] + 1] + lines[anchors[0] + 1 + len(records):])
 
 
 def report_matches(report, root, address):

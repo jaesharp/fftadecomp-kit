@@ -8,6 +8,7 @@ records centrally and hands each profile validator the report without them.
 import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -33,12 +34,17 @@ SYMBOL = ENTRY["symbol"]
 SEMANTICS = volatile_semantics.record(SYMBOL, [(f"func_{A:08X}", 1, [2], [])])
 HEADER = ("#ifndef CONTROL_FLAGS_H\n#define CONTROL_FLAGS_H\n"
           "typedef unsigned char u8;\ntypedef unsigned short u16;\n{declaration}\n#endif\n")
+# the first two volatile byte members of the entry's declaration, so the
+# tests follow the allowlist entry whatever its members are called
+PINNED = re.findall(r"\bvolatile u8 (\w+) : 8;", ENTRY["declaration"])[:2]
+STORE = f"{SYMBOL}.{PINNED[0]} = 1;"
+PLANTED = f"(void){SYMBOL}.{PINNED[0]}; {SYMBOL}.{PINNED[1]} = 1;"
 SCRATCH = Path(__file__).resolve().parents[1] / "build/tests"
 COMPILER = (Path(os.path.expandvars(match.DEFAULT_CC)).is_file() and shutil.which("cpp") and
             shutil.which("arm-none-eabi-as") and shutil.which("arm-none-eabi-objcopy"))
 
 
-def header_user(root, body=f"{SYMBOL}.unknown_3C = 1;"):
+def header_user(root, body=STORE):
     """a decomp tree whose addressed source uses the allowlisted object"""
     for name in ("src", "include", "config", "symbols", "docs/match", "build"):
         (root / name).mkdir(parents=True, exist_ok=True)
@@ -92,7 +98,12 @@ class RecordPlacementTests(unittest.TestCase):
         carried = match_evidence.carry_volatile_records(self.REPORT, self.RECORDS)
         for report, records in ((carried, self.RECORDS[:1]), (self.REPORT, self.RECORDS),
                                 (carried, []), (carried.replace("semantics: `s`", "semantics: `t`"), self.RECORDS),
-                                (carried.replace(self.RECORDS[1], "  " + self.RECORDS[1]), self.RECORDS)):
+                                (carried.replace(self.RECORDS[1], "  " + self.RECORDS[1]), self.RECORDS),
+                                (self.REPORT + "\n".join(self.RECORDS) + "\n", self.RECORDS),
+                                (carried.replace(self.RECORDS[0] + "\n", "* other: z\n" + self.RECORDS[0] + "\n"),
+                                 self.RECORDS),
+                                (carried.replace(self.RECORDS[1], "* other: z\n" + self.RECORDS[1]), self.RECORDS),
+                                (carried + "* source plausibility: plausible\n", self.RECORDS)):
             with self.subTest(report=report, records=records), self.assertRaises(ValueError):
                 match_evidence.strip_volatile_records(report, records)
 
@@ -189,6 +200,27 @@ class AddressedRuntimeRecordTests(unittest.TestCase):
         self.assertNotIn("verdict MATCH", output)
         self.assertFalse((root / f"docs/match/{A:08X}.md").exists())
 
+    def test_source_that_becomes_a_user_after_the_check_is_refused(self):
+        # review repro (race.py): the check sees a non-user, then the source
+        # starts including the header before the selector writes its report
+        root, f = self.tree()
+        source = root / f"src/{A:08X}.c"
+        source.write_text("/* synthetic source token */\n")
+        result = self.synthetic_result(root, f)
+        check = match.allowlisted_volatile_check
+
+        def raced(*args):
+            outcome = check(*args)
+            self.assertEqual(outcome[:2], ([], None))
+            source.write_text('#include "control_flags.h"\n/* synthetic source token */\n')
+            return outcome
+        with patch.object(addressed, "build", return_value=result), \
+                patch.object(match, "allowlisted_volatile_check", side_effect=raced):
+            status, output = run_main(self.argv(root))
+        self.assertIn("source or headers changed", status)
+        self.assertNotIn("verdict MATCH", output)
+        self.assertFalse((root / f"docs/match/{A:08X}.md").exists())
+
     def test_sources_without_the_object_are_unchanged(self):
         root, f = self.tree()
         (root / f"src/{A:08X}.c").write_text("/* synthetic source token */\n")
@@ -218,7 +250,7 @@ class OwnerRuntimeRecordTests(unittest.TestCase):
     """--owner-runtime-profile: the owner validator re-renders and compares exactly"""
     DATA = bytes.fromhex("7047")
 
-    def tree(self, body=f"{SYMBOL}.unknown_3C = 1;"):
+    def tree(self, body=STORE):
         SCRATCH.mkdir(parents=True, exist_ok=True)
         directory = tempfile.TemporaryDirectory(prefix="volatile_owner_", dir=SCRATCH)
         self.addCleanup(directory.cleanup)
@@ -282,7 +314,7 @@ class OwnerRuntimeRecordTests(unittest.TestCase):
 
     @unittest.skipUnless(COMPILER, "fixed compiler required")
     def test_compiled_planted_read_is_implausible_on_profile_paths(self):
-        root = self.tree(f"(void){SYMBOL}.unknown_3C; {SYMBOL}.unknown_3D = 1;")
+        root = self.tree(PLANTED)
         for module, argv in ((owner, ["--owner-runtime-profile", SELECTOR]),
                              (addressed, ["--addressed-signed-runtime-profile", addressed.SELECTOR])):
             with self.subTest(selector=argv[0]), \
@@ -293,6 +325,33 @@ class OwnerRuntimeRecordTests(unittest.TestCase):
                 self.assertIn("dead load", status)
                 self.assertNotIn("MATCH", output)
                 self.assertFalse((root / f"docs/match/{A:08X}.md").exists())
+
+
+@unittest.skipUnless(COMPILER, "fixed compiler required")
+class GenericPathRaceTests(unittest.TestCase):
+    """the generic writer refuses a source edited after the volatile check"""
+
+    def test_source_edited_after_the_check_is_refused(self):
+        SCRATCH.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="volatile_generic_", dir=SCRATCH) as directory:
+            root = Path(directory)
+            header_user(root)
+            source = root / f"src/{A:08X}.c"
+            source.write_text(f"int func_{A:08X}(int a)\n{{\n    return a + 1;\n}}\n")
+            (root / "symbols/functions.txt").write_text(f"{A:08X} {A + 4:08X} 4 2 return\n")
+            (root / "baserom.bin").write_bytes(bytes(A - match.ROM_BASE + 0x100))
+            check = match.allowlisted_volatile_check
+
+            def raced(*args):
+                outcome = check(*args)
+                source.write_text('#include "control_flags.h"\n' + source.read_text())
+                return outcome
+            with patch.dict(os.environ, FFTA_ROM=str(root / "baserom.bin")), \
+                    patch.object(match, "allowlisted_volatile_check", side_effect=raced):
+                status, output = run_main(["--root", str(root), f"{A:08X}"])
+            self.assertIn("source or headers changed", str(status))
+            self.assertNotIn("verdict", output)
+            self.assertFalse((root / f"docs/match/{A:08X}.md").exists())
 
 
 if __name__ == "__main__":
