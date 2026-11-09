@@ -516,10 +516,10 @@ def render_progress(progress):
     row = (f"| Bytes matched (index span) | {done:,} / {total:,} | "
            f"**{frac * 100:.2f}%** | `{bar(frac)}` |")
     note = ("Both byte denominators are provisional. Layout labels undercount\n"
-            "code; index spans can run long or cover code-like data. The true\n"
-            "figure lies between the two byte rows. The index-span row divides\n"
-            "the union of matched entries' spans by the union, overlaps merged,\n"
-            f"of every entry span starting below `0x{CODE_END:08X}`.")
+            "code; index spans can run long or cover code-like data. Neither\n"
+            "denominator is established. The index-span row divides the union\n"
+            "of matched entries' spans by the union, overlaps merged, of every\n"
+            f"entry span starting below `0x{CODE_END:08X}`.")
     rows = []
     for base, region_total, region_done, count, count_done in progress["regions"]:
         part = region_done / region_total if region_total else 0.0
