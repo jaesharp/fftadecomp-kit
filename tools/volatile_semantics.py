@@ -80,7 +80,19 @@ effect): reading a pinned member twice where an ordinary declaration would
 reuse the first value (`if (x) ...; if (x) ...`) is refused, as are loops
 whose exit depends on unknown values, stripped compiles that legally reorder
 accesses around a pinned one, and equivalent code that the expression
-normaliser cannot prove equal.
+normaliser cannot prove equal.  For halfword members that includes a narrow
+read (`(u8)sym.h`, `sym.h & 0xFF`), which the stripped compile narrows to an
+`ldrb` of the low byte that the overlap rule refuses; a signed read
+(`(s16)sym.h`), whose `lsl`/`asr` the normaliser does not equate with the
+other compile's sign extension; and the mixed chain `sym.h = (sym.b = a)`,
+whose zero-extended byte the normaliser does not equate with the stripped
+compile's `lsl #24; lsr #24` (`sym.b = (sym.h = a)` passes).
+
+Without the permuted compile, an alias store paired with a planted read
+(`(void)sym.h; p[1] = 0x100;` with `p` derived from another member) has the
+shape of a read-modify-write store and passes the real/stripped rules; the
+permutation is its only guard (the lexical provenance rules are defence in
+depth).
 """
 
 import re
@@ -139,10 +151,16 @@ def members(declaration):
         if rest[:1] == ["*"]:
             size, rest = 4, rest[1:]
         count, bit_field = 1, False
+        if len(rest) in (3, 4) and rest[1] in ("[", ":"):
+            try:
+                number = int(rest[2], 0)
+            except ValueError:
+                raise SemanticError(f"pinned declaration member `{' '.join(member)}` has an "
+                                    "unreadable size or width") from None
         if len(rest) == 4 and rest[1] == "[" and rest[3] == "]":
-            count, rest = int(rest[2], 0), rest[:1]
+            count, rest = number, rest[:1]
         elif len(rest) == 3 and rest[1] == ":":
-            if int(rest[2], 0) != 8 * size:
+            if number != 8 * size:
                 raise SemanticError("only full-width bit-fields can be modelled")
             rest, bit_field = rest[:1], True
         if len(rest) != 1 or not re.fullmatch(r"[A-Za-z_]\w*", rest[0]):
@@ -558,6 +576,7 @@ class Record:
         self.reads, self.writes = set(reads), set(writes)
         self.address = self.width = self.value_register = None
         self.signed = self.forwarded = self.copy = self.constant = self.self_assignment = False
+        self.immediate = False
         self.guarded = set()
         self.__dict__.update(fields)
 
@@ -931,7 +950,7 @@ class Executor:
                 low = [f"r{n}" for n in range(8)]
                 if immediate(sources[0]) is not None:
                     self.flags = ("nz", result)
-                    record.constant = True
+                    record.constant = record.immediate = True
                 elif destination in low and register(sources[0]) in low:
                     # a low-register `mov` assembles as `adds rd, rm, #0`
                     self.flags = ("cmn", result, 0)
@@ -1146,8 +1165,11 @@ def read_modify_write_store(records, position, address, width):
     load and the `strb`/`strh` are immediate `mov`s and arithmetic on known
     constants (its own value - `mov #128; lsl #1` for a halfword 0x100 - or
     a later store's hoisted constant in 08050D50) and register copies or
-    literal loads that write a register the store reads (08122C6C copies
-    the address).  Anything else in between - arithmetic, another memory
+    literal loads (08122C6C copies the address).  Apart from an immediate
+    `mov`, a copy or literal load must write a register whose value reaches
+    the store's operands (its value or address register) through copies,
+    and constant arithmetic must reach the store's value register.
+    Anything else in between - arithmetic on unknown values, another memory
     access, a call or a branch - means the load was not emitted by the
     store.  The store must have the load's width and address.
     """
@@ -1157,8 +1179,25 @@ def read_modify_write_store(records, position, address, width):
         if record.kind == "store":
             if record.width != width or record.address != address:
                 return None
-            if any(not step.constant and not record.reads >= step.writes for step in between):
-                return None
+            def feeding(registers):
+                """the steps whose result reaches registers through copies"""
+                live, found = set(registers), set()
+                for step in reversed(between):
+                    if step.writes & live:
+                        found.add(step.index)
+                        live -= step.writes
+                        if step.copy:
+                            live |= step.reads
+                return found
+            operands, value = feeding(record.reads), feeding({record.value_register})
+            for step in between:
+                if step.immediate:
+                    continue
+                if step.constant and not step.copy and step.kind != "literal":
+                    if step.index not in value:      # constant arithmetic builds the stored value
+                        return None
+                elif step.index not in operands:
+                    return None
             return later
         if not (record.kind == "literal" or record.copy or record.constant):
             return None

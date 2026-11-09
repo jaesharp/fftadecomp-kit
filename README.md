@@ -1745,8 +1745,9 @@ symbolically along every path, and the check requires:
     destination is overwritten before any use, followed by its store of the
     same width to the same member with nothing in between but constant
     materialisation (immediate `mov`s, and arithmetic on known constants such
-    as `mov #128; lsl #1` for a halfword `0x100`) and copies or literal loads
-    into the store's own operand registers. agbcc computes any other stored
+    as `mov #128; lsl #1` for a halfword `0x100`, whose result must reach the
+    store's value register through copies) and copies or literal loads whose
+    result reaches the store's own operand registers through copies. agbcc computes any other stored
     value before the load, and 08028C34, 08050D50, 08050DA0, 08122C6C (bytes)
     and 080034B8, 080032F8 (halfwords) show exactly this shape;
   - a **chained re-read** for `a = (b = v)`: a load of the member, at its
@@ -1789,7 +1790,12 @@ compile's. In both compiles any access that overlaps a pinned member without
 being exactly it is refused, so only an access of the member's own offset
 and width can touch one.
 
-The security argument rests on these compiler-enforced checks. On the
+The security argument rests on these compiler-enforced checks. For an
+alias store paired with a planted read (`(void)sym.bg0cnt; p[1] = 0x100;`
+with `p` derived from another member), the permuted compile is the only
+compiler-enforced guard: the pair has the shape of a read-modify-write store,
+so the real/stripped rules accept it, and only the permutation shows that
+the store does not follow `bg0cnt`. On the
 preprocessed text, the check also refuses every occurrence of the symbol
 that is not `symbol.member`, apart from the pinned declaration itself. It
 refuses the plausibility `&` and subscript rules there too. The lexical
@@ -1875,7 +1881,16 @@ has these gaps:
   order.
 * The read-modify-write shape is empirical. It comes from agbcc's output for
   the recoveries, and a genuine store whose value is computed between its
-  load and its `strb` would be refused.
+  load and its store would be refused. Only constant arithmetic whose result
+  reaches the store's value register through copies, and copies or literal
+  loads that reach the store's operands, may sit there.
+* Halfword members have further false refusals. A narrow read
+  (`(u8)symbol.bg0cnt`, `symbol.bg0cnt & 0xFF`) is refused because the
+  stripped compile narrows it to an `ldrb` of the low byte, which the overlap
+  rule refuses. A signed read (`(s16)symbol.bg0cnt`) is refused because the
+  normaliser does not equate the two compiles' sign extensions. The mixed
+  chain `symbol.bg0cnt = (symbol.win0h_lo = a)` is refused, while
+  `symbol.win0h_lo = (symbol.bg0cnt = a)` passes.
 * It reasons about agbcc's assembly. It assumes cc1's output is what the
   assembler encodes.
 * It does not police reads that stay in both compiles. These are ordinary

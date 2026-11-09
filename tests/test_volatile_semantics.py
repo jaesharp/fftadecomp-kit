@@ -61,7 +61,9 @@ class SemanticDiffTests(unittest.TestCase):
         for broken in (DECLARATION.replace(": 8", ": 4"), DECLARATION.replace("u16", "float"),
                        DECLARATION.replace("volatile u8 unknown_3D : 8", "volatile u32 unknown_3D : 32"),
                        DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt : 8"),
-                       DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt[1]")):
+                       DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt[1]"),
+                       DECLARATION16.replace("volatile u16 bg1cnt : 16", "volatile u16 bg1cnt : 016"),
+                       DECLARATION16.replace("[0x34]", "[064]")):
             with self.subTest(declaration=broken), self.assertRaises(semantics.SemanticError):
                 semantics.object_layout(broken)
 
@@ -337,6 +339,23 @@ class SemanticDiffTests(unittest.TestCase):
                          "strh\tr0, [r1, #4]", "bx\tlr")
         self.assertEqual(self.compare16(built, built.replace("ldrh\tr2, [r1, #4]\n\t", ""))[0][1:],
                          (1, [1], []))
+        # the constant may reach the value register through a copy, as a
+        # literal may; a constant built into any other register may not sit there
+        for name, window, accepted in (
+                ("copied constant", "mov\tr3, #128\n\tlsl\tr3, r3, #1\n\tadd\tr0, r3, #0", True),
+                ("copied literal", "ldr\tr3, .L3+4\n\tadd\tr0, r3, #0", True),
+                ("unrelated constant", "mov\tr3, #128\n\tlsl\tr3, r3, #1\n\tmov\tr0, #1", False),
+                ("unrelated literal", "ldr\tr3, .L3+4\n\tmov\tr0, #1", False)):
+            shaped = built.replace("mov\tr0, #128\n\tlsl\tr0, r0, #1", window).replace(
+                f".word\t{SYMBOL}\n", f".word\t{SYMBOL}\n\t.word\t0x1234\n")
+            with self.subTest(window=name):
+                if accepted:
+                    self.assertEqual(self.compare16(shaped, shaped.replace("ldrh\tr2, [r1, #4]\n\t", ""))[0][1:3],
+                                     (1, [1]))
+                else:
+                    with self.assertRaises(semantics.SemanticError) as caught:
+                        self.compare16(shaped, shaped.replace("ldrh\tr2, [r1, #4]\n\t", ""))
+                    self.assertIn("not directly followed by a store", str(caught.exception))
         computed = built.replace("mov\tr0, #128\n\tlsl\tr0, r0, #1", "lsl\tr0, r0, #1")
         with self.assertRaises(semantics.SemanticError) as caught:
             self.compare16(computed, computed.replace("ldrh\tr2, [r1, #4]\n\t", ""))
@@ -710,27 +729,37 @@ class CompiledSemanticTests(unittest.TestCase):
                 self.assertIn(reason, str(caught.exception))
 
     def test_compiled_layout_equals_the_modelled_layout(self):
-        """agbcc places every pinned member where pinned_members() says"""
+        """agbcc places every member, pinned or not, of the shipped declaration
+        and of its permuted form where members() says"""
         import re
         import subprocess
-        declaration = plausible.volatile_allow_entries()[0]["declaration"]
-        layout, size = semantics.members(declaration)
-        names = [name for _, name, _, _, qualified in layout if qualified]
-        source = ("typedef unsigned char u8;\ntypedef unsigned short u16;\n" + declaration +
-                  "\nint size(void) { return sizeof(" + SYMBOL + "); }\n" +
-                  "".join(f"int l_{name}(void) {{ return {SYMBOL}.{name}; }}\n" for name in names))
-        output = subprocess.run([os.path.expandvars(match.DEFAULT_CC), "-mthumb-interwork", "-O2"],
-                                input=source, capture_output=True, text=True, check=True).stdout
-        compiled = {}
-        for found in re.finditer(r"^l_(\w+):\n(.*?)\.size", output, re.S | re.M):
-            body = found[2]
-            added = re.search(r"add\tr\d, r\d, #(\d+)", body)
-            load = re.search(r"ldr(b|h)\tr\d, \[r\d(?:, #(\d+))?\]", body)
-            compiled[found[1]] = (int(added[1]) if added else 0) + int(load[2] or 0), \
-                {"b": 1, "h": 2}[load[1]]
-        self.assertEqual(compiled, {name: (offset, width) for _, name, offset, width, qualified in layout
-                                    if qualified})
-        self.assertIn(f"mov\tr0, #{size}", output)
+        shipped = plausible.volatile_allow_entries()[0]["declaration"]
+        for label, declaration in (("shipped", shipped),
+                                   ("permuted", semantics.perturbed_declaration(shipped)[0])):
+            layout, size = semantics.members(declaration)
+            # u8 arrays are read through their first element
+            arrays = {name for _, name, _, _, _ in layout
+                      if re.search(r"\b" + name + r"\s*\[", declaration)}
+            source = ("typedef unsigned char u8;\ntypedef unsigned short u16;\n" + declaration +
+                      "\nint size(void) { return sizeof(" + SYMBOL + "); }\n")
+            for _, name, _, _, _ in layout:
+                source += (f"int l_{name}(void) {{ return {SYMBOL}.{name}"
+                           f"{'[0]' if name in arrays else ''}; }}\n")
+            output = subprocess.run([os.path.expandvars(match.DEFAULT_CC), "-mthumb-interwork", "-O2"],
+                                    input=source, capture_output=True, text=True, check=True).stdout
+            compiled = {}
+            for found in re.finditer(r"^l_(\w+):\n(.*?)\.size", output, re.S | re.M):
+                body = found[2]
+                added = sum(int(n) for n in re.findall(r"add\tr\d, r\d, #(\d+)", body))
+                load = re.search(r"ldr(b|h)\tr\d, \[r\d(?:, #(\d+))?\]", body)
+                compiled[found[1]] = added + int(load[2] or 0), {"b": 1, "h": 2}[load[1]]
+            expected = {name: (offset, 1 if name in arrays else width)
+                        for _, name, offset, width, _ in layout}
+            with self.subTest(declaration=label):
+                self.assertEqual(compiled, expected)
+                self.assertEqual(len(compiled), len(layout))
+                self.assertIn(f"mov\tr0, #{size}", output)
+
 
 
 if __name__ == "__main__":
