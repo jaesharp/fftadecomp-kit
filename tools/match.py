@@ -311,12 +311,14 @@ def allowlisted_volatile_check(root, address, args):
     record and the semantic check run for every profile.  `finding` is None when
     the source uses no allowlisted object or both checks pass; otherwise it is
     the plausibility finding that makes the source IMPLAUSIBLE on every path.
+    The source SHA-256 is taken before the uses record, for users and
+    non-users alike, so a later edit (one that adds a use, say) is refused.
     """
     try:
+        source = source_fingerprint(root, address)
         records = plausibility.allowlisted_volatile_uses(root, address)
         if not records:
-            return [], None, None
-        source = source_fingerprint(root, address)
+            return [], None, source
     except VOLATILE_CHECK_ERRORS as error:
         return [], f"allowlisted volatile record failed: {error}", None
     runner = Runner(args.cc, args.wsl, args.wsl_path, root=str(root), timeout=SIGNED_REPLAY_TIMEOUT)
@@ -331,14 +333,12 @@ def issue_with_volatile_records(issue, root, address, args, records, source):
     """run a selector's own report writer and carry the volatile records into its report.
 
     The selector's output is held back until its report carries `records`
-    (match_evidence.carry_volatile_records) and the source is unchanged since
-    the check; if either fails, the report and any emitted bytes it just wrote
-    are removed and no MATCH verdict is printed.
+    (match_evidence.carry_volatile_records; none for a non-user) and the source
+    is unchanged since the check; if either fails, the report and any emitted
+    bytes it just wrote are removed and no MATCH verdict is printed.
     """
     root = Path(root)
-    if not records:
-        return issue(root, address, args)
-    if args.label:
+    if records and args.label:
         sys.exit("allowlisted volatile records need the unlabelled report")
     report = root / "docs" / "match" / f"{address:08X}.md"
     emitted = (root / args.emit).resolve() if args.emit else None
@@ -358,8 +358,10 @@ def issue_with_volatile_records(issue, root, address, args, records, source):
             raise ValueError("the selector printed no single MATCH verdict")
         if not args.no_write:
             text = report.read_bytes().decode("utf-8")
-            report.write_bytes(carry_volatile_records(text, records).encode("utf-8"))
-        if source_fingerprint(root, address) != source:
+            carried = carry_volatile_records(text, records)
+            if carried != text:
+                report.write_bytes(carried.encode("utf-8"))
+        if source is None or source_fingerprint(root, address) != source:
             raise ValueError("source or headers changed during verification; re-run match.py")
     except (OSError, ValueError, UnicodeError) as error:
         if not args.no_write and status == 0:

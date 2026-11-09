@@ -390,7 +390,8 @@ class ReportRecordTests(unittest.TestCase):
     SEMANTICS = semantics.record(SYMBOL, [("func_08028C34", 1, [2, 6], [])])
 
     def report(self, *records):
-        return "\n".join(("* verification: x",) + records + ("", "**MATCH - byte identical** - 4/4 bytes", ""))
+        return "\n".join(("* verification: x", "* source plausibility: plausible") + records +
+                         ("* hand-asm allow list: not listed", "", "**MATCH - byte identical** - 4/4 bytes", ""))
 
     def matches(self, report, semantic_records=None, error=None):
         def fresh(root, address):
@@ -410,6 +411,13 @@ class ReportRecordTests(unittest.TestCase):
         self.assertFalse(self.matches(self.report(self.USES)))
         self.assertFalse(self.matches(self.report(self.USES, self.SEMANTICS.replace("[3, 7]", "[3]"))))
         self.assertFalse(self.matches(self.report(self.USES, self.SEMANTICS, self.SEMANTICS)))
+        # the records sit together directly after the plausible-source line
+        placed = self.report(self.USES, self.SEMANTICS)
+        self.assertFalse(self.matches(placed.replace(f"{self.USES}\n{self.SEMANTICS}\n", "") +
+                                      f"{self.USES}\n{self.SEMANTICS}\n"))
+        self.assertFalse(self.matches(placed.replace(f"{self.USES}\n", f"* other: y\n{self.USES}\n")))
+        self.assertFalse(self.matches(placed.replace(f"{self.USES}\n{self.SEMANTICS}",
+                                                     f"{self.USES}\n* other: y\n{self.SEMANTICS}")))
         self.assertFalse(self.matches(self.report(self.USES, self.SEMANTICS),
                                       semantic_records=[self.SEMANTICS.replace("1 path", "2 paths")]))
         self.assertFalse(self.matches(self.report(self.USES, self.SEMANTICS),
